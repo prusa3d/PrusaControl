@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-# -*- coding: utf-8 -*-
-
-=======
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import kivy
@@ -11,6 +6,7 @@ import locale
 
 
 __author__ = 'Tibor Vavra'
+
 
 class Config():
 	def __init__(self):
@@ -59,4 +55,3 @@ class MultiLanguage(object):
 
     def setLanguage(self, lang):
         self.language = lang
->>>>>>> a007b1d5576f357a833085e3871ee58a3a0bcce1

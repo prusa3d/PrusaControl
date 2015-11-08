@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 
 class SlicerEngineManager():
@@ -28,9 +27,4 @@ class OwnSlicerEngine(SlicerEngineAbstract):
 	Future
 	'''
 	pass
-=======
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-__author__ = 'Tibor Vavra'
->>>>>>> a007b1d5576f357a833085e3871ee58a3a0bcce1

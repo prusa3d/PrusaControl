@@ -47,8 +47,6 @@ class ModelTypeStl(ModelTypeAbstract):
 		print "this is STL file reader"
 		mesh = mesh.Mesh.from_file(filename)
 		
-		model = Model() 
-		model.vertexArray = mesh
-		model.faceArray =
+		model = Model()
 
 

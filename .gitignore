@@ -1,2 +1,4 @@
 #No compiled files
 *.pyc
+*.sublime-project
+*.sublime-workspace
