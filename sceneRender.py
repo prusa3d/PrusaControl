@@ -10,7 +10,7 @@ class PrusaControllWidget(FloatLayout):
 	pass
 
 
-class CenteredCamera():
+class CenteredCamera(object):
 	'''
 	Special camera class, this camera is centered on scene and rotate around
 	it can zoom in and out
@@ -26,7 +26,7 @@ class SceneRenderer(CenteredCamera):
 	pass
 
 
-class Scene():
+class Scene(object):
 	'''
 	Scene is class representing data from AppScene, it is simplificated data of scene, rendering is less important then printing
 	'''

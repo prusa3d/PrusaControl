@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-class SlicerEngineManager():
+class SlicerEngineManager(object):
 	'''
 	SlicerEngineManager is class designed for managing slicers engine and prepare parameters
 	'''
 	pass
 
 
-class SlicerEngineAbstract():
+class SlicerEngineAbstract(object):
 	'''
 	SlicerEngineAbstract is abstract class patern for others SlicerEngines
 	'''
