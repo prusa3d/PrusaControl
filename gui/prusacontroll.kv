@@ -1,0 +1,95 @@
+#:kivy 1.9.0
+
+
+<PrusaControllWidget>:
+    BoxLayout:
+        orientation: 'vertical'
+		size: root.size
+        ActionBar:
+            id: topBar
+
+			size_hint: (1, .07)
+            pos_hint: {'top':1}
+
+            ActionView:
+                #icon: 'gui/logo.png'
+                use_separator: True
+                ActionButton:
+                    icon: 'gui/shopping.png'
+                    text: 'shop'
+                ActionButton:
+                    icon: 'gui/help.png'
+                    text: 'help'
+                ActionButton:
+                    icon: 'gui/settings.png'
+                    text: 'settings'
+                    #on_press: app.open_settings()
+                ActionPrevious:
+                    app_icon: 'gui/logo.png'
+                    title: ''
+                    with_previous: False
+        BoxLayout:
+			orientation: 'horizontal'
+
+		    RendererBasic:
+		        size: self.size
+		        pos: self.pos
+
+            Widget:
+                id: sideBar
+                size_hint: (topBar.size_hint[1], 1)
+                canvas:
+                    Rectangle:
+                        source: 'atlas://data/images/defaulttheme/action_bar'
+                        size: self.size
+						pos: self.pos
+
+                BoxLayout:
+                    padding: 2
+                    spacing: 2
+                    orientation: 'vertical'
+                    size_hint: sideBar.size_hint
+                    size: sideBar.size
+					pos: sideBar.pos
+					ActionToggleButton:
+					    id: moveBtn
+					    icon: 'gui/move.png'
+					    group: 'tools'
+                        size_hint: (1, 0.3)
+                        pos_hint: {'top':1}
+                        #text: 'move'
+                    ActionToggleButton:
+                        id: rotateBtn
+                        icon: 'gui/rotate.png'
+                        group: 'tools'
+                        size_hint: (1, 0.3)
+                        pos_hint: {'top':1}
+                        #text: 'rotate
+                    ActionToggleButton:
+                        id: scaleBtn
+                        icon: 'gui/resize.png'
+                        group: 'tools'
+                        size_hint: (1, 0.3)
+                        pos_hint: {'top':1}
+                        #text: 'scale'
+
+                    Label:
+                        text: ''
+
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        ActionButton:
+                            id: saveBtn
+                            icon: 'gui/save.png'
+                            size_hint: (1, 0.2)
+                            text: 'save'
+                        ActionButton:
+                            id: openBtn
+                            icon: 'gui/open.png'
+                            size_hint: (1, 0.2)
+                            text: 'open'
+                    Button:
+                        id: printBtn
+                        pos_hint: {'top':0}
+                        size_hint: (1, 0.2)
+                        text: 'print'

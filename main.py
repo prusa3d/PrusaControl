@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from kivy.uix.label import Label
 
 from stl import *
 
@@ -8,6 +8,8 @@ import kivy
 from kivy.app import App
 
 from sceneRender import *
+from sceneData import *
+from utilities import *
 
 __author__ = 'Tibor Vavra'
 
@@ -35,13 +37,6 @@ class TestUM:
 	def test_strings_b_2(self):
 		print 'test_strings_b_2()  <============================ actual test code'
 
-
-'''
-if __name__ == "__main__":
-	f = Open('z.stl', 'r')
-	data = stl.read_binary_file(f)
-	print(str(data))
-'''
 
 class PrusaControllApp(App):
 	kv_directory = 'gui'
