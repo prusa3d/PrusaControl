@@ -75,17 +75,64 @@
 					pos: sideBar.pos
 
 					Label:
-						size_hint: (1, 0.3)
+						font_size: '20sp'
+						text_size: self.size
+						halign: 'left'
+						valign: 'middle'
+						size_hint: (1, 0.35)
 						text: 'Material'
-					Button:
+					Spinner:
 						size_hint: (1, 0.3)
+						value: ('PLA', 'ABS')
 						text: 'PLA'
 					Label:
+						font_size: '20sp'
+						text_size: self.size
+						halign: 'left'
+						valign: 'middle'
+						size_hint: (1, 0.35)
+						text: 'Quality'
+					Spinner:
 						size_hint: (1, 0.3)
-						text: 'Infill'
-					Button:
+						value: ('Low 0.4mm', 'Normal 0.2mm', 'High 0.05mm')
+						text: 'Normal 0.2mm'
+					Label:
+						font_size: '20sp'
+						text_size: self.size
+						halign: 'left'
+						valign: 'middle'
+						size_hint: (1, 0.35)
+						text: 'Infill % ' + str(infillSldr.value)
+					Slider:
+						id: infillSldr
 						size_hint: (1, 0.3)
-						text: '100%'
+						step: 20
+					BoxLayout:
+						padding: 2
+						spacing: 2
+						orientation: 'horizontal'
+						size_hint: (1, 0.3)
+						CheckBox:
+							id: supportChck
+							size_hint: (.25, 1)
+						Label:
+							text_size: self.size
+							halign: 'left'
+							valign: 'middle'
+							text: 'Support material'
+					BoxLayout:
+						padding: 2
+						spacing: 2
+						orientation: 'horizontal'
+						size_hint: (1, 0.3)
+						CheckBox:
+							id: brimChck
+							size_hint: (.25, 1)
+						Label:
+							text_size: self.size
+							halign: 'left'
+							valign: 'middle'
+							text: 'Brim'
 
 					#vyplnovy widget aby mezi nastavenim a tlacitkama byla mezera
 					Label:
@@ -96,16 +143,20 @@
 						orientation: 'horizontal'
 						padding: 2
 						spacing: 2
+						size_hint: (1, 0.3)
 						Button:
-							size_hint: (.5, 0.3)
-							text: 'back'
+							size_hint: (.6, 1)
+							text: 'BACK'
 							on_press:
 								sideBar.remove_widget(printMenu)
 								sideBar.size_hint=(topBar.size_hint[1], 1)
 								sideBar.add_widget(normalMenu)
+						Label:
+							size_hint: (.4, 1)
+							text: ''
 						Button:
-							size_hint: (1, 0.3)
-							text: 'Save GCode'
+							size_hint: (1, 1)
+							text: 'SAVE G-CODE'
 
 				BoxLayout:
 					id: normalMenu
@@ -160,10 +211,10 @@
 						id: printBtn
 						pos_hint: {'top':0}
 						size_hint: (1, 0.2)
-						text: 'print'
+						text: 'PRINT'
 						on_press:
 							sideBar.remove_widget(normalMenu)
-							sideBar.size_hint=(topBar.size_hint[1]*3, 1)
+							sideBar.size_hint=(topBar.size_hint[1]*5, 1)
 							sideBar.add_widget(printMenu)
 
 
