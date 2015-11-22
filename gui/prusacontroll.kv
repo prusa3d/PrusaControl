@@ -1,5 +1,24 @@
 #:kivy 1.9.0
 
+<PrintMenuClass>:
+	Widget:
+		id: PrintMenu
+		BoxLayout:
+			orientation: 'vertical'
+			size_hint: sideBar.size_hint
+			size: sideBar.size
+			pos: sideBar.pos
+		Label:
+			text: 'Material'
+		Button:
+			id: printBtn
+			text: 'material'
+		Label:
+			text: 'Quality'
+		Button:
+			id: qualityBtn
+			text: 'quality'
+
 
 <PrusaControllWidget>:
 	BoxLayout:
@@ -45,13 +64,58 @@
 						pos: self.pos
 
 				BoxLayout:
-					id: sideBarLayout
+					id: printMenu
+					#tato podminka zajisti ze tento widget nebude na zacatku zobrazen ale instance bude existovat
+					on_parent: if self.parent == sideBar: sideBar.remove_widget(printMenu)
 					padding: 2
 					spacing: 2
 					orientation: 'vertical'
 					size_hint: sideBar.size_hint
 					size: sideBar.size
 					pos: sideBar.pos
+
+					Label:
+						size_hint: (1, 0.3)
+						text: 'Material'
+					Button:
+						size_hint: (1, 0.3)
+						text: 'PLA'
+					Label:
+						size_hint: (1, 0.3)
+						text: 'Infill'
+					Button:
+						size_hint: (1, 0.3)
+						text: '100%'
+
+					#vyplnovy widget aby mezi nastavenim a tlacitkama byla mezera
+					Label:
+						text: ''
+
+					BoxLayout:
+						id: printMenuSmallLayout
+						orientation: 'horizontal'
+						padding: 2
+						spacing: 2
+						Button:
+							size_hint: (.5, 0.3)
+							text: 'back'
+							on_press:
+								sideBar.remove_widget(printMenu)
+								sideBar.size_hint=(topBar.size_hint[1], 1)
+								sideBar.add_widget(normalMenu)
+						Button:
+							size_hint: (1, 0.3)
+							text: 'Save GCode'
+
+				BoxLayout:
+					id: normalMenu
+					orientation: 'vertical'
+					size_hint: sideBar.size_hint
+					size: sideBar.size
+					pos: sideBar.pos
+					padding: 2
+					spacing: 2
+
 					ActionToggleButton:
 						id: moveBtn
 						icon: 'gui/move.png'
@@ -78,26 +142,38 @@
 						text: ''
 
 					BoxLayout:
+						id: sideBarSmallLayout
 						orientation: 'horizontal'
 						ActionButton:
 							id: saveBtn
 							icon: 'gui/save.png'
 							size_hint: (1, 0.2)
 							text: 'save'
-							on_press:
-								sideBarLayout.add_widget(printBtn)
+
 						ActionButton:
 							id: openBtn
 							icon: 'gui/open.png'
 							size_hint: (1, 0.2)
 							text: 'open'
-							on_press:
-								sideBarLayout.remove_widget(printBtn)
+
 					Button:
 						id: printBtn
 						pos_hint: {'top':0}
 						size_hint: (1, 0.2)
 						text: 'print'
+						on_press:
+							sideBar.remove_widget(normalMenu)
+							sideBar.size_hint=(topBar.size_hint[1]*3, 1)
+							sideBar.add_widget(printMenu)
+
+
+
+
+
+
+
+
+
 
 
 
