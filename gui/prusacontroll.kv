@@ -1,6 +1,54 @@
 #:kivy 1.9.0
 
 
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            filters: ['*.stl', '*.prus']
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)
+
+<SaveDialog>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            filters: ['*.prus']
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release: root.save(filechooser.path, text_input.text)
+
 <PrusaControllWidget>:
 	BoxLayout:
 		id: mainVerticalLayout
@@ -149,7 +197,7 @@
 						source: 'atlas://data/images/defaulttheme/action_bar'
 						size: self.size
 						pos: self.pos
-
+#PrintMenu########################################
 				BoxLayout:
 					id: printMenu
 					#tato podminka zajisti ze tento widget nebude na zacatku zobrazen ale instance bude existovat
@@ -244,7 +292,10 @@
 						Button:
 							size_hint: (1, 1)
 							text: 'SAVE G-CODE'
+							on_release: root.show_save()
+###############################################
 
+#NormalMenu####################################
 				BoxLayout:
 					id: normalMenu
 					orientation: 'vertical'
@@ -295,12 +346,15 @@
 							icon: 'gui/save.png'
 							size_hint: (1, 0.2)
 							text: 'save'
+							on_release: root.show_save()
+
 
 						ActionButton:
 							id: openBtn
 							icon: 'gui/open.png'
 							size_hint: (1, 0.2)
 							text: 'open'
+							on_release: root.show_load()
 
 					Button:
 						id: printBtn
