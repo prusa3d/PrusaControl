@@ -1,24 +1,5 @@
 #:kivy 1.9.0
 
-<PrintMenuClass>:
-	Widget:
-		id: PrintMenu
-		BoxLayout:
-			orientation: 'vertical'
-			size_hint: sideBar.size_hint
-			size: sideBar.size
-			pos: sideBar.pos
-		Label:
-			text: 'Material'
-		Button:
-			id: printBtn
-			text: 'material'
-		Label:
-			text: 'Quality'
-		Button:
-			id: qualityBtn
-			text: 'quality'
-
 
 <PrusaControllWidget>:
 	BoxLayout:
@@ -57,77 +38,108 @@
 				RendererBasic:
 					size: self.size
 					pos: self.pos
-
 				Widget:
-					id: smallMenuScale
-					#tato podminka zajisti ze tento widget nebude na zacatku zobrazen ale instance bude existovat
-					on_parent: if self.parent == floatLayout: floatLayout.remove_widget(smallMenuScale)
-					pos_hint: {'x': .75, 'y': 0}
-					size_hint: (.25, .25)
-					canvas:
-						Rectangle:
-							source: 'atlas://data/images/defaulttheme/action_bar'
-							size: self.size
-							pos: self.pos
-					BoxLayout:
-						orientation: 'vertical'
-						size_hint: smallMenuScale.size_hint
-						size: smallMenuScale.size
-						pos: smallMenuScale.pos
-						Label:
-							font_size: '20sp'
-							text_size: self.size
-							halign: 'left'
-							valign: 'middle'
-							size_hint: (1, 0.35)
-							text: 'Resize'
+					id: smallMenu
+#SmallMenuScale#######################################
+					Widget:
+						id: smallMenuScale
+						#tato podminka zajisti ze tento widget nebude na zacatku zobrazen ale instance bude existovat
+						on_parent: if self.parent == smallMenu: smallMenu.remove_widget(smallMenuScale)
+						pos_hint: {'x': .75, 'y': 0}
+						size_hint: (.245, .25)
+						canvas:
+							Rectangle:
+								source: 'atlas://data/images/defaulttheme/action_bar'
+								size: self.size
+								pos: self.pos
 						BoxLayout:
-							orientation: 'horizontal'
-							size_hint: (1, .3)
-							CheckBox:
-								size_hint: (.2, 1)
+							orientation: 'vertical'
+							size_hint: smallMenuScale.size_hint
+							size: smallMenuScale.size
+							pos: smallMenuScale.pos
 							Label:
-								font_size: '15sp'
+								font_size: '20sp'
 								text_size: self.size
 								halign: 'left'
 								valign: 'middle'
-								text: 'Uniform scaling'
+								size_hint: (1, 0.35)
+								text: 'Resize'
+							BoxLayout:
+								orientation: 'horizontal'
+								size_hint: (1, .3)
+								CheckBox:
+									id: uniformChck
+									size_hint: (.2, 1)
+								Label:
+									font_size: '15sp'
+									text_size: self.size
+									halign: 'left'
+									valign: 'middle'
+									text: 'Uniform scaling'
+							BoxLayout:
+								orientation: 'horizontal'
+								size_hint: (1, .3)
+								Label:
+									font_size: '20sp'
+									text_size: self.size
+									halign: 'center'
+									valign: 'middle'
+									size_hint: (.2, 1)
+									text: 'X'
+								Slider:
+									step_size: 10
+							BoxLayout:
+								orientation: 'horizontal'
+								size_hint: (1, .3)
+								Label:
+									font_size: '20sp'
+									text_size: self.size
+									halign: 'center'
+									valign: 'middle'
+									size_hint: (.2, 1)
+									text: 'Y'
+								Slider:
+									step_size: 10
+							BoxLayout:
+								orientation: 'horizontal'
+								size_hint: (1, .3)
+								Label:
+									font_size: '20sp'
+									text_size: self.size
+									halign: 'center'
+									valign: 'middle'
+									size_hint: (.2, 1)
+									text: 'Z'
+								Slider:
+									step_size: 10
+
+#SmallMenuRotate####################################
+					Widget:
+						id: smallMenuRotate
+						#tato podminka zajisti ze tento widget nebude na zacatku zobrazen ale instance bude existovat, je mozne jej pak zobrazit
+						on_parent: if self.parent == smallMenu: smallMenu.remove_widget(smallMenuRotate)
+						pos_hint: {'x': .75, 'y': 0}
+						size_hint: (.245, .15)
+						canvas:
+							Rectangle:
+								source: 'atlas://data/images/defaulttheme/action_bar'
+								size: self.size
+								pos: self.pos
 						BoxLayout:
-							orientation: 'horizontal'
-							size_hint: (1, .3)
+							orientation: 'vertical'
+							size_hint: smallMenuRotate.size_hint
+							size: smallMenuRotate.size
+							pos: smallMenuRotate.pos
 							Label:
 								font_size: '20sp'
 								text_size: self.size
-								halign: 'center'
+								halign: 'left'
 								valign: 'middle'
-								size_hint: (.2, 1)
-								text: 'X'
+								size_hint: (1, 0.35)
+								text: 'Rotate'
 							Slider:
 								step_size: 10
-						BoxLayout:
-							orientation: 'horizontal'
-							size_hint: (1, .3)
-							Label:
-								font_size: '20sp'
-								text_size: self.size
-								halign: 'center'
-								valign: 'middle'
-								size_hint: (.2, 1)
-								text: 'Y'
-							Slider:
-								step_size: 10
-						BoxLayout:
-							orientation: 'horizontal'
-							size_hint: (1, .3)
-							Label:
-								font_size: '20sp'
-								text_size: self.size
-								halign: 'center'
-								valign: 'middle'
-								size_hint: (.2, 1)
-								text: 'Z'
-							Slider:
-								step_size: 10
+#################################################
 
 			Widget:
 				id: sideBar
@@ -158,7 +170,7 @@
 						text: 'Material'
 					Spinner:
 						size_hint: (1, 0.3)
-						value: ('PLA', 'ABS')
+						values: ('PLA', 'ABS')
 						text: 'PLA'
 					Label:
 						font_size: '20sp'
@@ -169,7 +181,7 @@
 						text: 'Quality'
 					Spinner:
 						size_hint: (1, 0.3)
-						value: ('Low 0.4mm', 'Normal 0.2mm', 'High 0.05mm')
+						values: ('Low 0.4mm', 'Normal 0.2mm', 'High 0.05mm')
 						text: 'Normal 0.2mm'
 					Label:
 						font_size: '20sp'
@@ -177,11 +189,11 @@
 						halign: 'left'
 						valign: 'middle'
 						size_hint: (1, 0.35)
-						text: 'Infill % ' + str(infillSldr.value)
+						text: 'Infill ' + str(int(infillSldr.value)) + '%'
 					Slider:
 						id: infillSldr
 						size_hint: (1, 0.3)
-						step: 20
+						step: 10
 					BoxLayout:
 						padding: 2
 						spacing: 2
@@ -249,6 +261,9 @@
 						size_hint: (1, 0.3)
 						pos_hint: {'top':1}
 						#text: 'move'
+						on_press:
+							floatLayout.remove_widget(smallMenuScale), floatLayout.remove_widget(smallMenuRotate) if moveBtn.state == 'down' else True
+
 					ActionToggleButton:
 						id: rotateBtn
 						icon: 'gui/rotate.png'
@@ -256,6 +271,9 @@
 						size_hint: (1, 0.3)
 						pos_hint: {'top':1}
 						#text: 'rotate
+						on_press:
+							floatLayout.remove_widget(smallMenuScale), floatLayout.add_widget(smallMenuRotate) if rotateBtn.state == 'down' else floatLayout.remove_widget(smallMenuRotate)
+
 					ActionToggleButton:
 						id: scaleBtn
 						icon: 'gui/resize.png'
@@ -263,7 +281,8 @@
 						size_hint: (1, 0.3)
 						pos_hint: {'top':1}
 						#text: 'scale'
-						on_press: floatLayout.add_widget(smallMenuScale) if scaleBtn.state == 'down'  else floatLayout.remove_widget(smallMenuScale)
+						on_press:
+							floatLayout.remove_widget(smallMenuRotate), floatLayout.add_widget(smallMenuScale) if scaleBtn.state == 'down' else floatLayout.remove_widget(smallMenuScale)
 
 					Label:
 						text: ''
@@ -289,6 +308,11 @@
 						size_hint: (1, 0.2)
 						text: 'PRINT'
 						on_press:
+							floatLayout.remove_widget(smallMenuRotate)
+							floatLayout.remove_widget(smallMenuScale)
+							moveBtn.state = 'normal'
+							rotateBtn.state = 'normal'
+							scaleBtn.state = 'normal'
 							sideBar.remove_widget(normalMenu)
 							sideBar.size_hint=(topBar.size_hint[1]*5, 1)
 							sideBar.add_widget(printMenu)
