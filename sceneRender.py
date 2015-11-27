@@ -85,6 +85,7 @@ class RendererBasic(Widget):
 		self.canvas = RenderContext(compute_normal_mat=True)
 		self.canvas.shader.source = resource_find('simple.glsl')
 		self.scene = ObjFile(resource_find("monkey.obj"))
+
 		super(RendererBasic, self).__init__(**kwargs)
 		with self.canvas:
 			self.cb = Callback(self.setup_gl_context)
@@ -101,7 +102,7 @@ class RendererBasic(Widget):
 		glDisable(GL_DEPTH_TEST)
 
 	def update_glsl(self, *largs):
-		Window.clearcolor = (0.75, 0.75, 0.75, 1)
+		Window.clearcolor = (0.0, 0.47, 0.62, 1)
 		asp = self.width / float(self.height)
 		proj = Matrix().view_clip(-asp, asp, -1, 1, 1, 100, 1)
 		self.canvas['projection_mat'] = proj

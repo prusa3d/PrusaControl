@@ -60,9 +60,13 @@
 			size_hint: (1, .07)
 			canvas:
 				Rectangle:
-					source: 'gui/img/up_down.png'
+					source: 'gui/img/grey.png'
 					size: self.size
 					pos: self.pos
+				BorderImage
+                    pos: self.pos
+                    size: self.size
+                    source: 'gui/img/border.png'
 			BoxLayout:
 				size_hint: topBar.size_hint
 				size: topBar.size
@@ -71,7 +75,6 @@
 				ActionButton:
 					size_hint: (.1, 1)
 					icon: 'gui/logo.png'
-					texture: texture.sizefFf
 					title: ''
 				Label:
 					text: ''
@@ -95,6 +98,7 @@
 				RendererBasic:
 					size: self.size
 					pos: self.pos
+					source: 'gui/img/background.png'
 
 
 #SmallMenuScale#######################################
@@ -106,7 +110,7 @@
 					size_hint: (.245, .25)
 					canvas:
 						Rectangle:
-							source: 'atlas://data/images/defaulttheme/action_bar'
+							source: 'gui/img/full.png'
 							size: self.size
 							pos: self.pos
 					BoxLayout:
@@ -117,6 +121,7 @@
 						Label:
 							font_size: '20sp'
 							text_size: self.size
+							color: (0,0,0,1)
 							halign: 'left'
 							valign: 'middle'
 							size_hint: (1, 0.35)
@@ -133,6 +138,7 @@
 								halign: 'left'
 								valign: 'middle'
 								text: 'Uniform scaling'
+								color: (0,0,0,1)
 						BoxLayout:
 							orientation: 'horizontal'
 							size_hint: (1, .3)
@@ -143,6 +149,7 @@
 								valign: 'middle'
 								size_hint: (.2, 1)
 								text: 'X'
+								color: (0,0,0,1)
 							Slider:
 								step_size: 10
 						BoxLayout:
@@ -155,6 +162,7 @@
 								valign: 'middle'
 								size_hint: (.2, 1)
 								text: 'Y'
+								color: (0,0,0,1)
 							Slider:
 								step_size: 10
 						BoxLayout:
@@ -167,6 +175,7 @@
 								valign: 'middle'
 								size_hint: (.2, 1)
 								text: 'Z'
+								color: (0,0,0,1)
 							Slider:
 								step_size: 10
 #SmallMenuRotate####################################
@@ -179,7 +188,7 @@
 					size_hint: (.245, .15)
 					canvas:
 						Rectangle:
-							source: 'atlas://data/images/defaulttheme/action_bar'
+							source: 'gui/img/full.png'
 							size: self.size
 							pos: self.pos
 					BoxLayout:
@@ -194,6 +203,7 @@
 							valign: 'middle'
 							size_hint: (1, 0.35)
 							text: 'Rotate'
+							color: (0,0,0,1)
 						Slider:
 							step_size: 10
 #################################################
@@ -205,9 +215,13 @@
 				canvas:
 					Rectangle:
 						#source: 'atlas://data/images/defaulttheme/action_bar'
-						source: 'gui/img/left_right.png'
+						#source: 'gui/img/grey.png'
 						size: self.size
 						pos: self.pos
+					BorderImage
+                        pos: self.pos
+                        size: self.size
+                        source: 'gui/img/border.png'
 #PrintMenu########################################
 				BoxLayout:
 					id: printMenu
@@ -227,10 +241,12 @@
 						valign: 'middle'
 						size_hint: (1, 0.35)
 						text: 'Material'
+						color: (0,0,0,1)
 					Spinner:
 						size_hint: (1, 0.3)
 						values: ('PLA', 'ABS')
 						text: 'PLA'
+						color: (0,0,0,1)
 					Label:
 						font_size: '20sp'
 						text_size: self.size
@@ -238,10 +254,12 @@
 						valign: 'middle'
 						size_hint: (1, 0.35)
 						text: 'Quality'
+						color: (0,0,0,1)
 					Spinner:
 						size_hint: (1, 0.3)
 						values: ('Low 0.4mm', 'Normal 0.2mm', 'High 0.05mm')
 						text: 'Normal 0.2mm'
+						color: (0,0,0,1)
 					Label:
 						font_size: '20sp'
 						text_size: self.size
@@ -249,6 +267,7 @@
 						valign: 'middle'
 						size_hint: (1, 0.35)
 						text: 'Infill ' + str(int(infillSldr.value)) + '%'
+						color: (0,0,0,1)
 					Slider:
 						id: infillSldr
 						size_hint: (1, 0.3)
@@ -266,6 +285,7 @@
 							halign: 'left'
 							valign: 'middle'
 							text: 'Support material'
+							color: (0,0,0,1)
 					BoxLayout:
 						padding: 4
 						spacing: 4
@@ -279,6 +299,7 @@
 							halign: 'left'
 							valign: 'middle'
 							text: 'Brim'
+							color: (0,0,0,1)
 
 					#vyplnovy widget aby mezi nastavenim a tlacitkama byla mezera
 					Label:
@@ -293,6 +314,7 @@
 						Button:
 							size_hint: (.6, 1)
 							text: 'BACK'
+							color: (0,0,0,1)
 							on_press:
 								sideBar.remove_widget(printMenu)
 								sideBar.size_hint=(topBar.size_hint[1], 1)
@@ -303,7 +325,9 @@
 						Button:
 							size_hint: (1, 1)
 							text: 'SAVE G-CODE'
+							color: (0,0,0,1)
 							on_release: root.show_save()
+
 ###############################################
 
 #NormalMenu####################################
@@ -313,7 +337,7 @@
 					size_hint: sideBar.size_hint
 					size: sideBar.size
 					pos: sideBar.pos
-					padding: 4
+					padding: 7
 					spacing: 4
 
 					ActionToggleButton:
@@ -372,6 +396,7 @@
 						pos_hint: {'top':0}
 						size_hint: (1, 0.2)
 						text: 'PRINT'
+						color: (0,0,0,1)
 						on_press:
 							floatLayout.remove_widget(smallMenuRotate)
 							floatLayout.remove_widget(smallMenuScale)
