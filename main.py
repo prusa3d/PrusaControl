@@ -42,7 +42,7 @@ if __name__ == "__main__":
 '''
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
-    window = PrusaControllWidget()
-    window.show()
-    sys.exit(app.exec_())
+	app = QtGui.QApplication(sys.argv)
+	window = PrusaControllWidget()
+	window.show()
+	sys.exit(app.exec_())

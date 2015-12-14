@@ -14,6 +14,9 @@ from PyQt4 import QtCore
 class PrusaControllWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		QtGui.QWidget.__init__(self, parent)
+
+		self.infillValue = 20
+
 		self.initGUI()
 
 	def initGUI(self):
@@ -41,15 +44,22 @@ class PrusaControllWidget(QtGui.QWidget):
 		#print tab
 		self.materialLabel = QtGui.QLabel("Material")
 		self.materialCombo = QtGui.QComboBox()
+		#set enumeration
+		self.materialCombo.addItem('ABS')
+		self.materialCombo.addItem('PLA')
 
 		self.qualityLabel = QtGui.QLabel("Quality")
 		self.qualityCombo = QtGui.QComboBox()
+		#set enumeration
+		self.qualityCombo.addItem('High')
+		self.qualityCombo.addItem('Medium')
+		self.qualityCombo.addItem('Low')
 
-		self.infillLabel = QtGui.QLabel("Infill %")
-		self.infillSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
+		self.infillLabel = QtGui.QLabel("Infill 20%")
+		self.infillSlider = self.createSlider(self.setInfill, self.infillValue)
 
-		self.supportCheckBox = QtGui.QCheckBox()
-		self.brimCheckBox = QtGui.QCheckBox()
+		self.supportCheckBox = QtGui.QCheckBox("Support material")
+		self.brimCheckBox = QtGui.QCheckBox("Brim")
 
 		self.generateButton = QtGui.QPushButton("Generate")
 		self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
@@ -74,41 +84,31 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.tabWidget.addTab(self.printTab, "Print")
 		self.tabWidget.setMaximumWidth(300)
 
-
-		#self.xSlider = self.createSlider(QtCore.SIGNAL("xRotationChanged(int)"),
-		#								 self.glWidget.setXRotation)
-		#self.ySlider = self.createSlider(QtCore.SIGNAL("yRotationChanged(int)"),
-		#								 self.glWidget.setYRotation)
-		#self.zSlider = self.createSlider(QtCore.SIGNAL("zRotationChanged(int)"),
-		#								 self.glWidget.setZRotation)
-
 		mainLayout = QtGui.QHBoxLayout()
 		mainLayout.addWidget(self.glWidget)
 		mainLayout.addWidget(self.tabWidget)
 		self.setLayout(mainLayout)
 
-		#self.xSlider.setValue(15 * 16)
-		#self.ySlider.setValue(345 * 16)
-		#self.zSlider.setValue(0 * 16)
-
 		self.setWindowTitle(self.tr("PrusaControll"))
 		self.show()
 
+	def setInfill(self, val):
+		self.infillValue = val
+		self.infillLabel.setText("Infill " + str(val) + "%")
 
 
 
-	def createSlider(self, changedSignal, setterSlot):
-		slider = QtGui.QSlider(QtCore.Qt.Vertical)
+	def createSlider(self, setterSlot, defaultValue=0):
+		slider = QtGui.QSlider(QtCore.Qt.Horizontal)
 
-		slider.setRange(0, 360 * 16)
-		slider.setSingleStep(16)
-		slider.setPageStep(15 * 16)
-		slider.setTickInterval(15 * 16)
+		slider.setRange(0, 100)
+		slider.setSingleStep(10)
+		slider.setPageStep(20)
+		slider.setTickInterval(20)
+		slider.setValue(defaultValue)
 		slider.setTickPosition(QtGui.QSlider.TicksRight)
 
-		self.glWidget.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
-		self.connect(self.glWidget, changedSignal, slider, QtCore.SLOT("setValue(int)"))
-
+		self.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
 		return slider
 
 
