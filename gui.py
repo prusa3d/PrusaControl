@@ -1,0 +1,243 @@
+#!/usr/bin/env python
+
+
+import math
+
+from OpenGL.GL import *
+from OpenGL.GLU import *
+from PyQt4 import *
+from PyQt4 import QtGui
+from PyQt4.QtOpenGL import *
+from PyQt4 import QtCore
+
+
+class PrusaControllWidget(QtGui.QWidget):
+	def __init__(self, parent=None):
+		QtGui.QWidget.__init__(self, parent)
+
+		self.glWidget = GLWidget()
+
+		self.tabWidget = QtGui.QTabWidget()
+
+		self.toolTab = QtGui.QWidget()
+		self.printTab = QtGui.QWidget()
+
+		self.moveButton = QtGui.QPushButton("Move")
+		self.rotateButton = QtGui.QPushButton("Rotate")
+		self.scaleButton = QtGui.QPushButton("Scale")
+
+		self.toolTabVLayout = QtGui.QVBoxLayout()
+		self.toolTabVLayout.addWidget(self.moveButton)
+		self.toolTabVLayout.addWidget(self.rotateButton)
+		self.toolTabVLayout.addWidget(self.scaleButton)
+
+		self.toolTab.setLayout(self.toolTabVLayout)
+
+		self.tabWidget.addTab(self.toolTab, "Tools")
+		self.tabWidget.addTab(self.printTab, "Print")
+		self.tabWidget.setMaximumWidth(300)
+
+
+		#self.xSlider = self.createSlider(QtCore.SIGNAL("xRotationChanged(int)"),
+		#								 self.glWidget.setXRotation)
+		#self.ySlider = self.createSlider(QtCore.SIGNAL("yRotationChanged(int)"),
+		#								 self.glWidget.setYRotation)
+		#self.zSlider = self.createSlider(QtCore.SIGNAL("zRotationChanged(int)"),
+		#								 self.glWidget.setZRotation)
+
+		mainLayout = QtGui.QHBoxLayout()
+		mainLayout.addWidget(self.glWidget)
+		mainLayout.addWidget(self.tabWidget)
+		self.setLayout(mainLayout)
+
+		#self.xSlider.setValue(15 * 16)
+		#self.ySlider.setValue(345 * 16)
+		#self.zSlider.setValue(0 * 16)
+
+		self.setWindowTitle(self.tr("PrusaControll"))
+
+	def createSlider(self, changedSignal, setterSlot):
+		slider = QtGui.QSlider(QtCore.Qt.Vertical)
+
+		slider.setRange(0, 360 * 16)
+		slider.setSingleStep(16)
+		slider.setPageStep(15 * 16)
+		slider.setTickInterval(15 * 16)
+		slider.setTickPosition(QtGui.QSlider.TicksRight)
+
+		self.glWidget.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
+		self.connect(self.glWidget, changedSignal, slider, QtCore.SLOT("setValue(int)"))
+
+		return slider
+
+
+class GLWidget(QGLWidget):
+	def __init__(self, parent=None):
+		QGLWidget.__init__(self, parent)
+
+		self.object = 0
+		self.xRot = 0
+		self.yRot = 0
+		self.zRot = 0
+
+		self.lastPos = QtCore.QPoint()
+
+		self.trolltechGreen = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
+		self.trolltechPurple = QtGui.QColor.fromCmykF(0.39, 0.39, 0.0, 0.0)
+
+	def xRotation(self):
+		return self.xRot
+
+	def yRotation(self):
+		return self.yRot
+
+	def zRotation(self):
+		return self.zRot
+
+	def minimumSizeHint(self):
+		return QtCore.QSize(50, 50)
+
+	def sizeHint(self):
+		return QtCore.QSize(400, 400)
+
+	def setXRotation(self, angle):
+		angle = self.normalizeAngle(angle)
+		if angle != self.xRot:
+			self.xRot = angle
+			self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
+			self.updateGL()
+
+	def setYRotation(self, angle):
+		angle = self.normalizeAngle(angle)
+		if angle != self.yRot:
+			self.yRot = angle
+			self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
+			self.updateGL()
+
+	def setZRotation(self, angle):
+		angle = self.normalizeAngle(angle)
+		if angle != self.zRot:
+			self.zRot = angle
+			self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
+			self.updateGL()
+
+	def initializeGL(self):
+		self.qglClearColor(self.trolltechPurple.darker())
+		self.object = self.makeObject()
+		glShadeModel(GL_FLAT)
+		glEnable(GL_DEPTH_TEST)
+		glEnable(GL_CULL_FACE)
+
+	def paintGL(self):
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		glLoadIdentity()
+		glTranslated(0.0, 0.0, -10.0)
+		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
+		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+		glCallList(self.object)
+
+	def resizeGL(self, width, height):
+		side = min(width, height)
+		glViewport((width - side) / 2, (height - side) / 2, side, side)
+
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
+		glOrtho(-0.5, +0.5, +0.5, -0.5, 4.0, 15.0)
+		glMatrixMode(GL_MODELVIEW)
+
+	def mousePressEvent(self, event):
+		self.lastPos = QtCore.QPoint(event.pos())
+
+	def mouseMoveEvent(self, event):
+		dx = event.x() - self.lastPos.x()
+		dy = event.y() - self.lastPos.y()
+
+		if event.buttons() & QtCore.Qt.LeftButton:
+			self.setXRotation(self.xRot + 8 * dy)
+			self.setYRotation(self.yRot + 8 * dx)
+		elif event.buttons() & QtCore.Qt.RightButton:
+			self.setXRotation(self.xRot + 8 * dy)
+			self.setZRotation(self.zRot + 8 * dx)
+
+		self.lastPos = QtCore.QPoint(event.pos())
+
+	def makeObject(self):
+		genList = glGenLists(1)
+		glNewList(genList, GL_COMPILE)
+
+		glBegin(GL_QUADS)
+
+		x1 = +0.06
+		y1 = -0.14
+		x2 = +0.14
+		y2 = -0.06
+		x3 = +0.08
+		y3 = +0.00
+		x4 = +0.30
+		y4 = +0.22
+
+		self.quad(x1, y1, x2, y2, y2, x2, y1, x1)
+		self.quad(x3, y3, x4, y4, y4, x4, y3, x3)
+
+		self.extrude(x1, y1, x2, y2)
+		self.extrude(x2, y2, y2, x2)
+		self.extrude(y2, x2, y1, x1)
+		self.extrude(y1, x1, x1, y1)
+		self.extrude(x3, y3, x4, y4)
+		self.extrude(x4, y4, y4, x4)
+		self.extrude(y4, x4, y3, x3)
+
+		Pi = 3.14159265358979323846
+		NumSectors = 200
+
+		for i in range(NumSectors):
+			angle1 = (i * 2 * Pi) / NumSectors
+			x5 = 0.30 * math.sin(angle1)
+			y5 = 0.30 * math.cos(angle1)
+			x6 = 0.20 * math.sin(angle1)
+			y6 = 0.20 * math.cos(angle1)
+
+			angle2 = ((i + 1) * 2 * Pi) / NumSectors
+			x7 = 0.20 * math.sin(angle2)
+			y7 = 0.20 * math.cos(angle2)
+			x8 = 0.30 * math.sin(angle2)
+			y8 = 0.30 * math.cos(angle2)
+
+			self.quad(x5, y5, x6, y6, x7, y7, x8, y8)
+
+			self.extrude(x6, y6, x7, y7)
+			self.extrude(x8, y8, x5, y5)
+
+		glEnd()
+		glEndList()
+
+		return genList
+
+	def quad(self, x1, y1, x2, y2, x3, y3, x4, y4):
+		self.qglColor(self.trolltechGreen)
+
+		glVertex3d(x1, y1, -0.05)
+		glVertex3d(x2, y2, -0.05)
+		glVertex3d(x3, y3, -0.05)
+		glVertex3d(x4, y4, -0.05)
+
+		glVertex3d(x4, y4, +0.05)
+		glVertex3d(x3, y3, +0.05)
+		glVertex3d(x2, y2, +0.05)
+		glVertex3d(x1, y1, +0.05)
+
+	def extrude(self, x1, y1, x2, y2):
+		self.qglColor(self.trolltechGreen.darker(250 + int(100 * x1)))
+
+		glVertex3d(x1, y1, +0.05)
+		glVertex3d(x2, y2, +0.05)
+		glVertex3d(x2, y2, -0.05)
+		glVertex3d(x1, y1, -0.05)
+
+	def normalizeAngle(self, angle):
+		while angle < 0:
+			angle += 360 * 16
+		while angle > 360 * 16:
+			angle -= 360 * 16
+		return angle

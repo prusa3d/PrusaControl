@@ -1,19 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from kivy.uix.label import Label
+import sys
 
-from stl import *
-
-import kivy
-from kivy.app import App
-
+from gui import *
 from sceneRender import *
 from sceneData import *
 from utilities import *
 
 __author__ = 'Tibor Vavra'
 
-kivy.require('1.9.0')
 
 
 class TestUM:
@@ -38,11 +33,16 @@ class TestUM:
 		print 'test_strings_b_2()  <============================ actual test code'
 
 
-class PrusaControllApp(App):
-	kv_directory = 'gui'
-
-	def build(self):
-		return PrusaControllWidget()
-
+'''
 if __name__ == "__main__":
-	PrusaControllApp().run()
+	app = QtGui.QApplication(['Yo'])
+	window = PrusaControllWidget()
+	window.show()
+	app.exec_()
+'''
+
+if __name__ == '__main__':
+    app = QtGui.QApplication(sys.argv)
+    window = PrusaControllWidget()
+    window.show()
+    sys.exit(app.exec_())

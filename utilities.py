@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import kivy
 from ConfigParser import ConfigParser
 import locale
 
@@ -27,7 +26,7 @@ class MultiLanguage(object):
 		try:
 			(a, _) = locale.getdefaultlocale()
 		except Exception:
-			kivy.Logger.warning(str(Exception))
+			print(str(Exception))
 			a = None
 		if a:
 			return a
@@ -47,7 +46,7 @@ class MultiLanguage(object):
 		try:
 			value = self.languageFile.get(section, sid)
 		except:
-			kivy.Logger.warning(str(Exception))
+			print(str(Exception))
 			return '!!!' + sid + '!!!'
 		return value
 
