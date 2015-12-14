@@ -14,7 +14,9 @@ from PyQt4 import QtCore
 class PrusaControllWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		QtGui.QWidget.__init__(self, parent)
+		self.initGUI()
 
+	def initGUI(self):
 		self.glWidget = GLWidget()
 
 		self.tabWidget = QtGui.QTabWidget()
@@ -22,6 +24,7 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.toolTab = QtGui.QWidget()
 		self.printTab = QtGui.QWidget()
 
+		#tool tab
 		self.moveButton = QtGui.QPushButton("Move")
 		self.rotateButton = QtGui.QPushButton("Rotate")
 		self.scaleButton = QtGui.QPushButton("Scale")
@@ -30,8 +33,42 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.toolTabVLayout.addWidget(self.moveButton)
 		self.toolTabVLayout.addWidget(self.rotateButton)
 		self.toolTabVLayout.addWidget(self.scaleButton)
+		self.toolTabVLayout.addItem(QtGui.QSpacerItem(0,0,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding))
 
 		self.toolTab.setLayout(self.toolTabVLayout)
+		#tool tab
+
+		#print tab
+		self.materialLabel = QtGui.QLabel("Material")
+		self.materialCombo = QtGui.QComboBox()
+
+		self.qualityLabel = QtGui.QLabel("Quality")
+		self.qualityCombo = QtGui.QComboBox()
+
+		self.infillLabel = QtGui.QLabel("Infill %")
+		self.infillSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
+
+		self.supportCheckBox = QtGui.QCheckBox()
+		self.brimCheckBox = QtGui.QCheckBox()
+
+		self.generateButton = QtGui.QPushButton("Generate")
+		self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
+
+		self.printTabVLayout = QtGui.QVBoxLayout()
+		self.printTabVLayout.addWidget(self.materialLabel)
+		self.printTabVLayout.addWidget(self.materialCombo)
+		self.printTabVLayout.addWidget(self.qualityLabel)
+		self.printTabVLayout.addWidget(self.qualityCombo)
+		self.printTabVLayout.addWidget(self.infillLabel)
+		self.printTabVLayout.addWidget(self.infillSlider)
+		self.printTabVLayout.addWidget(self.supportCheckBox)
+		self.printTabVLayout.addWidget(self.brimCheckBox)
+		self.printTabVLayout.addItem(QtGui.QSpacerItem(0,0,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding))
+		self.printTabVLayout.addWidget(self.generateButton)
+		self.printTabVLayout.addWidget(self.saveGCodeButton)
+
+		self.printTab.setLayout(self.printTabVLayout)
+		#print tab
 
 		self.tabWidget.addTab(self.toolTab, "Tools")
 		self.tabWidget.addTab(self.printTab, "Print")
@@ -55,6 +92,10 @@ class PrusaControllWidget(QtGui.QWidget):
 		#self.zSlider.setValue(0 * 16)
 
 		self.setWindowTitle(self.tr("PrusaControll"))
+		self.show()
+
+
+
 
 	def createSlider(self, changedSignal, setterSlot):
 		slider = QtGui.QSlider(QtCore.Qt.Vertical)
