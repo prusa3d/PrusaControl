@@ -2,6 +2,7 @@
 
 
 import math
+import os
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -15,6 +16,8 @@ from PyQt4 import QtCore
 class PrusaControll(QtGui.QMainWindow):
 	def __init__(self):
 		super(PrusaControll, self).__init__()
+		self.setAcceptDrops(True)
+		#self.setDragDropMode(QAbstractItemView.InternalMove)
 
 		self.prusaControllWidget = PrusaControllWidget(self)
 		self.setCentralWidget(self.prusaControllWidget)
@@ -71,6 +74,24 @@ class PrusaControll(QtGui.QMainWindow):
 		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
 		print(str(data))
 		self.statusBar().showMessage('file path: ' + str(data))
+
+	def dragEnterEvent(self, event):
+		if event.mimeData().hasUrls():
+			event.acceptProposedAction()
+		else:
+			super(PrusaControll, self).dragEnterEvent(event)
+
+	def dragMoveEvent(self, event):
+		super(PrusaControll, self).dragMoveEvent(event)
+
+	def dropEvent(self, event):
+		if event.mimeData().hasUrls():
+			for url in event.mimeData().urls():
+				self.statusBar().showMessage('Dropped file name is ' + str(url.path()))
+			event.acceptProposedAction()
+		else:
+			super(PrusaControll, self).dropEvent(event)
+
 
 class PrusaControllWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
