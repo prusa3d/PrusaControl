@@ -11,6 +11,67 @@ from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
 
+
+class PrusaControll(QtGui.QMainWindow):
+	def __init__(self):
+		super(PrusaControll, self).__init__()
+
+		self.prusaControllWidget = PrusaControllWidget(self)
+		self.setCentralWidget(self.prusaControllWidget)
+
+		self.menubar = self.menuBar()
+		#file menu definition
+		self.fileMenu = self.menubar.addMenu('&File')
+		self.fileMenu.addAction('Open project', self.openProjectFile)
+		self.fileMenu.addAction('Save project', self.saveProjectFile)
+		self.fileMenu.addSeparator()
+		self.fileMenu.addAction('Import stl file', self.openStlFile)
+		self.fileMenu.addSeparator()
+		self.fileMenu.addAction('Close')
+		#file menu definition
+
+		#Settings menu
+		self.settingsMenu = self.menubar.addMenu('&Settings')
+		self.settingsMenu.addAction('PrusaControll Settings')
+		#Settings menu
+
+		#Help menu
+		self.helpMenu = self.menubar.addMenu('&Help')
+		self.helpMenu.addAction('Help')
+		self.helpMenu.addAction('Prusa Online')
+		self.helpMenu.addSeparator()
+		self.helpMenu.addAction('About')
+		#Help menu
+
+
+		self.statusBar().showMessage('Ready')
+		self.setWindowTitle(self.tr("PrusaControll"))
+		self.show()
+
+	def openProjectFile(self):
+		filters = "Prus (*.prus *.PRUS)"
+		title = 'Open project file'
+		openAt = "/home"
+		filepath = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+		print(str(filepath))
+		self.statusBar().showMessage('file path: ' + str(filepath))
+
+	def openStlFile(self):
+		filters = "STL (*.stl *.STL)"
+		title = "Import stl file"
+		openAt = "/home"
+		data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+		print(str(data))
+		self.statusBar().showMessage('file path: ' + str(data))
+
+	def saveProjectFile(self):
+		filters = "Prus (*.prus *.PRUS)"
+		title = 'Save project file'
+		openAt = "/home"
+		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
+		print(str(data))
+		self.statusBar().showMessage('file path: ' + str(data))
+
 class PrusaControllWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		QtGui.QWidget.__init__(self, parent)
@@ -87,9 +148,9 @@ class PrusaControllWidget(QtGui.QWidget):
 		mainLayout = QtGui.QHBoxLayout()
 		mainLayout.addWidget(self.glWidget)
 		mainLayout.addWidget(self.tabWidget)
+
 		self.setLayout(mainLayout)
 
-		self.setWindowTitle(self.tr("PrusaControll"))
 		self.show()
 
 	def setInfill(self, val):
@@ -104,7 +165,7 @@ class PrusaControllWidget(QtGui.QWidget):
 		slider.setRange(0, 100)
 		slider.setSingleStep(10)
 		slider.setPageStep(20)
-		slider.setTickInterval(20)
+		slider.setTickInterval(10)
 		slider.setValue(defaultValue)
 		slider.setTickPosition(QtGui.QSlider.TicksRight)
 
