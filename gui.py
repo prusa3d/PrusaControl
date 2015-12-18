@@ -206,7 +206,7 @@ class GLWidget(QGLWidget):
 		self.lastPos = QtCore.QPoint()
 
 		self.trolltechGreen = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
-		self.trolltechPurple = QtGui.QColor.fromCmykF(0.39, 0.39, 0.0, 0.0)
+		self.trolltechPurple = QtGui.QColor.fromCmykF(0.39, 0.15, 0.0, 0.0)
 
 	def xRotation(self):
 		return self.xRot
