@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 
 import math
 import os
@@ -13,11 +13,10 @@ from PyQt4 import QtCore
 
 
 
-class PrusaControll(QtGui.QMainWindow):
+class PrusaControllView(QtGui.QMainWindow):
 	def __init__(self):
-		super(PrusaControll, self).__init__()
+		super(PrusaControllView, self).__init__()
 		self.setAcceptDrops(True)
-		#self.setDragDropMode(QAbstractItemView.InternalMove)
 
 		self.prusaControllWidget = PrusaControllWidget(self)
 		self.setCentralWidget(self.prusaControllWidget)
@@ -25,10 +24,10 @@ class PrusaControll(QtGui.QMainWindow):
 		self.menubar = self.menuBar()
 		#file menu definition
 		self.fileMenu = self.menubar.addMenu('&File')
-		self.fileMenu.addAction('Open project', self.openProjectFile)
-		self.fileMenu.addAction('Save project', self.saveProjectFile)
+		self.fileMenu.addAction('Open project', self.openProjectFileDialog)
+		self.fileMenu.addAction('Save project', self.saveProjectFileDialog)
 		self.fileMenu.addSeparator()
-		self.fileMenu.addAction('Import stl file', self.openStlFile)
+		self.fileMenu.addAction('Import stl file', self.openModelFileDialog)
 		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Close')
 		#file menu definition
@@ -51,7 +50,7 @@ class PrusaControll(QtGui.QMainWindow):
 		self.setWindowTitle(self.tr("PrusaControll"))
 		self.show()
 
-	def openProjectFile(self):
+	def openProjectFileDialog(self):
 		filters = "Prus (*.prus *.PRUS)"
 		title = 'Open project file'
 		openAt = "/home"
@@ -59,7 +58,7 @@ class PrusaControll(QtGui.QMainWindow):
 		print(str(filepath))
 		self.statusBar().showMessage('file path: ' + str(filepath))
 
-	def openStlFile(self):
+	def openModelFileDialog(self):
 		filters = "STL (*.stl *.STL)"
 		title = "Import stl file"
 		openAt = "/home"
@@ -67,7 +66,7 @@ class PrusaControll(QtGui.QMainWindow):
 		print(str(data))
 		self.statusBar().showMessage('file path: ' + str(data))
 
-	def saveProjectFile(self):
+	def saveProjectFileDialog(self):
 		filters = "Prus (*.prus *.PRUS)"
 		title = 'Save project file'
 		openAt = "/home"
@@ -79,10 +78,10 @@ class PrusaControll(QtGui.QMainWindow):
 		if event.mimeData().hasUrls():
 			event.acceptProposedAction()
 		else:
-			super(PrusaControll, self).dragEnterEvent(event)
+			super(PrusaControllView, self).dragEnterEvent(event)
 
 	def dragMoveEvent(self, event):
-		super(PrusaControll, self).dragMoveEvent(event)
+		super(PrusaControllView, self).dragMoveEvent(event)
 
 	def dropEvent(self, event):
 		if event.mimeData().hasUrls():
@@ -90,7 +89,7 @@ class PrusaControll(QtGui.QMainWindow):
 				self.statusBar().showMessage('Dropped file name is ' + str(url.path()))
 			event.acceptProposedAction()
 		else:
-			super(PrusaControll, self).dropEvent(event)
+			super(PrusaControllView, self).dropEvent(event)
 
 
 class PrusaControllWidget(QtGui.QWidget):
@@ -110,15 +109,30 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.printTab = QtGui.QWidget()
 
 		#tool tab
+		self.selectButton = QtGui.QPushButton("Select")
 		self.moveButton = QtGui.QPushButton("Move")
 		self.rotateButton = QtGui.QPushButton("Rotate")
 		self.scaleButton = QtGui.QPushButton("Scale")
 
+		self.toolButtonGroup = QtGui.QButtonGroup()
+		self.toolButtonGroup.setExclusive(True)
+
+		self.toolButtonGroup.addButton(self.selectButton)
+		self.toolButtonGroup.addButton(self.moveButton)
+		self.toolButtonGroup.addButton(self.rotateButton)
+		self.toolButtonGroup.addButton(self.scaleButton)
+
+		self.selectButton.setCheckable(True)
+		self.moveButton.setCheckable(True)
+		self.rotateButton.setCheckable(True)
+		self.scaleButton.setCheckable(True)
+
 		self.toolTabVLayout = QtGui.QVBoxLayout()
+		self.toolTabVLayout.addWidget(self.selectButton)
 		self.toolTabVLayout.addWidget(self.moveButton)
 		self.toolTabVLayout.addWidget(self.rotateButton)
 		self.toolTabVLayout.addWidget(self.scaleButton)
-		self.toolTabVLayout.addItem(QtGui.QSpacerItem(0,0,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding))
+		self.toolTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
 		self.toolTab.setLayout(self.toolTabVLayout)
 		#tool tab
@@ -177,8 +191,6 @@ class PrusaControllWidget(QtGui.QWidget):
 	def setInfill(self, val):
 		self.infillValue = val
 		self.infillLabel.setText("Infill " + str(val) + "%")
-
-
 
 	def createSlider(self, setterSlot, defaultValue=0):
 		slider = QtGui.QSlider(QtCore.Qt.Horizontal)
@@ -245,13 +257,13 @@ class GLWidget(QGLWidget):
 			self.updateGL()
 
 	def initializeGL(self):
-		self.qglClearColor(self.trolltechPurple.darker())
 		self.object = self.makeObject()
 		glShadeModel(GL_FLAT)
 		glEnable(GL_DEPTH_TEST)
 		glEnable(GL_CULL_FACE)
 
 	def paintGL(self):
+		glClearColor(0.0, 0.47, 0.62, 1.0)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
 		glTranslated(0.0, 0.0, -10.0)
