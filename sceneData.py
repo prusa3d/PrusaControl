@@ -4,13 +4,17 @@ from abc import ABCMeta, abstractmethod
 from stl import mesh
 
 
-
 class AppScene(object):
 	'''
 	Class holding data of scene, models, positions, parameters
 	it can be used for generating sliced data and rendering data
 	'''
-	pass
+	def __init__(self):
+		self.model = []
+
+
+
+
 
 
 class Model(object):
@@ -41,10 +45,15 @@ class ModelTypeStl(ModelTypeAbstract):
 	Concrete ModelType class for STL type file, it can load binary and char file
 	'''
 	
-	def load(filename):
+	def load(self, filename):
 		print "this is STL file reader"
 		mesh = mesh.Mesh.from_file(filename)
-		
 		model = Model()
+
+		'''
+		some magic with model data
+		'''
+
+		return model
 
 

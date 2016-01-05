@@ -14,7 +14,8 @@ from PyQt4 import QtCore
 
 
 class PrusaControllView(QtGui.QMainWindow):
-	def __init__(self):
+	def __init__(self, c):
+		self.controller = c
 		super(PrusaControllView, self).__init__()
 		self.setAcceptDrops(True)
 
@@ -24,10 +25,10 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.menubar = self.menuBar()
 		#file menu definition
 		self.fileMenu = self.menubar.addMenu('&File')
-		self.fileMenu.addAction('Open project', self.openProjectFileDialog)
-		self.fileMenu.addAction('Save project', self.saveProjectFileDialog)
+		self.fileMenu.addAction('Open project', self.controller.openProjectFile)
+		self.fileMenu.addAction('Save project', self.controller.saveProjectFile)
 		self.fileMenu.addSeparator()
-		self.fileMenu.addAction('Import stl file', self.openModelFileDialog)
+		self.fileMenu.addAction('Import stl file', self.controller.openModelFile)
 		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Close')
 		#file menu definition
@@ -54,25 +55,22 @@ class PrusaControllView(QtGui.QMainWindow):
 		filters = "Prus (*.prus *.PRUS)"
 		title = 'Open project file'
 		openAt = "/home"
-		filepath = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
-		print(str(filepath))
-		self.statusBar().showMessage('file path: ' + str(filepath))
+		data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+		return data
 
 	def openModelFileDialog(self):
 		filters = "STL (*.stl *.STL)"
 		title = "Import stl file"
 		openAt = "/home"
 		data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
-		print(str(data))
-		self.statusBar().showMessage('file path: ' + str(data))
+		return data
 
 	def saveProjectFileDialog(self):
 		filters = "Prus (*.prus *.PRUS)"
 		title = 'Save project file'
 		openAt = "/home"
 		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
-		print(str(data))
-		self.statusBar().showMessage('file path: ' + str(data))
+		return data
 
 	def dragEnterEvent(self, event):
 		if event.mimeData().hasUrls():
@@ -87,6 +85,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		if event.mimeData().hasUrls():
 			for url in event.mimeData().urls():
 				self.statusBar().showMessage('Dropped file name is ' + str(url.path()))
+				self.controller.openFile(url.path())
 			event.acceptProposedAction()
 		else:
 			super(PrusaControllView, self).dropEvent(event)

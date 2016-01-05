@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 
+from controller import Controller
 from gui import *
 from sceneRender import *
 from sceneData import *
@@ -43,6 +44,7 @@ if __name__ == "__main__":
 
 if __name__ == '__main__':
 	app = QtGui.QApplication(sys.argv)
-	window = PrusaControllView()
+	controller = Controller()
+	window = controller.getView()
 	#window.show()
 	sys.exit(app.exec_())
