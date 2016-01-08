@@ -23,10 +23,15 @@ class Controller:
         data = self.view.saveProjectFileDialog()
         print(str(data))
 
+    def saveGCodeFile(self):
+        data = self.view.saveGCondeFileDialog()
+        print(str(data))
+
     def openModelFile(self):
         data = self.view.openModelFileDialog()
         self.view.statusBar().showMessage('Load file name: ' + data)
         self.model.model.append(ModelTypeStl().load(data))
+
 
 
 

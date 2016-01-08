@@ -72,6 +72,14 @@ class PrusaControllView(QtGui.QMainWindow):
 		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
 		return data
 
+	def saveGCondeFileDialog(self):
+		filters = "gcode (*.gcode *.GCODE)"
+		title = 'Save G-Code file'
+		openAt = "/home"
+		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
+		return data
+
+
 	def dragEnterEvent(self, event):
 		if event.mimeData().hasUrls():
 			event.acceptProposedAction()
@@ -94,6 +102,12 @@ class PrusaControllView(QtGui.QMainWindow):
 class PrusaControllWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
 		QtGui.QWidget.__init__(self, parent)
+		if parent:
+			self.parent = parent
+			self.controller = parent.controller
+		else:
+			self.parent = None
+			self.controller = None
 
 		self.infillValue = 20
 
@@ -158,6 +172,7 @@ class PrusaControllWidget(QtGui.QWidget):
 
 		self.generateButton = QtGui.QPushButton("Generate")
 		self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
+		self.saveGCodeButton.clicked.connect(self.controller.saveGCodeFile)
 
 		self.printTabVLayout = QtGui.QVBoxLayout()
 		self.printTabVLayout.addWidget(self.materialLabel)

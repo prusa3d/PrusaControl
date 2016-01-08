@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABCMeta, abstractmethod
-from stl import mesh
+from stl.mesh import Mesh
 
 
 class AppScene(object):
@@ -47,13 +47,12 @@ class ModelTypeStl(ModelTypeAbstract):
 	
 	def load(self, filename):
 		print "this is STL file reader"
-		mesh = mesh.Mesh.from_file(filename)
+		mesh = Mesh.from_file(filename)
 		model = Model()
 
 		'''
 		some magic with model data
 		'''
-
 		return model
 
 
