@@ -8,11 +8,55 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from PyQt4 import *
 from PyQt4 import QtGui
+
+from PyQt4.QtCore import QDateTime, Qt
+from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox
+from PyQt4.QtGui import QVBoxLayout
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
 import sceneRender
 
+class SettingsDialog(QDialog):
+	def __init__(self, controller, parent = None):
+		super(SettingsDialog, self).__init__(parent)
+
+		self.controller = controller
+
+		layout = QVBoxLayout(self)
+
+		# nice widget for editing the date
+		self.languageLabel = QtGui.QLabel("Language")
+		self.languageCombo = QtGui.QComboBox()
+		#set enumeration
+		self.languageCombo.addItem('en')
+		self.languageCombo.addItem('cz')
+
+		self.printerLabel = QtGui.QLabel("Printer model")
+		self.printerCombo = QtGui.QComboBox()
+		self.printerCombo.addItem('Prusa i3')
+		self.printerCombo.addItem('Prusa i3 v2')
+
+		layout.addWidget(self.languageLabel)
+		layout.addWidget(self.languageCombo)
+
+		layout.addWidget(self.printerLabel)
+		layout.addWidget(self.printerCombo)
+
+		# OK and Cancel buttons
+		buttons = QDialogButtonBox(
+			QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+		Qt.Horizontal, self)
+		buttons.accepted.connect(self.accept)
+		buttons.rejected.connect(self.reject)
+		layout.addWidget(buttons)
+
+	@staticmethod
+	def getSettingsData(parent = None):
+		dialog = SettingsDialog(parent)
+		result = dialog.exec_()
+		data = dialog.languageCombo.currentIndex()
+		return (data, result == QDialog.Accepted)
 
 
 class PrusaControllView(QtGui.QMainWindow):
@@ -38,7 +82,7 @@ class PrusaControllView(QtGui.QMainWindow):
 
 		#Settings menu
 		self.settingsMenu = self.menubar.addMenu('&Settings')
-		self.settingsMenu.addAction('PrusaControll settings')
+		self.settingsMenu.addAction('PrusaControll settings', self.controller.openSettings)
 		#Settings menu
 
 		#Help menu
@@ -53,6 +97,10 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.statusBar().showMessage('Ready')
 		self.setWindowTitle(self.tr("PrusaControll"))
 		self.show()
+
+	def openSettingsDialog(self):
+		data, ok = SettingsDialog.getSettingsData()
+		return data
 
 	def openProjectFileDialog(self):
 		filters = "Prus (*.prus *.PRUS)"

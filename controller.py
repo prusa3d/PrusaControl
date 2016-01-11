@@ -32,9 +32,14 @@ class Controller:
         self.view.statusBar().showMessage('Load file name: ' + data)
         self.model.model.append(ModelTypeStl().load(data))
 
+    def openSettings(self):
+        data = self.view.openSettingsDialog()
+        print('Settings dialog')
+        print(str(data))
+
+
     def close(self):
         exit()
-
 
     def openFile(self, urls):
         '''

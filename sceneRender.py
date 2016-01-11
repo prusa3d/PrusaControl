@@ -90,16 +90,10 @@ class GLWidget(QGLWidget):
 
 
 	def resizeGL(self, width, height):
-		side = min(width, height)
-		#glViewport((width - side) / 2, (height - side) / 2, side, side)
 		glViewport(0, 0, width, height)
-
 		glMatrixMode(GL_PROJECTION)
 		glLoadIdentity()
-		#glOrtho(-0.5, +0.5, +0.5, -0.5, 4, 15.0)
-		#glFrustum(-2.0, +2.0, +2.0, -2.0, 1.5, 20.0)
-
-		gluPerspective(90.0, width/height, 0.01, 150)
+		gluPerspective(60*((width*1.0)/(height*1.0)), (width*1.0)/(height*1.0), 0.01, 150.0)
 		glMatrixMode(GL_MODELVIEW)
 
 	def mousePressEvent(self, event):
