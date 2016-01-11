@@ -2,92 +2,201 @@
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from PyQt4 import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
+from PyQt4 import QtCore
 
 
-class PrusaControllWidget2(QtGui.QWidget):
-	'''
-	Main widget of application
-	'''
-
-	def __init__(self):
-		super(PrusaControllWidget, self).__init__()
-
-		self.widget = glWidget(self)
-
-		self.button = QtGui.QPushButton('Test', self)
-
-		mainLayout = QtGui.QHBoxLayout()
-		mainLayout.addWidget(self.widget)
-		mainLayout.addWidget(self.button)
-
-		self.setLayout(mainLayout)
-
-
-
-
-class CenteredCamera(object):
-	'''
-	Special camera class, this camera is centered on scene and rotate around
-	it can zoom in and out
-	hanndle mouse events
-	'''
-	pass
-
-
-class SceneRenderer(CenteredCamera):
-	'''
-	Scene Renderer widget, renderer designed for drawing a Scene data
-	'''
-	pass
-
-
-
-class glWidget(QGLWidget):
-	def __init__(self, parent):
+class GLWidget(QGLWidget):
+	def __init__(self, parent=None):
 		QGLWidget.__init__(self, parent)
-		self.setMinimumSize(640, 480)
 
-	def paintGL(self):
+		self.parent = parent
 
+		self.bed = 0
+		self.axis = 0
+		self.xRot = 0
+		self.yRot = 0
+		self.zRot = 0
+		self.zoom = -15
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-		glLoadIdentity()
-
-
-		glTranslatef(-2.5, 0.5, -6.0)
-		glColor3f( 1.0, 1.5, 0.0 );
-		glPolygonMode(GL_FRONT, GL_FILL);
-
-		glBegin(GL_TRIANGLES)
-		glVertex3f(2.0,-1.2,0.0)
-		glVertex3f(2.6,0.0,0.0)
-		glVertex3f(2.9,-1.2,0.0)
-		glEnd()
-
-		glFlush()
+		self.lastPos = QtCore.QPoint()
 
 
+	def xRotation(self):
+		return self.xRot
+
+	def yRotation(self):
+		return self.yRot
+
+	def zRotation(self):
+		return self.zRot
+
+	def minimumSizeHint(self):
+		return QtCore.QSize(50, 50)
+
+	def sizeHint(self):
+		return QtCore.QSize(400, 400)
+
+	def setXRotation(self, angle):
+		angle = self.normalizeAngle(angle)
+		if angle != self.xRot:
+			self.xRot = angle
+			self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
+			self.updateGL()
+
+	def setYRotation(self, angle):
+		angle = self.normalizeAngle(angle)
+		if angle != self.yRot:
+			self.yRot = angle
+			self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
+			self.updateGL()
+
+	def setZRotation(self, angle):
+		angle = self.normalizeAngle(angle)
+		if angle != self.zRot:
+			self.zRot = angle
+			self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
+			self.updateGL()
 
 	def initializeGL(self):
+		#self.object = self.makeObject()
+		self.bed = self.makePrintingBed()
+		self.axis = self.makeAxis()
 
-
-
-		glClearDepth(1.0)
-		glDepthFunc(GL_LESS)
+		glShadeModel(GL_FLAT)
 		glEnable(GL_DEPTH_TEST)
-		glShadeModel(GL_SMOOTH)
+		#glEnable(GL_CULL_FACE)
+
+
+	def paintGL(self):
+		glClearColor(0.0, 0.47, 0.62, 1.0)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		glLoadIdentity()
+		glTranslated(0.0, 0.0, self.zoom)
+		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
+		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+
+		glCallList(self.bed)
+		glDisable(GL_DEPTH_TEST)
+		glCallList(self.axis)
+		glEnable(GL_DEPTH_TEST)
+
+		'''
+		draw scene with all objects
+		'''
+
+
+	def resizeGL(self, width, height):
+		side = min(width, height)
+		#glViewport((width - side) / 2, (height - side) / 2, side, side)
+		glViewport(0, 0, width, height)
 
 		glMatrixMode(GL_PROJECTION)
 		glLoadIdentity()
-		gluPerspective(45.0,1.33,0.1, 100.0)
+		#glOrtho(-0.5, +0.5, +0.5, -0.5, 4, 15.0)
+		#glFrustum(-2.0, +2.0, +2.0, -2.0, 1.5, 20.0)
+
+		gluPerspective(90.0, width/height, 0.01, 150)
 		glMatrixMode(GL_MODELVIEW)
 
+	def mousePressEvent(self, event):
+		self.lastPos = QtCore.QPoint(event.pos())
+
+	def mouseMoveEvent(self, event):
+		dx = event.x() - self.lastPos.x()
+		dy = event.y() - self.lastPos.y()
+
+		if event.buttons() & QtCore.Qt.LeftButton:
+			self.setXRotation(self.xRot + 8 * dy)
+			self.setYRotation(self.yRot + 8 * dx)
+		elif event.buttons() & QtCore.Qt.RightButton:
+			self.setXRotation(self.xRot + 8 * dy)
+			self.setZRotation(self.zRot + 8 * dx)
+
+		self.lastPos = QtCore.QPoint(event.pos())
+
+	def wheelEvent(self,event):
+		self.zoom = self.zoom + event.delta()/120
+		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
+		self.updateGL()
 
 
-class Scene(object):
-	'''
-	Scene is class representing data from AppScene, it is simplificated data of scene, rendering is less important then printing
-	'''
-	pass
+	def makeDisplayList(self, model):
+		genList = glGenLists(1)
+		glNewList(genList, GL_COMPILE)
+
+		glBegin(GL_TRIANGELS)
+
+		glEnd()
+		glEndList()
+
+		return genList
+
+	def makePrintingBed(self):
+
+		genList = glGenLists(1)
+		glNewList(genList, GL_COMPILE)
+
+		'''
+		glBegin(GL_QUADS)
+
+		glColor3f(1,1,0)
+		glVertex3d(1, 1, 0)
+		glVertex3d(1, -1, 0)
+		glVertex3d(-1, -1, 0)
+		glVertex3d(-1, 1, 0)
+
+		glEnd()
+		'''
+		glLineWidth(2)
+		glBegin(GL_LINES)
+
+		glColor3f(1,1,1)
+		for i in xrange(-5, 6, 1):
+			glVertex3d(i, 5, 0)
+			glVertex3d(i, -5, 0)
+
+			glVertex3d(5, i, 0)
+			glVertex3d(-5, i, 0)
+
+		glEnd()
+
+		glEndList()
+
+		return genList
+
+	def makeAxis(self):
+		genList = glGenLists(1)
+		glNewList(genList, GL_COMPILE)
+
+		glLineWidth(5)
+
+		glBegin(GL_LINES)
+
+		glColor3f(1, 0, 0)
+		glVertex3d(0, 0, 0)
+		glVertex3d(1, 0, 0)
+
+		glColor3f(0, 1, 0)
+		glVertex3d(0, 0, 0)
+		glVertex3d(0, 1, 0)
+
+		glColor3f(0, 0, 1)
+		glVertex3d(0, 0, 0)
+		glVertex3d(0, 0, 1)
+
+		glEnd()
+		glEndList()
+
+		return genList
+
+	def normalizeAngle(self, angle):
+		while angle < 0:
+			angle += 360 * 16
+		while angle > 360 * 16:
+			angle -= 360 * 16
+		return angle
+

@@ -3,7 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller.py" afterPath="$PROJECT_DIR$/controller.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui.py" afterPath="$PROJECT_DIR$/gui.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sceneRender.py" afterPath="$PROJECT_DIR$/sceneRender.py" />
     </list>
     <ignored path="PrusaControll.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -24,15 +26,23 @@
     <favorites_list name="PrusaControll" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+    <leaf>
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="25" column="28" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
-              <folding>
-                <element signature="e#46#56#0" expanded="true" />
-              </folding>
+              <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="controller.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/controller.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="32" column="58" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -40,11 +50,67 @@
       <file leaf-file-name="gui.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.44117647">
-              <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
-              <folding>
-                <element signature="e#24#35#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.1869748">
+              <caret line="7" column="24" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Python/#/home/tibor/projects/PrusaControll/gui.py" pinned="false" current-in-tab="false">
+        <entry file="uml://Python/#/home/tibor/projects/PrusaControll/gui.py">
+          <provider selected="true" editor-type-id="UmlEditorProvider">
+            <state>
+              <ID>Python</ID>
+              <OriginalElement>#/home/tibor/projects/PrusaControll/gui.py</OriginalElement>
+              <nodes>
+                <node x="638.0" y="16.0">sceneData.ModelTypeStl</node>
+                <node x="49.5" y="-93.0">gui.PrusaControllView</node>
+                <node x="-21.0" y="-174.0">PyQt4.QtGui.QMainWindow.QMainWindow</node>
+                <node x="19.0" y="-255.0">PyQt4.QtGui.QWidget.QWidget</node>
+                <node x="327.0" y="-174.0">gui.PrusaControllWidget</node>
+                <node x="-277.0" y="-174.0">PyQt4.QtOpenGL.QGLWidget</node>
+                <node x="-277.0" y="67.0">controller.Controller</node>
+                <node x="257.0" y="-93.0">sceneData.Model</node>
+                <node x="432.0" y="-93.0">sceneData.ModelTypeAbstract</node>
+                <node x="-221.0" y="-93.0">gui.GLWidget</node>
+              </nodes>
+              <notes />
+              <edges>
+                <edge source="sceneData.ModelTypeStl" target="sceneData.ModelTypeAbstract">
+                  <point x="0.0" y="0.0" />
+                  <point x="0.0" y="0.0" />
+                </edge>
+                <edge source="gui.PrusaControllView" target="PyQt4.QtGui.QMainWindow.QMainWindow">
+                  <point x="0.0" y="-15.5" />
+                  <point x="0.0" y="15.5" />
+                </edge>
+                <edge source="gui.PrusaControllWidget" target="PyQt4.QtGui.QWidget.QWidget">
+                  <point x="0.0" y="-15.5" />
+                  <point x="428.0" y="-199.0" />
+                  <point x="225.66666666666669" y="-199.0" />
+                  <point x="82.66666666666669" y="15.5" />
+                </edge>
+                <edge source="gui.GLWidget" target="PyQt4.QtOpenGL.QGLWidget">
+                  <point x="0.0" y="-15.5" />
+                  <point x="0.0" y="15.5" />
+                </edge>
+                <edge source="PyQt4.QtGui.QMainWindow.QMainWindow" target="PyQt4.QtGui.QWidget.QWidget">
+                  <point x="0.0" y="-15.5" />
+                  <point x="0.0" y="15.5" />
+                </edge>
+                <edge source="PyQt4.QtOpenGL.QGLWidget" target="PyQt4.QtGui.QWidget.QWidget">
+                  <point x="0.0" y="-15.5" />
+                  <point x="-159.0" y="-199.0" />
+                  <point x="60.333333333333314" y="-199.0" />
+                  <point x="-82.66666666666669" y="15.5" />
+                </edge>
+              </edges>
+              <settings layout="Hierarchic Group" zoom="1.0" x="-169.0" y="-85.5" />
+              <SelectedNodes>
+                <node>PyQt4.QtOpenGL.QGLWidget</node>
+              </SelectedNodes>
+              <Categories />
             </state>
           </provider>
         </entry>
@@ -53,10 +119,8 @@
         <entry file="file://$PROJECT_DIR$/sceneRender.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
-              <folding>
-                <element signature="e#25#48#0" expanded="true" />
-              </folding>
+              <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -65,7 +129,7 @@
         <entry file="file://$PROJECT_DIR$/sceneData.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding>
                 <element signature="e#25#64#0" expanded="true" />
               </folding>
@@ -77,10 +141,8 @@
         <entry file="file://$PROJECT_DIR$/utilities.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-              <folding>
-                <element signature="e#25#62#0" expanded="true" />
-              </folding>
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -101,8 +163,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/utilities.py" />
-        <option value="$PROJECT_DIR$/sceneRender.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/sceneData.py" />
+        <option value="$PROJECT_DIR$/controller.py" />
+        <option value="$PROJECT_DIR$/sceneRender.py" />
         <option value="$PROJECT_DIR$/gui.py" />
       </list>
     </option>
@@ -142,8 +206,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -169,8 +233,9 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../prusacontroll_prototypes/test/pyqt/main.py" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Font" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="full.screen.before.presentation.mode" value="false" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
@@ -368,6 +433,9 @@
     </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="" />
@@ -421,31 +489,221 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding>
+            <element signature="e#25#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="16" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="16" />
-          <folding>
-            <element signature="e#46#56#0" expanded="true" />
-          </folding>
+          <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="32" column="58" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gui.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="e#24#35#0" expanded="true" />
+            <element signature="e#25#64#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="173" column="63" selection-start-line="173" selection-start-column="63" selection-end-line="173" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding>
+            <element signature="e#25#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="25" column="19" selection-start-line="25" selection-start-column="19" selection-end-line="25" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding>
+            <element signature="e#25#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="25" column="16" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -453,9 +711,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
-          <folding>
-            <element signature="e#25#48#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -473,9 +729,49 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="20" column="16" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
           <folding>
-            <element signature="e#25#62#0" expanded="true" />
+            <element signature="e#25#64#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -483,9 +779,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#43#66#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -493,9 +786,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding>
-            <element signature="e#46#56#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -503,9 +794,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="21" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
-          <folding>
-            <element signature="e#24#35#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -513,9 +802,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding>
-            <element signature="e#25#48#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -533,9 +820,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="e#25#62#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -543,9 +828,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#43#66#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -556,32 +838,104 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../prusacontroll_prototypes/test/pyqt/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.5">
+          <caret line="14" column="38" selection-start-line="14" selection-start-column="38" selection-end-line="14" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm50/system/python_stubs/-1247972723/PyQt4/QtOpenGL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1135" column="6" selection-start-line="1135" selection-start-column="6" selection-end-line="1135" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://Python/#/home/tibor/projects/PrusaControll/sceneData.py">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>Python</ID>
+          <OriginalElement>#/home/tibor/projects/PrusaControll/sceneData.py</OriginalElement>
+          <nodes>
+            <node x="288.0" y="162.0">sceneData.AppScene</node>
+            <node x="19.0" y="81.0">abc.ABCMeta</node>
+            <node x="290.0" y="0.0">_abcoll.Hashable</node>
+            <node x="20.0" y="162.0">sceneData.ModelTypeAbstract</node>
+            <node x="40.5" y="243.0">sceneData.ModelTypeStl</node>
+            <node x="340.5" y="81.0">object</node>
+            <node x="489.0" y="162.0">sceneData.Model</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="object" target="_abcoll.Hashable">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="sceneData.Model" target="object">
+              <point x="0.0" y="-15.5" />
+              <point x="566.5" y="137.0" />
+              <point x="403.8333333333333" y="137.0" />
+              <point x="25.333333333333314" y="15.5" />
+            </edge>
+            <edge source="sceneData.ModelTypeStl" target="sceneData.ModelTypeAbstract">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="sceneData.ModelTypeAbstract" target="abc.ABCMeta">
+              <point x="-62.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="sceneData.ModelTypeAbstract" target="object">
+              <point x="62.0" y="-15.5" />
+              <point x="206.0" y="137.0" />
+              <point x="353.1666666666667" y="137.0" />
+              <point x="-25.333333333333314" y="15.5" />
+            </edge>
+            <edge source="sceneData.AppScene" target="object">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="1.0" x="-250.0" y="-85.5" />
+          <SelectedNodes>
+            <node>sceneData.Model</node>
+          </SelectedNodes>
+          <Categories />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://Python/#/home/tibor/projects/PrusaControll/controller.py">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>Python</ID>
+          <OriginalElement>#/home/tibor/projects/PrusaControll/controller.py</OriginalElement>
+          <nodes>
+            <node x="" y="">controller.Controller</node>
+          </nodes>
+          <notes />
+          <edges />
+          <settings layout="Hierarchic Group" zoom="1.0" x="89.0" y="15.5" />
+          <SelectedNodes />
+          <Categories />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/utilities.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding>
-            <element signature="e#25#62#0" expanded="true" />
-          </folding>
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sceneData.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
             <element signature="e#25#64#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../prusacontroll_prototypes/test/pyqt/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.5">
-          <caret line="14" column="38" selection-start-line="14" selection-start-column="38" selection-end-line="14" selection-end-column="38" />
-          <folding>
-            <element signature="e#43#66#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -589,30 +943,88 @@
     <entry file="file://$PROJECT_DIR$/sceneRender.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
-          <folding>
-            <element signature="e#25#48#0" expanded="true" />
-          </folding>
+          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="32" column="58" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="25" column="28" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
-          <folding>
-            <element signature="e#46#56#0" expanded="true" />
-          </folding>
+          <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://Python/#/home/tibor/projects/PrusaControll/gui.py">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>Python</ID>
+          <OriginalElement>#/home/tibor/projects/PrusaControll/gui.py</OriginalElement>
+          <nodes>
+            <node x="638.0" y="16.0">sceneData.ModelTypeStl</node>
+            <node x="49.5" y="-93.0">gui.PrusaControllView</node>
+            <node x="-21.0" y="-174.0">PyQt4.QtGui.QMainWindow.QMainWindow</node>
+            <node x="19.0" y="-255.0">PyQt4.QtGui.QWidget.QWidget</node>
+            <node x="327.0" y="-174.0">gui.PrusaControllWidget</node>
+            <node x="-277.0" y="-174.0">PyQt4.QtOpenGL.QGLWidget</node>
+            <node x="-277.0" y="67.0">controller.Controller</node>
+            <node x="257.0" y="-93.0">sceneData.Model</node>
+            <node x="432.0" y="-93.0">sceneData.ModelTypeAbstract</node>
+            <node x="-221.0" y="-93.0">gui.GLWidget</node>
+          </nodes>
+          <notes />
+          <edges>
+            <edge source="sceneData.ModelTypeStl" target="sceneData.ModelTypeAbstract">
+              <point x="0.0" y="0.0" />
+              <point x="0.0" y="0.0" />
+            </edge>
+            <edge source="gui.PrusaControllView" target="PyQt4.QtGui.QMainWindow.QMainWindow">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="gui.PrusaControllWidget" target="PyQt4.QtGui.QWidget.QWidget">
+              <point x="0.0" y="-15.5" />
+              <point x="428.0" y="-199.0" />
+              <point x="225.66666666666669" y="-199.0" />
+              <point x="82.66666666666669" y="15.5" />
+            </edge>
+            <edge source="gui.GLWidget" target="PyQt4.QtOpenGL.QGLWidget">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="PyQt4.QtGui.QMainWindow.QMainWindow" target="PyQt4.QtGui.QWidget.QWidget">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="PyQt4.QtOpenGL.QGLWidget" target="PyQt4.QtGui.QWidget.QWidget">
+              <point x="0.0" y="-15.5" />
+              <point x="-159.0" y="-199.0" />
+              <point x="60.333333333333314" y="-199.0" />
+              <point x="-82.66666666666669" y="15.5" />
+            </edge>
+          </edges>
+          <settings layout="Hierarchic Group" zoom="1.0" x="-169.0" y="-85.5" />
+          <SelectedNodes>
+            <node>PyQt4.QtOpenGL.QGLWidget</node>
+          </SelectedNodes>
+          <Categories />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.44117647">
-          <caret line="26" column="17" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="17" />
-          <folding>
-            <element signature="e#24#35#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.1869748">
+          <caret line="7" column="24" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="24" />
+          <folding />
         </state>
       </provider>
     </entry>

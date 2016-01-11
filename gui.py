@@ -11,6 +11,8 @@ from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
+import sceneRender
+
 
 
 class PrusaControllView(QtGui.QMainWindow):
@@ -30,12 +32,13 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Import stl file', self.controller.openModelFile)
 		self.fileMenu.addSeparator()
-		self.fileMenu.addAction('Close')
+		self.fileMenu.addAction('Close', self.controller.close)
+
 		#file menu definition
 
 		#Settings menu
 		self.settingsMenu = self.menubar.addMenu('&Settings')
-		self.settingsMenu.addAction('PrusaControll Settings')
+		self.settingsMenu.addAction('PrusaControll settings')
 		#Settings menu
 
 		#Help menu
@@ -114,7 +117,7 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.initGUI()
 
 	def initGUI(self):
-		self.glWidget = GLWidget()
+		self.glWidget = sceneRender.GLWidget(self)
 
 		self.tabWidget = QtGui.QTabWidget()
 
@@ -170,6 +173,11 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.supportCheckBox = QtGui.QCheckBox("Support material")
 		self.brimCheckBox = QtGui.QCheckBox("Brim")
 
+		self.progressBar = QtGui.QProgressBar()
+		self.progressBar.setMinimum(0)
+		self.progressBar.setMaximum(100)
+		self.progressBar.setValue(0)
+
 		self.generateButton = QtGui.QPushButton("Generate")
 		self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
 		self.saveGCodeButton.clicked.connect(self.controller.saveGCodeFile)
@@ -183,8 +191,10 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.printTabVLayout.addWidget(self.infillSlider)
 		self.printTabVLayout.addWidget(self.supportCheckBox)
 		self.printTabVLayout.addWidget(self.brimCheckBox)
-		self.printTabVLayout.addItem(QtGui.QSpacerItem(0,0,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding))
+		self.printTabVLayout.addWidget(self.progressBar)
 		self.printTabVLayout.addWidget(self.generateButton)
+		self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+
 		self.printTabVLayout.addWidget(self.saveGCodeButton)
 
 		self.printTab.setLayout(self.printTabVLayout)
@@ -220,97 +230,9 @@ class PrusaControllWidget(QtGui.QWidget):
 		return slider
 
 
-class GLWidget(QGLWidget):
-	def __init__(self, parent=None):
-		QGLWidget.__init__(self, parent)
 
-		self.object = 0
-		self.xRot = 0
-		self.yRot = 0
-		self.zRot = 0
 
-		self.lastPos = QtCore.QPoint()
-
-		self.trolltechGreen = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
-		self.trolltechPurple = QtGui.QColor.fromCmykF(0.39, 0.15, 0.0, 0.0)
-
-	def xRotation(self):
-		return self.xRot
-
-	def yRotation(self):
-		return self.yRot
-
-	def zRotation(self):
-		return self.zRot
-
-	def minimumSizeHint(self):
-		return QtCore.QSize(50, 50)
-
-	def sizeHint(self):
-		return QtCore.QSize(400, 400)
-
-	def setXRotation(self, angle):
-		angle = self.normalizeAngle(angle)
-		if angle != self.xRot:
-			self.xRot = angle
-			self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
-			self.updateGL()
-
-	def setYRotation(self, angle):
-		angle = self.normalizeAngle(angle)
-		if angle != self.yRot:
-			self.yRot = angle
-			self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
-			self.updateGL()
-
-	def setZRotation(self, angle):
-		angle = self.normalizeAngle(angle)
-		if angle != self.zRot:
-			self.zRot = angle
-			self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
-			self.updateGL()
-
-	def initializeGL(self):
-		self.object = self.makeObject()
-		glShadeModel(GL_FLAT)
-		glEnable(GL_DEPTH_TEST)
-		glEnable(GL_CULL_FACE)
-
-	def paintGL(self):
-		glClearColor(0.0, 0.47, 0.62, 1.0)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-		glLoadIdentity()
-		glTranslated(0.0, 0.0, -10.0)
-		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
-		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-		glCallList(self.object)
-
-	def resizeGL(self, width, height):
-		side = min(width, height)
-		glViewport((width - side) / 2, (height - side) / 2, side, side)
-
-		glMatrixMode(GL_PROJECTION)
-		glLoadIdentity()
-		glOrtho(-0.5, +0.5, +0.5, -0.5, 4.0, 15.0)
-		glMatrixMode(GL_MODELVIEW)
-
-	def mousePressEvent(self, event):
-		self.lastPos = QtCore.QPoint(event.pos())
-
-	def mouseMoveEvent(self, event):
-		dx = event.x() - self.lastPos.x()
-		dy = event.y() - self.lastPos.y()
-
-		if event.buttons() & QtCore.Qt.LeftButton:
-			self.setXRotation(self.xRot + 8 * dy)
-			self.setYRotation(self.yRot + 8 * dx)
-		elif event.buttons() & QtCore.Qt.RightButton:
-			self.setXRotation(self.xRot + 8 * dy)
-			self.setZRotation(self.zRot + 8 * dx)
-
-		self.lastPos = QtCore.QPoint(event.pos())
-
+'''
 	def makeObject(self):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
@@ -383,10 +305,6 @@ class GLWidget(QGLWidget):
 		glVertex3d(x2, y2, +0.05)
 		glVertex3d(x2, y2, -0.05)
 		glVertex3d(x1, y1, -0.05)
+'''
 
-	def normalizeAngle(self, angle):
-		while angle < 0:
-			angle += 360 * 16
-		while angle > 360 * 16:
-			angle -= 360 * 16
-		return angle
+
