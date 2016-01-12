@@ -102,6 +102,12 @@ class PrusaControllView(QtGui.QMainWindow):
 		data, ok = SettingsDialog.getSettingsData()
 		return data
 
+	def disableSaveGcodeButton(self):
+		self.prusaControllWidget.disableSaveGcodeButton()
+
+	def enableSaveGcodeButton(self):
+		self.prusaControllWidget.enableSaveGcodeButton()
+
 	def openProjectFileDialog(self):
 		filters = "Prus (*.prus *.PRUS)"
 		title = 'Open project file'
@@ -215,7 +221,7 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.qualityCombo.addItem('Medium')
 		self.qualityCombo.addItem('Low')
 
-		self.infillLabel = QtGui.QLabel("Infill 20%")
+		self.infillLabel = QtGui.QLabel("Infill %s" % str(self.infillValue)+'%')
 		self.infillSlider = self.createSlider(self.setInfill, self.infillValue)
 
 		self.supportCheckBox = QtGui.QCheckBox("Support material")
@@ -227,8 +233,15 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.progressBar.setValue(0)
 
 		self.generateButton = QtGui.QPushButton("Generate")
+
+		#printing info place
+		self.printingInfoLabel = QtGui.QLabel("Print info:")
+
+
+
 		self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
 		self.saveGCodeButton.clicked.connect(self.controller.saveGCodeFile)
+
 
 		self.printTabVLayout = QtGui.QVBoxLayout()
 		self.printTabVLayout.addWidget(self.materialLabel)
@@ -241,6 +254,7 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.printTabVLayout.addWidget(self.brimCheckBox)
 		self.printTabVLayout.addWidget(self.progressBar)
 		self.printTabVLayout.addWidget(self.generateButton)
+		self.printTabVLayout.addWidget(self.printingInfoLabel)
 		self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
 		self.printTabVLayout.addWidget(self.saveGCodeButton)
@@ -259,6 +273,12 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.setLayout(mainLayout)
 
 		self.show()
+
+	def disableSaveGcodeButton(self):
+		self.saveGCodeButton.setDisabled(True)
+
+	def enableSaveGcodeButton(self):
+		self.saveGCodeButton.setDisabled(False)
 
 	def setInfill(self, val):
 		self.infillValue = val

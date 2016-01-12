@@ -21,7 +21,10 @@ class Model(object):
 	'''
 	this is reprezentation of model data, data readed from file
 	'''
-	pass
+	def __init__(self):
+		self.v0 = []
+		self.v1 = []
+		self.v2 = []
 
 
 class ModelTypeAbstract(object):
@@ -50,6 +53,10 @@ class ModelTypeStl(ModelTypeAbstract):
 		mesh = Mesh.from_file(filename)
 		model = Model()
 
+		for i in xrange(len(mesh.v0)):
+			model.v0.append(mesh.v0[i])
+			model.v1.append(mesh.v1[i])
+			model.v2.append(mesh.v2[i])
 		'''
 		some magic with model data
 		'''

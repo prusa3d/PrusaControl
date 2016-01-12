@@ -7,6 +7,7 @@ from sceneData import AppScene, ModelTypeStl
 class Controller:
     def __init__(self):
         self.view = PrusaControllView(self)
+        self.view.disableSaveGcodeButton()
         self.model = AppScene()
 
     def getView(self):
@@ -37,6 +38,8 @@ class Controller:
         print('Settings dialog')
         print(str(data))
 
+    def generatePrint(self):
+        self.view.enableSaveGcodeButton()
 
     def close(self):
         exit()
