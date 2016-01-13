@@ -29,6 +29,7 @@ class Model(object):
 		self.v0 = []
 		self.v1 = []
 		self.v2 = []
+		self.normal = []
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
@@ -37,6 +38,7 @@ class Model(object):
 		glBegin(GL_TRIANGLES)
 
 		for i in xrange(len(self.v0)):
+			glNormal3f(self.normal[i][0], self.normal[i][1], self.normal[i][2])
 			glVertex3f(self.v0[i][0], self.v0[i][1], self.v0[i][2])
 			glVertex3f(self.v1[i][0], self.v1[i][1], self.v1[i][2])
 			glVertex3f(self.v2[i][0], self.v2[i][1], self.v2[i][2])
@@ -77,6 +79,9 @@ class ModelTypeStl(ModelTypeAbstract):
 			model.v0.append(mesh.v0[i])
 			model.v1.append(mesh.v1[i])
 			model.v2.append(mesh.v2[i])
+			model.normal.append(mesh.normals[i])
+
+		print(str(mesh.normals[0]))
 		'''
 		some magic with model data...
 		I need normals, transformations...
