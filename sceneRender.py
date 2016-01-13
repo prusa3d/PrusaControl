@@ -75,6 +75,7 @@ class GLWidget(QGLWidget):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
 		glTranslated(0.0, 0.0, self.zoom)
+		glRotated(90.0, 1.0, 0.0, 0.0)
 		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
 		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
 		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
@@ -87,6 +88,8 @@ class GLWidget(QGLWidget):
 		'''
 		draw scene with all objects
 		'''
+		if self.parent.controller.model.models:
+			glCallList(self.parent.controller.model.models[0])
 
 
 	def resizeGL(self, width, height):
@@ -112,22 +115,12 @@ class GLWidget(QGLWidget):
 
 		self.lastPos = QtCore.QPoint(event.pos())
 
-	def wheelEvent(self,event):
+	def wheelEvent(self, event):
 		self.zoom = self.zoom + event.delta()/120
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
 
 
-	def makeDisplayList(self, model):
-		genList = glGenLists(1)
-		glNewList(genList, GL_COMPILE)
-
-		glBegin(GL_TRIANGELS)
-
-		glEnd()
-		glEndList()
-
-		return genList
 
 	def makePrintingBed(self):
 

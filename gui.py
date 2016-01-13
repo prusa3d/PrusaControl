@@ -113,6 +113,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		title = 'Open project file'
 		openAt = "/home"
 		data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+		data = self.convertFilePathToUnicode(data)
 		return data
 
 	def openModelFileDialog(self):
@@ -120,6 +121,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		title = "Import stl file"
 		openAt = "/home"
 		data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+		data = self.convertFilePathToUnicode(data)
 		return data
 
 	def saveProjectFileDialog(self):
@@ -127,6 +129,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		title = 'Save project file'
 		openAt = "/home"
 		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
+		data = self.convertFilePathToUnicode(data)
 		return data
 
 	def saveGCondeFileDialog(self):
@@ -134,6 +137,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		title = 'Save G-Code file'
 		openAt = "/home"
 		data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
+		data = self.convertFilePathToUnicode(data)
 		return data
 
 
@@ -150,10 +154,17 @@ class PrusaControllView(QtGui.QMainWindow):
 		if event.mimeData().hasUrls():
 			for url in event.mimeData().urls():
 				self.statusBar().showMessage('Dropped file name is ' + str(url.path()))
-				self.controller.openFile(url.path())
+				path = self.convertFilePathToUnicode(url.path())
+				self.controller.openFile(path)
+
 			event.acceptProposedAction()
 		else:
 			super(PrusaControllView, self).dropEvent(event)
+
+	def convertFilePathToUnicode(self, path):
+		codec = QtCore.QTextCodec.codecForName("UTF-16")
+		convertedPath = unicode(codec.fromUnicode(path), 'UTF-16')
+		return convertedPath
 
 
 class PrusaControllWidget(QtGui.QWidget):

@@ -3,6 +3,9 @@
 from abc import ABCMeta, abstractmethod
 from stl.mesh import Mesh
 
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
 
 class AppScene(object):
 	'''
@@ -10,7 +13,8 @@ class AppScene(object):
 	it can be used for generating sliced data and rendering data
 	'''
 	def __init__(self):
-		self.model = []
+		self.modelsData = []
+		self.models = []
 
 
 
@@ -25,6 +29,22 @@ class Model(object):
 		self.v0 = []
 		self.v1 = []
 		self.v2 = []
+
+	def makeDisplayList(self):
+		genList = glGenLists(1)
+		glNewList(genList, GL_COMPILE)
+
+		glBegin(GL_TRIANGLES)
+
+		for i in xrange(len(self.v0)):
+			glVertex3f(self.v0[i][0], self.v0[i][1], self.v0[i][2])
+			glVertex3f(self.v1[i][0], self.v1[i][1], self.v1[i][2])
+			glVertex3f(self.v2[i][0], self.v2[i][1], self.v2[i][2])
+
+		glEnd()
+		glEndList()
+
+		return genList
 
 
 class ModelTypeAbstract(object):
@@ -58,7 +78,8 @@ class ModelTypeStl(ModelTypeAbstract):
 			model.v1.append(mesh.v1[i])
 			model.v2.append(mesh.v2[i])
 		'''
-		some magic with model data
+		some magic with model data...
+		I need normals, transformations...
 		'''
 		return model
 

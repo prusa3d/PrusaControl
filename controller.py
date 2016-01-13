@@ -2,6 +2,7 @@
 
 from gui import PrusaControllView
 from sceneData import AppScene, ModelTypeStl
+from sceneRender import GLWidget
 
 
 class Controller:
@@ -30,8 +31,12 @@ class Controller:
 
     def openModelFile(self):
         data = self.view.openModelFileDialog()
-        self.view.statusBar().showMessage('Load file name: ' + data)
-        self.model.model.append(ModelTypeStl().load(data))
+        self.loadModel(data)
+
+    def loadModel(self, path):
+        self.view.statusBar().showMessage('Load file name: ' + path)
+        self.model.modelsData.append(ModelTypeStl().load(path))
+        self.model.models.append(self.model.modelsData[0].makeDisplayList())
 
     def openSettings(self):
         data = self.view.openSettingsDialog()
@@ -48,9 +53,9 @@ class Controller:
         '''
         function for resolve whitch filetype will be loaded
         '''
+        for url in urls:
+            self.loadModel(url)
 
-        print(filename)
-        pass
 
 
 
