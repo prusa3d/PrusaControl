@@ -76,12 +76,11 @@ class ModelTypeStl(ModelTypeAbstract):
 		model = Model()
 
 		for i in xrange(len(mesh.v0)):
-			model.v0.append(mesh.v0[i])
-			model.v1.append(mesh.v1[i])
-			model.v2.append(mesh.v2[i])
+			model.v0.append(mesh.v0[i]*0.1)
+			model.v1.append(mesh.v1[i]*0.1)
+			model.v2.append(mesh.v2[i]*0.1)
 			model.normal.append(mesh.normals[i])
 
-		print(str(mesh.normals[0]))
 		'''
 		some magic with model data...
 		I need normals, transformations...
