@@ -75,7 +75,7 @@ class GLWidget(QGLWidget):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
 		glTranslated(0.0, 0.0, self.zoom)
-		glRotated(90.0, 1.0, 0.0, 0.0)
+		glRotated(-90.0, 1.0, 0.0, 0.0)
 		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
 		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
 		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
@@ -128,28 +128,16 @@ class GLWidget(QGLWidget):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
-		'''
-		glBegin(GL_QUADS)
-
-		glColor3f(1,1,0)
-		glVertex3d(1, 1, 0)
-		glVertex3d(1, -1, 0)
-		glVertex3d(-1, -1, 0)
-		glVertex3d(-1, 1, 0)
-
-		glEnd()
-		'''
 		glLineWidth(2)
+
 		glBegin(GL_LINES)
-
 		glColor3f(1,1,1)
-		for i in xrange(-5, 6, 1):
-			glVertex3d(i, 5, 0)
-			glVertex3d(i, -5, 0)
+		for i in xrange(-15, 16, 1):
+			glVertex3d(i, 15, 0)
+			glVertex3d(i, -15, 0)
 
-			glVertex3d(5, i, 0)
-			glVertex3d(-5, i, 0)
-
+			glVertex3d(15, i, 0)
+			glVertex3d(-15, i, 0)
 		glEnd()
 
 		glEndList()
