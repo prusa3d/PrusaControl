@@ -89,14 +89,15 @@ class GLWidget(QGLWidget):
 		draw scene with all objects
 		'''
 		if self.parent.controller.model.models:
-			glCallList(self.parent.controller.model.models[0])
+			for model in self.parent.controller.model.models:
+				glCallList(model)
 
 
 	def resizeGL(self, width, height):
 		glViewport(0, 0, width, height)
 		glMatrixMode(GL_PROJECTION)
 		glLoadIdentity()
-		gluPerspective(60*((width*1.0)/(height*1.0)), (width*1.0)/(height*1.0), 0.01, 150.0)
+		gluPerspective(60*((width*1.0)/(height*1.0)), (width*1.0)/(height*1.0), 0.0001, 1000.0)
 		glMatrixMode(GL_MODELVIEW)
 
 	def mousePressEvent(self, event):

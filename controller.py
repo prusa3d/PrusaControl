@@ -31,12 +31,13 @@ class Controller:
 
     def openModelFile(self):
         data = self.view.openModelFileDialog()
-        self.loadModel(data)
+        self.importModel(data)
 
-    def loadModel(self, path):
+    def importModel(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
-        self.model.modelsData.append(ModelTypeStl().load(path))
-        self.model.models.append(self.model.modelsData[0].makeDisplayList())
+        modelData = ModelTypeStl().load(path)
+        self.model.modelsData.append(modelData)
+        self.model.models.append(modelData.makeDisplayList())
 
     def openSettings(self):
         data = self.view.openSettingsDialog()
@@ -49,12 +50,34 @@ class Controller:
     def close(self):
         exit()
 
-    def openFile(self, urls):
+    def importImage(self, path):
+        pass
+
+    def openFile(self, url):
         '''
         function for resolve whitch filetype will be loaded
         '''
-        for url in urls:
-            self.loadModel(url)
+        #self.view.statusBar().showMessage('Load file name: ')
+        print(str(url))
+
+        urlSplited = url.split('.')
+        if len(urlSplited)>1:
+            fileEnd = urlSplited[1]
+        else:
+            fileEnd=''
+            print(str(urlSplited))
+
+        print(fileEnd)
+        if fileEnd in ['stl']:
+            print('import model')
+            self.importModel(url)
+        elif fileEnd in ['prus']:
+            print('open project')
+            self.openProjectFile(url)
+        elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
+            print('import image')
+            self.importImage(url)
+
 
 
 

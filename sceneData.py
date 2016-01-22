@@ -30,6 +30,7 @@ class Model(object):
 		self.v1 = []
 		self.v2 = []
 		self.normal = []
+		self.color = [rand(), rand(), rand()]
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
