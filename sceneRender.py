@@ -14,15 +14,19 @@ class GLWidget(QGLWidget):
 
 		self.parent = parent
 
-		self.bed = 0
-		self.axis = 0
+		self.initParametres()
+
+
+	def initParametres(self):
 		self.xRot = 0
 		self.yRot = 0
 		self.zRot = 0
 		self.zoom = -15
-
 		self.lastPos = QtCore.QPoint()
 
+	def updateScene(self):
+		self.initParametres()
+		self.updateGL()
 
 	def xRotation(self):
 		return self.xRot
@@ -61,7 +65,6 @@ class GLWidget(QGLWidget):
 			self.updateGL()
 
 	def initializeGL(self):
-		#self.object = self.makeObject()
 		self.bed = self.makePrintingBed()
 		self.axis = self.makeAxis()
 
@@ -124,7 +127,6 @@ class GLWidget(QGLWidget):
 
 
 	def makePrintingBed(self):
-
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
@@ -132,12 +134,12 @@ class GLWidget(QGLWidget):
 
 		glBegin(GL_LINES)
 		glColor3f(1,1,1)
-		for i in xrange(-15, 16, 1):
-			glVertex3d(i, 15, 0)
-			glVertex3d(i, -15, 0)
+		for i in xrange(-10, 11, 1):
+			glVertex3d(i, 10, 0)
+			glVertex3d(i, -10, 0)
 
-			glVertex3d(15, i, 0)
-			glVertex3d(-15, i, 0)
+			glVertex3d(10, i, 0)
+			glVertex3d(-10, i, 0)
 		glEnd()
 
 		glEndList()

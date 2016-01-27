@@ -41,14 +41,16 @@ class Controller:
 
     def openSettings(self):
         data = self.view.openSettingsDialog()
-        print('Settings dialog')
-        print(str(data))
 
     def generatePrint(self):
         self.view.enableSaveGcodeButton()
 
     def close(self):
         exit()
+
+    def resetScene(self):
+        self.model.clearScene()
+        self.view.updateScene()
 
     def importImage(self, path):
         pass
@@ -58,16 +60,13 @@ class Controller:
         function for resolve whitch filetype will be loaded
         '''
         #self.view.statusBar().showMessage('Load file name: ')
-        print(str(url))
 
         urlSplited = url.split('.')
         if len(urlSplited)>1:
             fileEnd = urlSplited[1]
         else:
             fileEnd=''
-            print(str(urlSplited))
 
-        print(fileEnd)
         if fileEnd in ['stl']:
             print('import model')
             self.importModel(url)

@@ -16,6 +16,10 @@ class AppScene(object):
 		self.modelsData = []
 		self.models = []
 
+	def clearScene(self):
+		self.modelsData = []
+		self.models = []
+
 
 
 

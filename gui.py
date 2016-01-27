@@ -76,6 +76,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Import stl file', self.controller.openModelFile)
 		self.fileMenu.addSeparator()
+		self.fileMenu.addAction('Reset', self.controller.resetScene)
 		self.fileMenu.addAction('Close', self.controller.close)
 
 		#file menu definition
@@ -166,6 +167,9 @@ class PrusaControllView(QtGui.QMainWindow):
 		convertedPath = unicode(codec.fromUnicode(path), 'UTF-16')
 		return convertedPath
 
+	def updateScene(self):
+		self.prusaControllWidget.updateScene()
+
 
 class PrusaControllWidget(QtGui.QWidget):
 	def __init__(self, parent=None):
@@ -249,7 +253,6 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.printingInfoLabel = QtGui.QLabel("Print info:")
 
 
-
 		self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
 		self.saveGCodeButton.clicked.connect(self.controller.saveGCodeFile)
 
@@ -285,6 +288,9 @@ class PrusaControllWidget(QtGui.QWidget):
 
 		self.show()
 
+	def updateScene(self):
+		self.glWidget.updateScene()
+
 	def disableSaveGcodeButton(self):
 		self.saveGCodeButton.setDisabled(True)
 
@@ -307,83 +313,4 @@ class PrusaControllWidget(QtGui.QWidget):
 
 		self.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
 		return slider
-
-
-
-
-'''
-	def makeObject(self):
-		genList = glGenLists(1)
-		glNewList(genList, GL_COMPILE)
-
-		glBegin(GL_QUADS)
-
-		x1 = +0.06
-		y1 = -0.14
-		x2 = +0.14
-		y2 = -0.06
-		x3 = +0.08
-		y3 = +0.00
-		x4 = +0.30
-		y4 = +0.22
-
-		self.quad(x1, y1, x2, y2, y2, x2, y1, x1)
-		self.quad(x3, y3, x4, y4, y4, x4, y3, x3)
-
-		self.extrude(x1, y1, x2, y2)
-		self.extrude(x2, y2, y2, x2)
-		self.extrude(y2, x2, y1, x1)
-		self.extrude(y1, x1, x1, y1)
-		self.extrude(x3, y3, x4, y4)
-		self.extrude(x4, y4, y4, x4)
-		self.extrude(y4, x4, y3, x3)
-
-		Pi = 3.14159265358979323846
-		NumSectors = 200
-
-		for i in range(NumSectors):
-			angle1 = (i * 2 * Pi) / NumSectors
-			x5 = 0.30 * math.sin(angle1)
-			y5 = 0.30 * math.cos(angle1)
-			x6 = 0.20 * math.sin(angle1)
-			y6 = 0.20 * math.cos(angle1)
-
-			angle2 = ((i + 1) * 2 * Pi) / NumSectors
-			x7 = 0.20 * math.sin(angle2)
-			y7 = 0.20 * math.cos(angle2)
-			x8 = 0.30 * math.sin(angle2)
-			y8 = 0.30 * math.cos(angle2)
-
-			self.quad(x5, y5, x6, y6, x7, y7, x8, y8)
-
-			self.extrude(x6, y6, x7, y7)
-			self.extrude(x8, y8, x5, y5)
-
-		glEnd()
-		glEndList()
-
-		return genList
-
-	def quad(self, x1, y1, x2, y2, x3, y3, x4, y4):
-		self.qglColor(self.trolltechGreen)
-
-		glVertex3d(x1, y1, -0.05)
-		glVertex3d(x2, y2, -0.05)
-		glVertex3d(x3, y3, -0.05)
-		glVertex3d(x4, y4, -0.05)
-
-		glVertex3d(x4, y4, +0.05)
-		glVertex3d(x3, y3, +0.05)
-		glVertex3d(x2, y2, +0.05)
-		glVertex3d(x1, y1, +0.05)
-
-	def extrude(self, x1, y1, x2, y2):
-		self.qglColor(self.trolltechGreen.darker(250 + int(100 * x1)))
-
-		glVertex3d(x1, y1, +0.05)
-		glVertex3d(x2, y2, +0.05)
-		glVertex3d(x2, y2, -0.05)
-		glVertex3d(x1, y1, -0.05)
-'''
-
 
