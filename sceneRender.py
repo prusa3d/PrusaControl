@@ -86,6 +86,8 @@ class GLWidget(QGLWidget):
 		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 		glEnable(GL_LIGHT0)
 
+		glEnable(GL_COLOR_MATERIAL)
+
 		#glEnable(GL_CULL_FACE)
 
 
