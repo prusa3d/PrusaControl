@@ -22,10 +22,17 @@ class GLWidget(QGLWidget):
 		self.yRot = 0
 		self.zRot = 0
 		self.zoom = -15
+
+		self.lightAmbient = [.5, .5, .5, 1.0]
+		self.lightDiffuse = [.5, .5, .5, 1.0]
+		self.lightPossition = [25.0, 25.0, 25.0, 1.0]
+
+
 		self.lastPos = QtCore.QPoint()
 
-	def updateScene(self):
-		self.initParametres()
+	def updateScene(self, reset=False):
+		if reset:
+			self.initParametres()
 		self.updateGL()
 
 	def xRotation(self):
@@ -68,8 +75,17 @@ class GLWidget(QGLWidget):
 		self.bed = self.makePrintingBed()
 		self.axis = self.makeAxis()
 
-		glShadeModel(GL_FLAT)
+		#glClearDepth(1.0)
+		glShadeModel(GL_SMOOTH)
 		glEnable(GL_DEPTH_TEST)
+
+
+		#light
+		glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightDiffuse)
+		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+		glEnable(GL_LIGHT0)
+
 		#glEnable(GL_CULL_FACE)
 
 
@@ -91,9 +107,11 @@ class GLWidget(QGLWidget):
 		'''
 		draw scene with all objects
 		'''
+		glEnable ( GL_LIGHTING )
 		if self.parent.controller.model.models:
 			for model in self.parent.controller.model.models:
 				glCallList(model)
+		glDisable( GL_LIGHTING )
 
 
 	def resizeGL(self, width, height):
@@ -110,10 +128,10 @@ class GLWidget(QGLWidget):
 		dx = event.x() - self.lastPos.x()
 		dy = event.y() - self.lastPos.y()
 
+#		if event.buttons() & QtCore.Qt.LeftButton:
+#			self.setXRotation(self.xRot + 8 * dy)
+#			self.setYRotation(self.yRot + 8 * dx)
 		if event.buttons() & QtCore.Qt.LeftButton:
-			self.setXRotation(self.xRot + 8 * dy)
-			self.setYRotation(self.yRot + 8 * dx)
-		elif event.buttons() & QtCore.Qt.RightButton:
 			self.setXRotation(self.xRot + 8 * dy)
 			self.setZRotation(self.zRot + 8 * dx)
 

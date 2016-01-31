@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import math
@@ -167,8 +166,8 @@ class PrusaControllView(QtGui.QMainWindow):
 		convertedPath = unicode(codec.fromUnicode(path), 'UTF-16')
 		return convertedPath
 
-	def updateScene(self):
-		self.prusaControllWidget.updateScene()
+	def updateScene(self, reset=False):
+		self.prusaControllWidget.updateScene(reset)
 
 
 class PrusaControllWidget(QtGui.QWidget):
@@ -288,8 +287,8 @@ class PrusaControllWidget(QtGui.QWidget):
 
 		self.show()
 
-	def updateScene(self):
-		self.glWidget.updateScene()
+	def updateScene(self, reset=False):
+		self.glWidget.updateScene(reset)
 
 	def disableSaveGcodeButton(self):
 		self.saveGCodeButton.setDisabled(True)

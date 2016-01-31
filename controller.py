@@ -38,6 +38,7 @@ class Controller:
         modelData = ModelTypeStl().load(path)
         self.model.modelsData.append(modelData)
         self.model.models.append(modelData.makeDisplayList())
+        self.view.updateScene()
 
     def openSettings(self):
         data = self.view.openSettingsDialog()
@@ -50,7 +51,7 @@ class Controller:
 
     def resetScene(self):
         self.model.clearScene()
-        self.view.updateScene()
+        self.view.updateScene(True)
 
     def importImage(self, path):
         pass

@@ -2,9 +2,11 @@
 
 from abc import ABCMeta, abstractmethod
 from stl.mesh import Mesh
+from random import randint
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+
 
 
 class AppScene(object):
@@ -34,12 +36,15 @@ class Model(object):
 		self.v1 = []
 		self.v2 = []
 		self.normal = []
-		#self.color = [rand(), rand(), rand()]
+		self.color = [randint(1,10)*0.1,
+					  randint(1,10)*0.1,
+					  randint(1,10)*0.1]
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
+		glColor3f(self.color[0], self.color[1], self.color[2])
 		glBegin(GL_TRIANGLES)
 
 		for i in xrange(len(self.v0)):
