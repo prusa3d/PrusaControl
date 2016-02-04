@@ -13,7 +13,6 @@ class GLWidget(QGLWidget):
 		QGLWidget.__init__(self, parent)
 
 		self.parent = parent
-
 		self.initParametres()
 
 
@@ -23,10 +22,12 @@ class GLWidget(QGLWidget):
 		self.zRot = 0
 		self.zoom = -15
 
-		self.lightAmbient = [.5, .5, .5, 1.0]
+		self.lightAmbient = [.95, .95, .95, 1.0]
 		self.lightDiffuse = [.5, .5, .5, 1.0]
-		self.lightPossition = [18.0, 11.0, 7.0, 1.0]
+		self.lightPossition = [29.0, 48.0, 37.0, 1.0]
 
+		self.materialSpecular = [.15,.15,.15,.1]
+		self.materialShiness = [0.25]
 
 		self.lastPos = QtCore.QPoint()
 
@@ -75,10 +76,14 @@ class GLWidget(QGLWidget):
 		self.bed = self.makePrintingBed()
 		self.axis = self.makeAxis()
 
-		#glClearDepth(1.0)
-		glShadeModel(GL_SMOOTH)
+		glClearDepth(1.0)
+		glShadeModel(GL_FLAT)
 		glEnable(GL_DEPTH_TEST)
+		glDepthFunc(GL_LEQUAL)
 
+		#material
+		glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
+   		glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
 		#light
 		glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
@@ -88,10 +93,13 @@ class GLWidget(QGLWidget):
 
 		glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
 		glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
 		glEnable(GL_COLOR_MATERIAL)
+		glEnable(GL_LINE_SMOOTH)
+		glEnable( GL_BLEND )
 
-		#glEnable(GL_CULL_FACE)
+		glEnable(GL_CULL_FACE)
 
 
 	def paintGL(self):
@@ -104,11 +112,20 @@ class GLWidget(QGLWidget):
 		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
 		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
 		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
 		glCallList(self.bed)
 		glDisable(GL_DEPTH_TEST)
 		glCallList(self.axis)
+
+		glPointSize(5)
+		glColor3f(1,1,0)
+		glBegin(GL_POINTS)
+		glVertex3f(self.lightPossition[0], self.lightPossition[1], self.lightPossition[2])
+		glEnd()
+
 		glEnable(GL_DEPTH_TEST)
+
 
 		'''
 		draw scene with all objects
@@ -118,6 +135,7 @@ class GLWidget(QGLWidget):
 			for model in self.parent.controller.model.models:
 				glCallList(model)
 		glDisable( GL_LIGHTING )
+
 
 
 	def resizeGL(self, width, height):
@@ -153,6 +171,7 @@ class GLWidget(QGLWidget):
 		glNewList(genList, GL_COMPILE)
 
 		glLineWidth(2)
+
 
 		glBegin(GL_LINES)
 		glColor3f(1,1,1)
