@@ -37,7 +37,7 @@ class Model(object):
 		self.v2 = []
 		self.normal = []
 		self.color = [randint(1,10)*0.1,
-					  randint(1,10)*0.1,
+					  randint(3,8)*0.1,
 					  randint(1,10)*0.1]
 
 	def makeDisplayList(self):

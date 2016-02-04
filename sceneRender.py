@@ -25,7 +25,7 @@ class GLWidget(QGLWidget):
 
 		self.lightAmbient = [.5, .5, .5, 1.0]
 		self.lightDiffuse = [.5, .5, .5, 1.0]
-		self.lightPossition = [25.0, 25.0, 25.0, 1.0]
+		self.lightPossition = [18.0, 11.0, 7.0, 1.0]
 
 
 		self.lastPos = QtCore.QPoint()
@@ -86,6 +86,9 @@ class GLWidget(QGLWidget):
 		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 		glEnable(GL_LIGHT0)
 
+		glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
+		glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
+
 		glEnable(GL_COLOR_MATERIAL)
 
 		#glEnable(GL_CULL_FACE)
@@ -95,6 +98,7 @@ class GLWidget(QGLWidget):
 		glClearColor(0.0, 0.47, 0.62, 1.0)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 		glLoadIdentity()
+		glTranslated(0,-5,0)
 		glTranslated(0.0, 0.0, self.zoom)
 		glRotated(-90.0, 1.0, 0.0, 0.0)
 		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
@@ -144,8 +148,6 @@ class GLWidget(QGLWidget):
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
 
-
-
 	def makePrintingBed(self):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
@@ -160,8 +162,30 @@ class GLWidget(QGLWidget):
 
 			glVertex3d(10, i, 0)
 			glVertex3d(-10, i, 0)
+
+
+		glVertex3d(-10, 10, 0)
+		glVertex3d(-10, 10, 20)
+
+		glVertex3d(10, 10, 0)
+		glVertex3d(10, 10, 20)
+
+		glVertex3d(10, -10, 0)
+		glVertex3d(10, -10, 20)
+
+		glVertex3d(-10, -10, 0)
+		glVertex3d(-10, -10, 20)
+
 		glEnd()
 
+		glBegin(GL_LINE_LOOP)
+
+		glVertex3d(-10, 10, 20)
+		glVertex3d(10, 10, 20)
+		glVertex3d(10, -10, 20)
+		glVertex3d(-10, -10, 20)
+
+		glEnd()
 		glEndList()
 
 		return genList
@@ -175,16 +199,16 @@ class GLWidget(QGLWidget):
 		glBegin(GL_LINES)
 
 		glColor3f(1, 0, 0)
-		glVertex3d(0, 0, 0)
-		glVertex3d(1, 0, 0)
+		glVertex3d(-10, -10, 0)
+		glVertex3d(-9, -10, 0)
 
 		glColor3f(0, 1, 0)
-		glVertex3d(0, 0, 0)
-		glVertex3d(0, 1, 0)
+		glVertex3d(-10, -10, 0)
+		glVertex3d(-10, -9, 0)
 
 		glColor3f(0, 0, 1)
-		glVertex3d(0, 0, 0)
-		glVertex3d(0, 0, 1)
+		glVertex3d(-10, -10, 0)
+		glVertex3d(-10, -10, 1)
 
 		glEnd()
 		glEndList()
