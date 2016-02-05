@@ -96,6 +96,7 @@ class GLWidget(QGLWidget):
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
 		glEnable(GL_COLOR_MATERIAL)
+		glEnable(GL_MULTISAMPLE)
 		glEnable(GL_LINE_SMOOTH)
 		glEnable( GL_BLEND )
 
@@ -114,6 +115,9 @@ class GLWidget(QGLWidget):
 		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
+
+
+
 		glCallList(self.bed)
 		glDisable(GL_DEPTH_TEST)
 		glCallList(self.axis)
@@ -125,7 +129,6 @@ class GLWidget(QGLWidget):
 		glEnd()
 
 		glEnable(GL_DEPTH_TEST)
-
 
 		'''
 		draw scene with all objects

@@ -68,7 +68,7 @@ class Controller:
         else:
             fileEnd=''
 
-        if fileEnd in ['stl']:
+        if fileEnd in ['stl', 'STL', 'Stl']:
             print('import model')
             self.importModel(url)
         elif fileEnd in ['prus']:

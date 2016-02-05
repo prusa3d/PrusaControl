@@ -38,9 +38,9 @@ class Model(object):
 		self.v2 = []
 		self.normal = []
 		self.newNormal = []
-		self.color = [randint(1,10)*0.1,
-					  randint(3,8)*0.1,
-					  randint(1,10)*0.1]
+		self.color = [randint(3, 8) * 0.1,
+					  randint(3, 8) * 0.1,
+					  randint(3, 8) * 0.1]
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
@@ -93,6 +93,9 @@ class ModelTypeStl(ModelTypeAbstract):
 			model.v1.append(mesh.v1[i]*0.1)
 			model.v2.append(mesh.v2[i]*0.1)
 
+			#calculate bounding box
+
+			'''
 			uX = mesh.v1[i][0] - mesh.v0[i][0]
 			uY = mesh.v1[i][1] - mesh.v0[i][1]
 			uZ = mesh.v1[i][2] - mesh.v0[i][2]
@@ -104,7 +107,9 @@ class ModelTypeStl(ModelTypeAbstract):
 			normal[0] = (uY*vZ) - (uZ*vY)
 			normal[1] = (uZ*vX) - (uX*vZ)
 			normal[2] = (uX*vY) - (uY*vX)
+			'''
 
+			normal = mesh.normals[i]
 			l = math.sqrt((normal[0] * normal[0]) + (normal[1] * normal[1]) + (normal[2] * normal[2]))
 			normal[0] = (normal[0]*1.0) / (l*1.0)
 			normal[1] = (normal[1]*1.0) / (l*1.0)
