@@ -16,11 +16,11 @@ class AppScene(object):
 	it can be used for generating sliced data and rendering data
 	'''
 	def __init__(self):
-		self.modelsData = []
+		#self.modelsData = []
 		self.models = []
 
 	def clearScene(self):
-		self.modelsData = []
+		#self.modelsData = []
 		self.models = []
 
 
@@ -33,14 +33,32 @@ class Model(object):
 	this is reprezentation of model data, data readed from file
 	'''
 	def __init__(self):
+		#structural data
 		self.v0 = []
 		self.v1 = []
 		self.v2 = []
 		self.normal = []
 		self.newNormal = []
+		self.displayList = []
+
+		#transformation data
+		self.pos = [.0,.0,.0]
+		self.rot = [.0,.0,.0]
+		self.scale = [.0,.0,.0]
+
+		#helping data
+		self.selected = False
+		self.boundingSphereZero = [.0,.0,.0]
+		self.boundingSphereSize = .0
 		self.color = [randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1]
+
+	def intersectionRayBoundingSphere(self):
+		return False
+
+	def intersectionRayModel(self):
+		return False
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
@@ -50,12 +68,20 @@ class Model(object):
 		glBegin(GL_TRIANGLES)
 
 		for i in xrange(len(self.v0)):
-			glNormal3f(self.newNormal[i][0], self.newNormal[i][1], self.newNormal[i][2])
-			glVertex3f(self.v0[i][0], self.v0[i][1], self.v0[i][2])
-			glVertex3f(self.v1[i][0], self.v1[i][1], self.v1[i][2])
-			glVertex3f(self.v2[i][0], self.v2[i][1], self.v2[i][2])
+			glNormal3d(self.newNormal[i][0], self.newNormal[i][1], self.newNormal[i][2])
+			glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
+			glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
+			glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
 
 		glEnd()
+
+		glPointSize(4.0)
+		glDisable(GL_DEPTH_TEST)
+		glColor3f(1,0,1)
+		glBegin(GL_POINTS)
+		glVertex3d(self.boundingSphereZero[0], self.boundingSphereZero[1], self.boundingSphereZero[2])
+		glEnd()
+		glEnable(GL_DEPTH_TEST)
 		glEndList()
 
 		return genList
@@ -87,13 +113,36 @@ class ModelTypeStl(ModelTypeAbstract):
 		mesh = Mesh.from_file(filename)
 		model = Model()
 
+		'''
+		some magic with model data...
+		I need normals, transformations...
+		'''
+
+		#calculate bounding sphere
+		print(str(len(mesh.points)))
+		xMax = max([a[0]*.1 for a in mesh.points])
+		xMin = min([a[0]*.1 for a in mesh.points])
+		model.boundingSphereZero[0] = (xMax + xMin) * .5
+
+		yMax = max([a[1]*.1 for a in mesh.points])
+		yMin = min([a[1]*.1 for a in mesh.points])
+		model.boundingSphereZero[1] = (yMax + yMin) * .5
+
+		zMax = max([a[2]*.1 for a in mesh.points])
+		zMin = min([a[2]*.1 for a in mesh.points])
+		model.boundingSphereZero[2] = (zMax + zMin) * .5
+		model.boundingSphereSize = max([abs(xMax), abs(yMax), abs(zMax), abs(xMin), abs(yMin), abs(zMin)])
+
+
+		print('X Max a Min jsou: ' + str(xMax) + ' ' + str(xMin))
+		print('Y Max a Min jsou: ' + str(yMax) + ' ' + str(yMin))
+		print('Z Max a Min jsou: ' + str(zMax) + ' ' + str(zMin))
+
 		for i in xrange(len(mesh.v0)):
 			normal = [.0, .0, .0]
 			model.v0.append(mesh.v0[i]*0.1)
 			model.v1.append(mesh.v1[i]*0.1)
 			model.v2.append(mesh.v2[i]*0.1)
-
-			#calculate bounding box
 
 			'''
 			uX = mesh.v1[i][0] - mesh.v0[i][0]
@@ -118,10 +167,10 @@ class ModelTypeStl(ModelTypeAbstract):
 			model.newNormal.append(normal)
 			model.normal.append(mesh.normals[i])
 
-		'''
-		some magic with model data...
-		I need normals, transformations...
-		'''
+
+
+		model.displayList = model.makeDisplayList()
+
 		return model
 
 

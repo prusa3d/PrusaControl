@@ -36,8 +36,8 @@ class Controller:
     def importModel(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
         modelData = ModelTypeStl().load(path)
-        self.model.modelsData.append(modelData)
-        self.model.models.append(modelData.makeDisplayList())
+        self.model.models.append(modelData)
+        #self.model.models.append(modelData.makeDisplayList())
         self.view.updateScene()
 
     def openSettings(self):

@@ -2,6 +2,7 @@
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
 from PyQt4 import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
@@ -79,6 +80,7 @@ class GLWidget(QGLWidget):
 		self.bed = self.makePrintingBed()
 		self.axis = self.makeAxis()
 
+		glutInit()
 		glClearDepth(1.0)
 		glShadeModel(GL_FLAT)
 		glEnable(GL_DEPTH_TEST)
@@ -86,7 +88,7 @@ class GLWidget(QGLWidget):
 
 		#material
 		glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
-   		glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
+		glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
 		#light
 		glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
@@ -140,10 +142,17 @@ class GLWidget(QGLWidget):
 		'''
 		draw scene with all objects
 		'''
+
+
 		glEnable ( GL_LIGHTING )
 		if self.parent.controller.model.models:
 			for model in self.parent.controller.model.models:
-				glCallList(model)
+				glPushMatrix()
+				#some model transformation(move, rotate, scale)
+				glCallList(model.displayList)
+				glTranslated(model.boundingSphereZero[0], model.boundingSphereZero[1], model.boundingSphereZero[2])
+				glutWireSphere(model.boundingSphereSize, 16, 10)
+				glPopMatrix()
 		glDisable( GL_LIGHTING )
 
 
