@@ -21,6 +21,9 @@ class GLWidget(QGLWidget):
 		self.yRot = 0
 		self.zRot = 0
 		self.zoom = -15
+		self.rayStart = [.0, .0, .0]
+		self.rayEnd = [.0, .0, .0]
+
 
 		self.lightAmbient = [.95, .95, .95, 1.0]
 		self.lightDiffuse = [.5, .5, .5, 1.0]
@@ -111,12 +114,9 @@ class GLWidget(QGLWidget):
 		glTranslated(0.0, 0.0, self.zoom)
 		glRotated(-90.0, 1.0, 0.0, 0.0)
 		glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-		glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
+		#glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
 		glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
-
-
-
 
 		glCallList(self.bed)
 		glDisable(GL_DEPTH_TEST)
@@ -125,10 +125,17 @@ class GLWidget(QGLWidget):
 		glPointSize(5)
 		glColor3f(1,1,0)
 		glBegin(GL_POINTS)
-		glVertex3f(self.lightPossition[0], self.lightPossition[1], self.lightPossition[2])
+		glVertex3d(self.lightPossition[0], self.lightPossition[1], self.lightPossition[2])
+		glEnd()
+		glEnable(GL_DEPTH_TEST)
+
+		glLineWidth(5)
+		glBegin(GL_LINES)
+		glColor3f(0,1,0)
+		glVertex3d(self.rayStart[0], self.rayStart[1], self.rayStart[2])
+		glVertex3d(self.rayEnd[0], self.rayEnd[1], self.rayEnd[2])
 		glEnd()
 
-		glEnable(GL_DEPTH_TEST)
 
 		'''
 		draw scene with all objects
@@ -140,7 +147,6 @@ class GLWidget(QGLWidget):
 		glDisable( GL_LIGHTING )
 
 
-
 	def resizeGL(self, width, height):
 		glViewport(0, 0, width, height)
 		glMatrixMode(GL_PROJECTION)
@@ -150,6 +156,8 @@ class GLWidget(QGLWidget):
 
 	def mousePressEvent(self, event):
 		self.lastPos = QtCore.QPoint(event.pos())
+		if event.buttons() & QtCore.Qt.RightButton:
+			self.hitObjects(event)
 
 	def mouseMoveEvent(self, event):
 		dx = event.x() - self.lastPos.x()
@@ -169,12 +177,28 @@ class GLWidget(QGLWidget):
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
 
+	def hitObjects(self, event):
+		matModelView = []
+		matProjection = []
+		viewport = []
+
+		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
+		matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
+		viewport = glGetIntegerv( GL_VIEWPORT )
+
+		winX = event.x() * 1.0
+		winY = viewport[3] - (event.y() *1.0)
+
+		self.rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
+		self.rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
+
+		return False
+
 	def makePrintingBed(self):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
 		glLineWidth(2)
-
 
 		glBegin(GL_LINES)
 		glColor3f(1,1,1)
@@ -244,3 +268,9 @@ class GLWidget(QGLWidget):
 			angle -= 360 * 16
 		return angle
 
+	def normalizeAngleX(self, angle):
+		if angle < 0:
+			angle = 0
+		if angle > 180:
+			angle = 180
+		return angle
