@@ -49,14 +49,15 @@ if __name__ == '__main__':
 	app = QtGui.QApplication(sys.argv)
 
 	#Create and Display splash screen
+	'''
 	splash_pix = QPixmap('gui/splashscreen.png')
 	splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
 	splash.setMask(splash_pix.mask())
 	splash.show()
-
+	'''
 	controller = Controller()
 
 	window = controller.getView()
-	splash.finish(window)
+	#splash.finish(window)
 
 	sys.exit(app.exec_())

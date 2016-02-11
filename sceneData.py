@@ -119,7 +119,6 @@ class ModelTypeStl(ModelTypeAbstract):
 		'''
 
 		#calculate bounding sphere
-		print(str(len(mesh.points)))
 		xMax = max([a[0]*.1 for a in mesh.points])
 		xMin = min([a[0]*.1 for a in mesh.points])
 		model.boundingSphereZero[0] = (xMax + xMin) * .5
@@ -131,18 +130,32 @@ class ModelTypeStl(ModelTypeAbstract):
 		zMax = max([a[2]*.1 for a in mesh.points])
 		zMin = min([a[2]*.1 for a in mesh.points])
 		model.boundingSphereZero[2] = (zMax + zMin) * .5
-		model.boundingSphereSize = max([abs(xMax), abs(yMax), abs(zMax), abs(xMin), abs(yMin), abs(zMin)])
-
-
-		print('X Max a Min jsou: ' + str(xMax) + ' ' + str(xMin))
-		print('Y Max a Min jsou: ' + str(yMax) + ' ' + str(yMin))
-		print('Z Max a Min jsou: ' + str(zMax) + ' ' + str(zMin))
+		#model.boundingSphereSize = max([abs(xMax), abs(yMax), abs(zMax), abs(xMin), abs(yMin), abs(zMin)])
 
 		for i in xrange(len(mesh.v0)):
 			normal = [.0, .0, .0]
-			model.v0.append(mesh.v0[i]*0.1)
-			model.v1.append(mesh.v1[i]*0.1)
-			model.v2.append(mesh.v2[i]*0.1)
+			mv0 = mesh.v0[i]*0.1
+			mv1 = mesh.v1[i]*0.1
+			mv2 = mesh.v2[i]*0.1
+
+			model.v0.append(mv0)
+			model.v1.append(mv1)
+			model.v2.append(mv2)
+
+			v0 = Vector(model.boundingSphereZero)
+			v1 = Vector(model.boundingSphereZero)
+			v2 = Vector(model.boundingSphereZero)
+
+			v0L = abs(v0.lenght(mv0))
+			v1L = abs(v1.lenght(mv1))
+			v2L = abs(v2.lenght(mv2))
+
+			if v0L > model.boundingSphereSize:
+				model.boundingSphereSize = v0L
+			if v1L > model.boundingSphereSize:
+				model.boundingSphereSize = v1L
+			if v2L > model.boundingSphereSize:
+				model.boundingSphereSize = v2L
 
 			'''
 			uX = mesh.v1[i][0] - mesh.v0[i][0]
@@ -174,3 +187,25 @@ class ModelTypeStl(ModelTypeAbstract):
 		return model
 
 
+#math
+class Vector(object):
+	def __init__(self, v=[.0, .0, .0]):
+		self.x = v[0]
+		self.y = v[1]
+		self.z = v[2]
+
+	def minus(self, v):
+		self.x -= v[0]
+		self.y -= v[1]
+		self.z -= v[2]
+
+	def plus(self, v):
+		self.x += v[0]
+		self.y += v[1]
+		self.z += v[2]
+
+	def lenght(self, v):
+		x = v[0] - self.x
+		y = v[1] - self.y
+		z = v[2] - self.z
+		return math.sqrt((x*x)+(y*y)+(z*z))

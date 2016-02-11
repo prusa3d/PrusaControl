@@ -11,6 +11,8 @@ class Controller:
         self.view.disableSaveGcodeButton()
         self.model = AppScene()
 
+        self.settings = {}
+
     def getView(self):
         return self.view
 
@@ -41,7 +43,7 @@ class Controller:
         self.view.updateScene()
 
     def openSettings(self):
-        data = self.view.openSettingsDialog()
+        self.settings = self.view.openSettingsDialog()
 
     def generatePrint(self):
         self.view.enableSaveGcodeButton()

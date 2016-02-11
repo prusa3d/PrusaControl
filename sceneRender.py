@@ -16,6 +16,8 @@ class GLWidget(QGLWidget):
 		self.parent = parent
 		self.initParametres()
 
+		self.debug = False
+
 
 	def initParametres(self):
 		self.xRot = 0
@@ -25,13 +27,12 @@ class GLWidget(QGLWidget):
 		self.rayStart = [.0, .0, .0]
 		self.rayEnd = [.0, .0, .0]
 
-
 		self.lightAmbient = [.95, .95, .95, 1.0]
 		self.lightDiffuse = [.5, .5, .5, 1.0]
-		self.lightPossition = [29.0, 48.0, 37.0, 1.0]
+		self.lightPossition = [29.0, -48.0, 37.0, 1.0]
 
-		self.materialSpecular = [.15,.15,.15,.1]
-		self.materialShiness = [0.25]
+		self.materialSpecular = [.05,.05,.05,.1]
+		self.materialShiness = [0.05]
 
 		self.lastPos = QtCore.QPoint()
 
@@ -131,30 +132,35 @@ class GLWidget(QGLWidget):
 		glEnd()
 		glEnable(GL_DEPTH_TEST)
 
-		glLineWidth(5)
-		glBegin(GL_LINES)
-		glColor3f(0,1,0)
-		glVertex3d(self.rayStart[0], self.rayStart[1], self.rayStart[2])
-		glVertex3d(self.rayEnd[0], self.rayEnd[1], self.rayEnd[2])
-		glEnd()
+		if 'debug' in self.parent.controller.settings:
+			if self.parent.controller.settings['debug']:
+				glLineWidth(5)
+				glBegin(GL_LINES)
+				glColor3f(0,1,0)
+				glVertex3d(self.rayStart[0], self.rayStart[1], self.rayStart[2])
+				glVertex3d(self.rayEnd[0], self.rayEnd[1], self.rayEnd[2])
+				glEnd()
 
 
 		'''
 		draw scene with all objects
 		'''
 
-
+		glDisable( GL_BLEND )
 		glEnable ( GL_LIGHTING )
 		if self.parent.controller.model.models:
 			for model in self.parent.controller.model.models:
 				glPushMatrix()
 				#some model transformation(move, rotate, scale)
 				glCallList(model.displayList)
-				glTranslated(model.boundingSphereZero[0], model.boundingSphereZero[1], model.boundingSphereZero[2])
-				glutWireSphere(model.boundingSphereSize, 16, 10)
+
+				if 'debug' in self.parent.controller.settings:
+					if self.parent.controller.settings['debug']:
+						glTranslated(model.boundingSphereZero[0], model.boundingSphereZero[1], model.boundingSphereZero[2])
+						glutWireSphere(model.boundingSphereSize, 16, 10)
 				glPopMatrix()
 		glDisable( GL_LIGHTING )
-
+		glEnable( GL_BLEND )
 
 	def resizeGL(self, width, height):
 		glViewport(0, 0, width, height)
@@ -180,6 +186,7 @@ class GLWidget(QGLWidget):
 			self.setZRotation(self.zRot + 8 * dx)
 
 		self.lastPos = QtCore.QPoint(event.pos())
+
 
 	def wheelEvent(self, event):
 		self.zoom = self.zoom + event.delta()/120

@@ -36,11 +36,15 @@ class SettingsDialog(QDialog):
 		self.printerCombo.addItem('Prusa i3')
 		self.printerCombo.addItem('Prusa i3 v2')
 
+		self.debugCheckBox = QtGui.QCheckBox("Debug")
+
 		layout.addWidget(self.languageLabel)
 		layout.addWidget(self.languageCombo)
 
 		layout.addWidget(self.printerLabel)
 		layout.addWidget(self.printerCombo)
+
+		layout.addWidget(self.debugCheckBox)
 
 		# OK and Cancel buttons
 		buttons = QDialogButtonBox(
@@ -52,9 +56,11 @@ class SettingsDialog(QDialog):
 
 	@staticmethod
 	def getSettingsData(parent = None):
+		data = {}
 		dialog = SettingsDialog(parent)
 		result = dialog.exec_()
-		data = dialog.languageCombo.currentIndex()
+		data['languageCombo'] = dialog.languageCombo.currentIndex()
+		data['debug'] = dialog.debugCheckBox.isChecked()
 		return (data, result == QDialog.Accepted)
 
 
