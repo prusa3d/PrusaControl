@@ -130,7 +130,6 @@ class ModelTypeStl(ModelTypeAbstract):
 		zMax = max([a[2]*.1 for a in mesh.points])
 		zMin = min([a[2]*.1 for a in mesh.points])
 		model.boundingSphereZero[2] = (zMax + zMin) * .5
-		#model.boundingSphereSize = max([abs(xMax), abs(yMax), abs(zMax), abs(xMin), abs(yMin), abs(zMin)])
 
 		for i in xrange(len(mesh.v0)):
 			normal = [.0, .0, .0]
