@@ -152,11 +152,19 @@ class GLWidget(QGLWidget):
 			for model in self.parent.controller.model.models:
 				glPushMatrix()
 				#some model transformation(move, rotate, scale)
+				if model.selected:
+					glColor3f(1,0,0)
+				else:
+					glColor3f(model.color[0], model.color[1], model.color[2])
 				glCallList(model.displayList)
 
 				if 'debug' in self.parent.controller.settings:
 					if self.parent.controller.settings['debug']:
 						glTranslated(model.boundingSphereZero[0], model.boundingSphereZero[1], model.boundingSphereZero[2])
+						if model.selected:
+							glColor3f(1,0,0)
+						else:
+							glColor3f(0,1,1)
 						glutWireSphere(model.boundingSphereSize, 16, 10)
 				glPopMatrix()
 		glDisable( GL_LIGHTING )
@@ -173,6 +181,7 @@ class GLWidget(QGLWidget):
 		self.lastPos = QtCore.QPoint(event.pos())
 		if event.buttons() & QtCore.Qt.RightButton:
 			self.hitObjects(event)
+			self.updateGL()
 
 	def mouseMoveEvent(self, event):
 		dx = event.x() - self.lastPos.x()
@@ -189,6 +198,7 @@ class GLWidget(QGLWidget):
 
 
 	def wheelEvent(self, event):
+
 		self.zoom = self.zoom + event.delta()/120
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
@@ -197,6 +207,7 @@ class GLWidget(QGLWidget):
 		matModelView = []
 		matProjection = []
 		viewport = []
+		possibleHitten = []
 
 		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
 		matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
@@ -207,6 +218,15 @@ class GLWidget(QGLWidget):
 
 		self.rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
 		self.rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
+
+		for model in self.parent.controller.model.models:
+			if model.intersectionRayBoundingSphere(self.rayStart, self.rayEnd):
+				possibleHitten.append(model)
+
+		for model in possibleHitten:
+			model.intersectionRayModel()
+
+
 
 		return False
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import numpy
 from abc import ABCMeta, abstractmethod
 from stl.mesh import Mesh
 from random import randint
@@ -16,15 +16,10 @@ class AppScene(object):
 	it can be used for generating sliced data and rendering data
 	'''
 	def __init__(self):
-		#self.modelsData = []
 		self.models = []
 
 	def clearScene(self):
-		#self.modelsData = []
 		self.models = []
-
-
-
 
 
 
@@ -54,17 +49,35 @@ class Model(object):
 					  randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1]
 
-	def intersectionRayBoundingSphere(self):
-		return False
+
+	def closestPoint(self, a, b, p):
+
+		ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
+		abSquare = numpy.dot(ab.getRaw(), ab.getRaw())
+		ap = Vector([p.x-a.x, p.y-a.y, p.z-a.z])
+		apDotAB = numpy.dot(ap.getRaw(), ab.getRaw())
+		t = apDotAB / abSquare
+		q = Vector([a.x+ab.x*t, a.y+ab.y*t, a.z+ab.z*t])
+		return q
+
+
+	def intersectionRayBoundingSphere(self, start, end):
+		pt = self.closestPoint(Vector(start), Vector(end), Vector(self.boundingSphereZero))
+		lenght = pt.lenght(self.boundingSphereZero)
+		return lenght < self.boundingSphereSize
+
+
 
 	def intersectionRayModel(self):
+		#print('trefeny model: ' + str(self.color))
+		self.selected = not self.selected
 		return False
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
-		glColor3f(self.color[0], self.color[1], self.color[2])
+		#glColor3f(self.color[0], self.color[1], self.color[2])
 		glBegin(GL_TRIANGLES)
 
 		for i in xrange(len(self.v0)):
@@ -208,3 +221,6 @@ class Vector(object):
 		y = v[1] - self.y
 		z = v[2] - self.z
 		return math.sqrt((x*x)+(y*y)+(z*z))
+
+	def getRaw(self):
+		return [self.x, self.y, self.z]
