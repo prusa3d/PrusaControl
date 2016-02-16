@@ -57,6 +57,7 @@ class Controller:
 
     def openSettings(self):
         self.settings = self.view.openSettingsDialog()
+        print(str(self.settings))
 
     def generatePrint(self):
         self.view.enableSaveGcodeButton()

@@ -152,11 +152,7 @@ class GLWidget(QGLWidget):
 			for model in self.parent.controller.model.models:
 				glPushMatrix()
 				#some model transformation(move, rotate, scale)
-				if model.selected:
-					glColor3f(1,0,0)
-				else:
-					glColor3f(model.color[0], model.color[1], model.color[2])
-				glCallList(model.displayList)
+				model.render()
 
 				if 'debug' in self.parent.controller.settings:
 					if self.parent.controller.settings['debug']:

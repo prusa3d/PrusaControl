@@ -64,7 +64,8 @@ class SettingsDialog(QDialog):
 		data = {}
 		dialog = SettingsDialog(controller, parent)
 		result = dialog.exec_()
-		data['languageCombo'] = dialog.languageCombo.currentIndex()
+		data['language'] = controller.enumeration['language'].keys()[dialog.languageCombo.currentIndex()]
+		data['printer'] = controller.enumeration['printer'].keys()[dialog.printerCombo.currentIndex()]
 		data['debug'] = dialog.debugCheckBox.isChecked()
 		return (data, result == QDialog.Accepted)
 
