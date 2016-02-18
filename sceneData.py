@@ -7,8 +7,12 @@ import math
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
+
+from copy import deepcopy
 
 
+glutInit()
 
 class AppScene(object):
 	'''
@@ -43,8 +47,9 @@ class Model(object):
 
 		#helping data
 		self.selected = False
-		self.boundingSphereCenter = [.0, .0, .0]
 		self.boundingSphereSize = .0
+		self.boundingSphereCenter = [.0, .0, .0]
+		self.boundingMinimalPoint = [.0, .0, .0]
 		self.zeroPoint = [.0, .0, .0]
 
 		self.color = [randint(3, 8) * 0.1,
@@ -53,7 +58,6 @@ class Model(object):
 
 
 	def closestPoint(self, a, b, p):
-
 		ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
 		abSquare = numpy.dot(ab.getRaw(), ab.getRaw())
 		ap = Vector([p.x-a.x, p.y-a.y, p.z-a.z])
@@ -114,9 +118,23 @@ class Model(object):
 
 
 
-	def render(self):
+	def render(self, debug=False):
+		if debug:
+			glDisable(GL_DEPTH_TEST)
+			glColor3f(0,1,0)
+			glBegin(GL_POINTS)
+			glVertex3f(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
+			glEnd()
+			glEnable(GL_DEPTH_TEST)
+			glPushMatrix()
+			glTranslated(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
+			glLineWidth(1)
+			glColor3f(.25, .25, .25)
+			glutWireSphere(self.boundingSphereSize, 16, 10)
+			glPopMatrix()
+
 		if self.selected:
-			glColor3f(1,0,0)
+			glColor3f(.5,0,0)
 		else:
 			glColor3f(self.color[0], self.color[1], self.color[2])
 		glCallList(self.displayList)
@@ -126,7 +144,6 @@ class Model(object):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
-		#glColor3f(self.color[0], self.color[1], self.color[2])
 		glBegin(GL_TRIANGLES)
 		for i in xrange(len(self.v0)):
 			glNormal3d(self.newNormal[i][0], self.newNormal[i][1], self.newNormal[i][2])
@@ -134,14 +151,6 @@ class Model(object):
 			glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
 			glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
 		glEnd()
-
-		glPointSize(4.0)
-		glDisable(GL_DEPTH_TEST)
-		glColor3f(1,0,1)
-		glBegin(GL_POINTS)
-		glVertex3d(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
-		glEnd()
-		glEnable(GL_DEPTH_TEST)
 		glEndList()
 
 		return genList
@@ -183,7 +192,6 @@ class ModelTypeStl(ModelTypeAbstract):
 		xMin = min([a[0]*.1 for a in mesh.points])
 		model.boundingSphereCenter[0] = (xMax + xMin) * .5
 
-
 		yMax = max([a[1]*.1 for a in mesh.points])
 		yMin = min([a[1]*.1 for a in mesh.points])
 		model.boundingSphereCenter[1] = (yMax + yMin) * .5
@@ -192,7 +200,7 @@ class ModelTypeStl(ModelTypeAbstract):
 		zMin = min([a[2]*.1 for a in mesh.points])
 		model.boundingSphereCenter[2] = (zMax + zMin) * .5
 
-		model.zeroPoint = model.boundingSphereCenter
+		model.zeroPoint = deepcopy(model.boundingSphereCenter)
 		model.zeroPoint[2] = .0
 
 		for i in xrange(len(mesh.v0)):

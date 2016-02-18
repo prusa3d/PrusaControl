@@ -13,7 +13,7 @@ class Controller:
 
         self.settings = {}
         if not self.settings:
-			self.settings['debug'] = True
+			self.settings['debug'] = False
 			self.settings['language'] = 'en'
 			self.settings['printer'] = 'prusa_i3_v2'
 
