@@ -70,10 +70,49 @@ class Model(object):
 
 
 
-	def intersectionRayModel(self):
-		#print('trefeny model: ' + str(self.color))
-		self.selected = not self.selected
+	def intersectionRayModel(self, rayStart, rayEnd):
+		w = Vector(rayEnd)
+		w.minus(rayStart)
+		w.normalize()
+
+		for i in xrange(len(self.v0)):
+			b = [.0,.0,.0]
+			e1 = Vector(self.v1[i])
+			e1.minus(self.v0[i])
+			e2 = Vector(self.v2[i])
+			e2.minus(self.v0[i])
+
+			n = Vector(self.newNormal[i])
+
+			q = numpy.cross(w.getRaw(), e2.getRaw())
+			a = numpy.dot(e1.getRaw(), q)
+
+			if((numpy.dot(n.getRaw(), w.getRaw())>= .0) or (abs(a) <=.0001)):
+				continue
+				#return False
+
+			s = Vector(rayStart)
+			s.minus(self.v0[i])
+			s.sqrt(a)
+
+			r = numpy.cross(s.getRaw(), e1.getRaw())
+			b[0] = numpy.dot(s.getRaw(), q)
+			b[1] = numpy.dot(r, w.getRaw())
+			b[2] = 1.0 - b[0] - b[1]
+
+			if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
+				continue
+				#return False
+
+			t = numpy.dot(e2.getRaw(), r)
+			if (t >= .0):
+				return True
+			else:
+				continue
 		return False
+
+
+
 
 	def render(self):
 		if self.selected:
@@ -223,15 +262,33 @@ class Vector(object):
 		self.y -= v[1]
 		self.z -= v[2]
 
+	def sqrt(self, n):
+		self.x /= n
+		self.y /= n
+		self.z /= n
+
 	def plus(self, v):
 		self.x += v[0]
 		self.y += v[1]
 		self.z += v[2]
 
+	def normalize(self):
+		l = self.len()
+		self.x /= l
+		self.y /= l
+		self.z /= l
+
+
 	def lenght(self, v):
 		x = v[0] - self.x
 		y = v[1] - self.y
 		z = v[2] - self.z
+		return math.sqrt((x*x)+(y*y)+(z*z))
+
+	def len(self):
+		x = self.x
+		y = self.y
+		z = self.z
 		return math.sqrt((x*x)+(y*y)+(z*z))
 
 	def getRaw(self):

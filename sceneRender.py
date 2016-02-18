@@ -141,7 +141,6 @@ class GLWidget(QGLWidget):
 				glVertex3d(self.rayEnd[0], self.rayEnd[1], self.rayEnd[2])
 				glEnd()
 
-
 		'''
 		draw scene with all objects
 		'''
@@ -150,19 +149,19 @@ class GLWidget(QGLWidget):
 		glEnable ( GL_LIGHTING )
 		if self.parent.controller.model.models:
 			for model in self.parent.controller.model.models:
-				glPushMatrix()
+				#glPushMatrix()
 				#some model transformation(move, rotate, scale)
 				model.render()
 
 				if 'debug' in self.parent.controller.settings:
 					if self.parent.controller.settings['debug']:
-						glTranslated(model.boundingSphereZero[0], model.boundingSphereZero[1], model.boundingSphereZero[2])
+						glTranslated(model.boundingSphereCenter[0], model.boundingSphereCenter[1], model.boundingSphereCenter[2])
 						if model.selected:
 							glColor3f(1,0,0)
 						else:
 							glColor3f(0,1,1)
 						glutWireSphere(model.boundingSphereSize, 16, 10)
-				glPopMatrix()
+				#glPopMatrix()
 		glDisable( GL_LIGHTING )
 		glEnable( GL_BLEND )
 
@@ -220,7 +219,10 @@ class GLWidget(QGLWidget):
 				possibleHitten.append(model)
 
 		for model in possibleHitten:
-			model.intersectionRayModel()
+			if model.intersectionRayModel(self.rayStart, self.rayEnd):
+				model.selected=True
+			else:
+				model.selected=False
 
 
 
