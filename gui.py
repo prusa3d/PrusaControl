@@ -28,15 +28,20 @@ class SettingsDialog(QDialog):
 		self.languageLabel = QtGui.QLabel("Language")
 		self.languageCombo = QtGui.QComboBox()
 		#set enumeration
-		self.languageCombo.addItem('en')
-		self.languageCombo.addItem('cz')
+		#self.languageCombo.addItem('en')
+		#self.languageCombo.addItem('cz')
+		self.languageCombo.addItems(self.controller.enumeration['language'].values())
+		self.languageCombo.setCurrentIndex(self.controller.enumeration['language'].keys().index(self.controller.settings['language']))
 
 		self.printerLabel = QtGui.QLabel("Printer model")
 		self.printerCombo = QtGui.QComboBox()
-		self.printerCombo.addItem('Prusa i3')
-		self.printerCombo.addItem('Prusa i3 v2')
+		#self.printerCombo.addItem('Prusa i3')
+		#self.printerCombo.addItem('Prusa i3 v2')
+		self.printerCombo.addItems(self.controller.enumeration['printer'].values())
+		self.printerCombo.setCurrentIndex(self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
 
 		self.debugCheckBox = QtGui.QCheckBox("Debug")
+		self.debugCheckBox.setChecked(self.controller.settings['debug'])
 
 		layout.addWidget(self.languageLabel)
 		layout.addWidget(self.languageCombo)
@@ -55,11 +60,12 @@ class SettingsDialog(QDialog):
 		layout.addWidget(buttons)
 
 	@staticmethod
-	def getSettingsData(parent = None):
+	def getSettingsData(controller, parent = None):
 		data = {}
-		dialog = SettingsDialog(parent)
+		dialog = SettingsDialog(controller, parent)
 		result = dialog.exec_()
-		data['languageCombo'] = dialog.languageCombo.currentIndex()
+		data['language'] = controller.enumeration['language'].keys()[dialog.languageCombo.currentIndex()]
+		data['printer'] = controller.enumeration['printer'].keys()[dialog.printerCombo.currentIndex()]
 		data['debug'] = dialog.debugCheckBox.isChecked()
 		return (data, result == QDialog.Accepted)
 
@@ -83,7 +89,6 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Reset', self.controller.resetScene)
 		self.fileMenu.addAction('Close', self.controller.close)
-
 		#file menu definition
 
 		#Settings menu
@@ -105,7 +110,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.show()
 
 	def openSettingsDialog(self):
-		data, ok = SettingsDialog.getSettingsData()
+		data, ok = SettingsDialog.getSettingsData(self.controller, self.parent())
 		return data
 
 	def disableSaveGcodeButton(self):
@@ -283,7 +288,8 @@ class PrusaControllWidget(QtGui.QWidget):
 
 		self.tabWidget.addTab(self.toolTab, "Tools")
 		self.tabWidget.addTab(self.printTab, "Print")
-		self.tabWidget.setMaximumWidth(300)
+		self.tabWidget.setCurrentIndex(1)
+		self.tabWidget.setMaximumWidth(250)
 
 		mainLayout = QtGui.QHBoxLayout()
 		mainLayout.addWidget(self.glWidget)

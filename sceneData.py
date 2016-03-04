@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import numpy
 from abc import ABCMeta, abstractmethod
 from stl.mesh import Mesh
 from random import randint
@@ -7,8 +7,12 @@ import math
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
+
+from copy import deepcopy
 
 
+glutInit()
 
 class AppScene(object):
 	'''
@@ -16,15 +20,10 @@ class AppScene(object):
 	it can be used for generating sliced data and rendering data
 	'''
 	def __init__(self):
-		#self.modelsData = []
 		self.models = []
 
 	def clearScene(self):
-		#self.modelsData = []
 		self.models = []
-
-
-
 
 
 
@@ -48,40 +47,110 @@ class Model(object):
 
 		#helping data
 		self.selected = False
-		self.boundingSphereZero = [.0,.0,.0]
 		self.boundingSphereSize = .0
+		self.boundingSphereCenter = [.0, .0, .0]
+		self.boundingMinimalPoint = [.0, .0, .0]
+		self.zeroPoint = [.0, .0, .0]
+
 		self.color = [randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1]
 
-	def intersectionRayBoundingSphere(self):
+
+	def closestPoint(self, a, b, p):
+		ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
+		abSquare = numpy.dot(ab.getRaw(), ab.getRaw())
+		ap = Vector([p.x-a.x, p.y-a.y, p.z-a.z])
+		apDotAB = numpy.dot(ap.getRaw(), ab.getRaw())
+		t = apDotAB / abSquare
+		q = Vector([a.x+ab.x*t, a.y+ab.y*t, a.z+ab.z*t])
+		return q
+
+
+	def intersectionRayBoundingSphere(self, start, end):
+		pt = self.closestPoint(Vector(start), Vector(end), Vector(self.boundingSphereCenter))
+		lenght = pt.lenght(self.boundingSphereCenter)
+		return lenght < self.boundingSphereSize
+
+
+
+	def intersectionRayModel(self, rayStart, rayEnd):
+		w = Vector(rayEnd)
+		w.minus(rayStart)
+		w.normalize()
+
+		for i in xrange(len(self.v0)):
+			b = [.0,.0,.0]
+			e1 = Vector(self.v1[i])
+			e1.minus(self.v0[i])
+			e2 = Vector(self.v2[i])
+			e2.minus(self.v0[i])
+
+			n = Vector(self.newNormal[i])
+
+			q = numpy.cross(w.getRaw(), e2.getRaw())
+			a = numpy.dot(e1.getRaw(), q)
+
+			if((numpy.dot(n.getRaw(), w.getRaw())>= .0) or (abs(a) <=.0001)):
+				continue
+				#return False
+
+			s = Vector(rayStart)
+			s.minus(self.v0[i])
+			s.sqrt(a)
+
+			r = numpy.cross(s.getRaw(), e1.getRaw())
+			b[0] = numpy.dot(s.getRaw(), q)
+			b[1] = numpy.dot(r, w.getRaw())
+			b[2] = 1.0 - b[0] - b[1]
+
+			if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
+				continue
+				#return False
+
+			t = numpy.dot(e2.getRaw(), r)
+			if (t >= .0):
+				return True
+			else:
+				continue
 		return False
 
-	def intersectionRayModel(self):
-		return False
+
+
+
+	def render(self, debug=False):
+		if debug:
+			glDisable(GL_DEPTH_TEST)
+			glColor3f(0,1,0)
+			glBegin(GL_POINTS)
+			glVertex3f(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
+			glEnd()
+			glEnable(GL_DEPTH_TEST)
+			glPushMatrix()
+			glTranslated(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
+			glLineWidth(1)
+			glColor3f(.25, .25, .25)
+			glutWireSphere(self.boundingSphereSize, 16, 10)
+			glPopMatrix()
+
+		if self.selected:
+			glColor3f(.5,0,0)
+		else:
+			glColor3f(self.color[0], self.color[1], self.color[2])
+		glCallList(self.displayList)
+
 
 	def makeDisplayList(self):
 		genList = glGenLists(1)
 		glNewList(genList, GL_COMPILE)
 
-		glColor3f(self.color[0], self.color[1], self.color[2])
 		glBegin(GL_TRIANGLES)
-
 		for i in xrange(len(self.v0)):
 			glNormal3d(self.newNormal[i][0], self.newNormal[i][1], self.newNormal[i][2])
 			glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
 			glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
 			glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
-
 		glEnd()
-
-		glPointSize(4.0)
-		glDisable(GL_DEPTH_TEST)
-		glColor3f(1,0,1)
-		glBegin(GL_POINTS)
-		glVertex3d(self.boundingSphereZero[0], self.boundingSphereZero[1], self.boundingSphereZero[2])
-		glEnd()
-		glEnable(GL_DEPTH_TEST)
 		glEndList()
 
 		return genList
@@ -121,16 +190,18 @@ class ModelTypeStl(ModelTypeAbstract):
 		#calculate bounding sphere
 		xMax = max([a[0]*.1 for a in mesh.points])
 		xMin = min([a[0]*.1 for a in mesh.points])
-		model.boundingSphereZero[0] = (xMax + xMin) * .5
+		model.boundingSphereCenter[0] = (xMax + xMin) * .5
 
 		yMax = max([a[1]*.1 for a in mesh.points])
 		yMin = min([a[1]*.1 for a in mesh.points])
-		model.boundingSphereZero[1] = (yMax + yMin) * .5
+		model.boundingSphereCenter[1] = (yMax + yMin) * .5
 
 		zMax = max([a[2]*.1 for a in mesh.points])
 		zMin = min([a[2]*.1 for a in mesh.points])
-		model.boundingSphereZero[2] = (zMax + zMin) * .5
-		#model.boundingSphereSize = max([abs(xMax), abs(yMax), abs(zMax), abs(xMin), abs(yMin), abs(zMin)])
+		model.boundingSphereCenter[2] = (zMax + zMin) * .5
+
+		model.zeroPoint = deepcopy(model.boundingSphereCenter)
+		model.zeroPoint[2] = .0
 
 		for i in xrange(len(mesh.v0)):
 			normal = [.0, .0, .0]
@@ -142,9 +213,9 @@ class ModelTypeStl(ModelTypeAbstract):
 			model.v1.append(mv1)
 			model.v2.append(mv2)
 
-			v0 = Vector(model.boundingSphereZero)
-			v1 = Vector(model.boundingSphereZero)
-			v2 = Vector(model.boundingSphereZero)
+			v0 = Vector(model.boundingSphereCenter)
+			v1 = Vector(model.boundingSphereCenter)
+			v2 = Vector(model.boundingSphereCenter)
 
 			v0L = abs(v0.lenght(mv0))
 			v1L = abs(v1.lenght(mv1))
@@ -199,13 +270,34 @@ class Vector(object):
 		self.y -= v[1]
 		self.z -= v[2]
 
+	def sqrt(self, n):
+		self.x /= n
+		self.y /= n
+		self.z /= n
+
 	def plus(self, v):
 		self.x += v[0]
 		self.y += v[1]
 		self.z += v[2]
+
+	def normalize(self):
+		l = self.len()
+		self.x /= l
+		self.y /= l
+		self.z /= l
+
 
 	def lenght(self, v):
 		x = v[0] - self.x
 		y = v[1] - self.y
 		z = v[2] - self.z
 		return math.sqrt((x*x)+(y*y)+(z*z))
+
+	def len(self):
+		x = self.x
+		y = self.y
+		z = self.z
+		return math.sqrt((x*x)+(y*y)+(z*z))
+
+	def getRaw(self):
+		return [self.x, self.y, self.z]

@@ -12,6 +12,21 @@ class Controller:
         self.model = AppScene()
 
         self.settings = {}
+        if not self.settings:
+			self.settings['debug'] = False
+			self.settings['language'] = 'en'
+			self.settings['printer'] = 'prusa_i3_v2'
+
+        self.enumeration = {
+            'language': {
+                'cs': 'Czech',
+                'en': 'English'
+            },
+            'printer': {
+                'prusa_i3': 'Prusa i3',
+                'prusa_i3_v2': 'Prusa i3 v2'
+            }
+        }
 
     def getView(self):
         return self.view
@@ -37,13 +52,12 @@ class Controller:
 
     def importModel(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
-        modelData = ModelTypeStl().load(path)
-        self.model.models.append(modelData)
-        #self.model.models.append(modelData.makeDisplayList())
+        self.model.models.append(ModelTypeStl().load(path))
         self.view.updateScene()
 
     def openSettings(self):
         self.settings = self.view.openSettingsDialog()
+        print(str(self.settings))
 
     def generatePrint(self):
         self.view.enableSaveGcodeButton()

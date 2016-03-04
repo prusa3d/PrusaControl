@@ -2,7 +2,7 @@
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *
+
 from PyQt4 import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
@@ -16,7 +16,6 @@ class GLWidget(QGLWidget):
 		self.parent = parent
 		self.initParametres()
 
-		self.debug = False
 
 
 	def initParametres(self):
@@ -81,7 +80,7 @@ class GLWidget(QGLWidget):
 		self.bed = self.makePrintingBed()
 		self.axis = self.makeAxis()
 
-		glutInit()
+
 		glClearDepth(1.0)
 		glShadeModel(GL_FLAT)
 		glEnable(GL_DEPTH_TEST)
@@ -125,8 +124,9 @@ class GLWidget(QGLWidget):
 		glDisable(GL_DEPTH_TEST)
 		glCallList(self.axis)
 
+		#light
 		glPointSize(5)
-		glColor3f(1,1,0)
+		glColor3f(0,1,1)
 		glBegin(GL_POINTS)
 		glVertex3d(self.lightPossition[0], self.lightPossition[1], self.lightPossition[2])
 		glEnd()
@@ -141,24 +141,28 @@ class GLWidget(QGLWidget):
 				glVertex3d(self.rayEnd[0], self.rayEnd[1], self.rayEnd[2])
 				glEnd()
 
-
 		'''
 		draw scene with all objects
 		'''
-
 		glDisable( GL_BLEND )
 		glEnable ( GL_LIGHTING )
 		if self.parent.controller.model.models:
 			for model in self.parent.controller.model.models:
-				glPushMatrix()
+				#glPushMatrix()
 				#some model transformation(move, rotate, scale)
-				glCallList(model.displayList)
-
+				model.render(self.parent.controller.settings['debug'] or False)
+		'''
 				if 'debug' in self.parent.controller.settings:
 					if self.parent.controller.settings['debug']:
-						glTranslated(model.boundingSphereZero[0], model.boundingSphereZero[1], model.boundingSphereZero[2])
+						glPushMatrix()
+						glTranslated(model.boundingSphereCenter[0], model.boundingSphereCenter[1], model.boundingSphereCenter[2])
+						if model.selected:
+							glColor3f(1,0,0)
+						else:
+							glColor3f(0,1,1)
 						glutWireSphere(model.boundingSphereSize, 16, 10)
-				glPopMatrix()
+						glPopMatrix()
+		'''
 		glDisable( GL_LIGHTING )
 		glEnable( GL_BLEND )
 
@@ -173,6 +177,7 @@ class GLWidget(QGLWidget):
 		self.lastPos = QtCore.QPoint(event.pos())
 		if event.buttons() & QtCore.Qt.RightButton:
 			self.hitObjects(event)
+			self.updateGL()
 
 	def mouseMoveEvent(self, event):
 		dx = event.x() - self.lastPos.x()
@@ -189,6 +194,7 @@ class GLWidget(QGLWidget):
 
 
 	def wheelEvent(self, event):
+
 		self.zoom = self.zoom + event.delta()/120
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
@@ -197,6 +203,7 @@ class GLWidget(QGLWidget):
 		matModelView = []
 		matProjection = []
 		viewport = []
+		possibleHitten = []
 
 		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
 		matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
@@ -207,6 +214,20 @@ class GLWidget(QGLWidget):
 
 		self.rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
 		self.rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
+
+		for model in self.parent.controller.model.models:
+			if model.intersectionRayBoundingSphere(self.rayStart, self.rayEnd):
+				possibleHitten.append(model)
+			else:
+				model.selected = False
+
+		for model in possibleHitten:
+			if model.intersectionRayModel(self.rayStart, self.rayEnd):
+				model.selected = not model.selected
+			else:
+				model.selected = False
+
+
 
 		return False
 
