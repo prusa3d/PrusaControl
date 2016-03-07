@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 from stl.mesh import Mesh
 from random import randint
 import math
+import itertools
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -20,6 +21,7 @@ class AppScene(object):
 	it can be used for generating sliced data and rendering data
 	'''
 	def __init__(self):
+		self.sceneZero = [.0, .0, .0]
 		self.models = []
 
 	def clearScene(self):
@@ -51,6 +53,9 @@ class Model(object):
 		self.boundingSphereCenter = [.0, .0, .0]
 		self.boundingMinimalPoint = [.0, .0, .0]
 		self.zeroPoint = [.0, .0, .0]
+		self.min = [.0,.0,.0]
+		self.max = [.0,.0,.0]
+
 
 		self.color = [randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1,
@@ -71,7 +76,6 @@ class Model(object):
 		pt = self.closestPoint(Vector(start), Vector(end), Vector(self.boundingSphereCenter))
 		lenght = pt.lenght(self.boundingSphereCenter)
 		return lenght < self.boundingSphereSize
-
 
 
 	def intersectionRayModel(self, rayStart, rayEnd):
@@ -116,21 +120,30 @@ class Model(object):
 		return False
 
 
+	def normalizeObject(self):
+		sceneCenter = Vector(a=Vector().getRaw(), b=self.zeroPoint)
+		print(str(sceneCenter.getRaw()))
+		self.v0 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v0]
+		self.v1 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v1]
+		self.v2 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v2]
 
 
 	def render(self, debug=False):
 		if debug:
 			glDisable(GL_DEPTH_TEST)
-			glColor3f(0,1,0)
+
 			glBegin(GL_POINTS)
+			glColor3f(0,1,0)
 			glVertex3f(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
+			glColor3f(0,0,1)
+			glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
 			glEnd()
 			glEnable(GL_DEPTH_TEST)
 			glPushMatrix()
 			glTranslated(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
 			glLineWidth(1)
 			glColor3f(.25, .25, .25)
-			glutWireSphere(self.boundingSphereSize, 16, 10)
+			glutWireSphere(self.boundingSphereSize+0.1, 16, 10)
 			glPopMatrix()
 
 		if self.selected:
@@ -188,20 +201,21 @@ class ModelTypeStl(ModelTypeAbstract):
 		'''
 
 		#calculate bounding sphere
-		xMax = max([a[0]*.1 for a in mesh.points])
-		xMin = min([a[0]*.1 for a in mesh.points])
-		model.boundingSphereCenter[0] = (xMax + xMin) * .5
+		'''
+		model.max[0] = max([a[0]*.1 for a in mesh.points])
+		model.min[0] = min([a[0]*.1 for a in mesh.points])
+		model.boundingSphereCenter[0] = (model.max[0] + model.min[0]) * .5
 
-		yMax = max([a[1]*.1 for a in mesh.points])
-		yMin = min([a[1]*.1 for a in mesh.points])
-		model.boundingSphereCenter[1] = (yMax + yMin) * .5
+		model.max[1] = max([a[1]*.1 for a in mesh.points])
+		model.min[1] = min([a[1]*.1 for a in mesh.points])
+		model.boundingSphereCenter[1] = (model.max[1] + model.min[1]) * .5
 
-		zMax = max([a[2]*.1 for a in mesh.points])
-		zMin = min([a[2]*.1 for a in mesh.points])
-		model.boundingSphereCenter[2] = (zMax + zMin) * .5
+		model.max[2] = max([a[2]*.1 for a in mesh.points])
+		model.min[2] = min([a[2]*.1 for a in mesh.points])
+		model.boundingSphereCenter[2] = (model.max[2] + model.min[2]) * .5
 
 		model.zeroPoint = deepcopy(model.boundingSphereCenter)
-		model.zeroPoint[2] = .0
+		model.zeroPoint[2] = model.min[2]
 
 		for i in xrange(len(mesh.v0)):
 			normal = [.0, .0, .0]
@@ -228,42 +242,67 @@ class ModelTypeStl(ModelTypeAbstract):
 			if v2L > model.boundingSphereSize:
 				model.boundingSphereSize = v2L
 
-			'''
-			uX = mesh.v1[i][0] - mesh.v0[i][0]
-			uY = mesh.v1[i][1] - mesh.v0[i][1]
-			uZ = mesh.v1[i][2] - mesh.v0[i][2]
-
-			vX = mesh.v2[i][0] - mesh.v0[i][0]
-			vY = mesh.v2[i][1] - mesh.v0[i][1]
-			vZ = mesh.v2[i][2] - mesh.v0[i][2]
-
-			normal[0] = (uY*vZ) - (uZ*vY)
-			normal[1] = (uZ*vX) - (uX*vZ)
-			normal[2] = (uX*vY) - (uY*vX)
-			'''
-
 			normal = mesh.normals[i]
-			l = math.sqrt((normal[0] * normal[0]) + (normal[1] * normal[1]) + (normal[2] * normal[2]))
-			normal[0] = (normal[0]*1.0) / (l*1.0)
-			normal[1] = (normal[1]*1.0) / (l*1.0)
-			normal[2] = (normal[2]*1.0) / (l*1.0)
+			l = numpy.linalg.norm(normal)
+			normal[0] = normal[0] / l
+			normal[1] = normal[1] / l
+			normal[2] = normal[2] / l
 
 			model.newNormal.append(normal)
-			model.normal.append(mesh.normals[i])
 
+		model.normalizeObject()
+		model.displayList = model.makeDisplayList()
+		'''
 
+		model.newNormal = mesh.normals
+		model.newNormal = model.newNormal/numpy.linalg.norm(mesh.normals)
+		model.v0 = mesh.v0*.1
+		model.v1 = mesh.v1*.1
+		model.v2 = mesh.v2*.1
+
+		#TODO:Zrychlit tuto cast
+		model.max[0] = numpy.max([a[0] for a in itertools.chain(model.v0, model.v1, model.v2)])
+		model.min[0] = numpy.min([a[0] for a in itertools.chain(model.v0, model.v1, model.v2)])
+		model.boundingSphereCenter[0] = (model.max[0] + model.min[0]) * .5
+
+		model.max[1] = numpy.max([a[1] for a in itertools.chain(model.v0, model.v1, model.v2)])
+		model.min[1] = numpy.min([a[1] for a in itertools.chain(model.v0, model.v1, model.v2)])
+		model.boundingSphereCenter[1] = (model.max[1] + model.min[1]) * .5
+
+		model.max[2] = numpy.max([a[2] for a in itertools.chain(model.v0, model.v1, model.v2)])
+		model.min[2] = numpy.min([a[2] for a in itertools.chain(model.v0, model.v1, model.v2)])
+		model.boundingSphereCenter[2] = (model.max[2] + model.min[2]) * .5
+
+		model.zeroPoint = deepcopy(model.boundingSphereCenter)
+		model.zeroPoint[2] = model.min[2]
+
+		model.normalizeObject()
+
+		v = Vector(model.boundingSphereCenter)
+		for vert in itertools.chain(model.v0, model.v1, model.v2):
+			vL = abs(v.lenght(vert))
+
+			if vL > model.boundingSphereSize:
+				model.boundingSphereSize = vL
 
 		model.displayList = model.makeDisplayList()
+
 
 		return model
 
 
 #math
 class Vector(object):
-	def __init__(self, v=[.0, .0, .0]):
-		self.x = v[0]
-		self.y = v[1]
-		self.z = v[2]
+	def __init__(self, v=[.0, .0, .0], a=[], b=[]):
+		if a and b:
+			self.x = b[0]-a[0]
+			self.y = b[1]-a[1]
+			self.z = b[2]-a[2]
+		else:
+			self.x = v[0]
+			self.y = v[1]
+			self.z = v[2]
+
 
 	def minus(self, v):
 		self.x -= v[0]
@@ -286,7 +325,6 @@ class Vector(object):
 		self.y /= l
 		self.z /= l
 
-
 	def lenght(self, v):
 		x = v[0] - self.x
 		y = v[1] - self.y
@@ -301,3 +339,11 @@ class Vector(object):
 
 	def getRaw(self):
 		return [self.x, self.y, self.z]
+
+	@staticmethod
+	def minusAB(a, b):
+		c =[0,0,0]
+		c[0] = a[0]-b[0]
+		c[1] = a[1]-b[1]
+		c[2] = a[2]-b[2]
+		return c

@@ -16,7 +16,7 @@ class Config(object):
 
 class MultiLanguage(object):
 	def __init__(self, config):
-		#TODO: Placed in config file
+		#TODO: Place in config file
 		self.default = config.defaultLanguage
 		self.language = self.getLanguage()
 		self.languageFile = ConfigParser()

@@ -134,6 +134,11 @@ class GLWidget(QGLWidget):
 
 		if 'debug' in self.parent.controller.settings:
 			if self.parent.controller.settings['debug']:
+				glBegin(GL_POINTS)
+				glColor3f(1,0,0)
+				glVertex3f(self.parent.controller.model.sceneZero[0], self.parent.controller.model.sceneZero[1], self.parent.controller.model.sceneZero[2])
+				glEnd()
+
 				glLineWidth(5)
 				glBegin(GL_LINES)
 				glColor3f(0,1,0)

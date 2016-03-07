@@ -28,15 +28,11 @@ class SettingsDialog(QDialog):
 		self.languageLabel = QtGui.QLabel("Language")
 		self.languageCombo = QtGui.QComboBox()
 		#set enumeration
-		#self.languageCombo.addItem('en')
-		#self.languageCombo.addItem('cz')
 		self.languageCombo.addItems(self.controller.enumeration['language'].values())
 		self.languageCombo.setCurrentIndex(self.controller.enumeration['language'].keys().index(self.controller.settings['language']))
 
 		self.printerLabel = QtGui.QLabel("Printer model")
 		self.printerCombo = QtGui.QComboBox()
-		#self.printerCombo.addItem('Prusa i3')
-		#self.printerCombo.addItem('Prusa i3 v2')
 		self.printerCombo.addItems(self.controller.enumeration['printer'].values())
 		self.printerCombo.setCurrentIndex(self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
 
@@ -233,6 +229,8 @@ class PrusaControllWidget(QtGui.QWidget):
 		#tool tab
 
 		#print tab
+		#TODO: Vytvorit print_settings.json ve kterem bude strom nastaveni pro ruzne materialy...
+		#a bude se tady aplikovat jako vyjimky
 		self.materialLabel = QtGui.QLabel("Material")
 		self.materialCombo = QtGui.QComboBox()
 		#set enumeration

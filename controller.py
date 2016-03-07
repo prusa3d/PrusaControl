@@ -11,12 +11,14 @@ class Controller:
         self.view.disableSaveGcodeButton()
         self.model = AppScene()
 
+        #TODO:Reading settings from file
         self.settings = {}
         if not self.settings:
 			self.settings['debug'] = False
 			self.settings['language'] = 'en'
 			self.settings['printer'] = 'prusa_i3_v2'
 
+        #TODO:Add extra file for printing settings(rules)
         self.enumeration = {
             'language': {
                 'cs': 'Czech',
