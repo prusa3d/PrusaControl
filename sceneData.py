@@ -127,6 +127,13 @@ class Model(object):
 		self.v1 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v1]
 		self.v2 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v2]
 
+		self.max = Vector().minusAB(self.max, sceneCenter.getRaw())
+		self.min = Vector().minusAB(self.min, sceneCenter.getRaw())
+
+		self.boundingSphereCenter = Vector().minusAB(self.boundingSphereCenter, sceneCenter.getRaw())
+		self.zeroPoint = Vector().minusAB(self.zeroPoint, sceneCenter.getRaw())
+		self.zeroPoint[2] = self.min[2]
+
 
 	def render(self, debug=False):
 		if debug:
