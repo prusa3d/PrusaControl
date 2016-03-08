@@ -155,6 +155,7 @@ class GLWidget(QGLWidget):
 			for model in self.parent.controller.model.models:
 				#glPushMatrix()
 				#some model transformation(move, rotate, scale)
+
 				model.render(self.parent.controller.settings['debug'] or False)
 		'''
 				if 'debug' in self.parent.controller.settings:
@@ -231,8 +232,6 @@ class GLWidget(QGLWidget):
 				model.selected = not model.selected
 			else:
 				model.selected = False
-
-
 
 		return False
 

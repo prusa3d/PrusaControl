@@ -38,14 +38,21 @@ class Model(object):
 		self.v0 = []
 		self.v1 = []
 		self.v2 = []
+		#self.normal = []
 		self.normal = []
-		self.newNormal = []
 		self.displayList = []
 
 		#transformation data
+		self.matrix = [[1.0, 0.0, 0.0, 0.0],
+					   [0.0, 1.0, 0.0, 0.0],
+					   [0.0, 0.0, 1.0, 0.0],
+					   [0.0, 0.0, 0.0, 1.0]]
+
+
 		self.pos = [.0,.0,.0]
 		self.rot = [.0,.0,.0]
 		self.scale = [.0,.0,.0]
+		self.scaleDefault = [.1,.1,.1]
 
 		#helping data
 		self.selected = False
@@ -56,10 +63,32 @@ class Model(object):
 		self.min = [.0,.0,.0]
 		self.max = [.0,.0,.0]
 
-
 		self.color = [randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1]
+
+	def addTranslate(self, v):
+		self.matrix[0][3] += v[0]
+		self.matrix[1][3] += v[1]
+		self.matrix[2][3] += v[2]
+
+	def addScale(self, v):
+		self.matrix[0][0] += v[0]
+		self.matrix[1][1] += v[1]
+		self.matrix[2][2] += v[2]
+
+	def setTranslate(self, v):
+		self.matrix[0][3] = v[0]
+		self.matrix[1][3] = v[1]
+		self.matrix[2][3] = v[2]
+
+	def setScale(self, v):
+		self.matrix[0][0] = v[0]
+		self.matrix[1][1] = v[1]
+		self.matrix[2][2] = v[2]
+
+	def setRotate(self, v):
+		pass
 
 
 	def closestPoint(self, a, b, p):
@@ -71,12 +100,15 @@ class Model(object):
 		q = Vector([a.x+ab.x*t, a.y+ab.y*t, a.z+ab.z*t])
 		return q
 
-
 	def intersectionRayBoundingSphere(self, start, end):
-		pt = self.closestPoint(Vector(start), Vector(end), Vector(self.boundingSphereCenter))
+		v = Vector(self.boundingSphereCenter)
+		print('Pred transformaci: ' + str(v.getRaw()))
+		v.plus(self.pos)
+		print('Po transformaci: ' + str(v.getRaw()))
+		pt = self.closestPoint(Vector(start), Vector(end), v)
 		lenght = pt.lenght(self.boundingSphereCenter)
+		print('Trefili jsme se? ' + str(lenght < self.boundingSphereSize))
 		return lenght < self.boundingSphereSize
-
 
 	def intersectionRayModel(self, rayStart, rayEnd):
 		w = Vector(rayEnd)
@@ -90,7 +122,7 @@ class Model(object):
 			e2 = Vector(self.v2[i])
 			e2.minus(self.v0[i])
 
-			n = Vector(self.newNormal[i])
+			n = Vector(self.normal[i])
 
 			q = numpy.cross(w.getRaw(), e2.getRaw())
 			a = numpy.dot(e1.getRaw(), q)
@@ -136,6 +168,8 @@ class Model(object):
 
 
 	def render(self, debug=False):
+		glPushMatrix()
+		glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 		if debug:
 			glDisable(GL_DEPTH_TEST)
 
@@ -157,7 +191,18 @@ class Model(object):
 			glColor3f(.5,0,0)
 		else:
 			glColor3f(self.color[0], self.color[1], self.color[2])
-		glCallList(self.displayList)
+
+
+		#glCallList(self.displayList)
+		glBegin(GL_TRIANGLES)
+		for i in xrange(len(self.v0)):
+			glNormal3d(self.normal[i][0], self.normal[i][1], self.normal[i][2])
+			glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
+			glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
+			glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
+		glEnd()
+
+		glPopMatrix()
 
 
 	def makeDisplayList(self):
@@ -166,7 +211,7 @@ class Model(object):
 
 		glBegin(GL_TRIANGLES)
 		for i in xrange(len(self.v0)):
-			glNormal3d(self.newNormal[i][0], self.newNormal[i][1], self.newNormal[i][2])
+			glNormal3d(self.normal[i][0], self.normal[i][1], self.normal[i][2])
 			glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
 			glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
 			glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
@@ -261,13 +306,17 @@ class ModelTypeStl(ModelTypeAbstract):
 		model.displayList = model.makeDisplayList()
 		'''
 
-		model.newNormal = mesh.normals
-		model.newNormal = model.newNormal/numpy.linalg.norm(mesh.normals)
-		model.v0 = mesh.v0*.1
-		model.v1 = mesh.v1*.1
-		model.v2 = mesh.v2*.1
+		#normalization of normal vectors
+		model.normal = mesh.normals
+		model.normal = model.normal / numpy.linalg.norm(mesh.normals)
+
+		#scale of imported data
+		model.v0 = mesh.v0*model.scaleDefault[0]
+		model.v1 = mesh.v1*model.scaleDefault[1]
+		model.v2 = mesh.v2*model.scaleDefault[2]
 
 		#TODO:Zrychlit tuto cast
+		#calculate min and max for BoundingBox and center of object
 		model.max[0] = numpy.max([a[0] for a in itertools.chain(model.v0, model.v1, model.v2)])
 		model.min[0] = numpy.min([a[0] for a in itertools.chain(model.v0, model.v1, model.v2)])
 		model.boundingSphereCenter[0] = (model.max[0] + model.min[0]) * .5
@@ -283,17 +332,25 @@ class ModelTypeStl(ModelTypeAbstract):
 		model.zeroPoint = deepcopy(model.boundingSphereCenter)
 		model.zeroPoint[2] = model.min[2]
 
+		#normalize position of object on 0
 		model.normalizeObject()
 
+		#calculate size of BoundingSphere
 		v = Vector(model.boundingSphereCenter)
 		for vert in itertools.chain(model.v0, model.v1, model.v2):
 			vL = abs(v.lenght(vert))
-
 			if vL > model.boundingSphereSize:
 				model.boundingSphereSize = vL
 
 		model.displayList = model.makeDisplayList()
 
+		#model.pos = [randint(0, 10), randint(0, 10), 0]
+
+		#TODO:Pozor, jen pro ucely testovani, odstranit pro produkcni verzi round!!!
+		model.v0 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v0]
+		model.v1 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v1]
+		model.v2 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v2]
+		print(str(zip(model.v0, model.v1, model.v2)))
 
 		return model
 
