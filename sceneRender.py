@@ -181,7 +181,7 @@ class GLWidget(QGLWidget):
 
 	def mousePressEvent(self, event):
 		self.lastPos = QtCore.QPoint(event.pos())
-		if event.buttons() & QtCore.Qt.RightButton:
+		if event.buttons() & QtCore.Qt.LeftButton:
 			self.hitObjects(event)
 			self.updateGL()
 
@@ -192,7 +192,7 @@ class GLWidget(QGLWidget):
 #		if event.buttons() & QtCore.Qt.LeftButton:
 #			self.setXRotation(self.xRot + 8 * dy)
 #			self.setYRotation(self.yRot + 8 * dx)
-		if event.buttons() & QtCore.Qt.LeftButton:
+		if event.buttons() & QtCore.Qt.RightButton:
 			self.setXRotation(self.xRot + 8 * dy)
 			self.setZRotation(self.zRot + 8 * dx)
 
@@ -200,15 +200,14 @@ class GLWidget(QGLWidget):
 
 
 	def wheelEvent(self, event):
-
 		self.zoom = self.zoom + event.delta()/120
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
 
 	def hitObjects(self, event):
-		matModelView = []
-		matProjection = []
-		viewport = []
+		#matModelView = []
+		#matProjection = []
+		#viewport = []
 		possibleHitten = []
 
 		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )

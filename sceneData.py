@@ -11,7 +11,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 from copy import deepcopy
-
+from pyrr import Matrix44, Vector3
 
 glutInit()
 
@@ -38,20 +38,17 @@ class Model(object):
 		self.v0 = []
 		self.v1 = []
 		self.v2 = []
+
+		self.dataTmp = []
+
 		#self.normal = []
 		self.normal = []
 		self.displayList = []
 
 		#transformation data
-		self.matrix = [[1.0, 0.0, 0.0, 0.0],
-					   [0.0, 1.0, 0.0, 0.0],
-					   [0.0, 0.0, 1.0, 0.0],
-					   [0.0, 0.0, 0.0, 1.0]]
-
-
 		self.pos = [.0,.0,.0]
 		self.rot = [.0,.0,.0]
-		self.scale = [.0,.0,.0]
+		self.scale = [1.,1.,1.]
 		self.scaleDefault = [.1,.1,.1]
 
 		#helping data
@@ -67,28 +64,7 @@ class Model(object):
 					  randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1]
 
-	def addTranslate(self, v):
-		self.matrix[0][3] += v[0]
-		self.matrix[1][3] += v[1]
-		self.matrix[2][3] += v[2]
 
-	def addScale(self, v):
-		self.matrix[0][0] += v[0]
-		self.matrix[1][1] += v[1]
-		self.matrix[2][2] += v[2]
-
-	def setTranslate(self, v):
-		self.matrix[0][3] = v[0]
-		self.matrix[1][3] = v[1]
-		self.matrix[2][3] = v[2]
-
-	def setScale(self, v):
-		self.matrix[0][0] = v[0]
-		self.matrix[1][1] = v[1]
-		self.matrix[2][2] = v[2]
-
-	def setRotate(self, v):
-		pass
 
 
 	def closestPoint(self, a, b, p):
@@ -101,26 +77,38 @@ class Model(object):
 		return q
 
 	def intersectionRayBoundingSphere(self, start, end):
-		v = Vector(self.boundingSphereCenter)
-		print('Pred transformaci: ' + str(v.getRaw()))
-		v.plus(self.pos)
-		print('Po transformaci: ' + str(v.getRaw()))
-		pt = self.closestPoint(Vector(start), Vector(end), v)
-		lenght = pt.lenght(self.boundingSphereCenter)
-		print('Trefili jsme se? ' + str(lenght < self.boundingSphereSize))
+		v = Vector3(self.boundingSphereCenter)
+		matrix = Matrix44.from_scale(Vector3(self.scale))
+		matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
+
+		v = matrix * v
+
+		pt = self.closestPoint(Vector(start), Vector(end), Vector(v.tolist()))
+		lenght = pt.lenght(v.tolist())
 		return lenght < self.boundingSphereSize
 
 	def intersectionRayModel(self, rayStart, rayEnd):
+		self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
+		matrix = Matrix44.from_scale(Vector3(self.scale))
+		matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
+
 		w = Vector(rayEnd)
 		w.minus(rayStart)
 		w.normalize()
 
-		for i in xrange(len(self.v0)):
+		for i, tri in enumerate(self.dataTmp):
+			v0 = matrix * Vector3(tri[0])
+			v1 = matrix * Vector3(tri[1])
+			v2 = matrix * Vector3(tri[2])
+			v0 = v0.tolist()
+			v1 = v1.tolist()
+			v2 = v2.tolist()
+
 			b = [.0,.0,.0]
-			e1 = Vector(self.v1[i])
-			e1.minus(self.v0[i])
-			e2 = Vector(self.v2[i])
-			e2.minus(self.v0[i])
+			e1 = Vector(v1)
+			e1.minus(v0)
+			e2 = Vector(v2)
+			e2.minus(v0)
 
 			n = Vector(self.normal[i])
 
@@ -129,10 +117,9 @@ class Model(object):
 
 			if((numpy.dot(n.getRaw(), w.getRaw())>= .0) or (abs(a) <=.0001)):
 				continue
-				#return False
 
 			s = Vector(rayStart)
-			s.minus(self.v0[i])
+			s.minus(v0)
 			s.sqrt(a)
 
 			r = numpy.cross(s.getRaw(), e1.getRaw())
@@ -142,7 +129,6 @@ class Model(object):
 
 			if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
 				continue
-				#return False
 
 			t = numpy.dot(e2.getRaw(), r)
 			if (t >= .0):
@@ -154,7 +140,6 @@ class Model(object):
 
 	def normalizeObject(self):
 		sceneCenter = Vector(a=Vector().getRaw(), b=self.zeroPoint)
-		print(str(sceneCenter.getRaw()))
 		self.v0 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v0]
 		self.v1 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v1]
 		self.v2 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v2]
@@ -344,15 +329,46 @@ class ModelTypeStl(ModelTypeAbstract):
 
 		model.displayList = model.makeDisplayList()
 
-		#model.pos = [randint(0, 10), randint(0, 10), 0]
+		model.pos = [randint(0, 10), randint(0, 10), 0]
 
 		#TODO:Pozor, jen pro ucely testovani, odstranit pro produkcni verzi round!!!
 		model.v0 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v0]
 		model.v1 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v1]
 		model.v2 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v2]
-		print(str(zip(model.v0, model.v1, model.v2)))
 
 		return model
+
+
+class Matrix(object):
+	def __init__(self, m=[[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.],[0.,0.,0.,1.]]):
+		self.matrix = m
+
+	def makeIdent(self):
+		self.matrix = [[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.],[0.,0.,0.,1.]]
+
+	def addTranslate(self, v):
+		self.matrix[0][3] += v[0]
+		self.matrix[1][3] += v[1]
+		self.matrix[2][3] += v[2]
+		return self
+
+	def setTranslate(self, v):
+		self.matrix[0][3] = v[0]
+		self.matrix[1][3] = v[1]
+		self.matrix[2][3] = v[2]
+		return self
+
+	def addScale(self, v):
+		self.matrix[0][0] += v[0]
+		self.matrix[1][1] += v[1]
+		self.matrix[2][2] += v[2]
+		return self
+
+	def setScale(self, v):
+		self.matrix[0][0] = v[0]
+		self.matrix[1][1] = v[1]
+		self.matrix[2][2] = v[2]
+		return self
 
 
 #math
