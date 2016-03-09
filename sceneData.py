@@ -178,14 +178,14 @@ class Model(object):
 			glColor3f(self.color[0], self.color[1], self.color[2])
 
 
-		#glCallList(self.displayList)
-		glBegin(GL_TRIANGLES)
-		for i in xrange(len(self.v0)):
-			glNormal3d(self.normal[i][0], self.normal[i][1], self.normal[i][2])
-			glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
-			glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
-			glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
-		glEnd()
+		glCallList(self.displayList)
+		#glBegin(GL_TRIANGLES)
+		#for i in xrange(len(self.v0)):
+		#	glNormal3d(self.normal[i][0], self.normal[i][1], self.normal[i][2])
+		#	glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
+		#	glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
+		#	glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
+		#glEnd()
 
 		glPopMatrix()
 
