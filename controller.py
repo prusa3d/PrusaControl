@@ -6,95 +6,131 @@ from sceneRender import GLWidget
 
 
 class Controller:
-    def __init__(self):
-        self.view = PrusaControllView(self)
-        self.view.disableSaveGcodeButton()
-        self.model = AppScene()
+	def __init__(self):
+		self.view = PrusaControllView(self)
+		self.view.disableSaveGcodeButton()
+		self.scene = AppScene()
 
-        #TODO:Reading settings from file
-        self.settings = {}
-        if not self.settings:
+		#TODO:Reading settings from file
+		self.settings = {}
+		if not self.settings:
 			self.settings['debug'] = False
 			self.settings['language'] = 'en'
 			self.settings['printer'] = 'prusa_i3_v2'
+			self.settings['toolButtons'] = {
+				'selectButton': False,
+				'moveButton': False,
+				'rotateButton': False,
+				'scaleButton': False
+			}
 
-        #TODO:Add extra file for printing settings(rules)
-        self.enumeration = {
-            'language': {
-                'cs': 'Czech',
-                'en': 'English'
-            },
-            'printer': {
-                'prusa_i3': 'Prusa i3',
-                'prusa_i3_v2': 'Prusa i3 v2'
-            }
-        }
+		self.printingSettings = {
+			'materials': ['ABS', 'PLA', 'FLEX'],
 
-    def getView(self):
-        return self.view
+		}
 
-    def getModel(self):
-        return self.model
+		#TODO:Add extra file for printing settings(rules)
+		self.enumeration = {
+			'language': {
+				'cs': 'Czech',
+				'en': 'English'
+			},
+			'printer': {
+				'prusa_i3': 'Prusa i3',
+				'prusa_i3_v2': 'Prusa i3 v2'
+			}
+		}
 
-    def openProjectFile(self):
-        data = self.view.openProjectFileDialog()
-        print(str(data))
+	def getView(self):
+		return self.view
 
-    def saveProjectFile(self):
-        data = self.view.saveProjectFileDialog()
-        print(str(data))
+	def getModel(self):
+		return self.scene
 
-    def saveGCodeFile(self):
-        data = self.view.saveGCondeFileDialog()
-        print(str(data))
+	def openProjectFile(self):
+		data = self.view.openProjectFileDialog()
+		print(str(data))
 
-    def openModelFile(self):
-        data = self.view.openModelFileDialog()
-        self.importModel(data)
+	def saveProjectFile(self):
+		data = self.view.saveProjectFileDialog()
+		print(str(data))
 
-    def importModel(self, path):
-        self.view.statusBar().showMessage('Load file name: ' + path)
-        self.model.models.append(ModelTypeStl().load(path))
-        self.view.updateScene()
+	def saveGCodeFile(self):
+		data = self.view.saveGCondeFileDialog()
+		print(str(data))
 
-    def openSettings(self):
-        self.settings = self.view.openSettingsDialog()
-        print(str(self.settings))
+	def openModelFile(self):
+		data = self.view.openModelFileDialog()
+		self.importModel(data)
 
-    def generatePrint(self):
-        self.view.enableSaveGcodeButton()
+	def importModel(self, path):
+		self.view.statusBar().showMessage('Load file name: ' + path)
+		self.scene.models.append(ModelTypeStl().load(path))
+		self.view.updateScene()
 
-    def close(self):
-        exit()
+	def openSettings(self):
+		self.settings = self.view.openSettingsDialog()
+		print(str(self.settings))
 
-    def resetScene(self):
-        self.model.clearScene()
-        self.view.updateScene(True)
+	def generatePrint(self):
+		self.view.enableSaveGcodeButton()
 
-    def importImage(self, path):
-        pass
+	def close(self):
+		exit()
 
-    def openFile(self, url):
-        '''
-        function for resolve whitch filetype will be loaded
-        '''
-        #self.view.statusBar().showMessage('Load file name: ')
+	def resetScene(self):
+		self.scene.clearScene()
+		self.view.updateScene(True)
 
-        urlSplited = url.split('.')
-        if len(urlSplited)>1:
-            fileEnd = urlSplited[1]
-        else:
-            fileEnd=''
+	def importImage(self, path):
+		pass
 
-        if fileEnd in ['stl', 'STL', 'Stl']:
-            print('import model')
-            self.importModel(url)
-        elif fileEnd in ['prus']:
-            print('open project')
-            self.openProjectFile(url)
-        elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
-            print('import image')
-            self.importImage(url)
+	def selectButtonPressed(self):
+		print('Select button pressed')
+		self.clearToolButtonStates()
+		self.settings['toolButtons']['selectButton'] = True
+
+	def moveButtonPressed(self):
+		print('Move button pressed')
+		self.clearToolButtonStates()
+		self.settings['toolButtons']['moveButton'] = True
+
+	def rotateButtonPressed(self):
+		print('Rotate button pressed')
+		self.clearToolButtonStates()
+		self.settings['toolButtons']['rotateButton'] = True
+
+	def scaleButtonPressed(self):
+		print('Scale button pressed')
+		self.clearToolButtonStates()
+		self.settings['toolButtons']['scaleButton'] = True
+		print(str(self.settings))
+
+	def clearToolButtonStates(self):
+		self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}
+
+
+	def openFile(self, url):
+		'''
+		function for resolve which file type will be loaded
+		'''
+		#self.view.statusBar().showMessage('Load file name: ')
+
+		urlSplited = url.split('.')
+		if len(urlSplited)>1:
+			fileEnd = urlSplited[1]
+		else:
+			fileEnd=''
+
+		if fileEnd in ['stl', 'STL', 'Stl']:
+			print('import model')
+			self.importModel(url)
+		elif fileEnd in ['prus']:
+			print('open project')
+			self.openProjectFile(url)
+		elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
+			print('import image')
+			self.importImage(url)
 
 
 

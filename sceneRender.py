@@ -26,12 +26,13 @@ class GLWidget(QGLWidget):
 		self.rayStart = [.0, .0, .0]
 		self.rayEnd = [.0, .0, .0]
 
-		self.lightAmbient = [.95, .95, .95, 1.0]
-		self.lightDiffuse = [.5, .5, .5, 1.0]
+		self.lightAmbient = [.35, .35, .35, .0]
+		self.lightDiffuse = [1., 1., 1., 1.0]
+		self.lightSpecular = [1.0, 1.0, 1.0, 1.0]
 		self.lightPossition = [29.0, -48.0, 37.0, 1.0]
 
-		self.materialSpecular = [.05,.05,.05,.1]
-		self.materialShiness = [0.05]
+		self.materialSpecular = [1.,1.,1.,.1]
+		self.materialShiness = [0.50]
 
 		self.lastPos = QtCore.QPoint()
 
@@ -93,6 +94,7 @@ class GLWidget(QGLWidget):
 		#light
 		glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
 		glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightDiffuse)
+		#glLightfv(GL_LIGHT0, GL_SPECULAR, self.lightSpecular)
 		glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 		glEnable(GL_LIGHT0)
 
@@ -132,6 +134,7 @@ class GLWidget(QGLWidget):
 		glEnd()
 		glEnable(GL_DEPTH_TEST)
 
+
 		if 'debug' in self.parent.controller.settings:
 			if self.parent.controller.settings['debug']:
 				glBegin(GL_POINTS)
@@ -151,24 +154,10 @@ class GLWidget(QGLWidget):
 		'''
 		glDisable( GL_BLEND )
 		glEnable ( GL_LIGHTING )
-		if self.parent.controller.model.models:
-			for model in self.parent.controller.model.models:
-				#glPushMatrix()
-				#some model transformation(move, rotate, scale)
-
+		if self.parent.controller.scene.models:
+			for model in self.parent.controller.scene.models:
 				model.render(self.parent.controller.settings['debug'] or False)
-		'''
-				if 'debug' in self.parent.controller.settings:
-					if self.parent.controller.settings['debug']:
-						glPushMatrix()
-						glTranslated(model.boundingSphereCenter[0], model.boundingSphereCenter[1], model.boundingSphereCenter[2])
-						if model.selected:
-							glColor3f(1,0,0)
-						else:
-							glColor3f(0,1,1)
-						glutWireSphere(model.boundingSphereSize, 16, 10)
-						glPopMatrix()
-		'''
+
 		glDisable( GL_LIGHTING )
 		glEnable( GL_BLEND )
 
@@ -181,7 +170,7 @@ class GLWidget(QGLWidget):
 
 	def mousePressEvent(self, event):
 		self.lastPos = QtCore.QPoint(event.pos())
-		if event.buttons() & QtCore.Qt.LeftButton:
+		if event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['selectButton']:
 			self.hitObjects(event)
 			self.updateGL()
 
@@ -192,9 +181,14 @@ class GLWidget(QGLWidget):
 #		if event.buttons() & QtCore.Qt.LeftButton:
 #			self.setXRotation(self.xRot + 8 * dy)
 #			self.setYRotation(self.yRot + 8 * dx)
-		if event.buttons() & QtCore.Qt.RightButton:
+		if event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['moveButton']:
+			pos = self.getCursorPossition(event)
+
+
+		elif event.buttons() & QtCore.Qt.RightButton:
 			self.setXRotation(self.xRot + 8 * dy)
 			self.setZRotation(self.zRot + 8 * dx)
+
 
 		self.lastPos = QtCore.QPoint(event.pos())
 
@@ -204,12 +198,27 @@ class GLWidget(QGLWidget):
 		self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
 		self.updateGL()
 
+	def getCursorPossition(self, event):
+		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
+		matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
+		viewport = glGetIntegerv( GL_VIEWPORT )
+
+		winX = event.x() * 1.0
+		winY = viewport[3] - (event.y() *1.0)
+
+		rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
+		rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
+
+		return (rayStart, rayEnd)
+
+
 	def hitObjects(self, event):
 		#matModelView = []
 		#matProjection = []
 		#viewport = []
 		possibleHitten = []
 
+		'''
 		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
 		matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
 		viewport = glGetIntegerv( GL_VIEWPORT )
@@ -219,8 +228,12 @@ class GLWidget(QGLWidget):
 
 		self.rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
 		self.rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
+		'''
 
-		for model in self.parent.controller.model.models:
+		self.rayStart, self.rayEnd = self.getCursorPossition(event)
+
+
+		for model in self.parent.controller.scene.models:
 			if model.intersectionRayBoundingSphere(self.rayStart, self.rayEnd):
 				possibleHitten.append(model)
 			else:

@@ -84,6 +84,7 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.fileMenu.addAction('Import stl file', self.controller.openModelFile)
 		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Reset', self.controller.resetScene)
+		self.fileMenu.addSeparator()
 		self.fileMenu.addAction('Close', self.controller.close)
 		#file menu definition
 
@@ -99,7 +100,6 @@ class PrusaControllView(QtGui.QMainWindow):
 		self.helpMenu.addSeparator()
 		self.helpMenu.addAction('About')
 		#Help menu
-
 
 		self.statusBar().showMessage('Ready')
 		self.setWindowTitle(self.tr("PrusaControll"))
@@ -217,6 +217,11 @@ class PrusaControllWidget(QtGui.QWidget):
 		self.moveButton.setCheckable(True)
 		self.rotateButton.setCheckable(True)
 		self.scaleButton.setCheckable(True)
+
+		self.selectButton.clicked.connect(self.controller.selectButtonPressed)
+		self.moveButton.clicked.connect(self.controller.moveButtonPressed)
+		self.rotateButton.clicked.connect(self.controller.rotateButtonPressed)
+		self.scaleButton.clicked.connect(self.controller.scaleButtonPressed)
 
 		self.toolTabVLayout = QtGui.QVBoxLayout()
 		self.toolTabVLayout.addWidget(self.selectButton)

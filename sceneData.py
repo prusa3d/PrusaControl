@@ -27,6 +27,8 @@ class AppScene(object):
 	def clearScene(self):
 		self.models = []
 
+	def automaticPositionOfModels(self):
+		print('Automaticke rozhazeni modelu po scene')
 
 
 class Model(object):
@@ -63,7 +65,6 @@ class Model(object):
 		self.color = [randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1,
 					  randint(3, 8) * 0.1]
-
 
 
 
@@ -177,16 +178,7 @@ class Model(object):
 		else:
 			glColor3f(self.color[0], self.color[1], self.color[2])
 
-
 		glCallList(self.displayList)
-		#glBegin(GL_TRIANGLES)
-		#for i in xrange(len(self.v0)):
-		#	glNormal3d(self.normal[i][0], self.normal[i][1], self.normal[i][2])
-		#	glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
-		#	glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
-		#	glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
-		#glEnd()
-
 		glPopMatrix()
 
 
@@ -327,49 +319,11 @@ class ModelTypeStl(ModelTypeAbstract):
 			if vL > model.boundingSphereSize:
 				model.boundingSphereSize = vL
 
-		model.displayList = model.makeDisplayList()
-
 		model.pos = [randint(0, 10), randint(0, 10), 0]
 
-		#TODO:Pozor, jen pro ucely testovani, odstranit pro produkcni verzi round!!!
-		model.v0 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v0]
-		model.v1 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v1]
-		model.v2 = [[round(a[0], 1), round(a[1], 1), round(a[2], 1)] for a in model.v2]
+		model.displayList = model.makeDisplayList()
 
 		return model
-
-
-class Matrix(object):
-	def __init__(self, m=[[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.],[0.,0.,0.,1.]]):
-		self.matrix = m
-
-	def makeIdent(self):
-		self.matrix = [[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.],[0.,0.,0.,1.]]
-
-	def addTranslate(self, v):
-		self.matrix[0][3] += v[0]
-		self.matrix[1][3] += v[1]
-		self.matrix[2][3] += v[2]
-		return self
-
-	def setTranslate(self, v):
-		self.matrix[0][3] = v[0]
-		self.matrix[1][3] = v[1]
-		self.matrix[2][3] = v[2]
-		return self
-
-	def addScale(self, v):
-		self.matrix[0][0] += v[0]
-		self.matrix[1][1] += v[1]
-		self.matrix[2][2] += v[2]
-		return self
-
-	def setScale(self, v):
-		self.matrix[0][0] = v[0]
-		self.matrix[1][1] = v[1]
-		self.matrix[2][2] = v[2]
-		return self
-
 
 #math
 class Vector(object):
