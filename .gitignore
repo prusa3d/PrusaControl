@@ -2,4 +2,4 @@
 *.pyc
 *.sublime-project
 *.sublime-workspace
-.idea
+.idea/
