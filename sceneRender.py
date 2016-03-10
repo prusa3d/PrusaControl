@@ -8,6 +8,9 @@ from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
+import sceneData
+from sceneData import Vector
+
 
 class GLWidget(QGLWidget):
 	def __init__(self, parent=None):
@@ -25,8 +28,9 @@ class GLWidget(QGLWidget):
 		self.zoom = -15
 		self.rayStart = [.0, .0, .0]
 		self.rayEnd = [.0, .0, .0]
+		self.oldPos3d = [.0, .0, .0]
 
-		self.lightAmbient = [.35, .35, .35, .0]
+		self.lightAmbient = [.15, .15, .15, .0]
 		self.lightDiffuse = [1., 1., 1., 1.0]
 		self.lightSpecular = [1.0, 1.0, 1.0, 1.0]
 		self.lightPossition = [29.0, -48.0, 37.0, 1.0]
@@ -35,6 +39,7 @@ class GLWidget(QGLWidget):
 		self.materialShiness = [0.50]
 
 		self.lastPos = QtCore.QPoint()
+
 
 	def updateScene(self, reset=False):
 		if reset:
@@ -170,6 +175,12 @@ class GLWidget(QGLWidget):
 
 	def mousePressEvent(self, event):
 		self.lastPos = QtCore.QPoint(event.pos())
+		if event.buttons() & QtCore.Qt.LeftButton:
+			newRayStart, newRayEnd = self.getCursorPossition(event)
+			newVector = Vector.minusAB(newRayStart, newRayEnd)
+			newVector[2] = 0.
+			self.oldPos3d = newVector
+
 		if event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['selectButton']:
 			self.hitObjects(event)
 			self.updateGL()
@@ -182,7 +193,18 @@ class GLWidget(QGLWidget):
 #			self.setXRotation(self.xRot + 8 * dy)
 #			self.setYRotation(self.yRot + 8 * dx)
 		if event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['moveButton']:
-			pos = self.getCursorPossition(event)
+			newRayStart, newRayEnd = self.getCursorPossition(event)
+			#newVector = Vector.minusAB(newRayStart, newRayEnd)
+			#newVector[2] = 0.
+			#newPos = Vector.minusAB(self.oldPos3d, newVector)
+			res = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
+			if res is not None:
+				for model in self.parent.controller.scene.models:
+					if model.selected:
+						#model.pos = [pos+newPos for pos, newPos in zip(model.pos, newPos)]
+						model.pos = res
+
+			#self.oldPos3d = newVector
 
 
 		elif event.buttons() & QtCore.Qt.RightButton:
@@ -191,6 +213,7 @@ class GLWidget(QGLWidget):
 
 
 		self.lastPos = QtCore.QPoint(event.pos())
+		self.updateGL()
 
 
 	def wheelEvent(self, event):
@@ -217,18 +240,6 @@ class GLWidget(QGLWidget):
 		#matProjection = []
 		#viewport = []
 		possibleHitten = []
-
-		'''
-		matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
-		matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
-		viewport = glGetIntegerv( GL_VIEWPORT )
-
-		winX = event.x() * 1.0
-		winY = viewport[3] - (event.y() *1.0)
-
-		self.rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
-		self.rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
-		'''
 
 		self.rayStart, self.rayEnd = self.getCursorPossition(event)
 

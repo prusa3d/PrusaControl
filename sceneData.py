@@ -11,7 +11,9 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 from copy import deepcopy
-from pyrr import Matrix44, Vector3
+from pyrr import Matrix44, Vector3, geometric_tests, line, ray, plane
+
+
 
 glutInit()
 
@@ -87,6 +89,7 @@ class Model(object):
 		pt = self.closestPoint(Vector(start), Vector(end), Vector(v.tolist()))
 		lenght = pt.lenght(v.tolist())
 		return lenght < self.boundingSphereSize
+
 
 	def intersectionRayModel(self, rayStart, rayEnd):
 		self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
@@ -284,6 +287,7 @@ class ModelTypeStl(ModelTypeAbstract):
 		'''
 
 		#normalization of normal vectors
+		mesh.update_normals()
 		model.normal = mesh.normals
 		model.normal = model.normal / numpy.linalg.norm(mesh.normals)
 
@@ -324,6 +328,14 @@ class ModelTypeStl(ModelTypeAbstract):
 		model.displayList = model.makeDisplayList()
 
 		return model
+
+def intersectionRayPlane(start, end, p=[]):
+	r = ray.create_from_line(line.create_from_points(start, end))
+	v = [.0,.0,.0]
+	n = [.0,.0,1.]
+	res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(v, n))
+	return res
+
 
 #math
 class Vector(object):
