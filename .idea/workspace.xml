@@ -2,10 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/logging.conf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller.py" afterPath="$PROJECT_DIR$/controller.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui.py" afterPath="$PROJECT_DIR$/gui.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sceneData.py" afterPath="$PROJECT_DIR$/sceneData.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sceneRender.py" afterPath="$PROJECT_DIR$/sceneRender.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utilities.py" afterPath="$PROJECT_DIR$/utilities.py" />
     </list>
     <ignored path="PrusaControll.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -26,12 +31,24 @@
     <favorites_list name="PrusaControll" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
+              <caret line="15" column="32" selection-start-line="15" selection-start-column="32" selection-end-line="15" selection-end-column="32" />
+              <folding>
+                <element signature="e#75#108#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="logging.conf" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/config/logging.conf">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.43926787">
+              <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -41,76 +58,22 @@
         <entry file="file://$PROJECT_DIR$/controller.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="32" column="58" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
-              <folding />
+              <caret line="43" column="11" selection-start-line="43" selection-start-column="11" selection-end-line="43" selection-end-column="11" />
+              <folding>
+                <element signature="e#25#58#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gui.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="gui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.1869748">
-              <caret line="7" column="24" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Python/#/home/tibor/projects/PrusaControll/gui.py" pinned="false" current-in-tab="false">
-        <entry file="uml://Python/#/home/tibor/projects/PrusaControll/gui.py">
-          <provider selected="true" editor-type-id="UmlEditorProvider">
-            <state>
-              <ID>Python</ID>
-              <OriginalElement>#/home/tibor/projects/PrusaControll/gui.py</OriginalElement>
-              <nodes>
-                <node x="638.0" y="16.0">sceneData.ModelTypeStl</node>
-                <node x="49.5" y="-93.0">gui.PrusaControllView</node>
-                <node x="-21.0" y="-174.0">PyQt4.QtGui.QMainWindow.QMainWindow</node>
-                <node x="19.0" y="-255.0">PyQt4.QtGui.QWidget.QWidget</node>
-                <node x="327.0" y="-174.0">gui.PrusaControllWidget</node>
-                <node x="-277.0" y="-174.0">PyQt4.QtOpenGL.QGLWidget</node>
-                <node x="-277.0" y="67.0">controller.Controller</node>
-                <node x="257.0" y="-93.0">sceneData.Model</node>
-                <node x="432.0" y="-93.0">sceneData.ModelTypeAbstract</node>
-                <node x="-221.0" y="-93.0">gui.GLWidget</node>
-              </nodes>
-              <notes />
-              <edges>
-                <edge source="sceneData.ModelTypeStl" target="sceneData.ModelTypeAbstract">
-                  <point x="0.0" y="0.0" />
-                  <point x="0.0" y="0.0" />
-                </edge>
-                <edge source="gui.PrusaControllView" target="PyQt4.QtGui.QMainWindow.QMainWindow">
-                  <point x="0.0" y="-15.5" />
-                  <point x="0.0" y="15.5" />
-                </edge>
-                <edge source="gui.PrusaControllWidget" target="PyQt4.QtGui.QWidget.QWidget">
-                  <point x="0.0" y="-15.5" />
-                  <point x="428.0" y="-199.0" />
-                  <point x="225.66666666666669" y="-199.0" />
-                  <point x="82.66666666666669" y="15.5" />
-                </edge>
-                <edge source="gui.GLWidget" target="PyQt4.QtOpenGL.QGLWidget">
-                  <point x="0.0" y="-15.5" />
-                  <point x="0.0" y="15.5" />
-                </edge>
-                <edge source="PyQt4.QtGui.QMainWindow.QMainWindow" target="PyQt4.QtGui.QWidget.QWidget">
-                  <point x="0.0" y="-15.5" />
-                  <point x="0.0" y="15.5" />
-                </edge>
-                <edge source="PyQt4.QtOpenGL.QGLWidget" target="PyQt4.QtGui.QWidget.QWidget">
-                  <point x="0.0" y="-15.5" />
-                  <point x="-159.0" y="-199.0" />
-                  <point x="60.333333333333314" y="-199.0" />
-                  <point x="-82.66666666666669" y="15.5" />
-                </edge>
-              </edges>
-              <settings layout="Hierarchic Group" zoom="1.0" x="-169.0" y="-85.5" />
-              <SelectedNodes>
-                <node>PyQt4.QtOpenGL.QGLWidget</node>
-              </SelectedNodes>
-              <Categories />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="22" column="36" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
+              <folding>
+                <element signature="e#25#36#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -119,7 +82,7 @@
         <entry file="file://$PROJECT_DIR$/sceneRender.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
+              <caret line="100" column="57" selection-start-line="100" selection-start-column="57" selection-end-line="100" selection-end-column="57" />
               <folding />
             </state>
           </provider>
@@ -129,9 +92,14 @@
         <entry file="file://$PROJECT_DIR$/sceneData.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <caret line="159" column="0" selection-start-line="159" selection-start-column="0" selection-end-line="159" selection-end-column="0" />
               <folding>
-                <element signature="e#25#64#0" expanded="true" />
+                <element signature="e#24#54#0" expanded="true" />
+                <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+                <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+                <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+                <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+                <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -141,7 +109,7 @@
         <entry file="file://$PROJECT_DIR$/utilities.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -162,12 +130,13 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/controller.py" />
+        <option value="$PROJECT_DIR$/gui.py" />
+        <option value="$PROJECT_DIR$/sceneRender.py" />
         <option value="$PROJECT_DIR$/utilities.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/sceneData.py" />
-        <option value="$PROJECT_DIR$/controller.py" />
-        <option value="$PROJECT_DIR$/sceneRender.py" />
-        <option value="$PROJECT_DIR$/gui.py" />
+        <option value="$PROJECT_DIR$/config/logging.conf" />
       </list>
     </option>
   </component>
@@ -177,9 +146,68 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="24" />
-    <option name="width" value="1920" />
-    <option name="height" value="1056" />
+    <option name="x" value="-3" />
+    <option name="width" value="2406" />
+    <option name="height" value="1327" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>CSS</id>
+          </State>
+          <State>
+            <id>Code style issuesJavaScript</id>
+          </State>
+          <State>
+            <id>CoffeeScript</id>
+          </State>
+          <State>
+            <id>Control flow issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Error handlingJavaScript</id>
+          </State>
+          <State>
+            <id>GeneralJavaScript</id>
+          </State>
+          <State>
+            <id>Invalid elementsCSS</id>
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+          <State>
+            <id>JavaScript validity issuesJavaScript</id>
+          </State>
+          <State>
+            <id>Potentially confusing code constructsJavaScript</id>
+          </State>
+          <State>
+            <id>Probable bugsCoffeeScript</id>
+          </State>
+          <State>
+            <id>Probable bugsJavaScript</id>
+          </State>
+          <State>
+            <id>Python</id>
+          </State>
+          <State>
+            <id>SQL</id>
+          </State>
+          <State>
+            <id>TypeScript</id>
+          </State>
+          <State>
+            <id>XML</id>
+          </State>
+        </expanded-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -206,7 +234,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -226,14 +253,29 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PrusaControll" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PrusaControll" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../prusacontroll_prototypes/test/pyqt/main.py" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="full.screen.before.presentation.mode" value="false" />
   </component>
@@ -446,48 +488,28 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
+    <frame x="-3" y="0" width="2406" height="1327" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15416667" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-    </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15416667" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+    </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -507,20 +529,17 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sceneRender.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sceneData.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -537,7 +556,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -545,7 +566,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="32" column="58" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
-          <folding />
+          <folding>
+            <element signature="e#25#58#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -553,7 +576,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -570,7 +595,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -587,7 +617,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -595,7 +627,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#25#58#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -603,7 +637,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="173" column="63" selection-start-line="173" selection-start-column="63" selection-end-line="173" selection-end-column="63" />
-          <folding />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -620,7 +656,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -637,7 +678,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -645,7 +688,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="25" column="19" selection-start-line="25" selection-start-column="19" selection-end-line="25" selection-end-column="19" />
-          <folding />
+          <folding>
+            <element signature="e#25#58#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -653,7 +698,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -661,7 +708,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
-          <folding />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -678,7 +727,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -695,7 +749,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="25" column="16" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -703,7 +759,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -720,7 +778,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -737,7 +800,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="20" column="16" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="16" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -745,7 +810,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -762,7 +829,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -786,7 +858,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -794,7 +868,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="21" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
-          <folding />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -811,7 +887,12 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
           <folding>
-            <element signature="e#25#64#0" expanded="true" />
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -869,15 +950,19 @@
           </nodes>
           <notes />
           <edges>
+            <edge source="sceneData.ModelTypeAbstract" target="object">
+              <point x="62.0" y="-15.5" />
+              <point x="206.0" y="137.0" />
+              <point x="353.1666666666667" y="137.0" />
+              <point x="-25.333333333333314" y="15.5" />
+            </edge>
             <edge source="object" target="_abcoll.Hashable">
               <point x="0.0" y="-15.5" />
               <point x="0.0" y="15.5" />
             </edge>
-            <edge source="sceneData.Model" target="object">
+            <edge source="sceneData.AppScene" target="object">
               <point x="0.0" y="-15.5" />
-              <point x="566.5" y="137.0" />
-              <point x="403.8333333333333" y="137.0" />
-              <point x="25.333333333333314" y="15.5" />
+              <point x="0.0" y="15.5" />
             </edge>
             <edge source="sceneData.ModelTypeStl" target="sceneData.ModelTypeAbstract">
               <point x="0.0" y="-15.5" />
@@ -887,22 +972,19 @@
               <point x="-62.0" y="-15.5" />
               <point x="0.0" y="15.5" />
             </edge>
-            <edge source="sceneData.ModelTypeAbstract" target="object">
-              <point x="62.0" y="-15.5" />
-              <point x="206.0" y="137.0" />
-              <point x="353.1666666666667" y="137.0" />
-              <point x="-25.333333333333314" y="15.5" />
-            </edge>
-            <edge source="sceneData.AppScene" target="object">
+            <edge source="sceneData.Model" target="object">
               <point x="0.0" y="-15.5" />
-              <point x="0.0" y="15.5" />
+              <point x="566.5" y="137.0" />
+              <point x="403.8333333333333" y="137.0" />
+              <point x="25.333333333333314" y="15.5" />
             </edge>
           </edges>
-          <settings layout="Hierarchic Group" zoom="1.0" x="-250.0" y="-85.5" />
+          <settings layout="Hierarchic Group" zoom="1.0" x="-250.0" y="-85.0" />
           <SelectedNodes>
             <node>sceneData.Model</node>
           </SelectedNodes>
           <Categories />
+          <SCOPE>All</SCOPE>
         </state>
       </provider>
     </entry>
@@ -916,51 +998,10 @@
           </nodes>
           <notes />
           <edges />
-          <settings layout="Hierarchic Group" zoom="1.0" x="89.0" y="15.5" />
+          <settings layout="Hierarchic Group" zoom="1.0" x="89.0" y="16.0" />
           <SelectedNodes />
           <Categories />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utilities.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sceneData.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding>
-            <element signature="e#25#64#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sceneRender.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="23" selection-start-line="0" selection-start-column="23" selection-end-line="0" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="32" column="58" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
-          <folding />
+          <SCOPE>All</SCOPE>
         </state>
       </provider>
     </entry>
@@ -987,21 +1028,7 @@
               <point x="0.0" y="0.0" />
               <point x="0.0" y="0.0" />
             </edge>
-            <edge source="gui.PrusaControllView" target="PyQt4.QtGui.QMainWindow.QMainWindow">
-              <point x="0.0" y="-15.5" />
-              <point x="0.0" y="15.5" />
-            </edge>
-            <edge source="gui.PrusaControllWidget" target="PyQt4.QtGui.QWidget.QWidget">
-              <point x="0.0" y="-15.5" />
-              <point x="428.0" y="-199.0" />
-              <point x="225.66666666666669" y="-199.0" />
-              <point x="82.66666666666669" y="15.5" />
-            </edge>
             <edge source="gui.GLWidget" target="PyQt4.QtOpenGL.QGLWidget">
-              <point x="0.0" y="-15.5" />
-              <point x="0.0" y="15.5" />
-            </edge>
-            <edge source="PyQt4.QtGui.QMainWindow.QMainWindow" target="PyQt4.QtGui.QWidget.QWidget">
               <point x="0.0" y="-15.5" />
               <point x="0.0" y="15.5" />
             </edge>
@@ -1011,19 +1038,95 @@
               <point x="60.333333333333314" y="-199.0" />
               <point x="-82.66666666666669" y="15.5" />
             </edge>
+            <edge source="gui.PrusaControllView" target="PyQt4.QtGui.QMainWindow.QMainWindow">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="PyQt4.QtGui.QMainWindow.QMainWindow" target="PyQt4.QtGui.QWidget.QWidget">
+              <point x="0.0" y="-15.5" />
+              <point x="0.0" y="15.5" />
+            </edge>
+            <edge source="gui.PrusaControllWidget" target="PyQt4.QtGui.QWidget.QWidget">
+              <point x="0.0" y="-15.5" />
+              <point x="428.0" y="-199.0" />
+              <point x="225.66666666666669" y="-199.0" />
+              <point x="82.66666666666669" y="15.5" />
+            </edge>
           </edges>
-          <settings layout="Hierarchic Group" zoom="1.0" x="-169.0" y="-85.5" />
+          <settings layout="Hierarchic Group" zoom="1.0" x="-169.0" y="-85.0" />
           <SelectedNodes>
             <node>PyQt4.QtOpenGL.QGLWidget</node>
           </SelectedNodes>
           <Categories />
+          <SCOPE>All</SCOPE>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.1869748">
-          <caret line="7" column="24" selection-start-line="7" selection-start-column="23" selection-end-line="7" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="36" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
+          <folding>
+            <element signature="e#25#36#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="100" column="57" selection-start-line="100" selection-start-column="57" selection-end-line="100" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utilities.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="43" column="0" selection-start-line="43" selection-start-column="0" selection-end-line="43" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="43" column="11" selection-start-line="43" selection-start-column="11" selection-end-line="43" selection-end-column="11" />
+          <folding>
+            <element signature="e#25#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="159" column="0" selection-start-line="159" selection-start-column="0" selection-end-line="159" selection-end-column="0" />
+          <folding>
+            <element signature="e#24#54#0" expanded="true" />
+            <marker date="1458061592728" expanded="true" signature="418:862" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="426:559" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="885:3442" placeholder="..." />
+            <marker date="1458061592728" expanded="true" signature="893:962" placeholder="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+            <marker date="1458061592728" expanded="true" signature="2858:3442" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="15" column="32" selection-start-line="15" selection-start-column="32" selection-end-line="15" selection-end-column="32" />
+          <folding>
+            <element signature="e#75#108#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/logging.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.43926787">
+          <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
           <folding />
         </state>
       </provider>
