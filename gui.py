@@ -200,7 +200,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.printTab = QtGui.QWidget()
 
         #tool tab
-        self.selectButton = QtGui.QPushButton("Select")
+        #self.selectButton = QtGui.QPushButton("Select")
         self.moveButton = QtGui.QPushButton("Move")
         self.rotateButton = QtGui.QPushButton("Rotate")
         self.scaleButton = QtGui.QPushButton("Scale")
@@ -208,23 +208,23 @@ class PrusaControllWidget(QtGui.QWidget):
         self.toolButtonGroup = QtGui.QButtonGroup()
         self.toolButtonGroup.setExclusive(True)
 
-        self.toolButtonGroup.addButton(self.selectButton)
+        #self.toolButtonGroup.addButton(self.selectButton)
         self.toolButtonGroup.addButton(self.moveButton)
         self.toolButtonGroup.addButton(self.rotateButton)
         self.toolButtonGroup.addButton(self.scaleButton)
 
-        self.selectButton.setCheckable(True)
+        #self.selectButton.setCheckable(True)
         self.moveButton.setCheckable(True)
         self.rotateButton.setCheckable(True)
         self.scaleButton.setCheckable(True)
 
-        self.selectButton.clicked.connect(self.controller.selectButtonPressed)
+        #self.selectButton.clicked.connect(self.controller.selectButtonPressed)
         self.moveButton.clicked.connect(self.controller.moveButtonPressed)
         self.rotateButton.clicked.connect(self.controller.rotateButtonPressed)
         self.scaleButton.clicked.connect(self.controller.scaleButtonPressed)
 
         self.toolTabVLayout = QtGui.QVBoxLayout()
-        self.toolTabVLayout.addWidget(self.selectButton)
+        #self.toolTabVLayout.addWidget(self.selectButton)
         self.toolTabVLayout.addWidget(self.moveButton)
         self.toolTabVLayout.addWidget(self.rotateButton)
         self.toolTabVLayout.addWidget(self.scaleButton)

@@ -174,7 +174,7 @@ class GLWidget(QGLWidget):
     def mousePressEvent(self, event):
         logging.info('Tlacitko mysi bylo stisknuto')
         self.lastPos = QtCore.QPoint(event.pos())
-        if event.buttons() & QtCore.Qt.LeftButton:
+        if event.buttons() & QtCore.Qt.LeftButton & (self.parent.controller.settings['toolButtons']['moveButton'] or self.parent.controller.settings['toolButtons']['rotateButton'] or self.parent.controller.settings['toolButtons']['scaleButton']):
             self.hitObjects(event)
             self.updateGL()
 
@@ -205,8 +205,16 @@ class GLWidget(QGLWidget):
 
             #self.oldPos3d = newVector
 
+        elif event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['rotateButton']:
+            #TODO:Dodelat rotaci
+            logging.info('Mouse move event spolu s levym tlacitkem a je nastaveno Rotate tool')
+
+        elif event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['scaleButton']:
+            #TODO:Dodelat scale
+            logging.info('Mouse move event spolu s levym tlacitkem a je nastaveno Scale tool')
 
         elif event.buttons() & QtCore.Qt.RightButton:
+
             self.setXRotation(self.xRot + 8 * dy)
             self.setZRotation(self.zRot + 8 * dx)
 

@@ -19,7 +19,7 @@ class Controller:
             self.settings['language'] = 'en'
             self.settings['printer'] = 'prusa_i3_v2'
             self.settings['toolButtons'] = {
-                'selectButton': False,
+        #        'selectButton': False,
                 'moveButton': False,
                 'rotateButton': False,
                 'scaleButton': False
@@ -88,10 +88,12 @@ class Controller:
     def importImage(self, path):
         pass
 
+    '''
     def selectButtonPressed(self):
         print('Select button pressed')
         self.clearToolButtonStates()
         self.settings['toolButtons']['selectButton'] = True
+    '''
 
     def moveButtonPressed(self):
         print('Move button pressed')
