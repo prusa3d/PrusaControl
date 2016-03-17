@@ -30,13 +30,12 @@ class GLWidget(QGLWidget):
         self.rayEnd = [.0, .0, .0]
         self.oldPos3d = [.0, .0, .0]
 
-        self.lightAmbient = [.15, .15, .15, .0]
-        self.lightDiffuse = [1., 1., 1., 1.0]
-        self.lightSpecular = [1.0, 1.0, 1.0, 1.0]
+        self.lightAmbient = [.95, .95, .95, 1.0]
+        self.lightDiffuse = [.5, .5, .5, 1.0]
         self.lightPossition = [29.0, -48.0, 37.0, 1.0]
 
-        self.materialSpecular = [1.,1.,1.,.1]
-        self.materialShiness = [0.50]
+        self.materialSpecular = [.05, .05, .05, .1]
+        self.materialShiness = [0.05]
 
         self.lastPos = QtCore.QPoint()
 
@@ -86,33 +85,31 @@ class GLWidget(QGLWidget):
         self.bed = self.makePrintingBed()
         self.axis = self.makeAxis()
 
-
         glClearDepth(1.0)
-        glShadeModel(GL_SMOOTH)
+        glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
 
         #material
-        #glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
-        #glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
+        glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
+        glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
         #light
         glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightDiffuse)
-        #glLightfv(GL_LIGHT0, GL_SPECULAR, self.lightSpecular)
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
         glEnable(GL_LIGHT0)
 
-        #glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
-        #glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
-        #glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+        glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
+        glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
-        #glEnable(GL_COLOR_MATERIAL)
+        glEnable(GL_COLOR_MATERIAL)
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
         glEnable( GL_BLEND )
 
-        #glEnable(GL_CULL_FACE)
+        glEnable(GL_CULL_FACE)
 
 
     def paintGL(self):

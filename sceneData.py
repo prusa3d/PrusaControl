@@ -113,12 +113,12 @@ class Model(object):
         glNewList(genList, GL_COMPILE)
 
         glBegin(GL_TRIANGLES)
-        for face in self.mesh.faces:
-            glNormal3fv(self.mesh.vertex_normals[face[0]])
+        for i, face in enumerate(self.mesh.faces):
+            glNormal3fv(self.mesh.face_normals[i])
             glVertex3fv(self.mesh.vertices[face[0]])
-            glNormal3fv(self.mesh.vertex_normals[face[1]])
+            #glNormal3fv(self.mesh.vertex_normals[face[1]])
             glVertex3fv(self.mesh.vertices[face[1]])
-            glNormal3fv(self.mesh.vertex_normals[face[2]])
+            #glNormal3fv(self.mesh.vertex_normals[face[2]])
             glVertex3fv(self.mesh.vertices[face[2]])
         glEnd()
         glEndList()
@@ -146,15 +146,13 @@ class ModelTypeStl2(ModelTypeAbstract):
 
     def load(self, filename):
         logging.info('Load new model')
-        mesh = trimesh.load_mesh(filename)
-
-        #model normalization
-        mesh.vertices -= mesh.center_mass
-        mesh.fix_normals()
-        mesh.vertices *= 0.1
         model = Model()
+        model.mesh = trimesh.load_mesh(filename)
+        #model normalization
+        #model.mesh.vertices -= model.mesh.center_mass
+        #model.mesh.fix_normals()
+        #model.mesh.vertices *= 0.1
 
-        model.mesh = mesh
         model.makeDisplayList()
 
         return model

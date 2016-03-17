@@ -10,10 +10,9 @@ from sceneData import *
 import logging
 import logging.config
 
-logging.config.fileConfig('config/logging.conf')
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="info.log", format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+    logging.basicConfig(filename="info.log", filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     logging.info('PrusaControll start')
     app = QtGui.QApplication(sys.argv)
     controller = Controller()
