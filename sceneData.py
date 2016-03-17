@@ -191,10 +191,10 @@ class Model(object):
 
         glBegin(GL_TRIANGLES)
         for i in xrange(len(self.v0)):
-            glNormal3d(self.normal[i][0], self.normal[i][1], self.normal[i][2])
-            glVertex3d(self.v0[i][0], self.v0[i][1], self.v0[i][2])
-            glVertex3d(self.v1[i][0], self.v1[i][1], self.v1[i][2])
-            glVertex3d(self.v2[i][0], self.v2[i][1], self.v2[i][2])
+            glNormal3fv(self.normal[i])
+            glVertex3fv(self.v0[i])
+            glVertex3fv(self.v1[i])
+            glVertex3fv(self.v2[i])
         glEnd()
         glEndList()
 
@@ -287,9 +287,8 @@ class ModelTypeStl(ModelTypeAbstract):
         '''
 
         #normalization of normal vectors
-        mesh.update_normals()
-        model.normal = mesh.normals
-        model.normal = model.normal / numpy.linalg.norm(mesh.normals)
+        #mesh.update_normals()
+        model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
 
         #scale of imported data
         model.v0 = mesh.v0*model.scaleDefault[0]

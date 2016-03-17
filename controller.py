@@ -50,6 +50,7 @@ class Controller:
 
     def openProjectFile(self):
         data = self.view.openProjectFileDialog()
+        logging.info('open project file %s' %data)
         print(str(data))
 
     def saveProjectFile(self):
@@ -62,6 +63,7 @@ class Controller:
 
     def openModelFile(self):
         data = self.view.openModelFileDialog()
+        logging.info('open model file %s' %data)
         self.importModel(data)
 
     def importModel(self, path):
