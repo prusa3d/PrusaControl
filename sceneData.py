@@ -39,12 +39,12 @@ class AppScene(object):
         print('Automaticke rozhazeni modelu po scene')
 
     #TODO:Iteratible adding models and finding new possition
-    def findNewPossition(self, model):
+    def find_new_position(self, model):
         pass
 
 
     #TODO:Doplnit setovani hotBed dimension from settings->controller
-    def defineHotBed(self, param):
+    def define_hot_bed(self, param):
         pass
 
 
