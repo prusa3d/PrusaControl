@@ -23,14 +23,29 @@ class AppScene(object):
     it can be used for generating sliced data and rendering data
     '''
     def __init__(self):
+        self.hot_bed_dimension = {'type':'cube',
+                                'a':25,
+                                'b':25,
+                                'c':25}
+        self.model_possition_offset = .0
+
         self.sceneZero = [.0, .0, .0]
         self.models = []
 
     def clearScene(self):
         self.models = []
 
-    def automaticPositionOfModels(self):
+    def automatic_models_position(self):
         print('Automaticke rozhazeni modelu po scene')
+
+    #TODO:Iteratible adding models and finding new possition
+    def findNewPossition(self, model):
+        pass
+
+
+    #TODO:Doplnit setovani hotBed dimension from settings->controller
+    def defineHotBed(self, param):
+        pass
 
 
 class Model(object):
@@ -59,6 +74,7 @@ class Model(object):
         self.selected = False
         self.boundingSphereSize = .0
         self.boundingSphereCenter = [.0, .0, .0]
+        self.boundingBox = []
         self.boundingMinimalPoint = [.0, .0, .0]
         self.zeroPoint = [.0, .0, .0]
         self.min = [.0,.0,.0]
@@ -231,63 +247,9 @@ class ModelTypeStl(ModelTypeAbstract):
         some magic with model data...
         I need normals, transformations...
         '''
-
-        #calculate bounding sphere
-        '''
-        model.max[0] = max([a[0]*.1 for a in mesh.points])
-        model.min[0] = min([a[0]*.1 for a in mesh.points])
-        model.boundingSphereCenter[0] = (model.max[0] + model.min[0]) * .5
-
-        model.max[1] = max([a[1]*.1 for a in mesh.points])
-        model.min[1] = min([a[1]*.1 for a in mesh.points])
-        model.boundingSphereCenter[1] = (model.max[1] + model.min[1]) * .5
-
-        model.max[2] = max([a[2]*.1 for a in mesh.points])
-        model.min[2] = min([a[2]*.1 for a in mesh.points])
-        model.boundingSphereCenter[2] = (model.max[2] + model.min[2]) * .5
-
-        model.zeroPoint = deepcopy(model.boundingSphereCenter)
-        model.zeroPoint[2] = model.min[2]
-
-        for i in xrange(len(mesh.v0)):
-            normal = [.0, .0, .0]
-            mv0 = mesh.v0[i]*0.1
-            mv1 = mesh.v1[i]*0.1
-            mv2 = mesh.v2[i]*0.1
-
-            model.v0.append(mv0)
-            model.v1.append(mv1)
-            model.v2.append(mv2)
-
-            v0 = Vector(model.boundingSphereCenter)
-            v1 = Vector(model.boundingSphereCenter)
-            v2 = Vector(model.boundingSphereCenter)
-
-            v0L = abs(v0.lenght(mv0))
-            v1L = abs(v1.lenght(mv1))
-            v2L = abs(v2.lenght(mv2))
-
-            if v0L > model.boundingSphereSize:
-                model.boundingSphereSize = v0L
-            if v1L > model.boundingSphereSize:
-                model.boundingSphereSize = v1L
-            if v2L > model.boundingSphereSize:
-                model.boundingSphereSize = v2L
-
-            normal = mesh.normals[i]
-            l = numpy.linalg.norm(normal)
-            normal[0] = normal[0] / l
-            normal[1] = normal[1] / l
-            normal[2] = normal[2] / l
-
-            model.newNormal.append(normal)
-
-        model.normalizeObject()
-        model.displayList = model.makeDisplayList()
-        '''
-
         #normalization of normal vectors
         #mesh.update_normals()
+
         model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
 
         #scale of imported data

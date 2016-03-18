@@ -3,13 +3,9 @@ import logging
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from PyQt4 import *
-from PyQt4 import QtGui
+
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
-
-import sceneData
-from sceneData import Vector
 
 
 class GLWidget(QGLWidget):
@@ -19,15 +15,12 @@ class GLWidget(QGLWidget):
         self.parent = parent
         self.initParametres()
 
-
-
     def initParametres(self):
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
         self.zoom = -15
-        self.rayStart = [.0, .0, .0]
-        self.rayEnd = [.0, .0, .0]
+
         self.oldPos3d = [.0, .0, .0]
 
         self.lightAmbient = [.95, .95, .95, 1.0]
@@ -37,13 +30,17 @@ class GLWidget(QGLWidget):
         self.materialSpecular = [.05,.05,.05,.1]
         self.materialShiness = [0.05]
 
-        self.lastPos = QtCore.QPoint()
-
 
     def updateScene(self, reset=False):
         if reset:
             self.initParametres()
         self.updateGL()
+
+    def set_zoom(self, diff):
+        self.zoom += diff
+
+    def get_zoom(self):
+        return self.zoom
 
     def xRotation(self):
         return self.xRot
@@ -60,21 +57,21 @@ class GLWidget(QGLWidget):
     def sizeHint(self):
         return QtCore.QSize(400, 400)
 
-    def setXRotation(self, angle):
+    def set_x_rotation(self, angle):
         angle = self.normalizeAngle(angle)
         if angle != self.xRot:
             self.xRot = angle
             self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
             self.updateGL()
 
-    def setYRotation(self, angle):
+    def set_y_rotation(self, angle):
         angle = self.normalizeAngle(angle)
         if angle != self.yRot:
             self.yRot = angle
             self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
             self.updateGL()
 
-    def setZRotation(self, angle):
+    def set_z_rotation(self, angle):
         angle = self.normalizeAngle(angle)
         if angle != self.zRot:
             self.zRot = angle
@@ -84,7 +81,6 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         self.bed = self.makePrintingBed()
         self.axis = self.makeAxis()
-
 
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)
@@ -121,7 +117,6 @@ class GLWidget(QGLWidget):
         glTranslated(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-        #glRotated(self.yRot / 16.0, 0.0, 1.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
@@ -133,23 +128,22 @@ class GLWidget(QGLWidget):
         glPointSize(5)
         glColor3f(0,1,1)
         glBegin(GL_POINTS)
-        glVertex3d(self.lightPossition[0], self.lightPossition[1], self.lightPossition[2])
+        glVertex3fv(self.lightPossition[:3])
         glEnd()
         glEnable(GL_DEPTH_TEST)
-
 
         if 'debug' in self.parent.controller.settings:
             if self.parent.controller.settings['debug']:
                 glBegin(GL_POINTS)
                 glColor3f(1,0,0)
-                glVertex3f(self.parent.controller.model.sceneZero[0], self.parent.controller.model.sceneZero[1], self.parent.controller.model.sceneZero[2])
+                glVertex3fv(self.parent.controller.scene.sceneZero)
                 glEnd()
 
                 glLineWidth(5)
                 glBegin(GL_LINES)
                 glColor3f(0,1,0)
-                glVertex3d(self.rayStart[0], self.rayStart[1], self.rayStart[2])
-                glVertex3d(self.rayEnd[0], self.rayEnd[1], self.rayEnd[2])
+                glVertex3fv(self.parent.controller.ray_start)
+                glVertex3fv(self.parent.controller.ray_end)
                 glEnd()
 
         '''
@@ -168,67 +162,24 @@ class GLWidget(QGLWidget):
         glViewport(0, 0, width, height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
+        #TODO:Fix perspective correction, wrong calculation now, deformated view
         gluPerspective(60*((width*1.0)/(height*1.0)), (width*1.0)/(height*1.0), 0.0001, 1000.0)
         glMatrixMode(GL_MODELVIEW)
 
     def mousePressEvent(self, event):
-        logging.info('Tlacitko mysi bylo stisknuto')
-        self.lastPos = QtCore.QPoint(event.pos())
-        if event.buttons() & QtCore.Qt.LeftButton & (self.parent.controller.settings['toolButtons']['moveButton'] or self.parent.controller.settings['toolButtons']['rotateButton'] or self.parent.controller.settings['toolButtons']['scaleButton']):
-            self.hitObjects(event)
-            self.updateGL()
+        self.parent.controller.mouse_press_event(event)
 
     def mouseReleaseEvent(self, event):
-        logging.info('Tlacitko mysi bylo uvolneno')
-        logging.info('Odoznacit vsechny objekty ve scene')
-        for model in self.parent.controller.scene.models:
-            model.selected = False
-        self.updateGL()
+        self.parent.controller.mouse_release_event(event)
 
     def mouseMoveEvent(self, event):
-        dx = event.x() - self.lastPos.x()
-        dy = event.y() - self.lastPos.y()
-
-        if event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['moveButton']:
-            logging.info('Mouse move event spolu s levym tlacitkem a je nastaveno Move tool')
-            newRayStart, newRayEnd = self.getCursorPossition(event)
-            #newVector = Vector.minusAB(newRayStart, newRayEnd)
-            #newVector[2] = 0.
-            #newPos = Vector.minusAB(self.oldPos3d, newVector)
-            res = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
-            if res is not None:
-                for model in self.parent.controller.scene.models:
-                    #TODO:Tuto cast predelat jen na pripocitavani diferenci k pozici objektu
-                    if model.selected:
-                        #model.pos = [pos+newPos for pos, newPos in zip(model.pos, newPos)]
-                        model.pos = res
-
-            #self.oldPos3d = newVector
-
-        elif event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['rotateButton']:
-            #TODO:Dodelat rotaci
-            logging.info('Mouse move event spolu s levym tlacitkem a je nastaveno Rotate tool')
-
-        elif event.buttons() & QtCore.Qt.LeftButton & self.parent.controller.settings['toolButtons']['scaleButton']:
-            #TODO:Dodelat scale
-            logging.info('Mouse move event spolu s levym tlacitkem a je nastaveno Scale tool')
-
-        elif event.buttons() & QtCore.Qt.RightButton:
-
-            self.setXRotation(self.xRot + 8 * dy)
-            self.setZRotation(self.zRot + 8 * dx)
-
-
-        self.lastPos = QtCore.QPoint(event.pos())
-        self.updateGL()
-
+        self.parent.controller.mouse_move_event(event)
 
     def wheelEvent(self, event):
-        self.zoom = self.zoom + event.delta()/120
-        self.parent.parent.statusBar().showMessage("Zoom = %s" % self.zoom)
-        self.updateGL()
+        logging.info('MouseWheel')
+        self.parent.controller.wheel_event(event)
 
-    def getCursorPossition(self, event):
+    def get_cursor_position(self, event):
         matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
         matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
         viewport = glGetIntegerv( GL_VIEWPORT )
@@ -241,29 +192,6 @@ class GLWidget(QGLWidget):
 
         return (rayStart, rayEnd)
 
-
-    def hitObjects(self, event):
-        #matModelView = []
-        #matProjection = []
-        #viewport = []
-        possibleHitten = []
-
-        self.rayStart, self.rayEnd = self.getCursorPossition(event)
-
-
-        for model in self.parent.controller.scene.models:
-            if model.intersectionRayBoundingSphere(self.rayStart, self.rayEnd):
-                possibleHitten.append(model)
-            else:
-                model.selected = False
-
-        for model in possibleHitten:
-            if model.intersectionRayModel(self.rayStart, self.rayEnd):
-                model.selected = not model.selected
-            else:
-                model.selected = False
-
-        return False
 
     def makePrintingBed(self):
         genList = glGenLists(1)

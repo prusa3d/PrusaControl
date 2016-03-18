@@ -147,7 +147,7 @@ class PrusaControllView(QtGui.QMainWindow):
         data = self.convertFilePathToUnicode(data)
         return data
 
-
+    #TODO:Move to controller class
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -175,6 +175,27 @@ class PrusaControllView(QtGui.QMainWindow):
 
     def updateScene(self, reset=False):
         self.prusaControllWidget.updateScene(reset)
+
+    def set_zoom(self, diff):
+        self.prusaControllWidget.set_zoom(diff)
+
+    def get_zoom(self):
+        return self.prusaControllWidget.get_zoom()
+
+    def get_cursor_position(self, event):
+        return self.prusaControllWidget.get_cursor_position(event)
+
+    def set_x_rotation(self, angle):
+        self.prusaControllWidget.set_x_rotation(angle)
+
+    def set_z_rotation(self, angle):
+        self.prusaControllWidget.set_z_rotation(angle)
+
+    def get_x_rotation(self):
+        return self.prusaControllWidget.get_x_rotation()
+
+    def get_z_rotation(self):
+        return self.prusaControllWidget.get_z_rotation()
 
 
 class PrusaControllWidget(QtGui.QWidget):
@@ -301,6 +322,27 @@ class PrusaControllWidget(QtGui.QWidget):
         self.setLayout(mainLayout)
 
         self.show()
+
+    def set_x_rotation(self, angle):
+        self.glWidget.set_x_rotation(angle)
+
+    def set_z_rotation(self, angle):
+        self.glWidget.set_z_rotation(angle)
+
+    def get_x_rotation(self):
+        return self.glWidget.xRot
+
+    def get_z_rotation(self):
+        return self.glWidget.zRot
+
+    def get_zoom(self):
+        return self.glWidget.get_zoom()
+
+    def set_zoom(self, diff):
+        self.glWidget.set_zoom(diff)
+
+    def get_cursor_position(self, event):
+        return self.glWidget.get_cursor_position(event)
 
     def updateScene(self, reset=False):
         self.glWidget.updateScene(reset)
