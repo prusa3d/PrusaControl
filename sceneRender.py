@@ -162,8 +162,9 @@ class GLWidget(QGLWidget):
         glViewport(0, 0, width, height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
+        logging.debug("Pomer stran je: %s" %float(width*1./height*1.))
         #TODO:Fix perspective correction, wrong calculation now, deformated view
-        gluPerspective(60*((width*1.0)/(height*1.0)), (width*1.0)/(height*1.0), 0.0001, 1000.0)
+        gluPerspective(45, float(width*1./height*1.), 1, 1000)
         glMatrixMode(GL_MODELVIEW)
 
     def mousePressEvent(self, event):

@@ -49,6 +49,7 @@ class Controller:
         self.last_pos = QtCore.QPoint()
         self.ray_start = [.0, .0, .0]
         self.ray_end = [.0, .0, .0]
+        self.res_old = []
 
     def getView(self):
         return self.view
@@ -98,6 +99,8 @@ class Controller:
         logging.debug('Tlacitko mysi bylo stisknuto')
         self.last_pos = QtCore.QPoint(event.pos())
         if event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['moveButton'] or self.settings['toolButtons']['rotateButton'] or self.settings['toolButtons']['scaleButton']):
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            self.res_old = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
             self.hit_objects(event)
             self.view.updateScene()
 
@@ -115,16 +118,13 @@ class Controller:
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
             logging.debug('Mouse move event spolu s levym tlacitkem a je nastaveno Move tool')
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
-            #newVector = Vector.minusAB(newRayStart, newRayEnd)
-            #newVector[2] = 0.
-            #newPos = Vector.minusAB(self.oldPos3d, newVector)
             res = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
             if res is not None:
+                res_new = sceneData.Vector.minusAB(res, self.res_old)
                 for model in self.scene.models:
-                    #TODO:Tuto cast predelat jen na pripocitavani diferenci k pozici objektu
                     if model.selected:
-                        #model.pos = [pos+newPos for pos, newPos in zip(model.pos, newPos)]
-                        model.pos = res
+                        model.pos = [p+n for p, n in zip(model.pos, res_new)]
+                    self.res_old = res
 
             #self.oldPos3d = newVector
 
