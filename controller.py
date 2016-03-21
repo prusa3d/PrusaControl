@@ -137,6 +137,7 @@ class Controller:
             logging.debug('Mouse move event spolu s levym tlacitkem a je nastaveno Scale tool')
 
         elif event.buttons() & QtCore.Qt.RightButton:
+            #TODO:Add controll of camera instance
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
 

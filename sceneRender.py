@@ -11,11 +11,12 @@ from PyQt4 import QtCore
 class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
-
+        #TODO:Add camera instance
         self.parent = parent
         self.initParametres()
 
     def initParametres(self):
+        #TODO:Add camera instance initialization
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
@@ -36,6 +37,7 @@ class GLWidget(QGLWidget):
             self.initParametres()
         self.updateGL()
 
+    #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
         self.zoom += diff
 
