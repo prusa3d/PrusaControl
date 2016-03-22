@@ -15,8 +15,30 @@ class GLWidget(QGLWidget):
         self.parent = parent
         self.initParametres()
 
+        #properties definition
+        self.xRot = 0
+        self.yRot = 0
+        self.zRot = 0
+        self.zoom = 0
+
+        self.oldPos3d = [.0, .0, .0]
+
+        self.lightAmbient = [.0, .0, .0, .0]
+        self.lightDiffuse = [.0, .0, .0, .0]
+        self.lightPossition = [.0, .0, .0, .0]
+
+        self.materialSpecular = [.0,.0,.0,.0]
+        self.materialShiness = [.0]
+
+        #screen properties
+        self.w = 0
+        self.h = 0
+
+        self.initParametres()
+
     def initParametres(self):
         #TODO:Add camera instance initialization
+        #properties initialization
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
@@ -31,6 +53,9 @@ class GLWidget(QGLWidget):
         self.materialSpecular = [.05,.05,.05,.1]
         self.materialShiness = [0.05]
 
+        #screen properties
+        self.w = 0
+        self.h = 0
 
     def updateScene(self, reset=False):
         if reset:
@@ -115,6 +140,9 @@ class GLWidget(QGLWidget):
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
+
+        #self.draw_background_texture()
+
         glTranslated(0,-5,0)
         glTranslated(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
@@ -161,11 +189,11 @@ class GLWidget(QGLWidget):
         glEnable( GL_BLEND )
 
     def resizeGL(self, width, height):
+        self.w = width
+        self.h = height
         glViewport(0, 0, width, height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        logging.debug("Pomer stran je: %s" %float(width*1./height*1.))
-        #TODO:Fix perspective correction, wrong calculation now, deformated view
         gluPerspective(45, float(width*1./height*1.), 1, 1000)
         glMatrixMode(GL_MODELVIEW)
 
@@ -262,6 +290,37 @@ class GLWidget(QGLWidget):
         glEndList()
 
         return genList
+
+    def draw_background_texture(self):
+        glMatrixMode(GL_PROJECTION)
+        glPushMatrix()
+        glLoadIdentity()
+        glOrtho(0.0, glutGet(GLUT_WINDOW_WIDTH), 0.0, glutGet(GLUT_WINDOW_HEIGHT), -1.0, 1.0)
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+
+        glLoadIdentity()
+        glDisable(GL_LIGHTING)
+
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, self.image_background)
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0); glVertex3f(0, 0, 0)
+        glTexCoord2f(0, 1); glVertex3f(0, 100, 0)
+        glTexCoord2f(1, 1); glVertex3f(100, 100, 0)
+        glTexCoord2f(1, 0); glVertex3f(100, 0, 0)
+        glEnd()
+
+        glDisable(GL_TEXTURE_2D)
+        glPopMatrix()
+
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
+
+        glMatrixMode(GL_MODELVIEW)
+
 
     def normalizeAngle(self, angle):
         while angle < 0:

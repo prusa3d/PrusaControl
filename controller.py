@@ -77,6 +77,7 @@ class Controller:
     def importModel(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
         self.scene.models.append(ModelTypeStl().load(path))
+        self.scene.automatic_models_position()
         self.view.updateScene()
 
     def openSettings(self):
@@ -102,7 +103,7 @@ class Controller:
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             self.res_old = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
             self.hit_objects(event)
-            self.view.updateScene()
+        self.view.updateScene()
 
     def mouse_release_event(self, event):
         logging.debug('Tlacitko mysi bylo uvolneno')
@@ -126,15 +127,17 @@ class Controller:
                         model.pos = [p+n for p, n in zip(model.pos, res_new)]
                     self.res_old = res
 
-            #self.oldPos3d = newVector
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             #TODO:Dodelat rotaci
             logging.debug('Mouse move event spolu s levym tlacitkem a je nastaveno Rotate tool')
+            #find plane(axis) in which rotation will be
+
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
             #TODO:Dodelat scale
             logging.debug('Mouse move event spolu s levym tlacitkem a je nastaveno Scale tool')
+            #find axis(), make scale
 
         elif event.buttons() & QtCore.Qt.RightButton:
             #TODO:Add controll of camera instance

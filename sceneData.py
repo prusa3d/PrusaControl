@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy
 from abc import ABCMeta, abstractmethod
+
+from pyrr.plane import position
 from stl.mesh import Mesh
 from random import randint
 import math
@@ -27,7 +29,7 @@ class AppScene(object):
                                 'a':25,
                                 'b':25,
                                 'c':25}
-        self.model_possition_offset = .0
+        self.model_position_offset = 10.
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
@@ -36,16 +38,39 @@ class AppScene(object):
         self.models = []
 
     def automatic_models_position(self):
-        print('Automaticke rozhazeni modelu po scene')
+        logging.info('Automaticke rozhazeni modelu po scene')
+        #sort objects over size of bounding sphere
+        self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
+        #place biggest object(first one) on center
+        #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
+        for i, m in enumerate(self.models):
+            self.find_new_position(i, m)
+
 
     #TODO:Iteratible adding models and finding new possition
-    def find_new_position(self, model):
-        pass
+    def find_new_position(self, index, model):
+        position_vector = [.0, .0, .0]
+        scene_tmp = self.models[:index]
+        if index == 0:
+            scene_tmp[index].pos = position_vector
+        else:
+            while not model.intersection_model_list_model_(scene_tmp):
+                #TODO:Nejak postavit to ze se vezme pozice stredu a zacne se pridavat v soustrednych kruzich do te doby dokud se nenajde misto
+                #position_vector[0] += cos()
+                #position_vector[1] += sin()
+
+                model.pos = position_vector
 
 
-    #TODO:Doplnit setovani hotBed dimension from settings->controller
+
+
+
+    #TODO:Doplnit setovani hot_bed dimension from settings->controller
     def define_hot_bed(self, param):
         pass
+
+
+
 
 
 class Model(object):
@@ -106,6 +131,20 @@ class Model(object):
         lenght = pt.lenght(v.tolist())
         return lenght < self.boundingSphereSize
 
+    def intersection_model_model(self, model):
+        vector_model_model = Vector(a=model.pos, b=self.pos)
+        distance = vector_model_model.len()
+        #TODO:Add better alg for detecting intersection(now is only detection of BS)
+        if distance >= (model.boundingSphereSize+self.boundingSphereSize):
+            return False
+        else:
+            return True
+
+    def intersection_model_list_model_(self, list):
+        for m in list:
+            if self.intersection_model_model(m):
+                return True
+        return False
 
     def intersectionRayModel(self, rayStart, rayEnd):
         self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
@@ -215,6 +254,9 @@ class Model(object):
         glEndList()
 
         return genList
+
+    def __str__(self):
+        return "Size: %s" % self.boundingSphereSize
 
 
 class ModelTypeAbstract(object):
