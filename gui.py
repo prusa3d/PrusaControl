@@ -88,6 +88,12 @@ class PrusaControllView(QtGui.QMainWindow):
         self.fileMenu.addAction('Close', self.controller.close)
         #file menu definition
 
+        #printer menu
+        self.printer_menu = self.menubar.addMenu('&Printer')
+        self.printer_menu.addAction('Printer info', self.controller.open_printer_info)
+        self.printer_menu.addAction('Update firmware', self.controller.open_update_firmware)
+        #printer menu
+
         #Settings menu
         self.settingsMenu = self.menubar.addMenu('&Settings')
         self.settingsMenu.addAction('PrusaControll settings', self.controller.openSettings)

@@ -63,6 +63,15 @@ class Controller:
     def getModel(self):
         return self.scene
 
+    def open_printer_info(self):
+        #TODO:Call info reading from printer
+        pass
+
+    def open_update_firmware(self):
+        #TODO:Call update_firmware dialog
+        pass
+
+
     def openProjectFile(self):
         data = self.view.openProjectFileDialog()
         logging.debug('open project file %s' %data)
