@@ -47,29 +47,33 @@ class AppScene(object):
             self.find_new_position(i, m)
 
 
-    #TODO:Iteratible adding models and finding new possition
+    #TODO:Iteratible adding models and finding new position
     def find_new_position(self, index, model):
+        logging.debug("finding position for new object")
         position_vector = [.0, .0, .0]
-        scene_tmp = self.models[:index]
         if index == 0:
-            scene_tmp[index].pos = position_vector
-        else:
-            while not model.intersection_model_list_model_(scene_tmp):
-                #TODO:Nejak postavit to ze se vezme pozice stredu a zacne se pridavat v soustrednych kruzich do te doby dokud se nenajde misto
-                #position_vector[0] += cos()
-                #position_vector[1] += sin()
+            self.models[0].pos=position_vector
+            return
+        scene_tmp = self.models[:index]
+        if index > 0:
+            while model.intersection_model_list_model_(scene_tmp):
+                for angle in xrange(0, 360, 20):
+                    logging.debug("Angle %s" % angle)
+                    logging.debug("Hledam spravnou pozici x:%s, y:%s" % (position_vector[0], position_vector[1]))
+                    model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
+                    model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
 
-                model.pos = position_vector
+                    if not model.intersection_model_list_model_(scene_tmp):
+                        return
 
-
+                position_vector[0] += model.boundingSphereSize*.1
+                position_vector[1] += model.boundingSphereSize*.1
 
 
 
     #TODO:Doplnit setovani hot_bed dimension from settings->controller
     def define_hot_bed(self, param):
         pass
-
-
 
 
 
@@ -105,10 +109,9 @@ class Model(object):
         self.min = [.0,.0,.0]
         self.max = [.0,.0,.0]
 
-        self.color = [randint(3, 8) * 0.1,
-                      randint(3, 8) * 0.1,
-                      randint(3, 8) * 0.1]
-
+        self.color = [randint(3, 7) * 0.11,
+                      randint(3, 7) * 0.1,
+                      randint(3, 7) * 0.12]
 
 
     def closestPoint(self, a, b, p):
@@ -132,12 +135,15 @@ class Model(object):
         return lenght < self.boundingSphereSize
 
     def intersection_model_model(self, model):
+        logging.debug("Intersection ModelxModel")
         vector_model_model = Vector(a=model.pos, b=self.pos)
         distance = vector_model_model.len()
         #TODO:Add better alg for detecting intersection(now is only detection of BS)
         if distance >= (model.boundingSphereSize+self.boundingSphereSize):
+            logging.debug("Intersection False")
             return False
         else:
+            logging.debug("Intersection True")
             return True
 
     def intersection_model_list_model_(self, list):
@@ -274,7 +280,6 @@ class ModelTypeAbstract(object):
         return None
 
 
-
 class ModelTypeStl(ModelTypeAbstract):
     '''
     Concrete ModelType class for STL type file, it can load binary and char file
@@ -326,7 +331,7 @@ class ModelTypeStl(ModelTypeAbstract):
             if vL > model.boundingSphereSize:
                 model.boundingSphereSize = vL
 
-        model.pos = [randint(0, 10), randint(0, 10), 0]
+        #model.pos = [randint(0, 10), randint(0, 10), 0]
 
         model.displayList = model.makeDisplayList()
 

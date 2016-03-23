@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import logging
 import math
 import os
 
@@ -57,7 +57,7 @@ class SettingsDialog(QDialog):
 
     @staticmethod
     def getSettingsData(controller, parent = None):
-        data = {}
+        data = controller.settings
         dialog = SettingsDialog(controller, parent)
         result = dialog.exec_()
         data['language'] = controller.enumeration['language'].keys()[dialog.languageCombo.currentIndex()]
@@ -197,6 +197,9 @@ class PrusaControllView(QtGui.QMainWindow):
     def get_z_rotation(self):
         return self.prusaControllWidget.get_z_rotation()
 
+    def clear_toolbuttons(self):
+        self.prusaControllWidget.clear_toolbuttons()
+
 
 class PrusaControllWidget(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -221,7 +224,6 @@ class PrusaControllWidget(QtGui.QWidget):
         self.printTab = QtGui.QWidget()
 
         #tool tab
-        #self.selectButton = QtGui.QPushButton("Select")
         self.moveButton = QtGui.QPushButton("Move")
         self.rotateButton = QtGui.QPushButton("Rotate")
         self.scaleButton = QtGui.QPushButton("Scale")
@@ -229,23 +231,19 @@ class PrusaControllWidget(QtGui.QWidget):
         self.toolButtonGroup = QtGui.QButtonGroup()
         self.toolButtonGroup.setExclusive(True)
 
-        #self.toolButtonGroup.addButton(self.selectButton)
         self.toolButtonGroup.addButton(self.moveButton)
         self.toolButtonGroup.addButton(self.rotateButton)
         self.toolButtonGroup.addButton(self.scaleButton)
 
-        #self.selectButton.setCheckable(True)
         self.moveButton.setCheckable(True)
         self.rotateButton.setCheckable(True)
         self.scaleButton.setCheckable(True)
 
-        #self.selectButton.clicked.connect(self.controller.selectButtonPressed)
         self.moveButton.clicked.connect(self.controller.moveButtonPressed)
         self.rotateButton.clicked.connect(self.controller.rotateButtonPressed)
         self.scaleButton.clicked.connect(self.controller.scaleButtonPressed)
 
         self.toolTabVLayout = QtGui.QVBoxLayout()
-        #self.toolTabVLayout.addWidget(self.selectButton)
         self.toolTabVLayout.addWidget(self.moveButton)
         self.toolTabVLayout.addWidget(self.rotateButton)
         self.toolTabVLayout.addWidget(self.scaleButton)
@@ -314,6 +312,8 @@ class PrusaControllWidget(QtGui.QWidget):
         self.tabWidget.addTab(self.printTab, "Print")
         self.tabWidget.setCurrentIndex(1)
         self.tabWidget.setMaximumWidth(250)
+        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.controller.tab_selected)
+
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.addWidget(self.glWidget)
@@ -322,6 +322,13 @@ class PrusaControllWidget(QtGui.QWidget):
         self.setLayout(mainLayout)
 
         self.show()
+
+    def clear_toolbuttons(self):
+        logging.debug("Odcheckovani toolbuttons")
+        self.moveButton.setChecked(False)
+        self.rotateButton.setChecked(False)
+        self.scaleButton.setChecked(False)
+
 
     def set_x_rotation(self, angle):
         self.glWidget.set_x_rotation(angle)

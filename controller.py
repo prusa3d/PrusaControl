@@ -51,6 +51,12 @@ class Controller:
         self.ray_end = [.0, .0, .0]
         self.res_old = []
 
+    def tab_selected(self, n):
+        logging.info("Byl zobrazen tab c." + str(n))
+        if n==1:
+            self.clearToolButtonStates()
+            self.view.clear_toolbuttons()
+
     def getView(self):
         return self.view
 
