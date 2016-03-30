@@ -107,6 +107,21 @@ class PrusaControllView(QtGui.QMainWindow):
         self.helpMenu.addAction('About')
         #Help menu
 
+        #status bar widgets
+        self.progress_bar = QtGui.QProgressBar()
+        self.progress_bar.setMaximum(100)
+        self.progress_bar.setMinimum(0)
+        self.progress_bar.setTextVisible(False)
+        self.cancel_button = QtGui.QPushButton("X")
+        self.cancel_button.setMaximumWidth(20)
+        self.progress_bar.setMaximumWidth(100)
+        self.statusLabel = QtGui.QLabel(self)
+        self.statusBar().addPermanentWidget(self.statusLabel)
+        self.statusBar().addPermanentWidget(self.progress_bar, 0)
+        self.statusBar().addPermanentWidget(self.cancel_button, 0)
+        self.progress_bar.setValue(0)
+        #status bar widgets
+
         self.statusBar().showMessage('Ready')
         self.setWindowTitle(self.tr("PrusaControll"))
         self.show()
@@ -264,6 +279,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.materialLabel = QtGui.QLabel("Material")
         self.materialCombo = QtGui.QComboBox()
         #set enumeration
+
         self.materialCombo.addItem('ABS')
         self.materialCombo.addItem('PLA')
 

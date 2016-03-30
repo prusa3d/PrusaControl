@@ -2,6 +2,7 @@
 import numpy
 from abc import ABCMeta, abstractmethod
 
+from PyQt4.QtCore import QObject
 from pyrr.plane import position
 from stl.mesh import Mesh
 from random import randint
@@ -265,7 +266,7 @@ class Model(object):
         return "Size: %s" % self.boundingSphereSize
 
 
-class ModelTypeAbstract(object):
+class ModelTypeAbstract(object, QObject):
     '''
     model type is abstract class, reprezenting reading of specific model data file
     '''
@@ -276,7 +277,8 @@ class ModelTypeAbstract(object):
 
     @abstractmethod
     def load(filename):
-        print "This is abstract model type"
+        logging.debug("This is abstract model type")
+
         return None
 
 
@@ -286,7 +288,7 @@ class ModelTypeStl(ModelTypeAbstract):
     '''
 
     def load(self, filename):
-        print "this is STL file reader"
+        logging.debug("this is STL file reader")
         mesh = Mesh.from_file(filename)
         model = Model()
 
