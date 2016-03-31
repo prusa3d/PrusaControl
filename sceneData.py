@@ -266,7 +266,7 @@ class Model(object):
         return "Size: %s" % self.boundingSphereSize
 
 
-class ModelTypeAbstract(object, QObject):
+class ModelTypeAbstract(object):
     '''
     model type is abstract class, reprezenting reading of specific model data file
     '''
