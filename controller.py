@@ -5,6 +5,7 @@ import sceneData
 from gui import PrusaControllView
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
+from copy import deepcopy
 
 from PyQt4 import QtCore
 
@@ -12,11 +13,9 @@ from PyQt4 import QtCore
 class Controller:
     def __init__(self):
         logging.info('Controller instance created')
-        self.view = PrusaControllView(self)
-        self.view.disableSaveGcodeButton()
-        self.scene = AppScene()
 
         #TODO:Reading settings from file
+        self.printing_settings = {}
         self.settings = {}
         if not self.settings:
             self.settings['debug'] = False
@@ -28,8 +27,27 @@ class Controller:
                 'scaleButton': False
             }
 
-        self.printingSettings = {
-            'materials': ['ABS', 'PLA', 'FLEX'],
+        self.printing_settings = {
+            'materials': ['abs', 'pla', 'flex'],
+            'abs':{
+                'speed':25,
+                'quality': ['draft', 'low', 'medium'],
+                'infill': 65,
+                'infillRange': [20, 80]
+            },
+            'pla':{
+                'speed':10,
+                'infill': 20,
+                'infillRange': [0, 200]
+            },
+            'default':{
+                'bed': 100,
+                'hotEnd': 250,
+                'quality': ['draft', 'low', 'medium', 'high', 'Ultra high'],
+                'speed': 20,
+                'infill': 20,
+                'infillRange': [0, 100]
+            }
         }
 
 
@@ -51,11 +69,26 @@ class Controller:
         self.ray_end = [.0, .0, .0]
         self.res_old = []
 
+        self.view = PrusaControllView(self)
+        self.view.disableSaveGcodeButton()
+        self.scene = AppScene()
+
     def tab_selected(self, n):
-        logging.info("Byl zobrazen tab c." + str(n))
         if n==1:
             self.clearToolButtonStates()
             self.view.clear_toolbuttons()
+
+    def get_printing_materials(self):
+        return self.printing_settings['materials']
+
+    def get_printing_settings_for_material(self, material):
+        #Deep copy, very important
+        printing_settings_tmp = deepcopy(self.printing_settings['default'])
+        printing_settings_tmp.update(self.printing_settings[material] if material in self.printing_settings else {})
+        return printing_settings_tmp
+
+    def update_gui(self):
+        self.view.update_gui()
 
     def getView(self):
         return self.view

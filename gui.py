@@ -108,6 +108,7 @@ class PrusaControllView(QtGui.QMainWindow):
         #Help menu
 
         #status bar widgets
+        '''
         self.progress_bar = QtGui.QProgressBar()
         self.progress_bar.setMaximum(100)
         self.progress_bar.setMinimum(0)
@@ -120,6 +121,7 @@ class PrusaControllView(QtGui.QMainWindow):
         self.statusBar().addPermanentWidget(self.progress_bar, 0)
         self.statusBar().addPermanentWidget(self.cancel_button, 0)
         self.progress_bar.setValue(0)
+        '''
         #status bar widgets
 
         self.statusBar().showMessage('Ready')
@@ -167,6 +169,9 @@ class PrusaControllView(QtGui.QMainWindow):
         data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
         data = self.convertFilePathToUnicode(data)
         return data
+
+    def update_gui(self):
+        self.prusaControllWidget.update_gui()
 
     #TODO:Move to controller class
     def dragEnterEvent(self, event):
@@ -274,21 +279,13 @@ class PrusaControllWidget(QtGui.QWidget):
         #tool tab
 
         #print tab
-        #TODO: Vytvorit print_settings.json ve kterem bude strom nastaveni pro ruzne materialy...
-        #a bude se tady aplikovat jako vyjimky
         self.materialLabel = QtGui.QLabel("Material")
         self.materialCombo = QtGui.QComboBox()
-        #set enumeration
-
-        self.materialCombo.addItem('ABS')
-        self.materialCombo.addItem('PLA')
+        self.materialCombo.addItems(self.controller.get_printing_materials())
+        self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
         self.qualityLabel = QtGui.QLabel("Quality")
         self.qualityCombo = QtGui.QComboBox()
-        #set enumeration
-        self.qualityCombo.addItem('High')
-        self.qualityCombo.addItem('Medium')
-        self.qualityCombo.addItem('Low')
 
         self.infillLabel = QtGui.QLabel("Infill %s" % str(self.infillValue)+'%')
         self.infillSlider = self.createSlider(self.setInfill, self.infillValue)
@@ -306,10 +303,8 @@ class PrusaControllWidget(QtGui.QWidget):
         #printing info place
         self.printingInfoLabel = QtGui.QLabel("Print info:")
 
-
         self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
         self.saveGCodeButton.clicked.connect(self.controller.saveGCodeFile)
-
 
         self.printTabVLayout = QtGui.QVBoxLayout()
         self.printTabVLayout.addWidget(self.materialLabel)
@@ -336,14 +331,35 @@ class PrusaControllWidget(QtGui.QWidget):
         self.tabWidget.setMaximumWidth(250)
         self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.controller.tab_selected)
 
-
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.addWidget(self.glWidget)
         mainLayout.addWidget(self.tabWidget)
 
         self.setLayout(mainLayout)
+        self.update_gui_for_material()
 
         self.show()
+
+    def update_gui(self):
+        self.update_gui_for_material()
+
+    def update_gui_for_material(self, set_materials=0):
+        if set_materials:
+            self.materialCombo.clear()
+            self.materialCombo.addItems(self.controller.get_printing_materials())
+
+        material = str(self.materialCombo.currentText())
+        material_printing_settings = self.controller.get_printing_settings_for_material(material)
+
+        #update print quality widget
+        self.qualityCombo.clear()
+        self.qualityCombo.addItems(material_printing_settings['quality'])
+
+        #infill slider
+        self.infillSlider.setValue(material_printing_settings['infill'])
+        self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
+        self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
+
 
     def clear_toolbuttons(self):
         logging.debug("Odcheckovani toolbuttons")
@@ -386,10 +402,10 @@ class PrusaControllWidget(QtGui.QWidget):
         self.infillValue = val
         self.infillLabel.setText("Infill " + str(val) + "%")
 
-    def createSlider(self, setterSlot, defaultValue=0):
+    def createSlider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100):
         slider = QtGui.QSlider(QtCore.Qt.Horizontal)
 
-        slider.setRange(0, 100)
+        slider.setRange(rangeMin, rangeMax)
         slider.setSingleStep(10)
         slider.setPageStep(20)
         slider.setTickInterval(10)
