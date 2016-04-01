@@ -39,6 +39,9 @@ class SettingsDialog(QDialog):
         self.debugCheckBox = QtGui.QCheckBox("Debug")
         self.debugCheckBox.setChecked(self.controller.settings['debug'])
 
+        self.automaticPlacingCheckBox = QtGui.QCheckBox("Automatic placing")
+        self.automaticPlacingCheckBox.setChecked(self.controller.settings['automatic_placing'])
+
         layout.addWidget(self.languageLabel)
         layout.addWidget(self.languageCombo)
 
@@ -46,6 +49,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.printerCombo)
 
         layout.addWidget(self.debugCheckBox)
+        layout.addWidget(self.automaticPlacingCheckBox)
 
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -211,6 +215,9 @@ class PrusaControllView(QtGui.QMainWindow):
     def get_cursor_position(self, event):
         return self.prusaControllWidget.get_cursor_position(event)
 
+    def get_cursor_pixel_color(self, event):
+        return self.prusaControllWidget.get_cursor_pixel_color(event)
+
     def set_x_rotation(self, angle):
         self.prusaControllWidget.set_x_rotation(angle)
 
@@ -250,6 +257,8 @@ class PrusaControllWidget(QtGui.QWidget):
         self.printTab = QtGui.QWidget()
 
         #tool tab
+        self.automatic_possition = QtGui.QCheckBox("Automatic placing")
+
         self.moveButton = QtGui.QPushButton("Move")
         self.rotateButton = QtGui.QPushButton("Rotate")
         self.scaleButton = QtGui.QPushButton("Scale")
@@ -299,6 +308,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.progressBar.setValue(0)
 
         self.generateButton = QtGui.QPushButton("Generate")
+        #self.generateButton.connect(self.controller.generate_button_pressed)
 
         #printing info place
         self.printingInfoLabel = QtGui.QLabel("Print info:")
@@ -388,6 +398,9 @@ class PrusaControllWidget(QtGui.QWidget):
 
     def get_cursor_position(self, event):
         return self.glWidget.get_cursor_position(event)
+
+    def get_cursor_pixel_color(self, event):
+        return self.glWidget.get_cursor_pixel_color(event)
 
     def updateScene(self, reset=False):
         self.glWidget.updateScene(reset)

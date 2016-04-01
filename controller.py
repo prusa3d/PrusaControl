@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 
+import functools
+
+import time
+
 import sceneData
 from gui import PrusaControllView
 from sceneData import AppScene, ModelTypeStl
@@ -9,6 +13,15 @@ from copy import deepcopy
 
 from PyQt4 import QtCore
 
+#Mesure
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        logging.debug('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        return ret
+    return wrap
 
 class Controller:
     def __init__(self):
@@ -19,13 +32,14 @@ class Controller:
         self.settings = {}
         if not self.settings:
             self.settings['debug'] = False
+            self.settings['automatic_placing'] = False
             self.settings['language'] = 'en'
             self.settings['printer'] = 'prusa_i3_v2'
             self.settings['toolButtons'] = {
                 'moveButton': False,
                 'rotateButton': False,
                 'scaleButton': False
-            }
+        }
 
         self.printing_settings = {
             'materials': ['abs', 'pla', 'flex'],
@@ -50,8 +64,6 @@ class Controller:
             }
         }
 
-
-        #TODO:Add extra file for printing settings(rules)
         self.enumeration = {
             'language': {
                 'cs': 'Czech',
@@ -125,14 +137,15 @@ class Controller:
     def importModel(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
         self.scene.models.append(ModelTypeStl().load(path))
-        self.scene.automatic_models_position()
+        if self.settings['automatic_placing']:
+            self.scene.automatic_models_position()
         self.view.updateScene()
 
     def openSettings(self):
         self.settings = self.view.openSettingsDialog()
-        print(str(self.settings))
 
-    def generatePrint(self):
+    def generate_button_pressed(self):
+        logging.debug('Generate button pressed')
         self.view.enableSaveGcodeButton()
 
     def close(self):
@@ -150,14 +163,17 @@ class Controller:
         if event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['moveButton'] or self.settings['toolButtons']['rotateButton'] or self.settings['toolButtons']['scaleButton']):
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             self.res_old = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
-            self.hit_objects(event)
+            #self.hit_objects(event)
+            color = self.view.get_cursor_pixel_color(event)
+            logging.debug(str(color))
+            self.hit_first_object(event)
         self.view.updateScene()
 
     def mouse_release_event(self, event):
         logging.debug('Tlacitko mysi bylo uvolneno')
         logging.debug('Odoznacit vsechny objekty ve scene')
-        for model in self.scene.models:
-            model.selected = False
+        #for model in self.scene.models:
+        #    model.selected = False
         self.view.updateScene()
 
     def mouse_move_event(self, event):
@@ -197,14 +213,19 @@ class Controller:
 
     def hit_objects(self, event):
         possible_hit = []
+        nSelected = 0
 
         self.ray_start, self.ray_end = self.view.get_cursor_position(event)
 
         for model in self.scene.models:
             if model.intersectionRayBoundingSphere(self.ray_start, self.ray_end):
                 possible_hit.append(model)
+                nSelected+=1
             else:
                 model.selected = False
+
+        if not nSelected:
+            return False
 
         for model in possible_hit:
             if model.intersectionRayModel(self.ray_start, self.ray_end):
@@ -214,12 +235,39 @@ class Controller:
 
         return False
 
+    @timing
+    def hit_first_object(self, event):
+        possible_hit = []
+        nSelected = 0
+        logging.debug("Hit first object")
+
+        self.ray_start, self.ray_end = self.view.get_cursor_position(event)
+        self.scene.clear_selected_models()
+
+        for model in self.scene.models:
+            if model.intersectionRayBoundingSphere(self.ray_start, self.ray_end):
+                possible_hit.append(model)
+                logging.debug("nalezen mozny objekt")
+                nSelected+=1
+
+        if not nSelected:
+            return False
+
+        for model in possible_hit:
+            if model.intersectionRayModel(self.ray_start, self.ray_end):
+                model.selected = True
+                logging.debug("nalezen objekt " + str(model))
+                return True
+
+        return False
+
 
     def resetScene(self):
         self.scene.clearScene()
         self.view.updateScene(True)
 
     def importImage(self, path):
+        #TODO:Add importing of image(just plane with texture?)
         pass
 
     def moveButtonPressed(self):
@@ -263,7 +311,6 @@ class Controller:
         elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
             print('import image')
             self.importImage(url)
-
 
 
 

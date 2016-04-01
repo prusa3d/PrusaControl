@@ -223,6 +223,21 @@ class GLWidget(QGLWidget):
 
         return (rayStart, rayEnd)
 
+    def get_cursor_pixel_color(self, event):
+        color = [0,0,0]
+        c = 0
+
+        viewport = glGetIntegerv( GL_VIEWPORT )
+
+        winX = event.x()
+        winY = viewport[3] - (event.y())
+        glReadPixels(winX, winY-1, 1, 1, GL_RED, GL_UNSIGNED_BYTE, c)
+        logging.debug("readed pixel color: " + str(c))
+        #TODO:Something Wrong
+
+        return color
+
+
 
     def makePrintingBed(self):
         genList = glGenLists(1)

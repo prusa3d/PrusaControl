@@ -21,6 +21,13 @@ class Slic3rEngine(SlicerEngineAbstract):
     '''
     pass
 
+class CuraEngine(SlicerEngineAbstract):
+    '''
+    This is just connector to console version of Slic3r software
+    first version
+    '''
+    pass
+
 class OwnSlicerEngine(SlicerEngineAbstract):
     '''
     PrusaResearch slicer engine, designed for their printers

@@ -38,6 +38,10 @@ class AppScene(object):
     def clearScene(self):
         self.models = []
 
+    def clear_selected_models(self):
+        for model in self.models:
+            model.selected = False
+
     def automatic_models_position(self):
         logging.info('Automaticke rozhazeni modelu po scene')
         #sort objects over size of bounding sphere
@@ -83,6 +87,7 @@ class Model(object):
     this is reprezentation of model data, data readed from file
     '''
     def __init__(self):
+        self.id = id(self)
         #structural data
         self.v0 = []
         self.v1 = []
@@ -110,10 +115,16 @@ class Model(object):
         self.min = [.0,.0,.0]
         self.max = [.0,.0,.0]
 
-        self.color = [randint(3, 7) * 0.11,
-                      randint(3, 7) * 0.1,
-                      randint(3, 7) * 0.12]
+        #self.color = [randint(3, 7) * 0.11,
+        #              randint(3, 7) * 0.1,
+        #              randint(3, 7) * 0.12]
+        self.color = [((self.id & 0x000000FF) >>  0),
+                       ((self.id & 0x0000FF00) >>  8),
+                        ((self.id & 0x00FF0000) >> 16)]
 
+
+    def __str__(self):
+        return "Mesh: " + str(self.id) + ' ' + str(self.color)
 
     def closestPoint(self, a, b, p):
         ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
@@ -218,10 +229,10 @@ class Model(object):
         self.zeroPoint[2] = self.min[2]
 
 
-    def render(self, debug=False):
+    def render(self, picking=False, debug=False):
         glPushMatrix()
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-        if debug:
+        if debug and not picking:
             glDisable(GL_DEPTH_TEST)
 
             glBegin(GL_POINTS)
@@ -238,10 +249,14 @@ class Model(object):
             glutWireSphere(self.boundingSphereSize+0.1, 16, 10)
             glPopMatrix()
 
-        if self.selected:
-            glColor3f(.5,0,0)
+        if picking:
+            glColor3bv(self.color)
         else:
-            glColor3f(self.color[0], self.color[1], self.color[2])
+            if self.selected:
+                glColor3f(.5,0,0)
+            else:
+                glColor3bv(self.color)
+
 
         glCallList(self.displayList)
         glPopMatrix()
@@ -262,8 +277,6 @@ class Model(object):
 
         return genList
 
-    def __str__(self):
-        return "Size: %s" % self.boundingSphereSize
 
 
 class ModelTypeAbstract(object):
