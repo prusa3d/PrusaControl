@@ -86,8 +86,9 @@ class Model(object):
     '''
     this is reprezentation of model data, data readed from file
     '''
+    newid = itertools.count().next
     def __init__(self):
-        self.id = id(self)
+        self.id = Model.newid()+2
         #structural data
         self.v0 = []
         self.v1 = []
@@ -115,12 +116,12 @@ class Model(object):
         self.min = [.0,.0,.0]
         self.max = [.0,.0,.0]
 
-        #self.color = [randint(3, 7) * 0.11,
-        #              randint(3, 7) * 0.1,
-        #              randint(3, 7) * 0.12]
-        self.color = [((self.id & 0x000000FF) >>  0),
-                       ((self.id & 0x0000FF00) >>  8),
-                        ((self.id & 0x00FF0000) >> 16)]
+        self.color = [randint(3, 7) * 0.11,
+                      randint(3, 7) * 0.1,
+                      randint(3, 7) * 0.12]
+        #self.color = [(1./self.id ),
+        #               (1./self.id),
+        #                (1./self.id)]
 
 
     def __str__(self):
@@ -250,12 +251,12 @@ class Model(object):
             glPopMatrix()
 
         if picking:
-            glColor3bv(self.color)
+            glColor4f(1./self.id, 1./self.id, 1./self.id, 1.)
         else:
             if self.selected:
                 glColor3f(.5,0,0)
             else:
-                glColor3bv(self.color)
+                glColor3fv(self.color)
 
 
         glCallList(self.displayList)

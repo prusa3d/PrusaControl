@@ -3,7 +3,7 @@ import logging
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-
+from PyQt4.QtGui import QImage, QColor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
@@ -36,6 +36,8 @@ class GLWidget(QGLWidget):
 
         self.initParametres()
 
+        self.sceneFrameBuffer = []
+
     def initParametres(self):
         #TODO:Add camera instance initialization
         #properties initialization
@@ -56,6 +58,8 @@ class GLWidget(QGLWidget):
         #screen properties
         self.w = 0
         self.h = 0
+
+        self.sceneFrameBuffer = []
 
     def updateScene(self, reset=False):
         if reset:
@@ -136,7 +140,37 @@ class GLWidget(QGLWidget):
         glEnable(GL_CULL_FACE)
 
 
-    def paintGL(self):
+    def paintGL(self, selection = 1):
+        if selection:
+            glClearColor(0.0, 0.0, 0.0, 1.0)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glLoadIdentity()
+
+            glTranslated(0,-5,0)
+            glTranslated(0.0, 0.0, self.zoom)
+            glRotated(-90.0, 1.0, 0.0, 0.0)
+            glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+            glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+            glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+            glDisable( GL_LIGHTING )
+            glDisable( GL_LIGHT0 )
+            glDisable( GL_BLEND )
+            glEnable(GL_DEPTH_TEST)
+
+            if self.parent.controller.scene.models:
+                for model in self.parent.controller.scene.models:
+                    model.render(picking=True, debug=False)
+
+            #glFinish()
+            glFlush()
+
+            self.sceneFrameBuffer = self.grabFrameBuffer()
+            self.sceneFrameBuffer.save('pokus.png')
+
+            glEnable( GL_LIGHTING )
+            glEnable( GL_LIGHT0 )
+            glEnable( GL_BLEND )
+
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
@@ -150,9 +184,12 @@ class GLWidget(QGLWidget):
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
+
         glCallList(self.bed)
         glDisable(GL_DEPTH_TEST)
         glCallList(self.axis)
+
+
 
         #light
         glPointSize(5)
@@ -183,10 +220,14 @@ class GLWidget(QGLWidget):
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
-                model.render(self.parent.controller.settings['debug'] or False)
+                model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
 
         glDisable( GL_LIGHTING )
         glEnable( GL_BLEND )
+
+        glFlush()
+        #glFinish()
+
 
     def resizeGL(self, width, height):
         self.w = width
@@ -224,16 +265,23 @@ class GLWidget(QGLWidget):
         return (rayStart, rayEnd)
 
     def get_cursor_pixel_color(self, event):
-        color = [0,0,0]
-        c = 0
+        color = []
 
         viewport = glGetIntegerv( GL_VIEWPORT )
 
         winX = event.x()
-        winY = viewport[3] - (event.y())
-        glReadPixels(winX, winY-1, 1, 1, GL_RED, GL_UNSIGNED_BYTE, c)
-        logging.debug("readed pixel color: " + str(c))
-        #TODO:Something Wrong
+        #winY = viewport[3] - (event.y())
+        winY = event.y()
+        #glReadBuffer(GL_FRONT)
+        #glReadPixels(winX, winY-1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color)
+        #glReadPixels(0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color)
+        #data = self.grabFrameBuffer()
+        #data.color((data.width()*winY)+winX)
+        #color = QColor()
+        #logging.debug("Raw data: " + str(color))
+        logging.debug("Coordinates: %sx%s" % (str(winX), str(winY)))
+        self.sceneFrameBuffer.pixel(winX, winY)
+        #logging.debug("Color : " + str(color.))
 
         return color
 
