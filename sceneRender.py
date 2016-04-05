@@ -142,6 +142,7 @@ class GLWidget(QGLWidget):
 
     def paintGL(self, selection = 1):
         if selection:
+            #glClearColor(0.0, 0.0, 0.0, 1.0)
             glClearColor(0.0, 0.0, 0.0, 1.0)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glLoadIdentity()
@@ -165,7 +166,6 @@ class GLWidget(QGLWidget):
             glFlush()
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
-            self.sceneFrameBuffer.save('pokus.png')
 
             glEnable( GL_LIGHTING )
             glEnable( GL_LIGHT0 )
@@ -280,8 +280,9 @@ class GLWidget(QGLWidget):
         #color = QColor()
         #logging.debug("Raw data: " + str(color))
         logging.debug("Coordinates: %sx%s" % (str(winX), str(winY)))
-        self.sceneFrameBuffer.pixel(winX, winY)
-        #logging.debug("Color : " + str(color.))
+        c = QColor(self.sceneFrameBuffer.pixel(winX, winY))
+        color = [c.red(), c.green(), c.blue()]
+        logging.debug("Color : " + str(color))
 
         return color
 

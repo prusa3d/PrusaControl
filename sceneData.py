@@ -88,7 +88,10 @@ class Model(object):
     '''
     newid = itertools.count().next
     def __init__(self):
-        self.id = Model.newid()+2
+        self.id = Model.newid()+1
+
+        self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
+
         #structural data
         self.v0 = []
         self.v1 = []
@@ -96,7 +99,6 @@ class Model(object):
 
         self.dataTmp = []
 
-        #self.normal = []
         self.normal = []
         self.displayList = []
 
@@ -119,9 +121,6 @@ class Model(object):
         self.color = [randint(3, 7) * 0.11,
                       randint(3, 7) * 0.1,
                       randint(3, 7) * 0.12]
-        #self.color = [(1./self.id ),
-        #               (1./self.id),
-        #                (1./self.id)]
 
 
     def __str__(self):
@@ -251,7 +250,7 @@ class Model(object):
             glPopMatrix()
 
         if picking:
-            glColor4f(1./self.id, 1./self.id, 1./self.id, 1.)
+            glColor3ubv(self.colorId)
         else:
             if self.selected:
                 glColor3f(.5,0,0)

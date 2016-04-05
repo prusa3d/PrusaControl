@@ -32,7 +32,7 @@ class Controller:
         self.settings = {}
         if not self.settings:
             self.settings['debug'] = False
-            self.settings['automatic_placing'] = False
+            self.settings['automatic_placing'] = True
             self.settings['language'] = 'en'
             self.settings['printer'] = 'prusa_i3_v2'
             self.settings['toolButtons'] = {
@@ -164,9 +164,10 @@ class Controller:
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             self.res_old = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
             #self.hit_objects(event)
-            color = self.view.get_cursor_pixel_color(event)
-            logging.debug(str(color))
-            self.hit_first_object(event)
+
+            #logging.debug(str(color))
+            #self.hit_first_object(event)
+            self.hit_first_object_by_color(event)
         self.view.updateScene()
 
     def mouse_release_event(self, event):
@@ -174,6 +175,7 @@ class Controller:
         logging.debug('Odoznacit vsechny objekty ve scene')
         #for model in self.scene.models:
         #    model.selected = False
+        self.scene.clear_selected_models()
         self.view.updateScene()
 
     def mouse_move_event(self, event):
@@ -260,6 +262,20 @@ class Controller:
                 return True
 
         return False
+
+    @timing
+    def hit_first_object_by_color(self, event):
+        self.scene.clear_selected_models()
+        color = self.view.get_cursor_pixel_color(event)
+        #color to id
+        find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        if find_id == 0:
+            return False
+        for model in self.scene.models:
+            if model.id == find_id:
+                model.selected = True
+                return True
+
 
 
     def resetScene(self):
