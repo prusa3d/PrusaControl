@@ -92,6 +92,20 @@ class Model(object):
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 
+        self.rotateColorXId = self.id + 1000
+        self.rotateColorXId = [(self.rotateColorXId & 0x000000FF) >> 0, (self.rotateColorXId & 0x0000FF00) >> 8, (self.rotateColorXId & 0x00FF0000) >> 16]
+        self.rotateColorYId = self.id + 1001
+        self.rotateColorYId = [(self.rotateColorYId & 0x000000FF) >> 0, (self.rotateColorYId & 0x0000FF00) >> 8, (self.rotateColorYId & 0x00FF0000) >> 16]
+        self.rotateColorZId = self.id + 1002
+        self.rotateColorZId = [(self.rotateColorZId & 0x000000FF) >> 0, (self.rotateColorZId & 0x0000FF00) >> 8, (self.rotateColorZId & 0x00FF0000) >> 16]
+
+        self.scaleColorXId = self.id + 2000
+        self.scaleColorXId = [(self.scaleColorXId & 0x000000FF) >> 0, (self.scaleColorXId & 0x0000FF00) >> 8, (self.scaleColorXId & 0x00FF0000) >> 16]
+        self.scaleColorYId = self.id + 2001
+        self.scaleColorYId = [(self.scaleColorYId & 0x000000FF) >> 0, (self.scaleColorYId & 0x0000FF00) >> 8, (self.scaleColorYId & 0x00FF0000) >> 16]
+        self.scaleColorZId = self.id + 2002
+        self.scaleColorZId = [(self.scaleColorZId & 0x000000FF) >> 0, (self.scaleColorZId & 0x0000FF00) >> 8, (self.scaleColorZId & 0x00FF0000) >> 16]
+
         #structural data
         self.v0 = []
         self.v1 = []
@@ -167,6 +181,7 @@ class Model(object):
     def intersectionRayModel(self, rayStart, rayEnd):
         self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
         matrix = Matrix44.from_scale(Vector3(self.scale))
+        #TODO:Add rotation
         matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
 
         w = Vector(rayEnd)
@@ -352,11 +367,11 @@ class ModelTypeStl(ModelTypeAbstract):
 
         return model
 
-def intersectionRayPlane(start, end, p=[]):
+def intersectionRayPlane(start, end, position=[.0,.0,.0], n=[.0,.0,1.]):
     r = ray.create_from_line(line.create_from_points(start, end))
-    v = [.0,.0,.0]
-    n = [.0,.0,1.]
-    res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(v, n))
+    #v = [.0,.0,.0]
+    #n = [.0,.0,1.]
+    res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(position, n))
     return res
 
 

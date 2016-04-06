@@ -3,6 +3,7 @@ import logging
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+import math
 from PyQt4.QtGui import QImage, QColor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
@@ -117,6 +118,7 @@ class GLWidget(QGLWidget):
         glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
+        glCullFace(GL_FRONT_AND_BACK)
 
         #material
         glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
@@ -130,25 +132,26 @@ class GLWidget(QGLWidget):
 
         glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
         glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+        #glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE)
 
         glEnable(GL_COLOR_MATERIAL)
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
         glEnable( GL_BLEND )
 
-        glEnable(GL_CULL_FACE)
+
 
 
     def paintGL(self, selection = 1):
         if selection:
-            #glClearColor(0.0, 0.0, 0.0, 1.0)
             glClearColor(0.0, 0.0, 0.0, 1.0)
+            #glClearColor(1.0, 1.0, 1.0, 1.0)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glLoadIdentity()
 
-            glTranslated(0,-5,0)
-            glTranslated(0.0, 0.0, self.zoom)
+            glTranslatef(0,-5,0)
+            glTranslatef(0.0, 0.0, self.zoom)
             glRotated(-90.0, 1.0, 0.0, 0.0)
             glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
             glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
@@ -160,12 +163,13 @@ class GLWidget(QGLWidget):
 
             if self.parent.controller.scene.models:
                 for model in self.parent.controller.scene.models:
+                    self.draw_tool(model, self.parent.controller.settings, True)
                     model.render(picking=True, debug=False)
 
-            #glFinish()
             glFlush()
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
+            self.sceneFrameBuffer.save("pokus.png")
 
             glEnable( GL_LIGHTING )
             glEnable( GL_LIGHT0 )
@@ -177,8 +181,8 @@ class GLWidget(QGLWidget):
 
         #self.draw_background_texture()
 
-        glTranslated(0,-5,0)
-        glTranslated(0.0, 0.0, self.zoom)
+        glTranslatef(0,-5,0)
+        glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
@@ -220,13 +224,74 @@ class GLWidget(QGLWidget):
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
+                #TODO:Draw scale circle widgets (blended)
+                self.draw_tool(model, self.parent.controller.settings)
                 model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
 
         glDisable( GL_LIGHTING )
         glEnable( GL_BLEND )
 
         glFlush()
-        #glFinish()
+
+    def draw_tool(self, model, settings, picking=False):
+        if picking:
+            rotateColors = [model.rotateColorXId, model.rotateColorYId, model.rotateColorZId]
+            scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId]
+        else:
+            rotateColors = [[255,0,0],[0,255,0],[0,0,255]]
+            scaleColors = [[255,0,0],[0,255,0],[0,0,255]]
+
+        if settings['toolButtons']['rotateButton']:
+            self.draw_rotation_circles(rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
+        elif settings['toolButtons']['scaleButton']:
+            self.draw_scale_axes(scaleColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
+
+    def draw_rotation_circles(self, colors, position, radius, picking=False):
+        segments = 24
+        glPushMatrix()
+        glTranslatef(position[0], position[1], position[2])
+        glColor3ubv(colors[0])
+        glBegin(GL_LINE_LOOP)
+        for i in xrange(0, 360, 360/segments):
+            glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
+        glEnd()
+        glColor3ubv(colors[1])
+        glBegin(GL_LINE_LOOP)
+        for i in xrange(0, 360, 360/segments):
+            glVertex3f(0., math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius)
+        glEnd()
+        glColor3ubv(colors[2])
+        glBegin(GL_LINE_LOOP)
+        for i in xrange(0, 360, 360/segments):
+            glVertex3f(math.cos(math.radians(i)) * radius, 0., math.sin(math.radians(i)) * radius)
+        glEnd()
+        glPopMatrix()
+
+    def draw_scale_axes(self, colors, position, radius, picking=False):
+        glPushMatrix()
+        glTranslatef(position[0], position[1], position[2])
+        glColor3ubv(colors[0])
+        glBegin(GL_LINES)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(1.*radius, 0., 0.)
+        glEnd()
+        glColor3ubv(colors[1])
+        glBegin(GL_LINES)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(0., 1.*radius, 0.)
+        glEnd()
+        glColor3ubv(colors[2])
+        glBegin(GL_LINES)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(0., 0., 1.*radius)
+        glEnd()
+        glColor3f(1.,1.,1.)
+        glBegin(GL_LINES)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(1.*radius, 1.*radius, 1.*radius)
+        glEnd()
+        glPopMatrix()
+
 
 
     def resizeGL(self, width, height):
@@ -266,26 +331,11 @@ class GLWidget(QGLWidget):
 
     def get_cursor_pixel_color(self, event):
         color = []
-
-        viewport = glGetIntegerv( GL_VIEWPORT )
-
         winX = event.x()
-        #winY = viewport[3] - (event.y())
         winY = event.y()
-        #glReadBuffer(GL_FRONT)
-        #glReadPixels(winX, winY-1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color)
-        #glReadPixels(0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color)
-        #data = self.grabFrameBuffer()
-        #data.color((data.width()*winY)+winX)
-        #color = QColor()
-        #logging.debug("Raw data: " + str(color))
-        logging.debug("Coordinates: %sx%s" % (str(winX), str(winY)))
         c = QColor(self.sceneFrameBuffer.pixel(winX, winY))
         color = [c.red(), c.green(), c.blue()]
-        logging.debug("Color : " + str(color))
-
         return color
-
 
 
     def makePrintingBed(self):
