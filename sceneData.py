@@ -43,7 +43,6 @@ class AppScene(object):
             model.selected = False
 
     def automatic_models_position(self):
-        logging.info('Automaticke rozhazeni modelu po scene')
         #sort objects over size of bounding sphere
         self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
         #place biggest object(first one) on center
@@ -54,7 +53,6 @@ class AppScene(object):
 
     #TODO:Iteratible adding models and finding new position
     def find_new_position(self, index, model):
-        logging.debug("finding position for new object")
         position_vector = [.0, .0, .0]
         if index == 0:
             self.models[0].pos=position_vector
@@ -63,8 +61,6 @@ class AppScene(object):
         if index > 0:
             while model.intersection_model_list_model_(scene_tmp):
                 for angle in xrange(0, 360, 20):
-                    logging.debug("Angle %s" % angle)
-                    logging.debug("Hledam spravnou pozici x:%s, y:%s" % (position_vector[0], position_vector[1]))
                     model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
 
@@ -73,7 +69,6 @@ class AppScene(object):
 
                 position_vector[0] += model.boundingSphereSize*.1
                 position_vector[1] += model.boundingSphereSize*.1
-
 
 
     #TODO:Doplnit setovani hot_bed dimension from settings->controller
@@ -92,24 +87,27 @@ class Model(object):
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 
-        self.rotateColorXId = self.id + 1000
-        self.rotateColorXId = [(self.rotateColorXId & 0x000000FF) >> 0, (self.rotateColorXId & 0x0000FF00) >> 8, (self.rotateColorXId & 0x00FF0000) >> 16]
-        self.rotateColorYId = self.id + 1001
-        self.rotateColorYId = [(self.rotateColorYId & 0x000000FF) >> 0, (self.rotateColorYId & 0x0000FF00) >> 8, (self.rotateColorYId & 0x00FF0000) >> 16]
-        self.rotateColorZId = self.id + 1002
-        self.rotateColorZId = [(self.rotateColorZId & 0x000000FF) >> 0, (self.rotateColorZId & 0x0000FF00) >> 8, (self.rotateColorZId & 0x00FF0000) >> 16]
+        self.rotateXId = self.id * 1001
+        self.rotateColorXId = [(self.rotateXId & 0x000000FF) >> 0, (self.rotateXId & 0x0000FF00) >> 8, (self.rotateXId & 0x00FF0000) >> 16]
+        self.rotateYId = self.id * 1002
+        self.rotateColorYId = [(self.rotateYId & 0x000000FF) >> 0, (self.rotateYId & 0x0000FF00) >> 8, (self.rotateYId & 0x00FF0000) >> 16]
+        self.rotateZId = self.id * 1003
+        self.rotateColorZId = [(self.rotateZId & 0x000000FF) >> 0, (self.rotateZId & 0x0000FF00) >> 8, (self.rotateZId & 0x00FF0000) >> 16]
 
-        self.scaleColorXId = self.id + 2000
-        self.scaleColorXId = [(self.scaleColorXId & 0x000000FF) >> 0, (self.scaleColorXId & 0x0000FF00) >> 8, (self.scaleColorXId & 0x00FF0000) >> 16]
-        self.scaleColorYId = self.id + 2001
-        self.scaleColorYId = [(self.scaleColorYId & 0x000000FF) >> 0, (self.scaleColorYId & 0x0000FF00) >> 8, (self.scaleColorYId & 0x00FF0000) >> 16]
-        self.scaleColorZId = self.id + 2002
-        self.scaleColorZId = [(self.scaleColorZId & 0x000000FF) >> 0, (self.scaleColorZId & 0x0000FF00) >> 8, (self.scaleColorZId & 0x00FF0000) >> 16]
+        self.scaleXId = self.id * 2005
+        self.scaleColorXId = [(self.scaleXId & 0x000000FF) >> 0, (self.scaleXId & 0x0000FF00) >> 8, (self.scaleXId & 0x00FF0000) >> 16]
+        self.scaleYId = self.id * 2007
+        self.scaleColorYId = [(self.scaleYId & 0x000000FF) >> 0, (self.scaleYId & 0x0000FF00) >> 8, (self.scaleYId & 0x00FF0000) >> 16]
+        self.scaleZId = self.id * 2009
+        self.scaleColorZId = [(self.scaleZId & 0x000000FF) >> 0, (self.scaleZId & 0x0000FF00) >> 8, (self.scaleZId & 0x00FF0000) >> 16]
 
         #structural data
         self.v0 = []
         self.v1 = []
         self.v2 = []
+
+        self.rotationAxis = []
+        self.scaleAxis = []
 
         self.dataTmp = []
 
@@ -161,15 +159,12 @@ class Model(object):
         return lenght < self.boundingSphereSize
 
     def intersection_model_model(self, model):
-        logging.debug("Intersection ModelxModel")
         vector_model_model = Vector(a=model.pos, b=self.pos)
         distance = vector_model_model.len()
         #TODO:Add better alg for detecting intersection(now is only detection of BS)
         if distance >= (model.boundingSphereSize+self.boundingSphereSize):
-            logging.debug("Intersection False")
             return False
         else:
-            logging.debug("Intersection True")
             return True
 
     def intersection_model_list_model_(self, list):
@@ -272,6 +267,9 @@ class Model(object):
             else:
                 glColor3fv(self.color)
 
+        glRotatef(self.rot[0], 1.,0.,0.)
+        glRotatef(self.rot[1], 0.,1.,0.)
+        glRotatef(self.rot[2], 0.,0.,1.)
 
         glCallList(self.displayList)
         glPopMatrix()
@@ -364,14 +362,17 @@ class ModelTypeStl(ModelTypeAbstract):
         #model.pos = [randint(0, 10), randint(0, 10), 0]
 
         model.displayList = model.makeDisplayList()
+        logging.debug("Position of object " + str(model.pos))
+        logging.debug("Position of object " + str(model.zeroPoint))
+        logging.debug("Position of object " + str(model.boundingSphereCenter))
 
         return model
 
-def intersectionRayPlane(start, end, position=[.0,.0,.0], n=[.0,.0,1.]):
+def intersectionRayPlane(start, end, pos=[.0,.0,.0], n=[.0,.0,1.]):
     r = ray.create_from_line(line.create_from_points(start, end))
     #v = [.0,.0,.0]
     #n = [.0,.0,1.]
-    res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(position, n))
+    res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(pos, n))
     return res
 
 

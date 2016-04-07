@@ -177,9 +177,10 @@ class Controller:
     def mouse_move_event(self, event):
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
+        newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
-            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+
             res = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
             if res is not None:
                 res_new = sceneData.Vector.minusAB(res, self.res_old)
@@ -191,9 +192,29 @@ class Controller:
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             #TODO:Dodelat rotaci
-            logging.debug('Mouse move event spolu s levym tlacitkem a je nastaveno Rotate tool')
+            res = [.0,.0,.0]
+
+            logging.debug("Delam rotaci")
             #find plane(axis) in which rotation will be made
-            #
+            #newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            for model in self.scene.models:
+                if model.selected and model.rotationAxis:
+                    logging.debug("Nasel jsem objekt a budu nad nim delat nejakou rotaci")
+                    position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
+                    if model.rotationAxis == 'y':
+                        logging.debug("Delam rotaci y")
+                        model.rot[0] = model.rot[0] + dy*0.25
+                    elif model.rotationAxis == 'z':
+                        logging.debug("Delam rotaci z")
+                        model.rot[1] = model.rot[1] + dy*0.25
+                    elif model.rotationAxis == 'x':
+                        logging.debug("Delam rotaci x")
+                        model.rot[2] = model.rot[2] + dx*0.25
+                    else:
+                        res = [.0,.0,.0]
+                    logging.debug("Rotace objektu %s je %s" %(str(model), str(model.rot)))
+                self.res_old = res
+            #self.view.updateScene()
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
@@ -267,42 +288,64 @@ class Controller:
                 model.selected = True
                 return True
 
-
     def find_object_and_rotation_axis_by_color(self, event):
         logging.debug("find_object_and_rotation_axis_by_color")
         color = self.view.get_cursor_pixel_color(event)
+        logging.debug("barva " + str(color))
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        logging.debug("color id " + str(find_id))
         if find_id == 0:
+            logging.debug("Nic nalezeno")
             return False
         for model in self.scene.models:
-            if model.rotateColorXId == find_id:
+            if model.rotateXId == find_id:
                 model.selected = True
+                model.rotationAxis = 'x'
+                logging.debug("Found X rotation for " + str(model))
                 return True
-            elif model.rotateColorYId == find_id:
+            elif model.rotateYId == find_id:
                 model.selected = True
+                model.rotationAxis = 'y'
+                logging.debug("Found Y rotation for " + str(model))
                 return True
-            elif model.rotateColorZId == find_id:
+            elif model.rotateZId == find_id:
                 model.selected = True
+                model.rotationAxis = 'z'
+                logging.debug("Found Z rotation for " + str(model))
                 return True
+            else:
+                model.rotationAxis = []
+
 
     def find_object_and_scale_axis_by_color(self, event):
         logging.debug("find_object_and_scale_axis_by_color")
         color = self.view.get_cursor_pixel_color(event)
+        logging.debug("barva " + str(color))
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        logging.debug("color id " + str(find_id))
         if find_id == 0:
+            logging.debug("Nic nalezeno")
             return False
         for model in self.scene.models:
-            if model.scaleColorXId == find_id:
+            if model.scaleXId == find_id:
                 model.selected = True
+                model.scaleAxis = 'x'
+                logging.debug("Found X scale for " + str(model))
                 return True
-            elif model.scaleColorYId == find_id:
+            elif model.scaleYId == find_id:
                 model.selected = True
+                model.scaleAxis = 'y'
+                logging.debug("Found Y scale for " + str(model))
                 return True
-            elif model.scaleColorZId == find_id:
+            elif model.scaleZId == find_id:
                 model.selected = True
+                model.scaleAxis = 'z'
+                logging.debug("Found Z scale for " + str(model))
                 return True
+            else:
+                model.scaleAxis = None
 
     def resetScene(self):
         self.scene.clearScene()
@@ -321,11 +364,26 @@ class Controller:
         self.clearToolButtonStates()
         self.settings['toolButtons']['rotateButton'] = True
         self.view.updateScene()
+        for model in self.scene.models:
+            logging.debug(str(model))
+            logging.debug("Rotate:")
+            logging.debug("x: " + str(model.rotateXId))
+            logging.debug("y: " + str(model.rotateYId))
+            logging.debug("z: " + str(model.rotateZId))
+            logging.debug("")
+
 
     def scaleButtonPressed(self):
         self.clearToolButtonStates()
         self.settings['toolButtons']['scaleButton'] = True
         self.view.updateScene()
+        for model in self.scene.models:
+            logging.debug(str(model))
+            logging.debug("Scale:")
+            logging.debug("x: " + str(model.scaleXId))
+            logging.debug("y: " + str(model.scaleYId))
+            logging.debug("z: " + str(model.scaleZId))
+            logging.debug("")
 
     def clearToolButtonStates(self):
         self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}
