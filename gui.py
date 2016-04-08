@@ -376,8 +376,6 @@ class PrusaControllWidget(QtGui.QWidget):
 
 
     def clear_toolbuttons(self):
-        #TODO:Not function, repair
-        logging.debug("Odcheckovani toolbuttons")
         self.toolButtonGroup.setExclusive(False)
         self.moveButton.setChecked(False)
         self.rotateButton.setChecked(False)
