@@ -291,7 +291,8 @@ class PrusaControllWidget(QtGui.QWidget):
         #print tab
         self.materialLabel = QtGui.QLabel("Material")
         self.materialCombo = QtGui.QComboBox()
-        self.materialCombo.addItems(self.controller.get_printing_materials())
+        printing_materials_ls = [self.controller.get_enumeration('materials', i) for i in self.controller.get_printing_materials()]
+        self.materialCombo.addItems(printing_materials_ls)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
         self.qualityLabel = QtGui.QLabel("Quality")
@@ -357,14 +358,16 @@ class PrusaControllWidget(QtGui.QWidget):
     def update_gui_for_material(self, set_materials=0):
         if set_materials:
             self.materialCombo.clear()
-            self.materialCombo.addItems(self.controller.get_printing_materials())
+            printing_materials_ls = [self.controller.get_enumeration('materials', i) for i in self.controller.get_printing_materials()]
+            self.materialCombo.addItems(printing_materials_ls)
 
-        material = str(self.materialCombo.currentText())
+        material = self.materialCombo.currentIndex()
         material_printing_settings = self.controller.get_printing_settings_for_material(material)
 
         #update print quality widget
         self.qualityCombo.clear()
-        self.qualityCombo.addItems(material_printing_settings['quality'])
+        material_printing_settings_quality_ls = [self.controller.get_enumeration('quality', i) for i in material_printing_settings['quality']]
+        self.qualityCombo.addItems(material_printing_settings_quality_ls)
 
         #infill slider
         self.infillSlider.setValue(material_printing_settings['infill'])
@@ -373,10 +376,13 @@ class PrusaControllWidget(QtGui.QWidget):
 
 
     def clear_toolbuttons(self):
+        #TODO:Not function, repair
         logging.debug("Odcheckovani toolbuttons")
+        self.toolButtonGroup.setExclusive(False)
         self.moveButton.setChecked(False)
         self.rotateButton.setChecked(False)
         self.scaleButton.setChecked(False)
+        self.toolButtonGroup.setExclusive(True)
 
 
     def set_x_rotation(self, angle):

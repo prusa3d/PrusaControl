@@ -52,12 +52,12 @@ class Controller:
             'pla':{
                 'speed':10,
                 'infill': 20,
-                'infillRange': [0, 200]
+                'infillRange': [0, 100]
             },
             'default':{
                 'bed': 100,
                 'hotEnd': 250,
-                'quality': ['draft', 'low', 'medium', 'high', 'Ultra high'],
+                'quality': ['draft', 'low', 'medium', 'high', 'ultra_high'],
                 'speed': 20,
                 'infill': 20,
                 'infillRange': [0, 100]
@@ -72,8 +72,39 @@ class Controller:
             'printer': {
                 'prusa_i3': 'Prusa i3',
                 'prusa_i3_v2': 'Prusa i3 v2'
+            },
+            'materials': {
+                'pla': 'PLA',
+                'abs': 'ABS',
+                'flex': 'FLEX'
+            },
+            'quality': {
+                'draft':'Draft',
+                'low':'Low',
+                'medium':'Medium',
+                'high':'High',
+                'ultra_high':'Ultra high'
             }
         }
+
+        '''
+            #language
+            'cs': 'Czech',
+            'en': 'English',
+            #printer
+            'prusa_i3': 'Prusa i3',
+            'prusa_i3_v2': 'Prusa i3 v2',
+            #materials
+            'pla': 'PLA',
+            'abs': 'ABS',
+            'flex': 'FLEX',
+            #quality
+            'draft':'Draft',
+            'low':'Low',
+            'medium':'Medium',
+            'high':'High',
+            'ultra_high':'Ultra high'
+        '''
 
         #variables for help
         self.last_pos = QtCore.QPoint()
@@ -85,6 +116,9 @@ class Controller:
         self.view.disableSaveGcodeButton()
         self.scene = AppScene()
 
+    def get_enumeration(self, section, enum):
+        return self.enumeration[section][enum] if section in self.enumeration and enum in self.enumeration[section] else str(section)+':'+str(enum)
+
     def tab_selected(self, n):
         if n==1:
             self.clearToolButtonStates()
@@ -93,7 +127,8 @@ class Controller:
     def get_printing_materials(self):
         return self.printing_settings['materials']
 
-    def get_printing_settings_for_material(self, material):
+    def get_printing_settings_for_material(self, material_id):
+        material = self.printing_settings['materials'][material_id]
         #Deep copy, very important
         printing_settings_tmp = deepcopy(self.printing_settings['default'])
         printing_settings_tmp.update(self.printing_settings[material] if material in self.printing_settings else {})
