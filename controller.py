@@ -152,13 +152,11 @@ class Controller:
         exit()
 
     def wheel_event(self, event):
-        logging.debug('MouseWheel')
         self.view.set_zoom(event.delta()/120)
         self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
         self.view.updateScene()
 
     def mouse_press_event(self, event):
-        logging.debug('Tlacitko mysi bylo stisknuto')
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
         if event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['moveButton']):
@@ -191,36 +189,42 @@ class Controller:
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
-            #TODO:Dodelat rotaci
             res = [.0,.0,.0]
-
-            logging.debug("Delam rotaci")
             #find plane(axis) in which rotation will be made
             #newRayStart, newRayEnd = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected and model.rotationAxis:
-                    logging.debug("Nasel jsem objekt a budu nad nim delat nejakou rotaci")
-                    position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
+                    #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
                     if model.rotationAxis == 'y':
-                        logging.debug("Delam rotaci y")
                         model.rot[0] = model.rot[0] + dy*0.25
                     elif model.rotationAxis == 'z':
-                        logging.debug("Delam rotaci z")
                         model.rot[1] = model.rot[1] + dy*0.25
                     elif model.rotationAxis == 'x':
-                        logging.debug("Delam rotaci x")
                         model.rot[2] = model.rot[2] + dx*0.25
                     else:
                         res = [.0,.0,.0]
-                    logging.debug("Rotace objektu %s je %s" %(str(model), str(model.rot)))
                 self.res_old = res
             #self.view.updateScene()
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
-            #TODO:Dodelat scale
-            logging.debug('Mouse move event spolu s levym tlacitkem a je nastaveno Scale tool')
+            res = [.0,.0,.0]
             #find axis(), set scale on model instance
+            for model in self.scene.models:
+                if model.selected and model.scaleAxis:
+                    #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
+                    if model.scaleAxis == 'x':
+                        model.scale[0] = model.scale[0] + dx*0.25
+                    elif model.scaleAxis == 'y':
+                        model.scale[1] = model.scale[1] + dx*0.25
+                    elif model.scaleAxis == 'z':
+                        model.scale[2] = model.scale[2] + dy*0.25
+                    elif model.scaleAxis == 'xyz':
+                        model.scale = [ i + dy*0.25 for i in model.scale]
+                    else:
+                        res = [.0,.0,.0]
+                self.res_old = res
+
 
         elif event.buttons() & QtCore.Qt.RightButton:
             #TODO:Add controll of camera instance
@@ -286,63 +290,54 @@ class Controller:
         for model in self.scene.models:
             if model.id == find_id:
                 model.selected = True
+                logging.debug("Nalezen objekt " + str(model))
                 return True
 
     def find_object_and_rotation_axis_by_color(self, event):
-        logging.debug("find_object_and_rotation_axis_by_color")
         color = self.view.get_cursor_pixel_color(event)
-        logging.debug("barva " + str(color))
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
-        logging.debug("color id " + str(find_id))
         if find_id == 0:
-            logging.debug("Nic nalezeno")
             return False
         for model in self.scene.models:
             if model.rotateXId == find_id:
                 model.selected = True
                 model.rotationAxis = 'x'
-                logging.debug("Found X rotation for " + str(model))
                 return True
             elif model.rotateYId == find_id:
                 model.selected = True
                 model.rotationAxis = 'y'
-                logging.debug("Found Y rotation for " + str(model))
                 return True
             elif model.rotateZId == find_id:
                 model.selected = True
                 model.rotationAxis = 'z'
-                logging.debug("Found Z rotation for " + str(model))
                 return True
             else:
                 model.rotationAxis = []
 
 
     def find_object_and_scale_axis_by_color(self, event):
-        logging.debug("find_object_and_scale_axis_by_color")
         color = self.view.get_cursor_pixel_color(event)
-        logging.debug("barva " + str(color))
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
-        logging.debug("color id " + str(find_id))
         if find_id == 0:
-            logging.debug("Nic nalezeno")
             return False
         for model in self.scene.models:
             if model.scaleXId == find_id:
                 model.selected = True
                 model.scaleAxis = 'x'
-                logging.debug("Found X scale for " + str(model))
                 return True
             elif model.scaleYId == find_id:
                 model.selected = True
                 model.scaleAxis = 'y'
-                logging.debug("Found Y scale for " + str(model))
                 return True
             elif model.scaleZId == find_id:
                 model.selected = True
                 model.scaleAxis = 'z'
-                logging.debug("Found Z scale for " + str(model))
+                return True
+            elif model.scaleXYZId == find_id:
+                model.selected = True
+                model.scaleAxis = 'xyz'
                 return True
             else:
                 model.scaleAxis = None
@@ -364,26 +359,11 @@ class Controller:
         self.clearToolButtonStates()
         self.settings['toolButtons']['rotateButton'] = True
         self.view.updateScene()
-        for model in self.scene.models:
-            logging.debug(str(model))
-            logging.debug("Rotate:")
-            logging.debug("x: " + str(model.rotateXId))
-            logging.debug("y: " + str(model.rotateYId))
-            logging.debug("z: " + str(model.rotateZId))
-            logging.debug("")
-
 
     def scaleButtonPressed(self):
         self.clearToolButtonStates()
         self.settings['toolButtons']['scaleButton'] = True
         self.view.updateScene()
-        for model in self.scene.models:
-            logging.debug(str(model))
-            logging.debug("Scale:")
-            logging.debug("x: " + str(model.scaleXId))
-            logging.debug("y: " + str(model.scaleYId))
-            logging.debug("z: " + str(model.scaleZId))
-            logging.debug("")
 
     def clearToolButtonStates(self):
         self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}

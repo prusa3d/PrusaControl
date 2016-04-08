@@ -188,12 +188,9 @@ class GLWidget(QGLWidget):
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
-
         glCallList(self.bed)
         glDisable(GL_DEPTH_TEST)
         glCallList(self.axis)
-
-
 
         #light
         glPointSize(5)
@@ -224,7 +221,6 @@ class GLWidget(QGLWidget):
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
-                #TODO:Draw scale circle widgets (blended)
                 self.draw_tool(model, self.parent.controller.settings)
                 model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
 
@@ -236,10 +232,10 @@ class GLWidget(QGLWidget):
     def draw_tool(self, model, settings, picking=False):
         if picking:
             rotateColors = [model.rotateColorXId, model.rotateColorYId, model.rotateColorZId]
-            scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId]
+            scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
         else:
             rotateColors = [[255,0,0],[0,255,0],[0,0,255]]
-            scaleColors = [[255,0,0],[0,255,0],[0,0,255]]
+            scaleColors = [[255,0,0],[0,255,0],[0,0,255], [255,255,255]]
 
         if settings['toolButtons']['rotateButton']:
             self.draw_rotation_circles(rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
@@ -285,14 +281,12 @@ class GLWidget(QGLWidget):
         glVertex3f(0., 0., 0.)
         glVertex3f(0., 0., 1.*radius)
         glEnd()
-        glColor3f(1.,1.,1.)
+        glColor3ubv(colors[3])
         glBegin(GL_LINES)
         glVertex3f(0., 0., 0.)
         glVertex3f(1.*radius, 1.*radius, 1.*radius)
         glEnd()
         glPopMatrix()
-
-
 
     def resizeGL(self, width, height):
         self.w = width
@@ -352,7 +346,6 @@ class GLWidget(QGLWidget):
 
             glVertex3d(10, i, 0)
             glVertex3d(-10, i, 0)
-
 
         glVertex3d(-10, 10, 0)
         glVertex3d(-10, 10, 20)

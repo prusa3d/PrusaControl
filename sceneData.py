@@ -26,7 +26,7 @@ class AppScene(object):
     it can be used for generating sliced data and rendering data
     '''
     def __init__(self):
-        self.hot_bed_dimension = {'type':'cube',
+        self.hot_bed_dimension = {
                                 'a':25,
                                 'b':25,
                                 'c':25}
@@ -51,7 +51,6 @@ class AppScene(object):
             self.find_new_position(i, m)
 
 
-    #TODO:Iteratible adding models and finding new position
     def find_new_position(self, index, model):
         position_vector = [.0, .0, .0]
         if index == 0:
@@ -73,7 +72,7 @@ class AppScene(object):
 
     #TODO:Doplnit setovani hot_bed dimension from settings->controller
     def define_hot_bed(self, param):
-        pass
+        self.hot_bed_dimension = param
 
 
 
@@ -100,6 +99,8 @@ class Model(object):
         self.scaleColorYId = [(self.scaleYId & 0x000000FF) >> 0, (self.scaleYId & 0x0000FF00) >> 8, (self.scaleYId & 0x00FF0000) >> 16]
         self.scaleZId = self.id * 2009
         self.scaleColorZId = [(self.scaleZId & 0x000000FF) >> 0, (self.scaleZId & 0x0000FF00) >> 8, (self.scaleZId & 0x00FF0000) >> 16]
+        self.scaleXYZId = self.id * 2011
+        self.scaleColorXYZId = [(self.scaleXYZId & 0x000000FF) >> 0, (self.scaleXYZId & 0x0000FF00) >> 8, (self.scaleXYZId & 0x00FF0000) >> 16]
 
         #structural data
         self.v0 = []
@@ -226,7 +227,8 @@ class Model(object):
 
 
     def normalizeObject(self):
-        sceneCenter = Vector(a=Vector().getRaw(), b=self.zeroPoint)
+        sceneCenter = Vector(a=Vector().getRaw(), b=self.boundingSphereCenter)
+
         self.v0 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v0]
         self.v1 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v1]
         self.v2 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v2]
@@ -235,8 +237,14 @@ class Model(object):
         self.min = Vector().minusAB(self.min, sceneCenter.getRaw())
 
         self.boundingSphereCenter = Vector().minusAB(self.boundingSphereCenter, sceneCenter.getRaw())
+        logging.debug(str(self.boundingSphereCenter))
+
         self.zeroPoint = Vector().minusAB(self.zeroPoint, sceneCenter.getRaw())
         self.zeroPoint[2] = self.min[2]
+
+        #minVect = Vector().getRaw()
+        #minVect[2] = self.min[2]
+        self.pos = Vector().minusAB(Vector().getRaw(), self.zeroPoint)
 
 
     def render(self, picking=False, debug=False):
@@ -270,6 +278,8 @@ class Model(object):
         glRotatef(self.rot[0], 1.,0.,0.)
         glRotatef(self.rot[1], 0.,1.,0.)
         glRotatef(self.rot[2], 0.,0.,1.)
+
+        glScalef(self.scale[0], self.scale[1], self.scale[2])
 
         glCallList(self.displayList)
         glPopMatrix()
@@ -370,8 +380,6 @@ class ModelTypeStl(ModelTypeAbstract):
 
 def intersectionRayPlane(start, end, pos=[.0,.0,.0], n=[.0,.0,1.]):
     r = ray.create_from_line(line.create_from_points(start, end))
-    #v = [.0,.0,.0]
-    #n = [.0,.0,1.]
     res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(pos, n))
     return res
 
