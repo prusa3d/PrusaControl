@@ -4,9 +4,15 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 import math
+
+import numpy
 from PyQt4.QtGui import QImage, QColor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
+
+from Image import *
+
+
 
 
 class GLWidget(QGLWidget):
@@ -38,6 +44,7 @@ class GLWidget(QGLWidget):
         self.initParametres()
 
         self.sceneFrameBuffer = []
+        self.image_background = []
 
     def initParametres(self):
         #TODO:Add camera instance initialization
@@ -110,9 +117,31 @@ class GLWidget(QGLWidget):
             self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()
 
+    def TexFromPNG(self, filename):
+        img = open(filename)
+        img = img.rotate(180)
+        img_data = numpy.array(list(img.getdata()), numpy.uint8)
+
+
+        texture = glGenTextures(1)
+        glPixelStorei(GL_UNPACK_ALIGNMENT,1)
+        glBindTexture(GL_TEXTURE_2D, texture)
+
+        # Texture parameters are part of the texture object, so you need to
+        # specify them only once for a given texture object.
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
+        return texture
+
     def initializeGL(self):
         self.bed = self.makePrintingBed()
         self.axis = self.makeAxis()
+
+        #load textures
+        self.image_background = self.TexFromPNG("gui/background.png")
 
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)
@@ -132,13 +161,12 @@ class GLWidget(QGLWidget):
 
         glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
         glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
-        #glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
         glBlendFunc(GL_SRC_ALPHA,GL_ONE)
 
         glEnable(GL_COLOR_MATERIAL)
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
-        glEnable( GL_BLEND )
+        #glEnable( GL_BLEND )
 
 
 
@@ -169,14 +197,14 @@ class GLWidget(QGLWidget):
             glFlush()
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
-            self.sceneFrameBuffer.save("pokus.png")
+            self.sceneFrameBuffer.save("select_buffer.png")
 
             glEnable( GL_LIGHTING )
             glEnable( GL_LIGHT0 )
-            glEnable( GL_BLEND )
 
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self.draw_background_texture()
         glLoadIdentity()
 
         #self.draw_background_texture()
@@ -188,9 +216,11 @@ class GLWidget(QGLWidget):
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
+        glEnable( GL_BLEND )
         glCallList(self.bed)
         glDisable(GL_DEPTH_TEST)
         glCallList(self.axis)
+        glDisable( GL_BLEND )
 
         #light
         glPointSize(5)
@@ -402,12 +432,15 @@ class GLWidget(QGLWidget):
         glMatrixMode(GL_PROJECTION)
         glPushMatrix()
         glLoadIdentity()
-        glOrtho(0.0, glutGet(GLUT_WINDOW_WIDTH), 0.0, glutGet(GLUT_WINDOW_HEIGHT), -1.0, 1.0)
+        viewport = glGetIntegerv( GL_VIEWPORT )
+        glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
 
         glLoadIdentity()
         glDisable(GL_LIGHTING)
+        glDisable(GL_BLEND)
+        glDisable(GL_DEPTH_TEST)
 
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
@@ -415,10 +448,12 @@ class GLWidget(QGLWidget):
 
         glBegin(GL_QUADS)
         glTexCoord2f(0, 0); glVertex3f(0, 0, 0)
-        glTexCoord2f(0, 1); glVertex3f(0, 100, 0)
-        glTexCoord2f(1, 1); glVertex3f(100, 100, 0)
-        glTexCoord2f(1, 0); glVertex3f(100, 0, 0)
+        glTexCoord2f(0, 1); glVertex3f(0, viewport[3], 0)
+        glTexCoord2f(1, 1); glVertex3f(viewport[2], viewport[3], 0)
+        glTexCoord2f(1, 0); glVertex3f(viewport[2], 0, 0)
         glEnd()
+
+        glEnable(GL_DEPTH_TEST)
 
         glDisable(GL_TEXTURE_2D)
         glPopMatrix()

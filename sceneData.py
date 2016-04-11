@@ -52,9 +52,10 @@ class AppScene(object):
 
 
     def find_new_position(self, index, model):
-        position_vector = [.0, .0, .0]
+        position_vector = [.0, .0]
         if index == 0:
-            self.models[0].pos=position_vector
+            self.models[0].pos[0]=position_vector[0]
+            self.models[0].pos[1]=position_vector[1]
             return
         scene_tmp = self.models[:index]
         if index > 0:
@@ -63,6 +64,7 @@ class AppScene(object):
                     model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
 
+                    #TODO:Add some test for checking if object is inside of printing space of printer
                     if not model.intersection_model_list_model_(scene_tmp):
                         return
 
@@ -237,13 +239,10 @@ class Model(object):
         self.min = Vector().minusAB(self.min, sceneCenter.getRaw())
 
         self.boundingSphereCenter = Vector().minusAB(self.boundingSphereCenter, sceneCenter.getRaw())
-        logging.debug(str(self.boundingSphereCenter))
 
         self.zeroPoint = Vector().minusAB(self.zeroPoint, sceneCenter.getRaw())
         self.zeroPoint[2] = self.min[2]
 
-        #minVect = Vector().getRaw()
-        #minVect[2] = self.min[2]
         self.pos = Vector().minusAB(Vector().getRaw(), self.zeroPoint)
 
 
@@ -372,9 +371,6 @@ class ModelTypeStl(ModelTypeAbstract):
         #model.pos = [randint(0, 10), randint(0, 10), 0]
 
         model.displayList = model.makeDisplayList()
-        logging.debug("Position of object " + str(model.pos))
-        logging.debug("Position of object " + str(model.zeroPoint))
-        logging.debug("Position of object " + str(model.boundingSphereCenter))
 
         return model
 
