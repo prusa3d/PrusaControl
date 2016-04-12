@@ -45,6 +45,7 @@ class GLWidget(QGLWidget):
 
         self.sceneFrameBuffer = []
         self.image_background = []
+        self.image_hotbed = []
 
     def initParametres(self):
         #TODO:Add camera instance initialization
@@ -129,19 +130,20 @@ class GLWidget(QGLWidget):
 
         # Texture parameters are part of the texture object, so you need to
         # specify them only once for a given texture object.
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
         return texture
 
     def initializeGL(self):
-        self.bed = self.makePrintingBed()
-        self.axis = self.makeAxis()
-
         #load textures
         self.image_background = self.TexFromPNG("gui/background.png")
+        self.image_hotbed = self.TexFromPNG("gui/checker.png")
+
+        self.bed = self.makePrintingBed()
+        self.axis = self.makeAxis()
 
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)
@@ -368,15 +370,28 @@ class GLWidget(QGLWidget):
 
         glLineWidth(2)
 
+        glEnable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        glBindTexture(GL_TEXTURE_2D, self.image_hotbed)
+
+        glColor3f(1,1,1)
+        glBegin(GL_QUADS)
+        glTexCoord2f(-10, 10)
+        glVertex3d(-10, 10, 0)
+
+        glTexCoord2f(-10, -10)
+        glVertex3d(-10, -10, 0)
+
+        glTexCoord2f(10, -10)
+        glVertex3d(10, -10, 0)
+
+        glTexCoord2f(10, 10)
+        glVertex3d(10, 10, 0)
+        glEnd()
+        glDisable(GL_TEXTURE_2D)
+        glEnable(GL_BLEND)
         glBegin(GL_LINES)
         glColor3f(1,1,1)
-        for i in xrange(-10, 11, 1):
-            glVertex3d(i, 10, 0)
-            glVertex3d(i, -10, 0)
-
-            glVertex3d(10, i, 0)
-            glVertex3d(-10, i, 0)
-
         glVertex3d(-10, 10, 0)
         glVertex3d(-10, 10, 20)
 
@@ -447,10 +462,17 @@ class GLWidget(QGLWidget):
         glBindTexture(GL_TEXTURE_2D, self.image_background)
 
         glBegin(GL_QUADS)
-        glTexCoord2f(0, 0); glVertex3f(0, 0, 0)
-        glTexCoord2f(0, 1); glVertex3f(0, viewport[3], 0)
-        glTexCoord2f(1, 1); glVertex3f(viewport[2], viewport[3], 0)
-        glTexCoord2f(1, 0); glVertex3f(viewport[2], 0, 0)
+        glTexCoord2f(0, 0)
+        glVertex3f(0, 0, 0)
+
+        glTexCoord2f(0, 1)
+        glVertex3f(0, viewport[3], 0)
+
+        glTexCoord2f(1, 1)
+        glVertex3f(viewport[2], viewport[3], 0)
+
+        glTexCoord2f(1, 0)
+        glVertex3f(viewport[2], 0, 0)
         glEnd()
 
         glEnable(GL_DEPTH_TEST)

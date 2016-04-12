@@ -7,9 +7,13 @@ import time
 
 import sceneData
 from gui import PrusaControllView
+from project_file import ProjectFile
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
 from copy import deepcopy
+
+import xml.etree.cElementTree as ET
+from zipfile import ZipFile
 
 from PyQt4 import QtCore
 
@@ -155,10 +159,12 @@ class Controller:
     def openProjectFile(self):
         data = self.view.openProjectFileDialog()
         logging.debug('open project file %s' %data)
+        self.import_project(data)
 
     def saveProjectFile(self):
         data = self.view.saveProjectFileDialog()
         logging.debug('save project file %s' %data)
+        self.save_project(data)
 
     def saveGCodeFile(self):
         data = self.view.saveGCondeFileDialog()
@@ -175,6 +181,18 @@ class Controller:
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
         self.view.updateScene()
+
+    def import_project(self, path):
+        #TODO:Add code for read zip file, in memory open it and read xml file scene(with transformations of objects) and object files in stl
+        #open zip file
+        project_file = ProjectFile(self.scene, path)
+
+    def save_project(self, path):
+        #TODO:Save project file
+        project_file = ProjectFile(self.scene)
+        project_file.save(path)
+
+
 
     def openSettings(self):
         self.settings = self.view.openSettingsDialog()

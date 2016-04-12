@@ -84,6 +84,7 @@ class Model(object):
     '''
     newid = itertools.count().next
     def __init__(self):
+        #IDs
         self.id = Model.newid()+1
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
@@ -136,6 +137,12 @@ class Model(object):
         self.color = [randint(3, 7) * 0.11,
                       randint(3, 7) * 0.1,
                       randint(3, 7) * 0.12]
+
+
+        #source file data
+        #example car.stl
+        self.filename = ""
+        self.normalization_flag = False
 
 
     def __str__(self):
@@ -244,6 +251,7 @@ class Model(object):
         self.zeroPoint[2] = self.min[2]
 
         self.pos = Vector().minusAB(Vector().getRaw(), self.zeroPoint)
+        self.normalization_flag = True
 
 
     def render(self, picking=False, debug=False):
@@ -326,6 +334,7 @@ class ModelTypeStl(ModelTypeAbstract):
         logging.debug("this is STL file reader")
         mesh = Mesh.from_file(filename)
         model = Model()
+        model.filename = filename
 
         '''
         some magic with model data...
