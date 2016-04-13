@@ -6,13 +6,25 @@ from OpenGL.GLU import *
 import math
 
 import numpy
+import time
 from PyQt4.QtGui import QImage, QColor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
 from Image import *
 
+import controller
+from glButton import GlButton
 
+#Mesure
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        logging.debug('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        return ret
+    return wrap
 
 
 class GLWidget(QGLWidget):
@@ -46,6 +58,13 @@ class GLWidget(QGLWidget):
         self.sceneFrameBuffer = []
         self.image_background = []
         self.image_hotbed = []
+
+        #tools
+        self.selectTool = None
+        self.moveTool = None
+        self.rotateTool = None
+        self.scaleTool = None
+        self.tool_background = None
 
     def initParametres(self):
         #TODO:Add camera instance initialization
@@ -118,29 +137,35 @@ class GLWidget(QGLWidget):
             self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()
 
-    def TexFromPNG(self, filename):
+    def texture_from_png(self, filename, type=GL_RGB):
         img = open(filename)
-        img = img.rotate(180)
+        img = img.transpose(FLIP_TOP_BOTTOM)
         img_data = numpy.array(list(img.getdata()), numpy.uint8)
-
 
         texture = glGenTextures(1)
         glPixelStorei(GL_UNPACK_ALIGNMENT,1)
         glBindTexture(GL_TEXTURE_2D, texture)
 
-        # Texture parameters are part of the texture object, so you need to
-        # specify them only once for a given texture object.
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
+        glTexImage2D(GL_TEXTURE_2D, 0, type, img.size[0], img.size[1], 0, type, GL_UNSIGNED_BYTE, img_data)
         return texture
 
     def initializeGL(self):
         #load textures
-        self.image_background = self.TexFromPNG("gui/background.png")
-        self.image_hotbed = self.TexFromPNG("gui/checker.png")
+        self.image_background = self.texture_from_png("gui/background.png")
+        self.image_hotbed = self.texture_from_png("gui/checker.png")
+
+        #tools
+        self.selectTool = GlButton(self.texture_from_png("gui/select_v.png", GL_RGBA), [4.,4.], [95, 16])
+        self.moveTool = GlButton(self.texture_from_png("gui/move_v.png", GL_RGBA), [4.,4.], [95,11])
+        self.rotateTool = GlButton(self.texture_from_png("gui/rotate_v.png", GL_RGBA), [4.,4.], [95,6])
+        self.scaleTool = GlButton(self.texture_from_png("gui/scale_v.png", GL_RGBA), [4.,4.], [95,1])
+
+        self.tool_background = self.texture_from_png("gui/tool_background.png", GL_RGBA)
+
 
         self.bed = self.makePrintingBed()
         self.axis = self.makeAxis()
@@ -149,7 +174,10 @@ class GLWidget(QGLWidget):
         glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
-        glCullFace(GL_FRONT_AND_BACK)
+        glCullFace(GL_BACK)
+
+        glAlphaFunc( GL_GREATER, 0. )
+        glEnable( GL_ALPHA_TEST )
 
         #material
         glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
@@ -172,7 +200,7 @@ class GLWidget(QGLWidget):
 
 
 
-
+    #@timing
     def paintGL(self, selection = 1):
         if selection:
             glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -193,8 +221,10 @@ class GLWidget(QGLWidget):
 
             if self.parent.controller.scene.models:
                 for model in self.parent.controller.scene.models:
-                    self.draw_tool(model, self.parent.controller.settings, True)
+                    self.draw_tools_helper(model, self.parent.controller.settings, True)
                     model.render(picking=True, debug=False)
+
+            self.draw_tools(picking=True)
 
             glFlush()
 
@@ -253,15 +283,18 @@ class GLWidget(QGLWidget):
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
-                self.draw_tool(model, self.parent.controller.settings)
+                self.draw_tools_helper(model, self.parent.controller.settings)
                 model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
 
         glDisable( GL_LIGHTING )
         glEnable( GL_BLEND )
 
+        self.draw_tools()
+
+
         glFlush()
 
-    def draw_tool(self, model, settings, picking=False):
+    def draw_tools_helper(self, model, settings, picking=False):
         if picking:
             rotateColors = [model.rotateColorXId, model.rotateColorYId, model.rotateColorZId]
             scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
@@ -374,22 +407,25 @@ class GLWidget(QGLWidget):
         glDisable(GL_BLEND)
         glBindTexture(GL_TEXTURE_2D, self.image_hotbed)
 
+        glEnable(GL_CULL_FACE)
         glColor3f(1,1,1)
         glBegin(GL_QUADS)
-        glTexCoord2f(-10, 10)
+        glNormal3f(.0,.0,1.)
+        glTexCoord2f(-10/2, 10/2)
         glVertex3d(-10, 10, 0)
 
-        glTexCoord2f(-10, -10)
+        glTexCoord2f(-10/2, -10/2)
         glVertex3d(-10, -10, 0)
 
-        glTexCoord2f(10, -10)
+        glTexCoord2f(10/2, -10/2)
         glVertex3d(10, -10, 0)
 
-        glTexCoord2f(10, 10)
+        glTexCoord2f(10/2, 10/2)
         glVertex3d(10, 10, 0)
         glEnd()
         glDisable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
+        glDisable(GL_CULL_FACE)
         glBegin(GL_LINES)
         glColor3f(1,1,1)
         glVertex3d(-10, 10, 0)
@@ -474,6 +510,58 @@ class GLWidget(QGLWidget):
         glTexCoord2f(1, 0)
         glVertex3f(viewport[2], 0, 0)
         glEnd()
+
+        glEnable(GL_DEPTH_TEST)
+
+        glDisable(GL_TEXTURE_2D)
+        glPopMatrix()
+
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
+
+        glMatrixMode(GL_MODELVIEW)
+
+    def draw_tools(self, picking=False):
+        glMatrixMode(GL_PROJECTION)
+        glPushMatrix()
+        glLoadIdentity()
+        viewport = glGetIntegerv( GL_VIEWPORT )
+        glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+
+        sW = viewport[2]
+        sH = viewport[3]
+
+        glLoadIdentity()
+        glDisable(GL_LIGHTING)
+        glDisable(GL_BLEND)
+        glDisable(GL_DEPTH_TEST)
+
+        glColor3f(1,1,1)
+        #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
+
+        for tool in [self.selectTool, self.moveTool, self.rotateTool, self.scaleTool]:
+            if picking:
+                glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])
+                glEnable(GL_TEXTURE_2D)
+                glBindTexture(GL_TEXTURE_2D, self.tool_background)
+            else:
+                glEnable(GL_TEXTURE_2D)
+                glBindTexture(GL_TEXTURE_2D, tool.texture)
+            glBegin(GL_QUADS)
+            glTexCoord2f(0, 0)
+            glVertex3f(tool.position[0] * (sW*.01), tool.position[1]* (sH*.01), 0)
+
+            glTexCoord2f(0, 1)
+            glVertex3f(tool.position[0] * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
+
+            glTexCoord2f(1, 1)
+            glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
+
+            glTexCoord2f(1, 0)
+            glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), tool.position[1]* (sH*.01), 0)
+            glEnd()
 
         glEnable(GL_DEPTH_TEST)
 

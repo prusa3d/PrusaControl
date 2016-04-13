@@ -7,7 +7,7 @@ import time
 
 import sceneData
 from gui import PrusaControllView
-from project_file import ProjectFile
+from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
 from copy import deepcopy
