@@ -159,10 +159,20 @@ class GLWidget(QGLWidget):
         self.image_hotbed = self.texture_from_png("gui/checker.png")
 
         #tools
-        self.selectTool = GlButton(self.texture_from_png("gui/select_v.png", GL_RGBA), [4.,4.], [95, 16])
-        self.moveTool = GlButton(self.texture_from_png("gui/move_v.png", GL_RGBA), [4.,4.], [95,11])
-        self.rotateTool = GlButton(self.texture_from_png("gui/rotate_v.png", GL_RGBA), [4.,4.], [95,6])
-        self.scaleTool = GlButton(self.texture_from_png("gui/scale_v.png", GL_RGBA), [4.,4.], [95,1])
+        #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png", GL_RGBA), [4.,4.], [95, 16])
+        self.moveTool = GlButton(self.texture_from_png("gui/move_n.png", GL_RGBA), [4.,4.], [95,11])
+        self.rotateTool = GlButton(self.texture_from_png("gui/rotate_n.png", GL_RGBA), [4.,4.], [95,6])
+        self.scaleTool = GlButton(self.texture_from_png("gui/scale_n.png", GL_RGBA), [4.,4.], [95,1])
+
+        #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
+        self.moveTool.set_callback(self.parent.controller.moveButtonPressed)
+        self.rotateTool.set_callback(self.parent.controller.rotateButtonPressed)
+        self.scaleTool.set_callback(self.parent.controller.scaleButtonPressed)
+
+        self.moveTool.set_press_variable(self.parent.controller.settings['toolButtons']['moveButton'])
+        self.rotateTool.set_press_variable(self.parent.controller.settings['toolButtons']['rotateButton'])
+        self.scaleTool.set_press_variable(self.parent.controller.settings['toolButtons']['scaleButton'])
+
 
         self.tool_background = self.texture_from_png("gui/tool_background.png", GL_RGBA)
 
@@ -541,7 +551,7 @@ class GLWidget(QGLWidget):
         glColor3f(1,1,1)
         #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
 
-        for tool in [self.selectTool, self.moveTool, self.rotateTool, self.scaleTool]:
+        for tool in [self.moveTool, self.rotateTool, self.scaleTool]:
             if picking:
                 glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])
                 glEnable(GL_TEXTURE_2D)
@@ -562,6 +572,16 @@ class GLWidget(QGLWidget):
             glTexCoord2f(1, 0)
             glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), tool.position[1]* (sH*.01), 0)
             glEnd()
+            if tool.pressed and not picking:
+                glDisable(GL_TEXTURE_2D)
+                glColor3f(1.,.0,.0)
+                glBegin(GL_LINE_LOOP)
+                glVertex3f(tool.position[0] * (sW*.01), tool.position[1]* (sH*.01), 0)
+                glVertex3f(tool.position[0] * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
+                glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
+                glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), tool.position[1]* (sH*.01), 0)
+                glEnd()
+
 
         glEnable(GL_DEPTH_TEST)
 

@@ -43,6 +43,7 @@ class Controller:
                 'moveButton': False,
                 'rotateButton': False,
                 'scaleButton': False
+#                ,'selectButton': True
         }
 
         self.printing_settings = {
@@ -212,6 +213,10 @@ class Controller:
     def mouse_press_event(self, event):
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
+        #if event.buttons() & QtCore.Qt.LeftButton:
+        #    logging.debug("hledani objektu na oznaceni")
+        #    self.hit_first_object_by_color(event)
+        self.hit_tool_button_by_color(event)
         if event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['moveButton']):
             self.res_old = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
             self.hit_first_object_by_color(event)
@@ -333,6 +338,22 @@ class Controller:
         return False
 
 #    @timing
+    def hit_tool_button_by_color(self, event):
+        color = self.view.get_cursor_pixel_color(event)
+        find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        if find_id == 0:
+            return False
+        for toolButton in self.view.getToolButtons():
+            if find_id == toolButton.id:
+                if toolButton.pressed:
+                    toolButton.unpress_button()
+                else:
+                    for t in self.view.getToolButtons():
+                        t.unpress_button()
+                    toolButton.press_button()
+                    toolButton.run_callback()
+
+
     def hit_first_object_by_color(self, event):
         self.scene.clear_selected_models()
         color = self.view.get_cursor_pixel_color(event)
@@ -343,8 +364,9 @@ class Controller:
         for model in self.scene.models:
             if model.id == find_id:
                 model.selected = True
-                logging.debug("Nalezen objekt " + str(model))
                 return True
+
+
 
     def find_object_and_rotation_axis_by_color(self, event):
         color = self.view.get_cursor_pixel_color(event)
@@ -402,6 +424,11 @@ class Controller:
     def importImage(self, path):
         #TODO:Add importing of image(just plane with texture?)
         pass
+
+    def selectButtonPressed(self):
+        self.clearToolButtonStates()
+        self.settings['toolButtons']['moveButton'] = True
+        self.view.updateScene()
 
     def moveButtonPressed(self):
         self.clearToolButtonStates()

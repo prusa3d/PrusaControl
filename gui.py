@@ -231,6 +231,9 @@ class PrusaControllView(QtGui.QMainWindow):
     def get_z_rotation(self):
         return self.prusaControllWidget.get_z_rotation()
 
+    def getToolButtons(self):
+        return self.prusaControllWidget.getToolButtons()
+
     def clear_toolbuttons(self):
         self.prusaControllWidget.clear_toolbuttons()
 
@@ -254,12 +257,11 @@ class PrusaControllWidget(QtGui.QWidget):
 
         self.tabWidget = QtGui.QTabWidget()
 
-        self.toolTab = QtGui.QWidget()
+        #self.toolTab = QtGui.QWidget()
         self.printTab = QtGui.QWidget()
 
         #tool tab
-        self.automatic_possition = QtGui.QCheckBox("Automatic placing")
-
+        '''
         self.moveButton = QtGui.QPushButton("Move")
         self.rotateButton = QtGui.QPushButton("Rotate")
         self.scaleButton = QtGui.QPushButton("Scale")
@@ -286,6 +288,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.toolTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
         self.toolTab.setLayout(self.toolTabVLayout)
+        '''
         #tool tab
 
         #print tab
@@ -337,7 +340,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.printTab.setLayout(self.printTabVLayout)
         #print tab
 
-        self.tabWidget.addTab(self.toolTab, "Tools")
+        #self.tabWidget.addTab(self.toolTab, "Tools")
         self.tabWidget.addTab(self.printTab, "Print")
         self.tabWidget.setCurrentIndex(1)
         self.tabWidget.setMaximumWidth(250)
@@ -406,6 +409,9 @@ class PrusaControllWidget(QtGui.QWidget):
 
     def get_cursor_pixel_color(self, event):
         return self.glWidget.get_cursor_pixel_color(event)
+
+    def getToolButtons(self):
+        return [self.glWidget.moveTool, self.glWidget.rotateTool, self.glWidget.scaleTool]
 
     def updateScene(self, reset=False):
         self.glWidget.updateScene(reset)
