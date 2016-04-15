@@ -70,6 +70,44 @@ class SettingsDialog(QDialog):
         data['automatic_placing'] = dialog.automaticPlacingCheckBox.isChecked()
         return (data, result == QDialog.Accepted)
 
+class FirmwareUpdateDialog(QDialog):
+    def __init__(self, controller, parent = None):
+        super(FirmwareUpdateDialog, self).__init__(parent)
+
+        self.controller = controller
+        self.differentVersion = True
+        self.actualVersion = '1.0.2'
+        self.yourVersion = '1.0.1'
+
+        layout = QVBoxLayout(self)
+
+        self.actualVersionLabel = QtGui.QLabel("Actual version of firmware is %s" % self.actualVersion)
+        self.yourVersionLabel = QtGui.QLabel("Your version of firmware is %s" % self.yourVersion)
+
+        self.updateButton = QtGui.QPushButton("Update")
+        #TODO:Doplnit
+        #self.updateButton.clicked.connect(self.controller.updateFirmware)
+        self.updateButton.setEnabled(self.differentVersion)
+
+        layout.addWidget(self.actualVersionLabel)
+        layout.addWidget(self.yourVersionLabel)
+        layout.addWidget(self.updateButton)
+
+        # Close button
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Close,
+        Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    @staticmethod
+    def getFirmwareUpdate(controller, parent = None):
+        dialog = FirmwareUpdateDialog(controller, parent)
+        result = dialog.exec_()
+        data = {'msg':'Update is complete. New version is ....'}
+        return (data, result == QDialog.Accepted)
+
 
 class PrusaControllView(QtGui.QMainWindow):
     def __init__(self, c):
@@ -136,6 +174,9 @@ class PrusaControllView(QtGui.QMainWindow):
     def openSettingsDialog(self):
         data, ok = SettingsDialog.getSettingsData(self.controller, self.parent())
         return data
+
+    def openFirmwareDialog(self):
+        data, ok = FirmwareUpdateDialog.getFirmwareUpdate(self.controller, self.parent())
 
     def disableSaveGcodeButton(self):
         self.prusaControllWidget.disableSaveGcodeButton()

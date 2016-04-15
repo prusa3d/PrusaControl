@@ -153,8 +153,7 @@ class Controller:
         pass
 
     def open_update_firmware(self):
-        #TODO:Call update_firmware dialog
-        pass
+        self.view.openFirmwareDialog()
 
 
     def openProjectFile(self):
@@ -193,7 +192,9 @@ class Controller:
         project_file = ProjectFile(self.scene)
         project_file.save(path)
 
-
+    def updateFirmware(self):
+        #TODO:Add code for update of firmware
+        pass
 
     def openSettings(self):
         self.settings = self.view.openSettingsDialog()

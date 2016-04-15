@@ -7,11 +7,13 @@ import math
 
 import numpy
 import time
-from PyQt4.QtGui import QImage, QColor
+
+
+from PyQt4.QtGui import QColor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
-from Image import *
+from PIL.Image import *
 
 import controller
 from glButton import GlButton
