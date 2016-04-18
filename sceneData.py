@@ -333,6 +333,9 @@ class ModelTypeStl(ModelTypeAbstract):
     def load(self, filename):
         logging.debug("this is STL file reader")
         mesh = Mesh.from_file(filename)
+        return self.load_from_mesh(mesh, filename)
+
+    def load_from_mesh(self, mesh, filename="", normalize=True):
         model = Model()
         model.filename = filename
 
@@ -382,6 +385,7 @@ class ModelTypeStl(ModelTypeAbstract):
         model.displayList = model.makeDisplayList()
 
         return model
+
 
 def intersectionRayPlane(start, end, pos=[.0,.0,.0], n=[.0,.0,1.]):
     r = ray.create_from_line(line.create_from_points(start, end))

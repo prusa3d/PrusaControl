@@ -1,8 +1,13 @@
+import ast
 import logging
 from abc import ABCMeta, abstractmethod
 from zipfile import ZipFile
 import xml.etree.cElementTree as ET
 
+import io
+from stl.mesh import Mesh
+
+from sceneData import ModelTypeStl
 
 
 class ProjectFile(object):
@@ -11,13 +16,6 @@ class ProjectFile(object):
         if filename:
             self.scene_xml = None
             self.scene = scene
-            opened_zip = ZipFile(filename, 'r')
-            for name in opened_zip.namelist():
-                if name== "scene.xml":
-                    self.scene_xml = opened_zip.read(name)
-            if not self.scene_xml:
-                logging.debug("Problem with reading %s, its not a standart PRUS file format." % filename)
-                return False
 
             #TODO:check which version is scene.xml version and according to chose class to read project file
             self.version = Version_1_0()
@@ -62,46 +60,62 @@ class Version_1_0(VersionAbstract):
     def get_version(self):
         return "1.0"
 
-    def save(self, scene, filename):
-        #create zipfile
-
-
-        root = ET.Element("scene")
-        version = ET.SubElement(root, "version").text=self.get_version()
-        doc = ET.SubElement(root, "models")
-
-        for model in scene.models:
-            model_element = ET.SubElement(doc, "model", name=model.filename)
-            normalization_element = ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
-            position_element = ET.SubElement(model_element, "position").text=str(model.pos)
-            rotation_element = ET.SubElement(model_element, "rotation").text=str(model.rot)
-            scale_element = ET.SubElement(model_element, "scale").text=str(model.scale)
-
-        tree = ET.ElementTree(root)
-        tree.write(filename)
-
-        return True
-
     def load(self, scene, filename):
         #open zipfile
-        opened_zipfile = ZipFile(filename, 'r')
-        #new_scene =
+        with ZipFile(filename, 'r') as opened_zipfile:
+            tree = ET.fromstring(opened_zipfile.read('scene.xml'))
+            version = tree.find('version').text
+            if self.get_version() == version:
+                logging.debug("Ano, soubor je stejna verze jako knihovna pro jeho nacitani. Pokracujeme")
+            else:
+                logging.debug("Problem, tuto verzi neumim nacitat.")
+                return False
+            models = tree.find('models')
+            models_data = []
+            for model in models.findall('model'):
+                model_data = {}
+                model_data['file_name'] = model.get('name')
+                model_data['normalization'] = ast.literal_eval(model.find('normalization').text)
+                model_data['position'] = ast.literal_eval(model.find('position').text)
+                model_data['rotation'] = ast.literal_eval(model.find('rotation').text)
+                model_data['scale'] = ast.literal_eval(model.find('scale').text)
+                models_data.append(model_data)
+
+            logging.debug(str(models_data))
+
+            scene.models = []
+            for m in models_data:
+                logging.debug("Jmeno souboru je: " + m['file_name'])
+                model = ModelTypeStl.load_from_mesh(Mesh.from_file(filename="", fh=opened_zipfile.open(m['file_name']), m['file_name']), normalize=not m['normalize'])
+                model.rot = m['rotation']
+                model.pos = m['position']
+                model.scale = m['scale']
+
+                scene.models.append(model)
+
+    def save(self, scene, filename):
+        #create zipfile
+        with ZipFile(filename, 'w') as opened_zipfile:
+            root = ET.Element("scene")
+            version = ET.SubElement(root, "version").text=self.get_version()
+            models_tag = ET.SubElement(root, "models")
+
+            for model in scene.models:
+                model_element = ET.SubElement(models_tag, "model", name=model.filename)
+                normalization_element = ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
+                position_element = ET.SubElement(model_element, "position").text=str(model.pos)
+                rotation_element = ET.SubElement(model_element, "rotation").text=str(model.rot)
+                scale_element = ET.SubElement(model_element, "scale").text=str(model.scale)
+
+            tree = ET.ElementTree(root)
+            tree.write(filename)
 
 
-        tree = ET.parse(filename)
-        version = tree.find('version')
-        if self.get_version() == version:
-            #clear scene
-            scene.clearScene()
-            #read models
 
-        else:
-            #problem
-            return False
-        models = tree.find('models')
-        for model in models.findall('model'):
-            pass
 
+
+
+        return True
 
 
 

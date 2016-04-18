@@ -63,6 +63,7 @@ class SettingsDialog(QDialog):
     def getSettingsData(controller, parent = None):
         data = controller.settings
         dialog = SettingsDialog(controller, parent)
+        dialog.setWindowTitle("Settings")
         result = dialog.exec_()
         data['language'] = controller.enumeration['language'].keys()[dialog.languageCombo.currentIndex()]
         data['printer'] = controller.enumeration['printer'].keys()[dialog.printerCombo.currentIndex()]
@@ -75,35 +76,127 @@ class FirmwareUpdateDialog(QDialog):
         super(FirmwareUpdateDialog, self).__init__(parent)
 
         self.controller = controller
-        self.differentVersion = True
-        self.actualVersion = '1.0.2'
-        self.yourVersion = '1.0.1'
+        #self.differentVersion = True
+        #self.actualVersion = '1.0.2'
+        #self.yourVersion = '1.0.1'
 
         layout = QVBoxLayout(self)
 
-        self.actualVersionLabel = QtGui.QLabel("Actual version of firmware is %s" % self.actualVersion)
-        self.yourVersionLabel = QtGui.QLabel("Your version of firmware is %s" % self.yourVersion)
+
+        #self.actualVersionLabel = QtGui.QLabel("Actual version of firmware is %s" % self.actualVersion)
+        #self.yourVersionLabel = QtGui.QLabel("Your version of firmware is %s" % self.yourVersion)
+
+        self.openFileButton = QtGui.QPushButton("Open file")
 
         self.updateButton = QtGui.QPushButton("Update")
         #TODO:Doplnit
         #self.updateButton.clicked.connect(self.controller.updateFirmware)
-        self.updateButton.setEnabled(self.differentVersion)
+        #self.updateButton.setEnabled(self.differentVersion)
 
-        layout.addWidget(self.actualVersionLabel)
-        layout.addWidget(self.yourVersionLabel)
+        #layout.addWidget(self.actualVersionLabel)
+        #layout.addWidget(self.yourVersionLabel)
+        layout.addWidget(self.openFileButton)
         layout.addWidget(self.updateButton)
 
         # Close button
         buttons = QDialogButtonBox(
             QDialogButtonBox.Close,
         Qt.Horizontal, self)
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
+        #buttons.accepted.connect(self.accept)
+        #buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
     @staticmethod
     def getFirmwareUpdate(controller, parent = None):
         dialog = FirmwareUpdateDialog(controller, parent)
+        dialog.setWindowTitle("Firmware update")
+        result = dialog.exec_()
+        data = {'msg':'Update is complete. New version is ....'}
+        return (data, result == QDialog.Accepted)
+
+
+class AboutDialog(QDialog):
+    def __init__(self, controller, parent = None):
+        super(AboutDialog, self).__init__(parent)
+
+        self.controller = controller
+        self.differentVersion = True
+        self.actualVersion = '1.0.2'
+        self.yourVersion = '1.0.1'
+
+        layout = QVBoxLayout(self)
+
+        self.prusaControllLabel = QtGui.QLabel("PrusaControll")
+        self.prusaControllLabel.setAlignment(Qt.AlignCenter)
+
+        self.prusaControllText = QtGui.QLabel("Created by Tibor Vavra for Prusa Research s.r.o.")
+
+        self.localVersionLabel = QtGui.QLabel("Your version is %s" % self.yourVersion)
+
+        self.checkVersionButton = QtGui.QPushButton("Check version")
+        #TODO:Doplnit
+        #self.checkVersionButton.clicked.connect(self.controller.checkVersion)
+        #self.checkVersionButton.setEnabled(self.differentVersion)
+
+        layout.addWidget(self.prusaControllLabel)
+        layout.addWidget(self.prusaControllText)
+
+        layout.addWidget(self.localVersionLabel)
+        layout.addWidget(self.checkVersionButton)
+
+        # Close button
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok,
+        Qt.Horizontal, self)
+        #buttons.accepted.connect(self.accept)
+        #buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    @staticmethod
+    def getAboutDialog(controller, parent = None):
+        dialog = AboutDialog(controller, parent)
+        dialog.setWindowTitle("About")
+        result = dialog.exec_()
+        data = {'msg':'Update is complete. New version is ....'}
+        return (data, result == QDialog.Accepted)
+
+
+class PrinteInfoDialog(QDialog):
+    def __init__(self, controller, parent = None):
+        super(PrinteInfoDialog, self).__init__(parent)
+
+        self.controller = controller
+        self.printerName = self.controller.getPrinterName()
+        self.yourFirmwareVersion = self.controller.getFirmwareVersionNumber()
+
+        layout = QVBoxLayout(self)
+
+        self.printerNameLabel = QtGui.QLabel("Your printer is %s" % self.printerName)
+        self.printerFirmwareText = QtGui.QLabel("Version of firmware is %s" % self.yourFirmwareVersion)
+
+
+        #TODO:Doplnit
+        #self.checkVersionButton.clicked.connect(self.controller.checkVersion)
+        #self.checkVersionButton.setEnabled(self.differentVersion)
+
+        layout.addWidget(self.printerNameLabel)
+        layout.addWidget(self.printerFirmwareText)
+
+        #layout.addWidget(self.localVersionLabel)
+        #layout.addWidget(self.checkVersionButton)
+
+        # Close button
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok,
+        Qt.Horizontal, self)
+        #buttons.accepted.connect(self.accept)
+        #buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    @staticmethod
+    def getPrinteInfoDialog(controller, parent = None):
+        dialog = PrinteInfoDialog(controller, parent)
+        dialog.setWindowTitle("Printer info")
         result = dialog.exec_()
         data = {'msg':'Update is complete. New version is ....'}
         return (data, result == QDialog.Accepted)
@@ -147,7 +240,8 @@ class PrusaControllView(QtGui.QMainWindow):
         self.helpMenu.addAction('Help')
         self.helpMenu.addAction('Prusa Online')
         self.helpMenu.addSeparator()
-        self.helpMenu.addAction('About')
+        self.helpMenu.addAction('About', self.controller.openAbout)
+
         #Help menu
 
         #status bar widgets
@@ -174,6 +268,12 @@ class PrusaControllView(QtGui.QMainWindow):
     def openSettingsDialog(self):
         data, ok = SettingsDialog.getSettingsData(self.controller, self.parent())
         return data
+
+    def openPrinterInfoDialog(self):
+        PrinteInfoDialog.getPrinteInfoDialog(self.controller, self.parent())
+
+    def openAboutDialog(self):
+        AboutDialog.getAboutDialog(self.controller, self.parent())
 
     def openFirmwareDialog(self):
         data, ok = FirmwareUpdateDialog.getFirmwareUpdate(self.controller, self.parent())

@@ -124,6 +124,14 @@ class Controller:
     def get_enumeration(self, section, enum):
         return self.enumeration[section][enum] if section in self.enumeration and enum in self.enumeration[section] else str(section)+':'+str(enum)
 
+    def getPrinterName(self):
+        #TODO:Add code for read and detect printer name
+        return "Original Prusa i3"
+
+    def getFirmwareVersionNumber(self):
+        #TODO:Add code for download firmware version
+        return '1.0.1'
+
     def tab_selected(self, n):
         if n==1:
             self.clearToolButtonStates()
@@ -149,12 +157,10 @@ class Controller:
         return self.scene
 
     def open_printer_info(self):
-        #TODO:Call info reading from printer
-        pass
+        self.view.openPrinterInfoDialog()
 
     def open_update_firmware(self):
         self.view.openFirmwareDialog()
-
 
     def openProjectFile(self):
         data = self.view.openProjectFileDialog()
@@ -198,6 +204,9 @@ class Controller:
 
     def openSettings(self):
         self.settings = self.view.openSettingsDialog()
+
+    def openAbout(self):
+        self.view.openAboutDialog()
 
     def generate_button_pressed(self):
         logging.debug('Generate button pressed')
