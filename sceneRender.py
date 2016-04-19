@@ -178,7 +178,6 @@ class GLWidget(QGLWidget):
 
         self.tool_background = self.texture_from_png("gui/tool_background.png", GL_RGBA)
 
-
         self.bed = self.makePrintingBed()
         self.axis = self.makeAxis()
 
@@ -211,7 +210,6 @@ class GLWidget(QGLWidget):
         #glEnable( GL_BLEND )
 
 
-
     #@timing
     def paintGL(self, selection = 1):
         if selection:
@@ -241,7 +239,10 @@ class GLWidget(QGLWidget):
             glFlush()
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
-            self.sceneFrameBuffer.save("select_buffer.png")
+
+            if 'debug' in self.parent.controller.settings:
+                if self.parent.controller.settings['debug']:
+                    self.sceneFrameBuffer.save("select_buffer.png")
 
             glEnable( GL_LIGHTING )
             glEnable( GL_LIGHT0 )
@@ -250,8 +251,6 @@ class GLWidget(QGLWidget):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.draw_background_texture()
         glLoadIdentity()
-
-        #self.draw_background_texture()
 
         glTranslatef(0,-5,0)
         glTranslatef(0.0, 0.0, self.zoom)
@@ -302,7 +301,6 @@ class GLWidget(QGLWidget):
         glEnable( GL_BLEND )
 
         self.draw_tools()
-
 
         glFlush()
 

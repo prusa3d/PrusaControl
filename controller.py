@@ -162,8 +162,11 @@ class Controller:
     def open_update_firmware(self):
         self.view.openFirmwareDialog()
 
-    def openProjectFile(self):
-        data = self.view.openProjectFileDialog()
+    def openProjectFile(self, url=None):
+        if url:
+            data =url
+        else:
+            data = self.view.openProjectFileDialog()
         logging.debug('open project file %s' %data)
         self.import_project(data)
 
@@ -192,6 +195,7 @@ class Controller:
         #TODO:Add code for read zip file, in memory open it and read xml file scene(with transformations of objects) and object files in stl
         #open zip file
         project_file = ProjectFile(self.scene, path)
+        self.view.updateScene()
 
     def save_project(self, path):
         #TODO:Save project file

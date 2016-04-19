@@ -5,10 +5,15 @@ from zipfile import ZipFile
 import xml.etree.cElementTree as ET
 
 import io
+
+import numpy
+
+from StringIO import StringIO
 from stl.mesh import Mesh
 
 from sceneData import ModelTypeStl
 
+fileExtension = 'prus'
 
 class ProjectFile(object):
 
@@ -54,6 +59,9 @@ class VersionAbstract(object):
 
 class Version_1_0(VersionAbstract):
 
+    def __init__(self):
+        self.xmlFilename = 'scene.xml'
+
     def check_version(self, filename):
         return True
 
@@ -62,8 +70,8 @@ class Version_1_0(VersionAbstract):
 
     def load(self, scene, filename):
         #open zipfile
-        with ZipFile(filename, 'r') as opened_zipfile:
-            tree = ET.fromstring(opened_zipfile.read('scene.xml'))
+        with ZipFile(filename, 'r') as openedZipfile:
+            tree = ET.fromstring(openedZipfile.read(self.xmlFilename))
             version = tree.find('version').text
             if self.get_version() == version:
                 logging.debug("Ano, soubor je stejna verze jako knihovna pro jeho nacitani. Pokracujeme")
@@ -81,12 +89,11 @@ class Version_1_0(VersionAbstract):
                 model_data['scale'] = ast.literal_eval(model.find('scale').text)
                 models_data.append(model_data)
 
-            logging.debug(str(models_data))
-
             scene.models = []
             for m in models_data:
                 logging.debug("Jmeno souboru je: " + m['file_name'])
-                model = ModelTypeStl.load_from_mesh(Mesh.from_file(filename="", fh=opened_zipfile.open(m['file_name']), m['file_name']), normalize=not m['normalize'])
+                mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
+                model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
                 model.rot = m['rotation']
                 model.pos = m['position']
                 model.scale = m['scale']
@@ -95,28 +102,49 @@ class Version_1_0(VersionAbstract):
 
     def save(self, scene, filename):
         #create zipfile
-        with ZipFile(filename, 'w') as opened_zipfile:
+        with ZipFile(filename, 'w') as openedZipfile:
+            #create xml file describing scene
             root = ET.Element("scene")
-            version = ET.SubElement(root, "version").text=self.get_version()
+            ET.SubElement(root, "version").text=self.get_version()
             models_tag = ET.SubElement(root, "models")
 
             for model in scene.models:
                 model_element = ET.SubElement(models_tag, "model", name=model.filename)
-                normalization_element = ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
-                position_element = ET.SubElement(model_element, "position").text=str(model.pos)
-                rotation_element = ET.SubElement(model_element, "rotation").text=str(model.rot)
-                scale_element = ET.SubElement(model_element, "scale").text=str(model.scale)
+                ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
+                ET.SubElement(model_element, "position").text=str(model.pos)
+                ET.SubElement(model_element, "rotation").text=str(model.rot)
+                ET.SubElement(model_element, "scale").text=str(model.scale)
 
-            tree = ET.ElementTree(root)
-            tree.write(filename)
+            #save xml file to new created zip file
+            newXml = ET.tostring(root)
+            openedZipfile.writestr(self.xmlFilename, newXml)
 
+            #write stl files to zip file
+            for model in scene.models:
+                #transform data to stl file
+                mesh = self._create_mesh_from_model(model)
 
-
-
+                #generate ascii format of stl(bug in numpy-stl)
+                #fileHandler = opened_zipfile.write(model.filename)
+                fileLike = StringIO()
+                mesh._write_ascii(fh=fileLike, name=model.filename)
+                openedZipfile.writestr(model.filename, fileLike.getvalue())
+                fileLike.close()
 
 
         return True
 
+    def _create_mesh_from_model(self, model):
+        data = numpy.zeros(len(model.v0), dtype=Mesh.dtype)
+        scale = numpy.array(model.scaleDefault)
+        for i, d in enumerate(zip(model.v0, model.v1, model.v2)):
+            data['vectors'][i] = numpy.array([d[0],
+                                            d[1],
+                                            d[2]])
+        data['vectors'] = data['vectors']/scale
+        mesh = Mesh(data)
+
+        return mesh
 
 
 

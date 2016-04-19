@@ -14,6 +14,7 @@ from PyQt4.QtGui import QVBoxLayout
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
+import projectFile
 import sceneRender
 
 class SettingsDialog(QDialog):
@@ -306,6 +307,9 @@ class PrusaControllView(QtGui.QMainWindow):
         openAt = "/home"
         data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
         data = self.convertFilePathToUnicode(data)
+        if not data[-4:] == projectFile.fileExtension:
+            data = data + '.' + projectFile.fileExtension
+
         return data
 
     def saveGCondeFileDialog(self):

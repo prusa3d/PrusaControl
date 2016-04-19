@@ -8,6 +8,7 @@ from stl.mesh import Mesh
 from random import randint
 import math
 import itertools
+import ntpath
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -319,7 +320,7 @@ class ModelTypeAbstract(object):
         pass
 
     @abstractmethod
-    def load(filename):
+    def load(self, filename):
         logging.debug("This is abstract model type")
 
         return None
@@ -333,11 +334,17 @@ class ModelTypeStl(ModelTypeAbstract):
     def load(self, filename):
         logging.debug("this is STL file reader")
         mesh = Mesh.from_file(filename)
-        return self.load_from_mesh(mesh, filename)
+        return ModelTypeStl.load_from_mesh(mesh, filename, True)
 
-    def load_from_mesh(self, mesh, filename="", normalize=True):
+    @staticmethod
+    def load_from_mesh(mesh, filename="", normalize=True):
         model = Model()
-        model.filename = filename
+
+        if filename:
+            model.filename = ntpath.basename(filename)
+        else:
+            model.filename = ""
+
 
         '''
         some magic with model data...
@@ -371,7 +378,9 @@ class ModelTypeStl(ModelTypeAbstract):
         model.zeroPoint[2] = model.min[2]
 
         #normalize position of object on 0
-        model.normalizeObject()
+
+        if normalize:
+            model.normalizeObject()
 
         #calculate size of BoundingSphere
         v = Vector(model.boundingSphereCenter)
@@ -379,8 +388,6 @@ class ModelTypeStl(ModelTypeAbstract):
             vL = abs(v.lenght(vert))
             if vL > model.boundingSphereSize:
                 model.boundingSphereSize = vL
-
-        #model.pos = [randint(0, 10), randint(0, 10), 0]
 
         model.displayList = model.makeDisplayList()
 
