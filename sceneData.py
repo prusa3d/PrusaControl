@@ -77,6 +77,13 @@ class AppScene(object):
     def define_hot_bed(self, param):
         self.hot_bed_dimension = param
 
+    def save_whole_scene_to_one_stl_file(self, filename):
+        whole_scene = Mesh(numpy.concatenate([i.get_mesh().data.copy() for i in self.models]))
+        n = len(whole_scene.vectors)
+        whole_scene.save(filename)
+        logging.debug("Pocet vektoru je %s" %n)
+        logging.debug("Byl zapsan soubor %s" %filename)
+
 
 
 class Model(object):
@@ -119,6 +126,8 @@ class Model(object):
         self.normal = []
         self.displayList = []
 
+        self.mesh = None
+
         #transformation data
         self.pos = [.0,.0,.0]
         self.rot = [.0,.0,.0]
@@ -145,11 +154,23 @@ class Model(object):
         self.filename = ""
         self.normalization_flag = False
 
+    def get_mesh(self):
+        data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
+        scale = numpy.array(self.scaleDefault)
+        move = numpy.array(self.pos)
+        #TODO:Add rotation, move and scale
+        for i, d in enumerate(zip(self.v0, self.v1, self.v2)):
+            data['vectors'][i] = numpy.array([d[0], d[1], d[2]])
+        data['vectors'] = data['vectors']/scale
+        move = move / scale
+        data['vectors'] = data['vectors'] + move
+        mesh = Mesh(data)
+        return mesh
 
     def __str__(self):
         return "Mesh: " + str(self.id) + ' ' + str(self.color)
 
-    def closestPoint(self, a, b, p):
+    def closest_point(self, a, b, p):
         ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
         abSquare = numpy.dot(ab.getRaw(), ab.getRaw())
         ap = Vector([p.x-a.x, p.y-a.y, p.z-a.z])
@@ -158,14 +179,14 @@ class Model(object):
         q = Vector([a.x+ab.x*t, a.y+ab.y*t, a.z+ab.z*t])
         return q
 
-    def intersectionRayBoundingSphere(self, start, end):
+    def intersection_ray_bounding_sphere(self, start, end):
         v = Vector3(self.boundingSphereCenter)
         matrix = Matrix44.from_scale(Vector3(self.scale))
         matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
 
         v = matrix * v
 
-        pt = self.closestPoint(Vector(start), Vector(end), Vector(v.tolist()))
+        pt = self.closest_point(Vector(start), Vector(end), Vector(v.tolist()))
         lenght = pt.lenght(v.tolist())
         return lenght < self.boundingSphereSize
 
@@ -184,7 +205,7 @@ class Model(object):
                 return True
         return False
 
-    def intersectionRayModel(self, rayStart, rayEnd):
+    def intersection_ray_model(self, rayStart, rayEnd):
         self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
         matrix = Matrix44.from_scale(Vector3(self.scale))
         #TODO:Add rotation
@@ -236,7 +257,7 @@ class Model(object):
         return False
 
 
-    def normalizeObject(self):
+    def normalize_object(self):
         sceneCenter = Vector(a=Vector().getRaw(), b=self.boundingSphereCenter)
 
         self.v0 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v0]
@@ -293,7 +314,7 @@ class Model(object):
         glPopMatrix()
 
 
-    def makeDisplayList(self):
+    def make_display_list(self):
         genList = glGenLists(1)
         glNewList(genList, GL_COMPILE)
 
@@ -380,7 +401,7 @@ class ModelTypeStl(ModelTypeAbstract):
         #normalize position of object on 0
 
         if normalize:
-            model.normalizeObject()
+            model.normalize_object()
 
         #calculate size of BoundingSphere
         v = Vector(model.boundingSphereCenter)
@@ -389,12 +410,13 @@ class ModelTypeStl(ModelTypeAbstract):
             if vL > model.boundingSphereSize:
                 model.boundingSphereSize = vL
 
-        model.displayList = model.makeDisplayList()
+        model.displayList = model.make_display_list()
+        model.mesh = mesh
 
         return model
 
 
-def intersectionRayPlane(start, end, pos=[.0,.0,.0], n=[.0,.0,1.]):
+def intersection_ray_plane(start, end, pos=[.0, .0, .0], n=[.0, .0, 1.]):
     r = ray.create_from_line(line.create_from_points(start, end))
     res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(pos, n))
     return res

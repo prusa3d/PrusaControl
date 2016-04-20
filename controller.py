@@ -43,23 +43,23 @@ class Controller:
                 'moveButton': False,
                 'rotateButton': False,
                 'scaleButton': False
-#                ,'selectButton': True
+                #'selectButton': True
         }
 
         self.printing_settings = {
             'materials': ['abs', 'pla', 'flex'],
-            'abs':{
-                'speed':25,
+            'abs': {
+                'speed': 25,
                 'quality': ['draft', 'low', 'medium'],
                 'infill': 65,
                 'infillRange': [20, 80]
             },
-            'pla':{
-                'speed':10,
+            'pla': {
+                'speed': 10,
                 'infill': 20,
                 'infillRange': [0, 100]
             },
-            'default':{
+            'default': {
                 'bed': 100,
                 'hotEnd': 250,
                 'quality': ['draft', 'low', 'medium', 'high', 'ultra_high'],
@@ -84,11 +84,11 @@ class Controller:
                 'flex': 'FLEX'
             },
             'quality': {
-                'draft':'Draft',
-                'low':'Low',
-                'medium':'Medium',
-                'high':'High',
-                'ultra_high':'Ultra high'
+                'draft': 'Draft',
+                'low': 'Low',
+                'medium': 'Medium',
+                'high': 'High',
+                'ultra_high': 'Ultra high'
             }
         }
 
@@ -118,24 +118,24 @@ class Controller:
         self.res_old = []
 
         self.view = PrusaControllView(self)
-        self.view.disableSaveGcodeButton()
+        self.view.disable_save_g_code_button()
         self.scene = AppScene()
 
     def get_enumeration(self, section, enum):
         return self.enumeration[section][enum] if section in self.enumeration and enum in self.enumeration[section] else str(section)+':'+str(enum)
 
-    def getPrinterName(self):
+    def get_printer_name(self):
         #TODO:Add code for read and detect printer name
         return "Original Prusa i3"
 
-    def getFirmwareVersionNumber(self):
+    def get_firmware_version_number(self):
         #TODO:Add code for download firmware version
         return '1.0.1'
 
     def tab_selected(self, n):
         if n==1:
-            self.clearToolButtonStates()
-            self.view.clear_toolbuttons()
+            self.clear_tool_button_states()
+            self.view.clear_tool_buttons()
 
     def get_printing_materials(self):
         return self.printing_settings['materials']
@@ -150,71 +150,73 @@ class Controller:
     def update_gui(self):
         self.view.update_gui()
 
-    def getView(self):
+    def get_view(self):
         return self.view
 
-    def getModel(self):
+    def get_model(self):
         return self.scene
 
     def open_printer_info(self):
-        self.view.openPrinterInfoDialog()
+        self.view.open_printer_info_dialog()
 
     def open_update_firmware(self):
-        self.view.openFirmwareDialog()
+        self.view.open_firmware_dialog()
 
-    def openProjectFile(self, url=None):
+    def open_project_file(self, url=None):
         if url:
             data =url
         else:
-            data = self.view.openProjectFileDialog()
+            data = self.view.open_project_file_dialog()
         logging.debug('open project file %s' %data)
         self.import_project(data)
 
-    def saveProjectFile(self):
-        data = self.view.saveProjectFileDialog()
+    def save_project_file(self):
+        data = self.view.save_project_file_dialog()
         logging.debug('save project file %s' %data)
         self.save_project(data)
 
-    def saveGCodeFile(self):
-        data = self.view.saveGCondeFileDialog()
+    def save_gcode_file(self):
+        data = self.view.save_gcode_file_dialog()
         print(str(data))
 
-    def openModelFile(self):
-        data = self.view.openModelFileDialog()
+    def open_model_file(self):
+        data = self.view.open_model_file_dialog()
         logging.debug('open model file %s' %data)
-        self.importModel(data)
+        self.import_model(data)
 
-    def importModel(self, path):
+    def import_model(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
         self.scene.models.append(ModelTypeStl().load(path))
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
-        self.view.updateScene()
+        self.view.update_scene()
 
     def import_project(self, path):
         #TODO:Add code for read zip file, in memory open it and read xml file scene(with transformations of objects) and object files in stl
         #open zip file
         project_file = ProjectFile(self.scene, path)
-        self.view.updateScene()
+        self.view.update_scene()
 
     def save_project(self, path):
         #TODO:Save project file
         project_file = ProjectFile(self.scene)
         project_file.save(path)
 
-    def updateFirmware(self):
+    def update_firmware(self):
         #TODO:Add code for update of firmware
         pass
 
-    def openSettings(self):
-        self.settings = self.view.openSettingsDialog()
+    def open_settings(self):
+        self.settings = self.view.open_settings_dialog()
 
-    def openAbout(self):
-        self.view.openAboutDialog()
+    def open_about(self):
+        self.view.open_about_dialog()
 
     def generate_button_pressed(self):
         logging.debug('Generate button pressed')
-        self.view.enableSaveGcodeButton()
+        self.scene.save_whole_scene_to_one_stl_file("/home/tibor/projects/PrusaControll/tmp/tmp.stl")
+        self.view.enable_save_gcode_button()
+
 
     def close(self):
         exit()
@@ -222,7 +224,7 @@ class Controller:
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
         self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
-        self.view.updateScene()
+        self.view.update_scene()
 
     def mouse_press_event(self, event):
         self.last_pos = QtCore.QPoint(event.pos())
@@ -232,17 +234,17 @@ class Controller:
         #    self.hit_first_object_by_color(event)
         self.hit_tool_button_by_color(event)
         if event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['moveButton']):
-            self.res_old = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
+            self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hit_first_object_by_color(event)
         elif event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['rotateButton']):
             self.find_object_and_rotation_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['scaleButton']):
             self.find_object_and_scale_axis_by_color(event)
-        self.view.updateScene()
+        self.view.update_scene()
 
     def mouse_release_event(self, event):
         self.scene.clear_selected_models()
-        self.view.updateScene()
+        self.view.update_scene()
 
     def mouse_move_event(self, event):
         dx = event.x() - self.last_pos.x()
@@ -251,7 +253,7 @@ class Controller:
 
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
 
-            res = sceneData.intersectionRayPlane(newRayStart, newRayEnd)
+            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
                 res_new = sceneData.Vector.minusAB(res, self.res_old)
                 for model in self.scene.models:
@@ -304,7 +306,7 @@ class Controller:
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
 
         self.last_pos = QtCore.QPoint(event.pos())
-        self.view.updateScene()
+        self.view.update_scene()
 
     def hit_objects(self, event):
         possible_hit = []
@@ -313,7 +315,7 @@ class Controller:
         self.ray_start, self.ray_end = self.view.get_cursor_position(event)
 
         for model in self.scene.models:
-            if model.intersectionRayBoundingSphere(self.ray_start, self.ray_end):
+            if model.intersection_ray_bounding_sphere(self.ray_start, self.ray_end):
                 possible_hit.append(model)
                 nSelected+=1
             else:
@@ -323,7 +325,7 @@ class Controller:
             return False
 
         for model in possible_hit:
-            if model.intersectionRayModel(self.ray_start, self.ray_end):
+            if model.intersection_ray_model(self.ray_start, self.ray_end):
                 model.selected = not model.selected
             else:
                 model.selected = False
@@ -337,7 +339,7 @@ class Controller:
         self.scene.clear_selected_models()
 
         for model in self.scene.models:
-            if model.intersectionRayBoundingSphere(self.ray_start, self.ray_end):
+            if model.intersection_ray_bounding_sphere(self.ray_start, self.ray_end):
                 possible_hit.append(model)
                 nSelected+=1
 
@@ -345,7 +347,7 @@ class Controller:
             return False
 
         for model in possible_hit:
-            if model.intersectionRayModel(self.ray_start, self.ray_end):
+            if model.intersection_ray_model(self.ray_start, self.ray_end):
                 model.selected = True
                 return True
 
@@ -357,12 +359,12 @@ class Controller:
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
         if find_id == 0:
             return False
-        for toolButton in self.view.getToolButtons():
+        for toolButton in self.view.get_tool_buttons():
             if find_id == toolButton.id:
                 if toolButton.pressed:
                     toolButton.unpress_button()
                 else:
-                    for t in self.view.getToolButtons():
+                    for t in self.view.get_tool_buttons():
                         t.unpress_button()
                     toolButton.press_button()
                     toolButton.run_callback()
@@ -431,39 +433,39 @@ class Controller:
             else:
                 model.scaleAxis = None
 
-    def resetScene(self):
+    def reset_scene(self):
         self.scene.clearScene()
-        self.view.updateScene(True)
+        self.view.update_scene(True)
 
-    def importImage(self, path):
+    def import_image(self, path):
         #TODO:Add importing of image(just plane with texture?)
         pass
 
-    def selectButtonPressed(self):
-        self.clearToolButtonStates()
+    def select_button_pressed(self):
+        self.clear_tool_button_states()
         self.settings['toolButtons']['moveButton'] = True
-        self.view.updateScene()
+        self.view.update_scene()
 
-    def moveButtonPressed(self):
-        self.clearToolButtonStates()
+    def move_button_pressed(self):
+        self.clear_tool_button_states()
         self.settings['toolButtons']['moveButton'] = True
-        self.view.updateScene()
+        self.view.update_scene()
 
-    def rotateButtonPressed(self):
-        self.clearToolButtonStates()
+    def rotate_button_pressed(self):
+        self.clear_tool_button_states()
         self.settings['toolButtons']['rotateButton'] = True
-        self.view.updateScene()
+        self.view.update_scene()
 
-    def scaleButtonPressed(self):
-        self.clearToolButtonStates()
+    def scale_button_pressed(self):
+        self.clear_tool_button_states()
         self.settings['toolButtons']['scaleButton'] = True
-        self.view.updateScene()
+        self.view.update_scene()
 
-    def clearToolButtonStates(self):
+    def clear_tool_button_states(self):
         self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}
 
 
-    def openFile(self, url):
+    def open_file(self, url):
         '''
         function for resolve which file type will be loaded
         '''
@@ -477,13 +479,13 @@ class Controller:
 
         if fileEnd in ['stl', 'STL', 'Stl']:
             print('import model')
-            self.importModel(url)
+            self.import_model(url)
         elif fileEnd in ['prus']:
             print('open project')
-            self.openProjectFile(url)
+            self.open_project_file(url)
         elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
             print('import image')
-            self.importImage(url)
+            self.import_image(url)
 
 
 

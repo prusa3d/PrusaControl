@@ -17,7 +17,7 @@ def main():
     logging.info('PrusaControll start')
     app = QtGui.QApplication(sys.argv)
     controller = Controller()
-    window = controller.getView()
+    window = controller.get_view()
     app.exec_()
     logging.info('PrusaControll exit')
 

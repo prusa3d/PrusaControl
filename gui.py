@@ -61,7 +61,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(buttons)
 
     @staticmethod
-    def getSettingsData(controller, parent = None):
+    def get_settings_data(controller, parent = None):
         data = controller.settings
         dialog = SettingsDialog(controller, parent)
         dialog.setWindowTitle("Settings")
@@ -108,11 +108,11 @@ class FirmwareUpdateDialog(QDialog):
         layout.addWidget(buttons)
 
     @staticmethod
-    def getFirmwareUpdate(controller, parent = None):
+    def get_firmware_update(controller, parent = None):
         dialog = FirmwareUpdateDialog(controller, parent)
         dialog.setWindowTitle("Firmware update")
         result = dialog.exec_()
-        data = {'msg':'Update is complete. New version is ....'}
+        data = {'msg': 'Update is complete. New version is ....'}
         return (data, result == QDialog.Accepted)
 
 
@@ -154,7 +154,7 @@ class AboutDialog(QDialog):
         layout.addWidget(buttons)
 
     @staticmethod
-    def getAboutDialog(controller, parent = None):
+    def get_about_dialog(controller, parent = None):
         dialog = AboutDialog(controller, parent)
         dialog.setWindowTitle("About")
         result = dialog.exec_()
@@ -162,13 +162,13 @@ class AboutDialog(QDialog):
         return (data, result == QDialog.Accepted)
 
 
-class PrinteInfoDialog(QDialog):
-    def __init__(self, controller, parent = None):
-        super(PrinteInfoDialog, self).__init__(parent)
+class PrinterInfoDialog(QDialog):
+    def __init__(self, controller, parent= None):
+        super(PrinterInfoDialog, self).__init__(parent)
 
         self.controller = controller
-        self.printerName = self.controller.getPrinterName()
-        self.yourFirmwareVersion = self.controller.getFirmwareVersionNumber()
+        self.printerName = self.controller.get_printer_name()
+        self.yourFirmwareVersion = self.controller.get_firmware_version_number()
 
         layout = QVBoxLayout(self)
 
@@ -195,8 +195,8 @@ class PrinteInfoDialog(QDialog):
         layout.addWidget(buttons)
 
     @staticmethod
-    def getPrinteInfoDialog(controller, parent = None):
-        dialog = PrinteInfoDialog(controller, parent)
+    def get_printer_info_dialog(controller, parent = None):
+        dialog = PrinterInfoDialog(controller, parent)
         dialog.setWindowTitle("Printer info")
         result = dialog.exec_()
         data = {'msg':'Update is complete. New version is ....'}
@@ -215,12 +215,12 @@ class PrusaControllView(QtGui.QMainWindow):
         self.menubar = self.menuBar()
         #file menu definition
         self.fileMenu = self.menubar.addMenu('&File')
-        self.fileMenu.addAction('Open project', self.controller.openProjectFile)
-        self.fileMenu.addAction('Save project', self.controller.saveProjectFile)
+        self.fileMenu.addAction('Open project', self.controller.open_project_file)
+        self.fileMenu.addAction('Save project', self.controller.save_project_file)
         self.fileMenu.addSeparator()
-        self.fileMenu.addAction('Import stl file', self.controller.openModelFile)
+        self.fileMenu.addAction('Import stl file', self.controller.open_model_file)
         self.fileMenu.addSeparator()
-        self.fileMenu.addAction('Reset', self.controller.resetScene)
+        self.fileMenu.addAction('Reset', self.controller.reset_scene)
         self.fileMenu.addSeparator()
         self.fileMenu.addAction('Close', self.controller.close)
         #file menu definition
@@ -233,7 +233,7 @@ class PrusaControllView(QtGui.QMainWindow):
 
         #Settings menu
         self.settingsMenu = self.menubar.addMenu('&Settings')
-        self.settingsMenu.addAction('PrusaControll settings', self.controller.openSettings)
+        self.settingsMenu.addAction('PrusaControll settings', self.controller.open_settings)
         #Settings menu
 
         #Help menu
@@ -241,7 +241,7 @@ class PrusaControllView(QtGui.QMainWindow):
         self.helpMenu.addAction('Help')
         self.helpMenu.addAction('Prusa Online')
         self.helpMenu.addSeparator()
-        self.helpMenu.addAction('About', self.controller.openAbout)
+        self.helpMenu.addAction('About', self.controller.open_about)
 
         #Help menu
 
@@ -266,58 +266,58 @@ class PrusaControllView(QtGui.QMainWindow):
         self.setWindowTitle(self.tr("PrusaControll"))
         self.show()
 
-    def openSettingsDialog(self):
-        data, ok = SettingsDialog.getSettingsData(self.controller, self.parent())
+    def open_settings_dialog(self):
+        data, ok = SettingsDialog.get_settings_data(self.controller, self.parent())
         return data
 
-    def openPrinterInfoDialog(self):
-        PrinteInfoDialog.getPrinteInfoDialog(self.controller, self.parent())
+    def open_printer_info_dialog(self):
+        PrinterInfoDialog.get_printer_info_dialog(self.controller, self.parent())
 
-    def openAboutDialog(self):
-        AboutDialog.getAboutDialog(self.controller, self.parent())
+    def open_about_dialog(self):
+        AboutDialog.get_about_dialog(self.controller, self.parent())
 
-    def openFirmwareDialog(self):
-        data, ok = FirmwareUpdateDialog.getFirmwareUpdate(self.controller, self.parent())
+    def open_firmware_dialog(self):
+        data, ok = FirmwareUpdateDialog.get_firmware_update(self.controller, self.parent())
 
-    def disableSaveGcodeButton(self):
-        self.prusaControllWidget.disableSaveGcodeButton()
+    def disable_save_g_code_button(self):
+        self.prusaControllWidget.disable_save_gcode_button()
 
-    def enableSaveGcodeButton(self):
-        self.prusaControllWidget.enableSaveGcodeButton()
+    def enable_save_gcode_button(self):
+        self.prusaControllWidget.enable_save_gcode_button()
 
-    def openProjectFileDialog(self):
+    def open_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"
         title = 'Open project file'
         openAt = "/home"
         data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
-        data = self.convertFilePathToUnicode(data)
+        data = self.convert_file_path_to_unicode(data)
         return data
 
-    def openModelFileDialog(self):
+    def open_model_file_dialog(self):
         filters = "STL (*.stl *.STL)"
         title = "Import stl file"
         openAt = "/home"
         data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
-        data = self.convertFilePathToUnicode(data)
+        data = self.convert_file_path_to_unicode(data)
         return data
 
-    def saveProjectFileDialog(self):
+    def save_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"
         title = 'Save project file'
         openAt = "/home"
         data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
-        data = self.convertFilePathToUnicode(data)
+        data = self.convert_file_path_to_unicode(data)
         if not data[-4:] == projectFile.fileExtension:
             data = data + '.' + projectFile.fileExtension
 
         return data
 
-    def saveGCondeFileDialog(self):
+    def save_gcode_file_dialog(self):
         filters = "gcode (*.gcode *.GCODE)"
         title = 'Save G-Code file'
         openAt = "/home"
         data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
-        data = self.convertFilePathToUnicode(data)
+        data = self.convert_file_path_to_unicode(data)
         return data
 
     def update_gui(self):
@@ -337,20 +337,20 @@ class PrusaControllView(QtGui.QMainWindow):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 self.statusBar().showMessage('Dropped file name is ' + str(url.path()))
-                path = self.convertFilePathToUnicode(url.path())
-                self.controller.openFile(path)
+                path = self.convert_file_path_to_unicode(url.path())
+                self.controller.open_file(path)
 
             event.acceptProposedAction()
         else:
             super(PrusaControllView, self).dropEvent(event)
 
-    def convertFilePathToUnicode(self, path):
+    def convert_file_path_to_unicode(self, path):
         codec = QtCore.QTextCodec.codecForName("UTF-16")
-        convertedPath = unicode(codec.fromUnicode(path), 'UTF-16')
-        return convertedPath
+        converted_path = unicode(codec.fromUnicode(path), 'UTF-16')
+        return converted_path
 
-    def updateScene(self, reset=False):
-        self.prusaControllWidget.updateScene(reset)
+    def update_scene(self, reset=False):
+        self.prusaControllWidget.update_scene(reset)
 
     def set_zoom(self, diff):
         self.prusaControllWidget.set_zoom(diff)
@@ -376,11 +376,11 @@ class PrusaControllView(QtGui.QMainWindow):
     def get_z_rotation(self):
         return self.prusaControllWidget.get_z_rotation()
 
-    def getToolButtons(self):
-        return self.prusaControllWidget.getToolButtons()
+    def get_tool_buttons(self):
+        return self.prusaControllWidget.get_tool_buttons()
 
-    def clear_toolbuttons(self):
-        self.prusaControllWidget.clear_toolbuttons()
+    def clear_tool_buttons(self):
+        self.prusaControllWidget.clear_tool_buttons()
 
 
 class PrusaControllWidget(QtGui.QWidget):
@@ -395,9 +395,9 @@ class PrusaControllWidget(QtGui.QWidget):
 
         self.infillValue = 20
 
-        self.initGUI()
+        self.init_gui()
 
-    def initGUI(self):
+    def init_gui(self):
         self.glWidget = sceneRender.GLWidget(self)
 
         self.tabWidget = QtGui.QTabWidget()
@@ -447,7 +447,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.qualityCombo = QtGui.QComboBox()
 
         self.infillLabel = QtGui.QLabel("Infill %s" % str(self.infillValue)+'%')
-        self.infillSlider = self.createSlider(self.setInfill, self.infillValue)
+        self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
 
         self.supportCheckBox = QtGui.QCheckBox("Support material")
         self.brimCheckBox = QtGui.QCheckBox("Brim")
@@ -458,13 +458,13 @@ class PrusaControllWidget(QtGui.QWidget):
         self.progressBar.setValue(0)
 
         self.generateButton = QtGui.QPushButton("Generate")
-        #self.generateButton.connect(self.controller.generate_button_pressed)
+        self.generateButton.clicked.connect(self.controller.generate_button_pressed)
 
         #printing info place
         self.printingInfoLabel = QtGui.QLabel("Print info:")
 
         self.saveGCodeButton = QtGui.QPushButton("Save G-Code")
-        self.saveGCodeButton.clicked.connect(self.controller.saveGCodeFile)
+        self.saveGCodeButton.clicked.connect(self.controller.save_gcode_file)
 
         self.printTabVLayout = QtGui.QVBoxLayout()
         self.printTabVLayout.addWidget(self.materialLabel)
@@ -522,14 +522,12 @@ class PrusaControllWidget(QtGui.QWidget):
         self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
         self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
 
-
-    def clear_toolbuttons(self):
+    def clear_tool_buttons(self):
         self.toolButtonGroup.setExclusive(False)
         self.moveButton.setChecked(False)
         self.rotateButton.setChecked(False)
         self.scaleButton.setChecked(False)
         self.toolButtonGroup.setExclusive(True)
-
 
     def set_x_rotation(self, angle):
         self.glWidget.set_x_rotation(angle)
@@ -555,23 +553,23 @@ class PrusaControllWidget(QtGui.QWidget):
     def get_cursor_pixel_color(self, event):
         return self.glWidget.get_cursor_pixel_color(event)
 
-    def getToolButtons(self):
+    def get_tool_buttons(self):
         return [self.glWidget.moveTool, self.glWidget.rotateTool, self.glWidget.scaleTool]
 
-    def updateScene(self, reset=False):
-        self.glWidget.updateScene(reset)
+    def update_scene(self, reset=False):
+        self.glWidget.update_scene(reset)
 
-    def disableSaveGcodeButton(self):
+    def disable_save_gcode_button(self):
         self.saveGCodeButton.setDisabled(True)
 
-    def enableSaveGcodeButton(self):
+    def enable_save_gcode_button(self):
         self.saveGCodeButton.setDisabled(False)
 
-    def setInfill(self, val):
+    def set_infill(self, val):
         self.infillValue = val
         self.infillLabel.setText("Infill " + str(val) + "%")
 
-    def createSlider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100):
+    def create_slider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100):
         slider = QtGui.QSlider(QtCore.Qt.Horizontal)
 
         slider.setRange(rangeMin, rangeMax)

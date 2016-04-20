@@ -34,7 +34,7 @@ class GLWidget(QGLWidget):
         QGLWidget.__init__(self, parent)
         #TODO:Add camera instance
         self.parent = parent
-        self.initParametres()
+        self.init_parametres()
 
         #properties definition
         self.xRot = 0
@@ -55,7 +55,7 @@ class GLWidget(QGLWidget):
         self.w = 0
         self.h = 0
 
-        self.initParametres()
+        self.init_parametres()
 
         self.sceneFrameBuffer = []
         self.image_background = []
@@ -68,7 +68,7 @@ class GLWidget(QGLWidget):
         self.scaleTool = None
         self.tool_background = None
 
-    def initParametres(self):
+    def init_parametres(self):
         #TODO:Add camera instance initialization
         #properties initialization
         self.xRot = 0
@@ -91,9 +91,9 @@ class GLWidget(QGLWidget):
 
         self.sceneFrameBuffer = []
 
-    def updateScene(self, reset=False):
+    def update_scene(self, reset=False):
         if reset:
-            self.initParametres()
+            self.init_parametres()
         self.updateGL()
 
     #TODO:All this function will be changed to controll camera instance
@@ -103,13 +103,13 @@ class GLWidget(QGLWidget):
     def get_zoom(self):
         return self.zoom
 
-    def xRotation(self):
+    def get_x_rotation(self):
         return self.xRot
 
-    def yRotation(self):
+    def get_y_rotation(self):
         return self.yRot
 
-    def zRotation(self):
+    def get_z_rotation(self):
         return self.zRot
 
     def minimumSizeHint(self):
@@ -119,21 +119,21 @@ class GLWidget(QGLWidget):
         return QtCore.QSize(400, 400)
 
     def set_x_rotation(self, angle):
-        angle = self.normalizeAngle(angle)
+        angle = self.normalize_angle(angle)
         if angle != self.xRot:
             self.xRot = angle
             self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
             self.updateGL()
 
     def set_y_rotation(self, angle):
-        angle = self.normalizeAngle(angle)
+        angle = self.normalize_angle(angle)
         if angle != self.yRot:
             self.yRot = angle
             self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
             self.updateGL()
 
     def set_z_rotation(self, angle):
-        angle = self.normalizeAngle(angle)
+        angle = self.normalize_angle(angle)
         if angle != self.zRot:
             self.zRot = angle
             self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
@@ -167,9 +167,9 @@ class GLWidget(QGLWidget):
         self.scaleTool = GlButton(self.texture_from_png("gui/scale_n.png", GL_RGBA), [4.,4.], [95,1])
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
-        self.moveTool.set_callback(self.parent.controller.moveButtonPressed)
-        self.rotateTool.set_callback(self.parent.controller.rotateButtonPressed)
-        self.scaleTool.set_callback(self.parent.controller.scaleButtonPressed)
+        self.moveTool.set_callback(self.parent.controller.move_button_pressed)
+        self.rotateTool.set_callback(self.parent.controller.rotate_button_pressed)
+        self.scaleTool.set_callback(self.parent.controller.scale_button_pressed)
 
         self.moveTool.set_press_variable(self.parent.controller.settings['toolButtons']['moveButton'])
         self.rotateTool.set_press_variable(self.parent.controller.settings['toolButtons']['rotateButton'])
@@ -179,7 +179,7 @@ class GLWidget(QGLWidget):
         self.tool_background = self.texture_from_png("gui/tool_background.png", GL_RGBA)
 
         self.bed = self.makePrintingBed()
-        self.axis = self.makeAxis()
+        self.axis = self.make_axis()
 
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)
@@ -236,7 +236,7 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-            glFlush()
+            #glFlush()
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
 
@@ -302,7 +302,7 @@ class GLWidget(QGLWidget):
 
         self.draw_tools()
 
-        glFlush()
+        #glFlush()
 
     def draw_tools_helper(self, model, settings, picking=False):
         if picking:
@@ -464,7 +464,7 @@ class GLWidget(QGLWidget):
 
         return genList
 
-    def makeAxis(self):
+    def make_axis(self):
         genList = glGenLists(1)
         glNewList(genList, GL_COMPILE)
 
@@ -594,14 +594,14 @@ class GLWidget(QGLWidget):
         glMatrixMode(GL_MODELVIEW)
 
 
-    def normalizeAngle(self, angle):
+    def normalize_angle(self, angle):
         while angle < 0:
             angle += 360 * 16
         while angle > 360 * 16:
             angle -= 360 * 16
         return angle
 
-    def normalizeAngleX(self, angle):
+    def normalize_angle_x(self, angle):
         if angle < 0:
             angle = 0
         if angle > 180:

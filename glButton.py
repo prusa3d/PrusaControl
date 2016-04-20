@@ -30,6 +30,7 @@ class GlButton(object):
     def unpress_button(self):
         self.pressed = False
         if not self.press_variable is None:
+            logging.debug("Unpress variable")
             self.press_variable = False
 
     def set_press_variable(self, variable):

@@ -1,19 +1,21 @@
 import ast
 import logging
 from abc import ABCMeta, abstractmethod
-from zipfile import ZipFile
+from cStringIO import StringIO
+from zipfile import ZipFile, ZIP_DEFLATED
 import xml.etree.cElementTree as ET
 
 import io
 
 import numpy
 
-from StringIO import StringIO
+
 from stl.mesh import Mesh
 
 from sceneData import ModelTypeStl
 
 fileExtension = 'prus'
+
 
 class ProjectFile(object):
 
@@ -31,6 +33,7 @@ class ProjectFile(object):
 
     def save(self, filename):
         self.version.save(self.scene, filename)
+
 
 class VersionAbstract(object):
     __metaclass__ = ABCMeta
@@ -102,7 +105,7 @@ class Version_1_0(VersionAbstract):
 
     def save(self, scene, filename):
         #create zipfile
-        with ZipFile(filename, 'w') as openedZipfile:
+        with ZipFile(filename, 'w', ZIP_DEFLATED) as openedZipfile:
             #create xml file describing scene
             root = ET.Element("scene")
             ET.SubElement(root, "version").text=self.get_version()
@@ -122,7 +125,8 @@ class Version_1_0(VersionAbstract):
             #write stl files to zip file
             for model in scene.models:
                 #transform data to stl file
-                mesh = self._create_mesh_from_model(model)
+                #mesh = self._create_mesh_from_model(model)
+                mesh = model.get_mesh()
 
                 #generate ascii format of stl(bug in numpy-stl)
                 #fileHandler = opened_zipfile.write(model.filename)
@@ -131,20 +135,18 @@ class Version_1_0(VersionAbstract):
                 openedZipfile.writestr(model.filename, fileLike.getvalue())
                 fileLike.close()
 
-
         return True
 
+'''
     def _create_mesh_from_model(self, model):
         data = numpy.zeros(len(model.v0), dtype=Mesh.dtype)
         scale = numpy.array(model.scaleDefault)
         for i, d in enumerate(zip(model.v0, model.v1, model.v2)):
-            data['vectors'][i] = numpy.array([d[0],
-                                            d[1],
-                                            d[2]])
+            data['vectors'][i] = numpy.array([d[0], d[1], d[2]])
         data['vectors'] = data['vectors']/scale
         mesh = Mesh(data)
 
         return mesh
-
+'''
 
 
