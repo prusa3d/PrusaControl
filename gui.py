@@ -55,7 +55,7 @@ class SettingsDialog(QDialog):
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-        Qt.Horizontal, self)
+            Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -102,7 +102,8 @@ class FirmwareUpdateDialog(QDialog):
         # Close button
         buttons = QDialogButtonBox(
             QDialogButtonBox.Close,
-        Qt.Horizontal, self)
+            Qt.Horizontal, self)
+        buttons.clicked.connect(self.close)
         #buttons.accepted.connect(self.accept)
         #buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -148,7 +149,8 @@ class AboutDialog(QDialog):
         # Close button
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok,
-        Qt.Horizontal, self)
+            Qt.Horizontal, self)
+        buttons.clicked.connect(self.close)
         #buttons.accepted.connect(self.accept)
         #buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -183,15 +185,10 @@ class PrinterInfoDialog(QDialog):
         layout.addWidget(self.printerNameLabel)
         layout.addWidget(self.printerFirmwareText)
 
-        #layout.addWidget(self.localVersionLabel)
-        #layout.addWidget(self.checkVersionButton)
-
-        # Close button
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok,
-        Qt.Horizontal, self)
-        #buttons.accepted.connect(self.accept)
-        #buttons.rejected.connect(self.reject)
+            Qt.Horizontal, self)
+        buttons.clicked.connect(self.close)
         layout.addWidget(buttons)
 
     @staticmethod
@@ -199,7 +196,7 @@ class PrinterInfoDialog(QDialog):
         dialog = PrinterInfoDialog(controller, parent)
         dialog.setWindowTitle("Printer info")
         result = dialog.exec_()
-        data = {'msg':'Update is complete. New version is ....'}
+        data = {'msg': 'Update is complete. New version is ....'}
         return (data, result == QDialog.Accepted)
 
 
@@ -279,7 +276,7 @@ class PrusaControllView(QtGui.QMainWindow):
     def open_firmware_dialog(self):
         data, ok = FirmwareUpdateDialog.get_firmware_update(self.controller, self.parent())
 
-    def disable_save_g_code_button(self):
+    def disable_save_gcode_button(self):
         self.prusaControllWidget.disable_save_gcode_button()
 
     def enable_save_gcode_button(self):
@@ -382,6 +379,9 @@ class PrusaControllView(QtGui.QMainWindow):
     def clear_tool_buttons(self):
         self.prusaControllWidget.clear_tool_buttons()
 
+    def set_progress_bar(self, value):
+        self.prusaControllWidget.progressBar.setValue(value)
+
 
 class PrusaControllWidget(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -401,6 +401,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.glWidget = sceneRender.GLWidget(self)
 
         self.tabWidget = QtGui.QTabWidget()
+        self.rightPanel = QtGui.QWidget()
 
         #self.toolTab = QtGui.QWidget()
         self.printTab = QtGui.QWidget()
@@ -486,14 +487,19 @@ class PrusaControllWidget(QtGui.QWidget):
         #print tab
 
         #self.tabWidget.addTab(self.toolTab, "Tools")
-        self.tabWidget.addTab(self.printTab, "Print")
-        self.tabWidget.setCurrentIndex(1)
-        self.tabWidget.setMaximumWidth(250)
-        self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.controller.tab_selected)
+        #self.tabWidget.addTab(self.printTab, "Print")
+        #self.tabWidget.setCurrentIndex(1)
+        #self.tabWidget.setMaximumWidth(250)
+        #self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.controller.tab_selected)
+
+        self.printTab.setMaximumWidth(250)
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.addWidget(self.glWidget)
-        mainLayout.addWidget(self.tabWidget)
+        #mainLayout.addWidget(self.tabWidget)
+
+
+        mainLayout.addWidget(self.printTab)
 
         self.setLayout(mainLayout)
         self.update_gui_for_material()

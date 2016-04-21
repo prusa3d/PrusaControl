@@ -79,10 +79,7 @@ class AppScene(object):
 
     def save_whole_scene_to_one_stl_file(self, filename):
         whole_scene = Mesh(numpy.concatenate([i.get_mesh().data.copy() for i in self.models]))
-        n = len(whole_scene.vectors)
         whole_scene.save(filename)
-        logging.debug("Pocet vektoru je %s" %n)
-        logging.debug("Byl zapsan soubor %s" %filename)
 
 
 
@@ -164,7 +161,9 @@ class Model(object):
         data['vectors'] = data['vectors']/scale
         move = move / scale
         data['vectors'] = data['vectors'] + move
+
         mesh = Mesh(data)
+        #mesh.rotate(x, )
         return mesh
 
     def __str__(self):

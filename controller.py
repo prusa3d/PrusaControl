@@ -18,6 +18,9 @@ from zipfile import ZipFile
 from PyQt4 import QtCore
 
 #Mesure
+from slicer import SlicerEngineManager
+
+
 def timing(f):
     def wrap(*args):
         time1 = time.time()
@@ -118,8 +121,9 @@ class Controller:
         self.res_old = []
 
         self.view = PrusaControllView(self)
-        self.view.disable_save_g_code_button()
+        self.view.disable_save_gcode_button()
         self.scene = AppScene()
+        self.slicer_manager = SlicerEngineManager(self)
 
     def get_enumeration(self, section, enum):
         return self.enumeration[section][enum] if section in self.enumeration and enum in self.enumeration[section] else str(section)+':'+str(enum)
@@ -150,6 +154,9 @@ class Controller:
     def update_gui(self):
         self.view.update_gui()
 
+    def set_progress_bar(self, value):
+        self.view.set_progress_bar(value)
+
     def get_view(self):
         return self.view
 
@@ -164,7 +171,7 @@ class Controller:
 
     def open_project_file(self, url=None):
         if url:
-            data =url
+            data = url
         else:
             data = self.view.open_project_file_dialog()
         logging.debug('open project file %s' %data)
@@ -213,10 +220,12 @@ class Controller:
         self.view.open_about_dialog()
 
     def generate_button_pressed(self):
-        logging.debug('Generate button pressed')
+        self.view.disable_save_gcode_button()
         self.scene.save_whole_scene_to_one_stl_file("/home/tibor/projects/PrusaControll/tmp/tmp.stl")
-        self.view.enable_save_gcode_button()
+        self.slicer_manager.slice()
 
+    def gcode_generated(self):
+        self.view.enable_save_gcode_button()
 
     def close(self):
         exit()
