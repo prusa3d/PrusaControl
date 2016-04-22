@@ -34,6 +34,7 @@ class Slic3rEngineRunner(QObject):
     def __init__(self):
         super(Slic3rEngineRunner, self).__init__()
         self.slicer_place = '../Slic3r/bin/slic3r'
+#        self.settings_dir = '/res/'
         self.data = {}
 
         self.step_max = 8
@@ -41,9 +42,9 @@ class Slic3rEngineRunner(QObject):
 
     def set_data(self, data):
         self.data = data
-
+#'--DataDir', self.settings_dir,
     def slice(self):
-        process = subprocess.Popen([self.slicer_place,'tmp/tmp.stl','--output', 'tmp/out.gcode'], stdout=subprocess.PIPE)
+        process = subprocess.Popen([self.slicer_place, 'tmp/tmp.stl', '--output', 'tmp/out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
         self.finished.emit()
 

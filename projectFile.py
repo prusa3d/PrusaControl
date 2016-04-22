@@ -137,16 +137,4 @@ class Version_1_0(VersionAbstract):
 
         return True
 
-'''
-    def _create_mesh_from_model(self, model):
-        data = numpy.zeros(len(model.v0), dtype=Mesh.dtype)
-        scale = numpy.array(model.scaleDefault)
-        for i, d in enumerate(zip(model.v0, model.v1, model.v2)):
-            data['vectors'][i] = numpy.array([d[0], d[1], d[2]])
-        data['vectors'] = data['vectors']/scale
-        mesh = Mesh(data)
-
-        return mesh
-'''
-
 

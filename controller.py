@@ -31,7 +31,7 @@ def timing(f):
     return wrap
 
 class Controller:
-    def __init__(self):
+    def __init__(self, app):
         logging.info('Controller instance created')
 
         #TODO:Reading settings from file
@@ -40,13 +40,12 @@ class Controller:
         if not self.settings:
             self.settings['debug'] = False
             self.settings['automatic_placing'] = True
-            self.settings['language'] = 'en'
+            self.settings['language'] = 'en_US'
             self.settings['printer'] = 'prusa_i3_v2'
             self.settings['toolButtons'] = {
                 'moveButton': False,
                 'rotateButton': False,
                 'scaleButton': False
-                #'selectButton': True
         }
 
         self.printing_settings = {
@@ -74,8 +73,8 @@ class Controller:
 
         self.enumeration = {
             'language': {
-                'cs': 'Czech',
-                'en': 'English'
+                'cs_CZ': 'Czech',
+                'en_US': 'English'
             },
             'printer': {
                 'prusa_i3': 'Prusa i3',
@@ -120,10 +119,24 @@ class Controller:
         self.ray_end = [.0, .0, .0]
         self.res_old = []
 
+        self.app = app
+
+        self.translator = QtCore.QTranslator()
+        self.set_language(self.settings['language'])
+
         self.view = PrusaControllView(self)
         self.view.disable_save_gcode_button()
         self.scene = AppScene()
         self.slicer_manager = SlicerEngineManager(self)
+
+
+    def set_language(self, language):
+        full_name = 'translation/' + language + '.qm'
+        self.translate_app(full_name)
+
+    def translate_app(self, translation="translation/en_US.qm"):
+        self.translator.load(translation)
+        self.app.installTranslator(self.translator)
 
     def get_enumeration(self, section, enum):
         return self.enumeration[section][enum] if section in self.enumeration and enum in self.enumeration[section] else str(section)+':'+str(enum)
