@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 import subprocess
 from copy import deepcopy
 
-from PyQt4.QtCore import QObject, QThread, pyqtSignal, SIGNAL, SLOT
+from PyQt4.QtCore import QObject, QThread, pyqtSignal
 
 
 class SlicerEngineAbstract():

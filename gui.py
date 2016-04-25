@@ -207,7 +207,7 @@ class PrusaControllView(QtGui.QMainWindow):
         super(PrusaControllView, self).__init__()
         self.setAcceptDrops(True)
 
-        self.prusaControllWidget = PrusaControllWidget(self)
+        self.prusaControllWidget = PrusaControlWidget(self)
         self.setCentralWidget(self.prusaControllWidget)
 
         self.menubar = self.menuBar()
@@ -366,7 +366,7 @@ class PrusaControllView(QtGui.QMainWindow):
         self.prusaControllWidget.progressBar.setValue(value)
 
 
-class PrusaControllWidget(QtGui.QWidget):
+class PrusaControlWidget(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
         if parent:

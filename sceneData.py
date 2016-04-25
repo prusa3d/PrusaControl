@@ -259,9 +259,9 @@ class Model(object):
     def normalize_object(self):
         sceneCenter = Vector(a=Vector().getRaw(), b=self.boundingSphereCenter)
 
-        self.v0 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v0]
-        self.v1 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v1]
-        self.v2 = [ Vector().minusAB(v, sceneCenter.getRaw())  for v in self.v2]
+        self.v0 = [Vector().minusAB(v, sceneCenter.getRaw()) for v in self.v0]
+        self.v1 = [Vector().minusAB(v, sceneCenter.getRaw()) for v in self.v1]
+        self.v2 = [Vector().minusAB(v, sceneCenter.getRaw()) for v in self.v2]
 
         self.max = Vector().minusAB(self.max, sceneCenter.getRaw())
         self.min = Vector().minusAB(self.min, sceneCenter.getRaw())

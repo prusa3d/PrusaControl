@@ -14,12 +14,12 @@ __author__ = 'Tibor Vavra'
 DEBUG = False
 
 def main():
-    logging.info('PrusaControll start')
+    logging.info('PrusaControl start')
     app = QtGui.QApplication(sys.argv)
     controller = Controller(app)
     window = controller.get_view()
     app.exec_()
-    logging.info('PrusaControll exit')
+    logging.info('PrusaControl exit')
 
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ def main():
     controller = Controller(app)
     window = controller.get_view()
     app.exec_()
-    logging.info('PrusaControll exit')
+    logging.info('PrusaControl exit')
 
 
 if __name__ == '__main__':

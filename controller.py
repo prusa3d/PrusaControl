@@ -124,9 +124,9 @@ class Controller:
         self.translator = QtCore.QTranslator()
         self.set_language(self.settings['language'])
 
+        self.scene = AppScene()
         self.view = PrusaControllView(self)
         self.view.disable_save_gcode_button()
-        self.scene = AppScene()
         self.slicer_manager = SlicerEngineManager(self)
 
 
@@ -148,11 +148,6 @@ class Controller:
     def get_firmware_version_number(self):
         #TODO:Add code for download firmware version
         return '1.0.1'
-
-    def tab_selected(self, n):
-        if n==1:
-            self.clear_tool_button_states()
-            self.view.clear_tool_buttons()
 
     def get_printing_materials(self):
         return self.printing_settings['materials']
@@ -404,8 +399,6 @@ class Controller:
                 model.selected = True
                 return True
 
-
-
     def find_object_and_rotation_axis_by_color(self, event):
         color = self.view.get_cursor_pixel_color(event)
         #color to id
@@ -427,7 +420,6 @@ class Controller:
                 return True
             else:
                 model.rotationAxis = []
-
 
     def find_object_and_scale_axis_by_color(self, event):
         color = self.view.get_cursor_pixel_color(event)
@@ -502,7 +494,7 @@ class Controller:
         if fileEnd in ['stl', 'STL', 'Stl']:
             print('import model')
             self.import_model(url)
-        elif fileEnd in ['prus']:
+        elif fileEnd in ['prus', 'PRUS']:
             print('open project')
             self.open_project_file(url)
         elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
