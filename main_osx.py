@@ -16,7 +16,7 @@ DEBUG = False
 def main():
     logging.info('PrusaControll start')
     app = QtGui.QApplication(sys.argv)
-    controller = Controller()
+    controller = Controller(app)
     window = controller.get_view()
     app.exec_()
     logging.info('PrusaControll exit')
