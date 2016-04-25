@@ -240,25 +240,7 @@ class PrusaControllView(QtGui.QMainWindow):
         self.helpMenu.addAction(self.tr('Prusa Online'))
         self.helpMenu.addSeparator()
         self.helpMenu.addAction(self.tr('About'), self.controller.open_about)
-
         #Help menu
-
-        #status bar widgets
-        '''
-        self.progress_bar = QtGui.QProgressBar()
-        self.progress_bar.setMaximum(100)
-        self.progress_bar.setMinimum(0)
-        self.progress_bar.setTextVisible(False)
-        self.cancel_button = QtGui.QPushButton("X")
-        self.cancel_button.setMaximumWidth(20)
-        self.progress_bar.setMaximumWidth(100)
-        self.statusLabel = QtGui.QLabel(self)
-        self.statusBar().addPermanentWidget(self.statusLabel)
-        self.statusBar().addPermanentWidget(self.progress_bar, 0)
-        self.statusBar().addPermanentWidget(self.cancel_button, 0)
-        self.progress_bar.setValue(0)
-        '''
-        #status bar widgets
 
         self.statusBar().showMessage('Ready')
         self.setWindowTitle(self.tr("PrusaControl"))
@@ -401,42 +383,10 @@ class PrusaControllWidget(QtGui.QWidget):
     def init_gui(self):
         self.glWidget = sceneRender.GLWidget(self)
 
-        self.tabWidget = QtGui.QTabWidget()
+        #self.tabWidget = QtGui.QTabWidget()
         self.rightPanel = QtGui.QWidget()
 
-        #self.toolTab = QtGui.QWidget()
         self.printTab = QtGui.QWidget()
-
-        #tool tab
-        '''
-        self.moveButton = QtGui.QPushButton("Move")
-        self.rotateButton = QtGui.QPushButton("Rotate")
-        self.scaleButton = QtGui.QPushButton("Scale")
-
-        self.toolButtonGroup = QtGui.QButtonGroup()
-        self.toolButtonGroup.setExclusive(True)
-
-        self.toolButtonGroup.addButton(self.moveButton)
-        self.toolButtonGroup.addButton(self.rotateButton)
-        self.toolButtonGroup.addButton(self.scaleButton)
-
-        self.moveButton.setCheckable(True)
-        self.rotateButton.setCheckable(True)
-        self.scaleButton.setCheckable(True)
-
-        self.moveButton.clicked.connect(self.controller.moveButtonPressed)
-        self.rotateButton.clicked.connect(self.controller.rotateButtonPressed)
-        self.scaleButton.clicked.connect(self.controller.scaleButtonPressed)
-
-        self.toolTabVLayout = QtGui.QVBoxLayout()
-        self.toolTabVLayout.addWidget(self.moveButton)
-        self.toolTabVLayout.addWidget(self.rotateButton)
-        self.toolTabVLayout.addWidget(self.scaleButton)
-        self.toolTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-
-        self.toolTab.setLayout(self.toolTabVLayout)
-        '''
-        #tool tab
 
         #print tab
         self.materialLabel = QtGui.QLabel(self.tr("Material"))
@@ -463,7 +413,7 @@ class PrusaControllWidget(QtGui.QWidget):
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
 
         #printing info place
-        self.printingInfoLabel = QtGui.QLabel("Print info:")
+        self.printingInfoLabel = QtGui.QLabel(self.tr("Print info:"))
 
         self.saveGCodeButton = QtGui.QPushButton(self.tr("Save G-Code"))
         self.saveGCodeButton.clicked.connect(self.controller.save_gcode_file)
@@ -485,21 +435,10 @@ class PrusaControllWidget(QtGui.QWidget):
         self.printTabVLayout.addWidget(self.saveGCodeButton)
 
         self.printTab.setLayout(self.printTabVLayout)
-        #print tab
-
-        #self.tabWidget.addTab(self.toolTab, "Tools")
-        #self.tabWidget.addTab(self.printTab, "Print")
-        #self.tabWidget.setCurrentIndex(1)
-        #self.tabWidget.setMaximumWidth(250)
-        #self.tabWidget.connect(self.tabWidget, QtCore.SIGNAL("currentChanged(int)"), self.controller.tab_selected)
-
         self.printTab.setMaximumWidth(250)
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.addWidget(self.glWidget)
-        #mainLayout.addWidget(self.tabWidget)
-
-
         mainLayout.addWidget(self.printTab)
 
         self.setLayout(mainLayout)

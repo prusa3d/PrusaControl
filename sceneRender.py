@@ -145,7 +145,7 @@ class GLWidget(QGLWidget):
         img_data = numpy.array(list(img.getdata()), numpy.uint8)
 
         texture = glGenTextures(1)
-        glPixelStorei(GL_UNPACK_ALIGNMENT,1)
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         glBindTexture(GL_TEXTURE_2D, texture)
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)

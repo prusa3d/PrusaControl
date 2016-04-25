@@ -40,7 +40,7 @@ class Controller:
         if not self.settings:
             self.settings['debug'] = False
             self.settings['automatic_placing'] = True
-            self.settings['language'] = 'en_US'
+            self.settings['language'] = 'cs_CZ'
             self.settings['printer'] = 'prusa_i3_v2'
             self.settings['toolButtons'] = {
                 'moveButton': False,
