@@ -1,4 +1,6 @@
 #!/bin/bash
 
 rm -rf build dist
-pyinstaller --windowed --onefile /home/buildbot/projects/slave/buildbot-slave/Linux_All/build/main.py
+pyinstaller -y --windowed --name=PrusaControl --onefile main.py --distpath ./dist/PrusaControl/
+mkdir ./dist/PrusaControl/gui
+cp gui/* dist/PrusaControl/gui/

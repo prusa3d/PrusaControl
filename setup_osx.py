@@ -9,8 +9,8 @@ Usage:
 from setuptools import setup
 
 APP = ['main_osx.py']
-APP_NAME = 'PrusaControll'
-DATA_FILES = []
+APP_NAME = 'PrusaControl'
+DATA_FILES = [('', ['gui'])]
 OPTIONS = {'argv_emulation': True,
 	    'plist':{
 		'CFBundleName': APP_NAME,
