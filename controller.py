@@ -6,7 +6,7 @@ import functools
 import time
 
 import sceneData
-from gui import PrusaControllView
+from gui import PrusaControlView
 from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
@@ -125,7 +125,7 @@ class Controller:
         self.set_language(self.settings['language'])
 
         self.scene = AppScene()
-        self.view = PrusaControllView(self)
+        self.view = PrusaControlView(self)
         self.view.disable_save_gcode_button()
         self.slicer_manager = SlicerEngineManager(self)
 

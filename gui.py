@@ -17,6 +17,7 @@ from PyQt4 import QtCore
 import projectFile
 import sceneRender
 
+
 class SettingsDialog(QDialog):
     def __init__(self, controller, parent = None):
         super(SettingsDialog, self).__init__(parent)
@@ -26,31 +27,31 @@ class SettingsDialog(QDialog):
         layout = QVBoxLayout(self)
 
         # nice widget for editing the date
-        self.languageLabel = QtGui.QLabel(self.tr("Language"))
-        self.languageCombo = QtGui.QComboBox()
+        self.language_label = QtGui.QLabel(self.tr("Language"))
+        self.language_combo = QtGui.QComboBox()
         #set enumeration
-        self.languageCombo.addItems(self.controller.enumeration['language'].values())
-        self.languageCombo.setCurrentIndex(self.controller.enumeration['language'].keys().index(self.controller.settings['language']))
+        self.language_combo.addItems(self.controller.enumeration['language'].values())
+        self.language_combo.setCurrentIndex(self.controller.enumeration['language'].keys().index(self.controller.settings['language']))
 
-        self.printerLabel = QtGui.QLabel(self.tr("Printer model"))
-        self.printerCombo = QtGui.QComboBox()
-        self.printerCombo.addItems(self.controller.enumeration['printer'].values())
-        self.printerCombo.setCurrentIndex(self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
+        self.printer_label = QtGui.QLabel(self.tr("Printer model"))
+        self.printer_combo = QtGui.QComboBox()
+        self.printer_combo.addItems(self.controller.enumeration['printer'].values())
+        self.printer_combo.setCurrentIndex(self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
 
-        self.debugCheckBox = QtGui.QCheckBox(self.tr("Debug"))
-        self.debugCheckBox.setChecked(self.controller.settings['debug'])
+        self.debug_checkbox = QtGui.QCheckBox(self.tr("Debug"))
+        self.debug_checkbox.setChecked(self.controller.settings['debug'])
 
-        self.automaticPlacingCheckBox = QtGui.QCheckBox(self.tr("Automatic placing"))
-        self.automaticPlacingCheckBox.setChecked(self.controller.settings['automatic_placing'])
+        self.automatic_placing_checkbox = QtGui.QCheckBox(self.tr("Automatic placing"))
+        self.automatic_placing_checkbox.setChecked(self.controller.settings['automatic_placing'])
 
-        layout.addWidget(self.languageLabel)
-        layout.addWidget(self.languageCombo)
+        layout.addWidget(self.language_label)
+        layout.addWidget(self.language_combo)
 
-        layout.addWidget(self.printerLabel)
-        layout.addWidget(self.printerCombo)
+        layout.addWidget(self.printer_label)
+        layout.addWidget(self.printer_combo)
 
-        layout.addWidget(self.debugCheckBox)
-        layout.addWidget(self.automaticPlacingCheckBox)
+        layout.addWidget(self.debug_checkbox)
+        layout.addWidget(self.automatic_placing_checkbox)
 
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -66,10 +67,10 @@ class SettingsDialog(QDialog):
         dialog = SettingsDialog(controller, parent)
         dialog.setWindowTitle("Settings")
         result = dialog.exec_()
-        data['language'] = controller.enumeration['language'].keys()[dialog.languageCombo.currentIndex()]
-        data['printer'] = controller.enumeration['printer'].keys()[dialog.printerCombo.currentIndex()]
-        data['debug'] = dialog.debugCheckBox.isChecked()
-        data['automatic_placing'] = dialog.automaticPlacingCheckBox.isChecked()
+        data['language'] = controller.enumeration['language'].keys()[dialog.language_combo.currentIndex()]
+        data['printer'] = controller.enumeration['printer'].keys()[dialog.printer_combo.currentIndex()]
+        data['debug'] = dialog.debug_checkbox.isChecked()
+        data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
         return (data, result == QDialog.Accepted)
 
 class FirmwareUpdateDialog(QDialog):
@@ -87,17 +88,17 @@ class FirmwareUpdateDialog(QDialog):
         #self.actualVersionLabel = QtGui.QLabel("Actual version of firmware is %s" % self.actualVersion)
         #self.yourVersionLabel = QtGui.QLabel("Your version of firmware is %s" % self.yourVersion)
 
-        self.openFileButton = QtGui.QPushButton(self.tr("Open file"))
+        self.open_file_button = QtGui.QPushButton(self.tr("Open file"))
 
-        self.updateButton = QtGui.QPushButton(self.tr("Update"))
+        self.update_button = QtGui.QPushButton(self.tr("Update"))
         #TODO:Doplnit
         #self.updateButton.clicked.connect(self.controller.updateFirmware)
         #self.updateButton.setEnabled(self.differentVersion)
 
         #layout.addWidget(self.actualVersionLabel)
         #layout.addWidget(self.yourVersionLabel)
-        layout.addWidget(self.openFileButton)
-        layout.addWidget(self.updateButton)
+        layout.addWidget(self.open_file_button)
+        layout.addWidget(self.update_button)
 
         # Close button
         buttons = QDialogButtonBox(
@@ -122,29 +123,29 @@ class AboutDialog(QDialog):
         super(AboutDialog, self).__init__(parent)
 
         self.controller = controller
-        self.differentVersion = True
-        self.actualVersion = '1.0.2'
-        self.yourVersion = '1.0.1'
+        self.different_version = True
+        self.actual_version = '1.0.2'
+        self.your_version = '1.0.1'
 
         layout = QVBoxLayout(self)
 
-        self.prusaControllLabel = QtGui.QLabel("PrusaControl")
-        self.prusaControllLabel.setAlignment(Qt.AlignCenter)
+        self.prusa_control_label = QtGui.QLabel("PrusaControl")
+        self.prusa_control_label.setAlignment(Qt.AlignCenter)
 
-        self.prusaControllText = QtGui.QLabel("Created by Tibor Vavra for Prusa Research s.r.o.")
+        self.prusa_control_text = QtGui.QLabel("Created by Tibor Vavra for Prusa Research s.r.o.")
 
-        self.localVersionLabel = QtGui.QLabel("Your version is %s" % self.yourVersion)
+        self.local_version_label = QtGui.QLabel("Your version is %s" % self.your_version)
 
-        self.checkVersionButton = QtGui.QPushButton(self.tr("Check version"))
+        self.check_version_button = QtGui.QPushButton(self.tr("Check version"))
         #TODO:Doplnit
         #self.checkVersionButton.clicked.connect(self.controller.checkVersion)
         #self.checkVersionButton.setEnabled(self.differentVersion)
 
-        layout.addWidget(self.prusaControllLabel)
-        layout.addWidget(self.prusaControllText)
+        layout.addWidget(self.prusa_control_label)
+        layout.addWidget(self.prusa_control_text)
 
-        layout.addWidget(self.localVersionLabel)
-        layout.addWidget(self.checkVersionButton)
+        layout.addWidget(self.local_version_label)
+        layout.addWidget(self.check_version_button)
 
         # Close button
         buttons = QDialogButtonBox(
@@ -169,14 +170,14 @@ class PrinterInfoDialog(QDialog):
         super(PrinterInfoDialog, self).__init__(parent)
 
         self.controller = controller
-        self.printerName = self.controller.get_printer_name()
-        self.yourFirmwareVersion = self.controller.get_firmware_version_number()
+        self.printer_name = self.controller.get_printer_name()
+        self.your_firmware_version = self.controller.get_firmware_version_number()
 
         layout = QVBoxLayout(self)
 
-        self.printerNameLabel = QtGui.QLabel(self.tr("Your printer is") + " %s" % self.printerName)
+        self.printerNameLabel = QtGui.QLabel(self.tr("Your printer is") + " %s" % self.printer_name)
 
-        self.printerFirmwareText = QtGui.QLabel(self.tr("Version of firmware is") + " %s" % self.yourFirmwareVersion)
+        self.printerFirmwareText = QtGui.QLabel(self.tr("Version of firmware is") + " %s" % self.your_firmware_version)
 
 
         #TODO:Doplnit
@@ -201,26 +202,26 @@ class PrinterInfoDialog(QDialog):
         return (data, result == QDialog.Accepted)
 
 
-class PrusaControllView(QtGui.QMainWindow):
+class PrusaControlView(QtGui.QMainWindow):
     def __init__(self, c):
         self.controller = c
-        super(PrusaControllView, self).__init__()
+        super(PrusaControlView, self).__init__()
         self.setAcceptDrops(True)
 
-        self.prusaControllWidget = PrusaControlWidget(self)
-        self.setCentralWidget(self.prusaControllWidget)
+        self.prusa_control_widget = PrusaControlWidget(self)
+        self.setCentralWidget(self.prusa_control_widget)
 
         self.menubar = self.menuBar()
         #file menu definition
-        self.fileMenu = self.menubar.addMenu(self.tr('&File'))
-        self.fileMenu.addAction(self.tr('Open project'), self.controller.open_project_file)
-        self.fileMenu.addAction(self.tr('Save project'), self.controller.save_project_file)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.tr('Import stl file'), self.controller.open_model_file)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.tr('Reset'), self.controller.reset_scene)
-        self.fileMenu.addSeparator()
-        self.fileMenu.addAction(self.tr('Close'), self.controller.close)
+        self.file_menu = self.menubar.addMenu(self.tr('&File'))
+        self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
+        self.file_menu.addAction(self.tr('Save project'), self.controller.save_project_file)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.tr('Import stl file'), self.controller.open_model_file)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.tr('Reset'), self.controller.reset_scene)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.tr('Close'), self.controller.close)
         #file menu definition
 
         #printer menu
@@ -230,16 +231,16 @@ class PrusaControllView(QtGui.QMainWindow):
         #printer menu
 
         #Settings menu
-        self.settingsMenu = self.menubar.addMenu(self.tr('&Settings'))
-        self.settingsMenu.addAction(self.tr('PrusaControl settings'), self.controller.open_settings)
+        self.settings_menu = self.menubar.addMenu(self.tr('&Settings'))
+        self.settings_menu.addAction(self.tr('PrusaControl settings'), self.controller.open_settings)
         #Settings menu
 
         #Help menu
-        self.helpMenu = self.menubar.addMenu(self.tr('&Help'))
-        self.helpMenu.addAction('Help')
-        self.helpMenu.addAction(self.tr('Prusa Online'))
-        self.helpMenu.addSeparator()
-        self.helpMenu.addAction(self.tr('About'), self.controller.open_about)
+        self.help_menu = self.menubar.addMenu(self.tr('&Help'))
+        self.help_menu.addAction('Help')
+        self.help_menu.addAction(self.tr('Prusa Online'))
+        self.help_menu.addSeparator()
+        self.help_menu.addAction(self.tr('About'), self.controller.open_about)
         #Help menu
 
         self.statusBar().showMessage('Ready')
@@ -260,32 +261,32 @@ class PrusaControllView(QtGui.QMainWindow):
         data, ok = FirmwareUpdateDialog.get_firmware_update(self.controller, self.parent())
 
     def disable_save_gcode_button(self):
-        self.prusaControllWidget.disable_save_gcode_button()
+        self.prusa_control_widget.disable_save_gcode_button()
 
     def enable_save_gcode_button(self):
-        self.prusaControllWidget.enable_save_gcode_button()
+        self.prusa_control_widget.enable_save_gcode_button()
 
     def open_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"
         title = 'Open project file'
-        openAt = "/home"
-        data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+        open_at = "/home"
+        data = QtGui.QFileDialog.getOpenFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data
 
     def open_model_file_dialog(self):
         filters = "STL (*.stl *.STL)"
         title = "Import stl file"
-        openAt = "/home"
-        data = QtGui.QFileDialog.getOpenFileName(None, title, openAt, filters)
+        open_at = "/home"
+        data = QtGui.QFileDialog.getOpenFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data
 
     def save_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"
         title = 'Save project file'
-        openAt = "/home"
-        data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
+        open_at = "/home"
+        data = QtGui.QFileDialog.getSaveFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         if not data[-4:] == projectFile.fileExtension:
             data = data + '.' + projectFile.fileExtension
@@ -295,23 +296,23 @@ class PrusaControllView(QtGui.QMainWindow):
     def save_gcode_file_dialog(self):
         filters = "gcode (*.gcode *.GCODE)"
         title = 'Save G-Code file'
-        openAt = "/home"
-        data = QtGui.QFileDialog.getSaveFileName(None, title, openAt, filters)
+        open_at = "/home"
+        data = QtGui.QFileDialog.getSaveFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data
 
     def update_gui(self):
-        self.prusaControllWidget.update_gui()
+        self.prusa_control_widget.update_gui()
 
     #TODO:Move to controller class
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
         else:
-            super(PrusaControllView, self).dragEnterEvent(event)
+            super(PrusaControlView, self).dragEnterEvent(event)
 
     def dragMoveEvent(self, event):
-        super(PrusaControllView, self).dragMoveEvent(event)
+        super(PrusaControlView, self).dragMoveEvent(event)
 
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
@@ -322,7 +323,7 @@ class PrusaControllView(QtGui.QMainWindow):
 
             event.acceptProposedAction()
         else:
-            super(PrusaControllView, self).dropEvent(event)
+            super(PrusaControlView, self).dropEvent(event)
 
     def convert_file_path_to_unicode(self, path):
         codec = QtCore.QTextCodec.codecForName("UTF-16")
@@ -330,40 +331,40 @@ class PrusaControllView(QtGui.QMainWindow):
         return converted_path
 
     def update_scene(self, reset=False):
-        self.prusaControllWidget.update_scene(reset)
+        self.prusa_control_widget.update_scene(reset)
 
     def set_zoom(self, diff):
-        self.prusaControllWidget.set_zoom(diff)
+        self.prusa_control_widget.set_zoom(diff)
 
     def get_zoom(self):
-        return self.prusaControllWidget.get_zoom()
+        return self.prusa_control_widget.get_zoom()
 
     def get_cursor_position(self, event):
-        return self.prusaControllWidget.get_cursor_position(event)
+        return self.prusa_control_widget.get_cursor_position(event)
 
     def get_cursor_pixel_color(self, event):
-        return self.prusaControllWidget.get_cursor_pixel_color(event)
+        return self.prusa_control_widget.get_cursor_pixel_color(event)
 
     def set_x_rotation(self, angle):
-        self.prusaControllWidget.set_x_rotation(angle)
+        self.prusa_control_widget.set_x_rotation(angle)
 
     def set_z_rotation(self, angle):
-        self.prusaControllWidget.set_z_rotation(angle)
+        self.prusa_control_widget.set_z_rotation(angle)
 
     def get_x_rotation(self):
-        return self.prusaControllWidget.get_x_rotation()
+        return self.prusa_control_widget.get_x_rotation()
 
     def get_z_rotation(self):
-        return self.prusaControllWidget.get_z_rotation()
+        return self.prusa_control_widget.get_z_rotation()
 
     def get_tool_buttons(self):
-        return self.prusaControllWidget.get_tool_buttons()
+        return self.prusa_control_widget.get_tool_buttons()
 
     def clear_tool_buttons(self):
-        self.prusaControllWidget.clear_tool_buttons()
+        self.prusa_control_widget.clear_tool_buttons()
 
     def set_progress_bar(self, value):
-        self.prusaControllWidget.progressBar.setValue(value)
+        self.prusa_control_widget.progressBar.setValue(value)
 
 
 class PrusaControlWidget(QtGui.QWidget):
@@ -383,7 +384,6 @@ class PrusaControlWidget(QtGui.QWidget):
     def init_gui(self):
         self.glWidget = sceneRender.GLWidget(self)
 
-        #self.tabWidget = QtGui.QTabWidget()
         self.rightPanel = QtGui.QWidget()
 
         self.printTab = QtGui.QWidget()
