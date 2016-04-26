@@ -118,6 +118,7 @@ class Controller:
         self.ray_start = [.0, .0, .0]
         self.ray_end = [.0, .0, .0]
         self.res_old = []
+        self.status = 'edit'
 
         self.app = app
 
@@ -126,7 +127,6 @@ class Controller:
 
         self.scene = AppScene()
         self.view = PrusaControlView(self)
-        self.view.disable_save_gcode_button()
         self.slicer_manager = SlicerEngineManager(self)
 
 
@@ -137,6 +137,9 @@ class Controller:
     def translate_app(self, translation="translation/en_US.qm"):
         self.translator.load(translation)
         self.app.installTranslator(self.translator)
+
+    def cancel_generation(self):
+        self.slicer_manager.cancel()
 
     def get_enumeration(self, section, enum):
         return self.enumeration[section][enum] if section in self.enumeration and enum in self.enumeration[section] else str(section)+':'+str(enum)
@@ -158,6 +161,29 @@ class Controller:
         printing_settings_tmp = deepcopy(self.printing_settings['default'])
         printing_settings_tmp.update(self.printing_settings[material] if material in self.printing_settings else {})
         return printing_settings_tmp
+
+
+    def generate_button_pressed(self):
+        if self.status in ['edit', 'canceled']:
+            self.generate_gcode()
+            self.set_cancel_button()
+            self.status = 'generating'
+        elif self.status == 'generating':
+            self.cancel_generation()
+            self.status = 'canceled'
+            self.set_generate_button()
+        elif self.status == 'generated':
+            self.save_gcode_file()
+
+
+    def set_save_gcode_button(self):
+        self.view.set_save_gcode_button()
+
+    def set_cancel_button(self):
+        self.view.set_cancel_button()
+
+    def set_generate_button(self):
+        self.view.set_generate_button()
 
     def update_gui(self):
         self.view.update_gui()
@@ -227,10 +253,11 @@ class Controller:
     def open_about(self):
         self.view.open_about_dialog()
 
-    def generate_button_pressed(self):
-        self.view.disable_save_gcode_button()
-        self.scene.save_whole_scene_to_one_stl_file("/home/tibor/projects/PrusaControll/tmp/tmp.stl")
-        self.slicer_manager.slice()
+    def generate_gcode(self):
+        if self.scene.models:
+            #self.view.disable_save_gcode_button()
+            self.scene.save_whole_scene_to_one_stl_file("tmp/tmp.stl")
+            self.slicer_manager.slice()
 
     def gcode_generated(self):
         self.view.enable_save_gcode_button()

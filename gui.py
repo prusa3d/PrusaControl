@@ -260,12 +260,6 @@ class PrusaControlView(QtGui.QMainWindow):
     def open_firmware_dialog(self):
         data, ok = FirmwareUpdateDialog.get_firmware_update(self.controller, self.parent())
 
-    def disable_save_gcode_button(self):
-        self.prusa_control_widget.disable_save_gcode_button()
-
-    def enable_save_gcode_button(self):
-        self.prusa_control_widget.enable_save_gcode_button()
-
     def open_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"
         title = 'Open project file'
@@ -366,6 +360,15 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_progress_bar(self, value):
         self.prusa_control_widget.progressBar.setValue(value)
 
+    def set_save_gcode_button(self):
+        self.prusa_control_widget.generateButton.setText(self.tr("Save G-Code"))
+
+    def set_cancel_button(self):
+        self.prusa_control_widget.generateButton.setText(self.tr("Cancel"))
+
+    def set_generate_button(self):
+        self.prusa_control_widget.generateButton.setText(self.tr("Generate"))
+
 
 class PrusaControlWidget(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -404,10 +407,21 @@ class PrusaControlWidget(QtGui.QWidget):
         self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
         self.brimCheckBox = QtGui.QCheckBox(self.tr("Brim"))
 
+
+        self.progress_bar_layout = QtGui.QHBoxLayout()
+        self.progress_bar_layout.setMargin(0)
+        #self.cancel_button = QtGui.QPushButton('x')
+        #self.cancel_button.setMaximumWidth(25)
+        #self.cancel_button.clicked.connect(self.controller.cancel_generation)
+        #self.cancel_button.setEnabled(False)
         self.progressBar = QtGui.QProgressBar()
+        self.progress_bar_widget = QtGui.QWidget()
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
+        self.progress_bar_layout.addWidget(self.progressBar)
+        #self.progress_bar_layout.addWidget(self.cancel_button, Qt.AlignRight)
+        self.progress_bar_widget.setLayout(self.progress_bar_layout)
 
         self.generateButton = QtGui.QPushButton(self.tr("Generate"))
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
@@ -415,8 +429,6 @@ class PrusaControlWidget(QtGui.QWidget):
         #printing info place
         self.printingInfoLabel = QtGui.QLabel(self.tr("Print info:"))
 
-        self.saveGCodeButton = QtGui.QPushButton(self.tr("Save G-Code"))
-        self.saveGCodeButton.clicked.connect(self.controller.save_gcode_file)
 
         self.printTabVLayout = QtGui.QVBoxLayout()
         self.printTabVLayout.addWidget(self.materialLabel)
@@ -427,12 +439,10 @@ class PrusaControlWidget(QtGui.QWidget):
         self.printTabVLayout.addWidget(self.infillSlider)
         self.printTabVLayout.addWidget(self.supportCheckBox)
         self.printTabVLayout.addWidget(self.brimCheckBox)
-        self.printTabVLayout.addWidget(self.progressBar)
+        self.printTabVLayout.addWidget(self.progress_bar_widget)
         self.printTabVLayout.addWidget(self.generateButton)
         self.printTabVLayout.addWidget(self.printingInfoLabel)
         self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-
-        self.printTabVLayout.addWidget(self.saveGCodeButton)
 
         self.printTab.setLayout(self.printTabVLayout)
         self.printTab.setMaximumWidth(250)
@@ -504,12 +514,6 @@ class PrusaControlWidget(QtGui.QWidget):
 
     def update_scene(self, reset=False):
         self.glWidget.update_scene(reset)
-
-    def disable_save_gcode_button(self):
-        self.saveGCodeButton.setDisabled(True)
-
-    def enable_save_gcode_button(self):
-        self.saveGCodeButton.setDisabled(False)
 
     def set_infill(self, val):
         self.infillValue = val

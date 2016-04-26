@@ -33,6 +33,7 @@ class Slic3rEngineRunner(QObject):
 
     def __init__(self):
         super(Slic3rEngineRunner, self).__init__()
+        self.is_running = True
         self.slicer_place = '../Slic3r/bin/slic3r'
 #        self.settings_dir = '/res/'
         self.data = {}
@@ -46,16 +47,19 @@ class Slic3rEngineRunner(QObject):
     def slice(self):
         process = subprocess.Popen([self.slicer_place, 'tmp/tmp.stl', '--output', 'tmp/out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
-        self.finished.emit()
+
 
     def check_progress(self, process):
-        for line in iter(process.stdout.readline, ''):
+        #for line in iter(process.stdout.readline, ''):
+        while self.step <= 8 and self.is_running is True:
+            line = process.stdout.readline()
             self.step += 1
             if not line:
                 break
             print(line.rstrip())
             self.step_increased.emit(int(((10. / 8.) * self.step) * 10))
             if self.step == 8:
+                self.finished.emit()
                 break
 
     def end(self):
@@ -93,6 +97,7 @@ class SlicerEngineManager(object):
                 'scene': self.controller.scene
                 }
 
+        #self.controller.set_cancel_button()
         self.slice_thread = QThread()
         self.slice_engine = Slic3rEngineRunner()
         self.slice_engine.moveToThread(self.slice_thread)
@@ -103,6 +108,17 @@ class SlicerEngineManager(object):
 
         self.slice_thread.start()
 
+    def cancel(self):
+        logging.debug("Thread canceling")
+        if self.slice_engine and self.slice_thread:
+            self.slice_engine.is_running = False
+            self.slice_thread.quit()
+            self.slice_thread.wait()
+            self.controller.status = 'canceled'
+            self.controller.set_generate_button()
+            self.controller.set_progress_bar(0.)
+
     def thread_ended(self):
         self.slice_thread.quit()
-        self.controller.gcode_generated()
+        self.controller.set_save_gcode_button()
+        self.controller.status = 'generated'
