@@ -29,6 +29,7 @@ class Slic3rEngineRunner(QObject):
     first version
     '''
     step_increased = pyqtSignal(int)
+    filament_info = pyqtSignal(str)
     finished = pyqtSignal()
 
     def __init__(self):
@@ -59,6 +60,10 @@ class Slic3rEngineRunner(QObject):
             print(line.rstrip())
             self.step_increased.emit(int(((10. / 8.) * self.step) * 10))
             if self.step == 8:
+                filament_str = line.rsplit()
+                filament_str = filament_str[2:4]
+                filament_str = str(filament_str[0] + ' ' + filament_str[1])
+                self.filament_info.emit(filament_str)
                 self.finished.emit()
                 break
 
@@ -104,6 +109,7 @@ class SlicerEngineManager(object):
         self.slice_engine.set_data(data)
         self.slice_thread.started.connect(self.slice_engine.slice)
         self.slice_engine.finished.connect(self.thread_ended)
+        self.slice_engine.filament_info.connect(self.controller.set_print_info_text)
         self.slice_engine.step_increased.connect(self.controller.set_progress_bar)
 
         self.slice_thread.start()
@@ -116,7 +122,7 @@ class SlicerEngineManager(object):
             self.slice_thread.wait()
             self.controller.status = 'canceled'
             self.controller.set_generate_button()
-            self.controller.set_progress_bar(0.)
+            self.controller.set_progress_bar(0.0)
 
     def thread_ended(self):
         self.slice_thread.quit()

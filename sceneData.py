@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy
 from abc import ABCMeta, abstractmethod
+from os.path import basename
 
 from PyQt4.QtCore import QObject
 from pyrr.plane import position
@@ -8,7 +9,6 @@ from stl.mesh import Mesh
 from random import randint
 import math
 import itertools
-import ntpath
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -85,7 +85,7 @@ class AppScene(object):
 
 class Model(object):
     '''
-    this is reprezentation of model data, data readed from file
+    this is reprezentation of model data
     '''
     newid = itertools.count().next
     def __init__(self):
@@ -144,7 +144,6 @@ class Model(object):
         self.color = [randint(3, 7) * 0.11,
                       randint(3, 7) * 0.1,
                       randint(3, 7) * 0.12]
-
 
         #source file data
         #example car.stl
@@ -361,7 +360,7 @@ class ModelTypeStl(ModelTypeAbstract):
         model = Model()
 
         if filename:
-            model.filename = ntpath.basename(filename)
+            model.filename = basename(filename)
         else:
             model.filename = ""
 

@@ -265,6 +265,14 @@ class Controller:
     def close(self):
         exit()
 
+    def set_print_info_text(self, string):
+        self.view.set_print_info_text(string)
+
+    def scene_was_changed(self):
+        self.status = 'edit'
+        self.set_generate_button()
+        self.set_progress_bar(0.0)
+
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
         self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
@@ -303,11 +311,12 @@ class Controller:
                 for model in self.scene.models:
                     if model.selected:
                         model.pos = [p+n for p, n in zip(model.pos, res_new)]
+                        self.scene_was_changed()
                     self.res_old = res
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
-            res = [.0,.0,.0]
+            res = [.0, .0, .0]
             #find plane(axis) in which rotation will be made
             #newRayStart, newRayEnd = self.view.get_cursor_position(event)
             for model in self.scene.models:
@@ -320,13 +329,14 @@ class Controller:
                     elif model.rotationAxis == 'x':
                         model.rot[2] = model.rot[2] + dx*0.25
                     else:
-                        res = [.0,.0,.0]
+                        res = [.0, .0, .0]
+                    self.scene_was_changed()
                 self.res_old = res
             #self.view.updateScene()
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
-            res = [.0,.0,.0]
+            res = [.0, .0, .0]
             #find axis(), set scale on model instance
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
@@ -340,7 +350,8 @@ class Controller:
                     elif model.scaleAxis == 'xyz':
                         model.scale = [ i + dy*0.25 for i in model.scale]
                     else:
-                        res = [.0,.0,.0]
+                        res = [.0, .0, .0]
+                    self.scene_was_changed()
                 self.res_old = res
 
 
