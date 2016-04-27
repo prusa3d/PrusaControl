@@ -8,7 +8,7 @@ Usage:
 
 from setuptools import setup
 
-APP = ['main_osx.py']
+APP = ['main.py']
 APP_NAME = 'PrusaControl'
 DATA_FILES = [('', ['gui', 'translation'])]
 OPTIONS = {'argv_emulation': True,
