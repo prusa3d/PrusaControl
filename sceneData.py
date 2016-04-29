@@ -302,9 +302,9 @@ class Model(object):
             else:
                 glColor3fv(self.color)
 
-        glRotatef(self.rot[0], 1.,0.,0.)
-        glRotatef(self.rot[1], 0.,1.,0.)
-        glRotatef(self.rot[2], 0.,0.,1.)
+        glRotatef(self.rot[0], 1., 0., 0.)
+        glRotatef(self.rot[1], 0., 1., 0.)
+        glRotatef(self.rot[2], 0., 0., 1.)
 
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 

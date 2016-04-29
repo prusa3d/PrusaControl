@@ -4,6 +4,7 @@ import logging
 import functools
 
 import time
+import webbrowser
 
 import sceneData
 from gui import PrusaControlView
@@ -175,6 +176,17 @@ class Controller:
         elif self.status == 'generated':
             self.save_gcode_file()
 
+    def open_web_browser(self, url):
+        webbrowser.open(url, 1)
+
+    def send_feedback(self):
+        self.open_web_browser("http://www.seznam.cz")
+
+    def open_help(self):
+        self.open_web_browser("http://www.prusa3d.com")
+
+    def open_shop(self):
+        self.open_web_browser("http://shop.prusa3d.com")
 
     def set_save_gcode_button(self):
         self.view.set_save_gcode_button()

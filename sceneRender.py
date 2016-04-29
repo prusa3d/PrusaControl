@@ -36,6 +36,10 @@ class GLWidget(QGLWidget):
         self.parent = parent
         self.init_parametres()
 
+
+
+
+
         #properties definition
         self.xRot = 0
         self.yRot = 0
@@ -180,6 +184,9 @@ class GLWidget(QGLWidget):
 
         self.bed = self.makePrintingBed()
         self.axis = self.make_axis()
+
+        vers = glGetString(GL_VERSION)
+        print(str(vers))
 
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)

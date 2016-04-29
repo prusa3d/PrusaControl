@@ -17,7 +17,6 @@ from PyQt4 import QtCore
 import projectFile
 import sceneRender
 
-
 class SettingsDialog(QDialog):
     def __init__(self, controller, parent = None):
         super(SettingsDialog, self).__init__(parent)
@@ -237,8 +236,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
         #Help menu
         self.help_menu = self.menubar.addMenu(self.tr('&Help'))
-        self.help_menu.addAction('Help')
-        self.help_menu.addAction(self.tr('Prusa Online'))
+        self.help_menu.addAction('Help', self.controller.open_help)
+        self.help_menu.addAction(self.tr('Prusa Online'), self.controller.open_shop)
         self.help_menu.addSeparator()
         self.help_menu.addAction(self.tr('About'), self.controller.open_about)
         #Help menu
@@ -426,6 +425,7 @@ class PrusaControlWidget(QtGui.QWidget):
 
         #send feedback button
         self.send_feedback_button = QtGui.QPushButton(self.tr("Send feedback"))
+        self.send_feedback_button.clicked.connect(self.controller.send_feedback)
 
         self.printTabVLayout = QtGui.QVBoxLayout()
         self.printTabVLayout.addWidget(self.materialLabel)
