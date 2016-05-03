@@ -291,7 +291,7 @@ class Controller:
     def generate_gcode(self):
         if self.scene.models:
             #self.view.disable_save_gcode_button()
-            self.scene.save_whole_scene_to_one_stl_file("tmp/tmp.stl")
+            self.scene.save_whole_scene_to_one_stl_file(self.tmp_place + "tmp.stl")
             self.slicer_manager.slice()
 
     def gcode_generated(self):
