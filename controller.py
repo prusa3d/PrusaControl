@@ -6,6 +6,8 @@ import functools
 import time
 import webbrowser
 
+from shutil import copyfile, Error
+
 import sceneData
 from gui import PrusaControlView
 from projectFile import ProjectFile
@@ -230,7 +232,17 @@ class Controller:
 
     def save_gcode_file(self):
         data = self.view.save_gcode_file_dialog()
-        print(str(data))
+        filename = data.split('.')
+        if filename[-1] in ['gcode', 'GCODE']:
+            filename_out = data
+        else:
+            filename_out = data + '.gcode'
+        try:
+            copyfile("tmp/out.gcode", filename_out)
+        except Error as e:
+            logging.debug('Error: %s' % e)
+        except IOError as e:
+            logging.debug('Error: %s' % e.strerror)
 
     def open_model_file(self):
         data = self.view.open_model_file_dialog()

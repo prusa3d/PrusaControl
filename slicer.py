@@ -2,6 +2,8 @@
 import logging
 from abc import ABCMeta, abstractmethod
 
+
+import platform
 import subprocess
 from copy import deepcopy
 
@@ -35,8 +37,19 @@ class Slic3rEngineRunner(QObject):
     def __init__(self):
         super(Slic3rEngineRunner, self).__init__()
         self.is_running = True
-        self.slicer_place = '../Slic3r/bin/slic3r'
-#        self.settings_dir = '/res/'
+
+        #TODO:Os specific
+        system_platform = platform.system()
+        if system_platform in ['Linux']:
+            self.slicer_place = './tools/Slic3r-Lite/slic3r'
+        elif system_platform in ['Darwin']:
+            self.slicer_place = 'slicr'
+        elif system_platform in ['Windows']:
+            self.slicer_place = '\tools\Slic3r-Lite\perl5.22.1.exe slic3r.pl'
+        else:
+            self.slicer_place = 'slicr'
+
+#       self.settings_dir = '/res/'
         self.data = {}
 
         self.step_max = 8

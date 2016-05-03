@@ -185,9 +185,6 @@ class GLWidget(QGLWidget):
         self.bed = self.makePrintingBed()
         self.axis = self.make_axis()
 
-        vers = glGetString(GL_VERSION)
-        print(str(vers))
-
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
