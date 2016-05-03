@@ -24,7 +24,7 @@ def main():
 
 if __name__ == '__main__':
     FORMAT = "[%(levelname)s][%(filename)s:%(lineno)s:%(funcName)s()]-%(message)s"
-    logging.basicConfig(format=FORMAT, filename='info.log', filemode='w', level=logging.DEBUG)
+    logging.basicConfig(format=FORMAT, filemode='w', level=logging.INFO)
 
     if DEBUG:
         profile.run('main()')
