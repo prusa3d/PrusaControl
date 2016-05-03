@@ -2,6 +2,7 @@
 import logging
 
 import functools
+import platform
 
 import time
 import webbrowser
@@ -36,6 +37,16 @@ def timing(f):
 class Controller:
     def __init__(self, app):
         logging.info('Controller instance created')
+
+        system_platform = platform.system()
+        if system_platform in ['Linux']:
+            self.tmp_place = '/tmp/'
+        elif system_platform in ['Darwin']:
+            self.tmp_place = '/tmp/'
+        elif system_platform in ['Windows']:
+            self.tmp_place = '%USERPROFILE%\\AppData\\Local\\Temp\\'
+        else:
+            self.tmp_place = './'
 
         #TODO:Reading settings from file
         self.printing_settings = {}
@@ -238,7 +249,7 @@ class Controller:
         else:
             filename_out = data + '.gcode'
         try:
-            copyfile("tmp/out.gcode", filename_out)
+            copyfile(self.tmp_place + "out.gcode", filename_out)
         except Error as e:
             logging.debug('Error: %s' % e)
         except IOError as e:

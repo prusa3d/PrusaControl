@@ -34,9 +34,10 @@ class Slic3rEngineRunner(QObject):
     filament_info = pyqtSignal(str)
     finished = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, controller):
         super(Slic3rEngineRunner, self).__init__()
         self.is_running = True
+        self.controller = controller
 
         system_platform = platform.system()
         if system_platform in ['Linux']:
@@ -48,16 +49,6 @@ class Slic3rEngineRunner(QObject):
         else:
             self.slicer_place = 'slicr'
 
-        if system_platform in ['Linux']:
-            self.tmp_place = '/tmp/'
-        elif system_platform in ['Darwin']:
-            self.tmp_place = '/tmp/'
-        elif system_platform in ['Windows']:
-            self.tmp_place = '%USERPROFILE%\\AppData\\Local\\Temp\\'
-        else:
-            self.tmp_place = './'
-
-
 #       self.settings_dir = '/res/'
         self.data = {}
 
@@ -68,7 +59,7 @@ class Slic3rEngineRunner(QObject):
         self.data = data
 #'--DataDir', self.settings_dir,
     def slice(self):
-        process = subprocess.Popen([self.slicer_place, 'tmp/tmp.stl', '--output', 'tmp/out.gcode'], stdout=subprocess.PIPE)
+        process = subprocess.Popen([self.slicer_place, self.controller.tmp_place + 'tmp.stl', '--output', self.controller.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
 
 
@@ -126,7 +117,7 @@ class SlicerEngineManager(object):
 
         #self.controller.set_cancel_button()
         self.slice_thread = QThread()
-        self.slice_engine = Slic3rEngineRunner()
+        self.slice_engine = Slic3rEngineRunner(self.controller)
         self.slice_engine.moveToThread(self.slice_thread)
         self.slice_engine.set_data(data)
         self.slice_thread.started.connect(self.slice_engine.slice)
