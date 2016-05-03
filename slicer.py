@@ -38,16 +38,25 @@ class Slic3rEngineRunner(QObject):
         super(Slic3rEngineRunner, self).__init__()
         self.is_running = True
 
-        #TODO:Os specific
         system_platform = platform.system()
         if system_platform in ['Linux']:
             self.slicer_place = './tools/Slic3r-Lite/slic3r'
         elif system_platform in ['Darwin']:
-            self.slicer_place = 'slicr'
+            self.slicer_place = './slicr'
         elif system_platform in ['Windows']:
-            self.slicer_place = '\tools\Slic3r-Lite\perl5.22.1.exe slic3r.pl'
+            self.slicer_place = '\\tools\\Slic3r-Lite\\perl5.22.1.exe slic3r.pl'
         else:
             self.slicer_place = 'slicr'
+
+        if system_platform in ['Linux']:
+            self.tmp_place = '/tmp/'
+        elif system_platform in ['Darwin']:
+            self.tmp_place = '/tmp/'
+        elif system_platform in ['Windows']:
+            self.tmp_place = '%USERPROFILE%\\AppData\\Local\\Temp\\'
+        else:
+            self.tmp_place = './'
+
 
 #       self.settings_dir = '/res/'
         self.data = {}
