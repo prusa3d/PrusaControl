@@ -45,7 +45,7 @@ class Slic3rEngineRunner(QObject):
         elif system_platform in ['Darwin']:
             self.slicer_place = './slicr'
         elif system_platform in ['Windows']:
-            self.slicer_place = '\\tools\\Slic3r-Lite\\perl5.22.1.exe slic3r.pl'
+            self.slicer_place = '.\\tools\\Slic3r-Lite\\perl5.22.1.exe slic3r.pl'
         else:
             self.slicer_place = 'slicr'
 
@@ -59,6 +59,7 @@ class Slic3rEngineRunner(QObject):
         self.data = data
 #'--DataDir', self.settings_dir,
     def slice(self):
+        print(self.slicer_place)
         process = subprocess.Popen([self.slicer_place, self.controller.tmp_place + 'tmp.stl', '--output', self.controller.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
 

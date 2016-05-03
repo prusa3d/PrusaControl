@@ -15,6 +15,7 @@ from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
 from copy import deepcopy
+import tempfile
 
 import xml.etree.cElementTree as ET
 from zipfile import ZipFile
@@ -44,7 +45,7 @@ class Controller:
         elif system_platform in ['Darwin']:
             self.tmp_place = '/tmp/'
         elif system_platform in ['Windows']:
-            self.tmp_place = '%USERPROFILE%\\AppData\\Local\\Temp\\'
+            self.tmp_place = tempfile.gettempdir() + '\\'
         else:
             self.tmp_place = './'
 
@@ -557,6 +558,8 @@ class Controller:
         function for resolve which file type will be loaded
         '''
         #self.view.statusBar().showMessage('Load file name: ')
+        if url[0] == '/':
+            url = url[1:]
 
         urlSplited = url.split('.')
         if len(urlSplited)>1:
