@@ -43,7 +43,7 @@ class Slic3rEngineRunner(QObject):
         if system_platform in ['Linux']:
             self.slicer_place = './tools/Slic3r-Lite/slic3r'
         elif system_platform in ['Darwin']:
-            self.slicer_place = './slicr'
+            self.slicer_place = './Slic3r'
         elif system_platform in ['Windows']:
             self.slicer_place = 'tools\\Slic3r-Lite\\slic3r.bat'
 # \\tools\\Slic3r-Lite\\slic3r.pl
