@@ -175,11 +175,6 @@ class GLWidget(QGLWidget):
         self.rotateTool.set_callback(self.parent.controller.rotate_button_pressed)
         self.scaleTool.set_callback(self.parent.controller.scale_button_pressed)
 
-        self.moveTool.set_press_variable(self.parent.controller.settings['toolButtons']['moveButton'])
-        self.rotateTool.set_press_variable(self.parent.controller.settings['toolButtons']['rotateButton'])
-        self.scaleTool.set_press_variable(self.parent.controller.settings['toolButtons']['scaleButton'])
-
-
         self.tool_background = self.texture_from_png("gui/tool_background.png", GL_RGBA)
 
         self.bed = self.makePrintingBed()

@@ -28,9 +28,9 @@ class AppScene(object):
     '''
     def __init__(self):
         self.hot_bed_dimension = {
-                                'a':25,
-                                'b':25,
-                                'c':25}
+                                'a':20,
+                                'b':20,
+                                'c':20}
         self.model_position_offset = 10.
 
         self.sceneZero = [.0, .0, .0]
@@ -51,12 +51,11 @@ class AppScene(object):
         for i, m in enumerate(self.models):
             self.find_new_position(i, m)
 
-
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
-            self.models[0].pos[0]=position_vector[0]
-            self.models[0].pos[1]=position_vector[1]
+            self.models[0].pos[0] = position_vector[0]
+            self.models[0].pos[1] = position_vector[1]
             return
         scene_tmp = self.models[:index]
         if index > 0:
@@ -110,6 +109,7 @@ class Model(object):
         self.scaleXYZId = self.id * 2011
         self.scaleColorXYZId = [(self.scaleXYZId & 0x000000FF) >> 0, (self.scaleXYZId & 0x0000FF00) >> 8, (self.scaleXYZId & 0x00FF0000) >> 16]
 
+        self.parent = None
         #structural data
         self.v0 = []
         self.v1 = []
@@ -126,10 +126,10 @@ class Model(object):
         self.mesh = None
 
         #transformation data
-        self.pos = [.0,.0,.0]
-        self.rot = [.0,.0,.0]
-        self.scale = [1.,1.,1.]
-        self.scaleDefault = [.1,.1,.1]
+        self.pos = [.0, .0, .0]
+        self.rot = [.0, .0, .0]
+        self.scale = [1., 1., 1.]
+        self.scaleDefault = [.1, .1, .1]
 
         #helping data
         self.selected = False
@@ -138,8 +138,8 @@ class Model(object):
         self.boundingBox = []
         self.boundingMinimalPoint = [.0, .0, .0]
         self.zeroPoint = [.0, .0, .0]
-        self.min = [.0,.0,.0]
-        self.max = [.0,.0,.0]
+        self.min = [.0, .0, .0]
+        self.max = [.0, .0, .0]
 
         self.color = [randint(3, 7) * 0.11,
                       randint(3, 7) * 0.1,
@@ -149,6 +149,17 @@ class Model(object):
         #example car.stl
         self.filename = ""
         self.normalization_flag = False
+
+    def is_in_printing_space(self, printing_bad):
+        min = numpy.array(self.min) + numpy.array(self.pos)
+        max = numpy.array(self.max) + numpy.array(self.pos)
+
+        if max[0] <= (printing_bad['a']*.5) and min[0] >= (printing_bad['a']*-.5) and max[1] <= (printing_bad['b']*.5)\
+                and min[1] >= (printing_bad['b']*-.5) and max[2] <= (printing_bad['c']*.5) \
+                and min[2] >= (printing_bad['c']*-.5):
+            return True
+        else:
+            return False
 
     def get_mesh(self):
         data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
@@ -297,10 +308,15 @@ class Model(object):
         if picking:
             glColor3ubv(self.colorId)
         else:
-            if self.selected:
-                glColor3f(.5,0,0)
+            if self.is_in_printing_space(self.parent.hot_bed_dimension):
+                if self.selected:
+                    glColor3f(.5,0,0)
+                else:
+                    glColor3fv(self.color)
             else:
-                glColor3fv(self.color)
+                glColor3f(1.,.25,.25)
+                glDisable( GL_LIGHTING )
+                glEnable(GL_BLEND)
 
         glRotatef(self.rot[0], 1., 0., 0.)
         glRotatef(self.rot[1], 0., 1., 0.)
@@ -309,6 +325,8 @@ class Model(object):
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 
         glCallList(self.displayList)
+        glEnable( GL_LIGHTING )
+        glDisable(GL_BLEND)
         glPopMatrix()
 
 

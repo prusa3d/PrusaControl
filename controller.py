@@ -263,7 +263,9 @@ class Controller:
 
     def import_model(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
-        self.scene.models.append(ModelTypeStl().load(path))
+        model = ModelTypeStl().load(path)
+        model.parent = self.scene
+        self.scene.models.append(model)
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
         self.view.update_scene()
@@ -321,12 +323,12 @@ class Controller:
         #    logging.debug("hledani objektu na oznaceni")
         #    self.hit_first_object_by_color(event)
         self.hit_tool_button_by_color(event)
-        if event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['moveButton']):
+        if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hit_first_object_by_color(event)
-        elif event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['rotateButton']):
+        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
             self.find_object_and_rotation_axis_by_color(event)
-        elif event.buttons() & QtCore.Qt.LeftButton & (self.settings['toolButtons']['scaleButton']):
+        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
         self.view.update_scene()
 
@@ -450,16 +452,13 @@ class Controller:
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
         if find_id == 0:
             return False
-        for toolButton in self.view.get_tool_buttons():
-            if find_id == toolButton.id:
-                if toolButton.pressed:
-                    toolButton.unpress_button()
-                else:
-                    for t in self.view.get_tool_buttons():
-                        t.unpress_button()
+        id_list = [i.id for i in self.view.get_tool_buttons()]
+        if find_id in id_list:
+            for toolButton in self.view.get_tool_buttons():
+                if find_id == toolButton.id:
                     toolButton.press_button()
-                    toolButton.run_callback()
-
+                else:
+                    toolButton.unpress_button()
 
     def hit_first_object_by_color(self, event):
         self.scene.clear_selected_models()
@@ -535,18 +534,27 @@ class Controller:
         self.view.update_scene()
 
     def move_button_pressed(self):
-        self.clear_tool_button_states()
-        self.settings['toolButtons']['moveButton'] = True
+        if self.settings['toolButtons']['moveButton']:
+            self.settings['toolButtons']['moveButton'] = not(self.settings['toolButtons']['moveButton'])
+        else:
+            self.clear_tool_button_states()
+            self.settings['toolButtons']['moveButton'] = True
         self.view.update_scene()
 
     def rotate_button_pressed(self):
-        self.clear_tool_button_states()
-        self.settings['toolButtons']['rotateButton'] = True
+        if self.settings['toolButtons']['rotateButton']:
+            self.settings['toolButtons']['rotateButton'] = not(self.settings['toolButtons']['rotateButton'])
+        else:
+            self.clear_tool_button_states()
+            self.settings['toolButtons']['rotateButton'] = True
         self.view.update_scene()
 
     def scale_button_pressed(self):
-        self.clear_tool_button_states()
-        self.settings['toolButtons']['scaleButton'] = True
+        if self.settings['toolButtons']['scaleButton']:
+            self.settings['toolButtons']['scaleButton'] = not(self.settings['toolButtons']['scaleButton'])
+        else:
+            self.clear_tool_button_states()
+            self.settings['toolButtons']['scaleButton'] = True
         self.view.update_scene()
 
     def clear_tool_button_states(self):

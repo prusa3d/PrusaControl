@@ -3,6 +3,7 @@ import logging
 
 
 class GlButton(object):
+
     newid = itertools.count().next
     def __init__(self, texture=None, size=[10.,10.], position=[0.0, 0.0]):
         self.id = (GlButton.newid()+1) * 7013
@@ -18,28 +19,29 @@ class GlButton(object):
         self.callback_function = None
         self.press_variable = None
 
+        self.key = None
+        self.subkey = None
 
     def set_callback(self, func):
         self.callback_function = func
 
     def press_button(self):
-        self.pressed = True
-        if not self.press_variable is None:
-            self.press_variable = True
+        self.pressed = not(self.pressed)
+        self.callback_function()
+
 
     def unpress_button(self):
         self.pressed = False
-        if not self.press_variable is None:
-            logging.debug("Unpress variable")
-            self.press_variable = False
 
-    def set_press_variable(self, variable):
+
+    def set_press_variable(self, variable, key, subkey):
         self.press_variable = variable
+        self.key = key
+        self.subkey = subkey
 
     def set_viewport(self, width, height):
         self.xW = width
         self.yH = height
-
 
     def get_size(self):
         pass
@@ -50,7 +52,6 @@ class GlButton(object):
     def run_callback(self):
         if self.callback_function:
             self.callback_function()
-
 
     def check_button(self, color):
         #return True if checked color is same as button color
