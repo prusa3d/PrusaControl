@@ -75,10 +75,10 @@ class GLWidget(QGLWidget):
     def init_parametres(self):
         #TODO:Add camera instance initialization
         #properties initialization
-        self.xRot = 0
+        self.xRot = 424
         self.yRot = 0
-        self.zRot = 0
-        self.zoom = -15
+        self.zRot = 5576
+        self.zoom = -39
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -86,7 +86,7 @@ class GLWidget(QGLWidget):
         self.lightDiffuse = [.5, .5, .5, 1.0]
         self.lightPossition = [29.0, -48.0, 37.0, 1.0]
 
-        self.materialSpecular = [.05,.05,.05,.1]
+        self.materialSpecular = [.05, .05, .05, .1]
         self.materialShiness = [0.05]
 
         #screen properties
@@ -162,7 +162,7 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("gui/background.png")
-        self.image_hotbed = self.texture_from_png("gui/checker.png")
+        self.image_hotbed = self.texture_from_png("gui/heatbed.png", GL_RGBA)
 
         #tools
         #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png", GL_RGBA), [4.,4.], [95, 16])
@@ -207,10 +207,12 @@ class GLWidget(QGLWidget):
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
         #glEnable( GL_BLEND )
+        glEnable( GL_LIGHT0 )
 
 
     #@timing
     def paintGL(self, selection = 1):
+        #print('Coords: ' + str(self.xRot) + ' ' + str(self.yRot) + ' ' + str(self.zRot) + ' ' + str(self.zoom))
         if selection:
             glClearColor(0.0, 0.0, 0.0, 1.0)
             #glClearColor(1.0, 1.0, 1.0, 1.0)
@@ -224,7 +226,7 @@ class GLWidget(QGLWidget):
             glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
             glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
             glDisable( GL_LIGHTING )
-            glDisable( GL_LIGHT0 )
+            #glDisable( GL_LIGHT0 )
             glDisable( GL_BLEND )
             glEnable(GL_DEPTH_TEST)
 
@@ -244,7 +246,7 @@ class GLWidget(QGLWidget):
                     self.sceneFrameBuffer.save("select_buffer.png")
 
             glEnable( GL_LIGHTING )
-            glEnable( GL_LIGHT0 )
+            #glEnable( GL_LIGHT0 )
 
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -420,16 +422,16 @@ class GLWidget(QGLWidget):
         glColor3f(1,1,1)
         glBegin(GL_QUADS)
         glNormal3f(.0,.0,1.)
-        glTexCoord2f(-10/2, 10/2)
+        glTexCoord2f(0, 1)
         glVertex3d(-10, 10, 0)
 
-        glTexCoord2f(-10/2, -10/2)
+        glTexCoord2f(0, 0)
         glVertex3d(-10, -10, 0)
 
-        glTexCoord2f(10/2, -10/2)
+        glTexCoord2f(1, 0)
         glVertex3d(10, -10, 0)
 
-        glTexCoord2f(10/2, 10/2)
+        glTexCoord2f(1, 1)
         glVertex3d(10, 10, 0)
         glEnd()
         glDisable(GL_TEXTURE_2D)

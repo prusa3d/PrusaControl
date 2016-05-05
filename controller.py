@@ -361,11 +361,11 @@ class Controller:
                 if model.selected and model.rotationAxis:
                     #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
                     if model.rotationAxis == 'y':
-                        model.rot[0] = model.rot[0] + dy*0.25
+                        model.rot[0] = model.rot[0] + dy*45
                     elif model.rotationAxis == 'z':
-                        model.rot[1] = model.rot[1] + dy*0.25
+                        model.rot[1] = model.rot[1] + dy*45
                     elif model.rotationAxis == 'x':
-                        model.rot[2] = model.rot[2] + dx*0.25
+                        model.rot[2] = model.rot[2] + dx*45
                     else:
                         res = [.0, .0, .0]
                     self.scene_was_changed()
@@ -386,12 +386,11 @@ class Controller:
                     elif model.scaleAxis == 'z':
                         model.scale[2] = model.scale[2] + dy*0.25
                     elif model.scaleAxis == 'xyz':
-                        model.scale = [ i + dy*0.25 for i in model.scale]
+                        model.scale = [i + dy*0.25 for i in model.scale]
                     else:
                         res = [.0, .0, .0]
                     self.scene_was_changed()
                 self.res_old = res
-
 
         elif event.buttons() & QtCore.Qt.RightButton:
             #TODO:Add controll of camera instance

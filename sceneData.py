@@ -28,13 +28,14 @@ class AppScene(object):
     '''
     def __init__(self):
         self.hot_bed_dimension = {
-                                'a':20,
-                                'b':20,
-                                'c':20}
+                                'a': 20,
+                                'b': 20,
+                                'c': 20}
         self.model_position_offset = 10.
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
+        self.printable = True
 
     def clearScene(self):
         self.models = []
@@ -131,6 +132,8 @@ class Model(object):
         self.scale = [1., 1., 1.]
         self.scaleDefault = [.1, .1, .1]
 
+        self.matrix = Matrix44([[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.],[0.,0.,0.,1.]])
+
         #helping data
         self.selected = False
         self.boundingSphereSize = .0
@@ -151,8 +154,16 @@ class Model(object):
         self.normalization_flag = False
 
     def is_in_printing_space(self, printing_bad):
-        min = numpy.array(self.min) + numpy.array(self.pos)
-        max = numpy.array(self.max) + numpy.array(self.pos)
+        m = Matrix44().from_translation(self.pos)
+        x = Matrix44().from_x_rotation(self.rot[0])
+        y = Matrix44().from_y_rotation(self.rot[1])
+        z = Matrix44().from_z_rotation(self.rot[2])
+        s = Matrix44().from_scale(self.scale)
+
+        f = s * x * y * z * m
+
+        min = f * Vector3(self.min)
+        max = f * Vector3(self.max)
 
         if max[0] <= (printing_bad['a']*.5) and min[0] >= (printing_bad['a']*-.5) and max[1] <= (printing_bad['b']*.5)\
                 and min[1] >= (printing_bad['b']*-.5) and max[2] <= (printing_bad['c']*.5) \
@@ -165,15 +176,30 @@ class Model(object):
         data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
         scale = numpy.array(self.scaleDefault)
         move = numpy.array(self.pos)
+        moveM = Matrix44().from_translation(self.pos)
+        rotateXM = Matrix44().from_x_rotation(self.rot[0])
+        rotateYM = Matrix44().from_y_rotation(self.rot[1])
+        rotateZM = Matrix44().from_z_rotation(self.rot[2])
+        scaleM = Matrix44().from_scale(self.scale)
+        scaleDM = Matrix44().from_scale(self.scaleDefault)
+
+        f = moveM * rotateZM * rotateYM * rotateXM * scaleM * ~scaleDM
+
         #TODO:Add rotation, move and scale
         for i, d in enumerate(zip(self.v0, self.v1, self.v2)):
-            data['vectors'][i] = numpy.array([d[0], d[1], d[2]])
-        data['vectors'] = data['vectors']/scale
-        move = move / scale
-        data['vectors'] = data['vectors'] + move
+            d0 = f * Vector3(d[0])
+            d1 = f * Vector3(d[1])
+            d2 = f * Vector3(d[2])
+            data['vectors'][i] = numpy.array([d0, d1, d2])
+        #data['vectors'] = data['vectors']/scale
+        #move = move / scale
+        #data['vectors'] = data['vectors'] + move
+        #print(f)
+        #print(len(data['vectors']))
+        #newData = f * data['vectors']
+        #print(len(newData))
 
         mesh = Mesh(data)
-        #mesh.rotate(x, )
         return mesh
 
     def __str__(self):
@@ -310,12 +336,12 @@ class Model(object):
         else:
             if self.is_in_printing_space(self.parent.hot_bed_dimension):
                 if self.selected:
-                    glColor3f(.5,0,0)
+                    glColor3f(.5, 0, 0)
                 else:
                     glColor3fv(self.color)
             else:
-                glColor3f(1.,.25,.25)
-                glDisable( GL_LIGHTING )
+                glColor3f(1., .0, .0)
+                glDisable(GL_DEPTH_TEST)
                 glEnable(GL_BLEND)
 
         glRotatef(self.rot[0], 1., 0., 0.)
@@ -325,8 +351,8 @@ class Model(object):
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 
         glCallList(self.displayList)
-        glEnable( GL_LIGHTING )
         glDisable(GL_BLEND)
+        glEnable(GL_DEPTH_TEST)
         glPopMatrix()
 
 
@@ -344,6 +370,21 @@ class Model(object):
         glEndList()
 
         return genList
+
+    def recalculate_min_max(self):
+        #TODO:Zrychlit tuto cast
+        #calculate min and max for BoundingBox and center of object
+        self.max[0] = numpy.max([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        self.min[0] = numpy.min([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        self.boundingSphereCenter[0] = (self.max[0] + self.min[0]) * .5
+
+        self.max[1] = numpy.max([a[1] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        self.min[1] = numpy.min([a[1] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        self.boundingSphereCenter[1] = (self.max[1] + self.min[1]) * .5
+
+        self.max[2] = numpy.max([a[2] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        self.min[2] = numpy.min([a[2] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        self.boundingSphereCenter[2] = (self.max[2] + self.min[2]) * .5
 
 
 
@@ -396,6 +437,8 @@ class ModelTypeStl(ModelTypeAbstract):
         model.v0 = mesh.v0*model.scaleDefault[0]
         model.v1 = mesh.v1*model.scaleDefault[1]
         model.v2 = mesh.v2*model.scaleDefault[2]
+
+        model.recalculate_min_max()
 
         #TODO:Zrychlit tuto cast
         #calculate min and max for BoundingBox and center of object
