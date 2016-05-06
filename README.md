@@ -1,3 +1,3 @@
-# PrusaControll
-PrusaControll software repository
+# PrusaControl
+PrusaControl software repository
 python 
