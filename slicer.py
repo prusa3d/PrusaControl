@@ -43,13 +43,13 @@ class Slic3rEngineRunner(QObject):
         if system_platform in ['Linux']:
             self.slicer_place = '../Slic3r/bin/slic3r'
             #self.slicer_place = './tools/Slic3r-Lite/slic3r'
+        #Not tested
         elif system_platform in ['Darwin']:
             self.slicer_place = '../MacOS/Slic3r'
         elif system_platform in ['Windows']:
             self.slicer_place = 'tools\\Slic3r-Lite\\slic3r.bat'
-# \\tools\\Slic3r-Lite\\slic3r.pl
         else:
-            self.slicer_place = 'slicr'
+            self.slicer_place = 'slic3r'
 
 #       self.settings_dir = '/res/'
         self.data = {}
@@ -59,10 +59,19 @@ class Slic3rEngineRunner(QObject):
 
     def set_data(self, data):
         self.data = data
-#'--DataDir', self.settings_dir,
+
+    def save_configuration(self):
+        #get data from controller
+        #get data from 
+        pass
+
     def slice(self):
-        print(self.slicer_place)
-        process = subprocess.Popen([self.slicer_place, self.controller.tmp_place + 'tmp.stl', '--output', self.controller.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
+        self.save_configuration(self.controller.tmp_place + 'prusacontrol.ini')
+
+
+        process = subprocess.Popen([self.slicer_place, self.controller.tmp_place + 'tmp.stl', '--load',
+                                    self.controller.tmp_place + 'prusacontrol.ini', '--output',
+                                    self.controller.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
 
 

@@ -2,10 +2,12 @@
 import logging
 
 import functools
+import os
 import platform
 
 import time
 import webbrowser
+from ConfigParser import ConfigParser
 
 from shutil import copyfile, Error
 
@@ -42,12 +44,21 @@ class Controller:
         self.system_platform = platform.system()
         if self.system_platform in ['Linux']:
             self.tmp_place = '/tmp/'
+            self.config_path = os.path.expanduser("~/.prusacontrol.cfg")
         elif self.system_platform in ['Darwin']:
             self.tmp_place = '/tmp/'
+            self.config_path = os.path.expanduser("~/.prusacontrol.cfg")
         elif self.system_platform in ['Windows']:
             self.tmp_place = tempfile.gettempdir() + '\\'
+            self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
         else:
             self.tmp_place = './'
+            self.config_path = 'prusacontrol.cfg'
+
+        self.config = ConfigParser()
+        self.config.readfp(open('defaults.cfg'))
+        self.config.read(self.config_path)
+
 
         #TODO:Reading settings from file
         self.printing_settings = {}
