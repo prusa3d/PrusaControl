@@ -7,7 +7,7 @@ import platform
 
 import time
 import webbrowser
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, RawConfigParser
 
 from shutil import copyfile, Error
 
@@ -44,10 +44,10 @@ class Controller:
         self.system_platform = platform.system()
         if self.system_platform in ['Linux']:
             self.tmp_place = '/tmp/'
-            self.config_path = os.path.expanduser("~/.prusacontrol.cfg")
+            self.config_path = os.path.expanduser("~/.prusacontrol")
         elif self.system_platform in ['Darwin']:
             self.tmp_place = '/tmp/'
-            self.config_path = os.path.expanduser("~/.prusacontrol.cfg")
+            self.config_path = os.path.expanduser("~/.prusacontrol")
         elif self.system_platform in ['Windows']:
             self.tmp_place = tempfile.gettempdir() + '\\'
             self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
@@ -64,10 +64,11 @@ class Controller:
         self.printing_settings = {}
         self.settings = {}
         if not self.settings:
-            self.settings['debug'] = False
-            self.settings['automatic_placing'] = True
-            self.settings['language'] = 'cs_CZ'
-            self.settings['printer'] = 'prusa_i3_v2'
+            self.settings['debug'] = self.config.getboolean('settings', 'debug')
+            self.settings['automatic_placing'] = self.config.getboolean('settings', 'automatic_placing')
+            self.settings['language'] = self.config.get('settings', 'language')
+            self.settings['printer'] = self.config.get('settings', 'printer')
+
             self.settings['toolButtons'] = {
                 'moveButton': False,
                 'rotateButton': False,
@@ -104,7 +105,7 @@ class Controller:
             },
             'printer': {
                 'prusa_i3': 'Prusa i3',
-                'prusa_i3_v2': 'Prusa i3 v2'
+                'prusa_i3_mk2': 'Prusa i3 mark2'
             },
             'materials': {
                 'pla': 'PLA',
@@ -154,6 +155,18 @@ class Controller:
         self.scene = AppScene()
         self.view = PrusaControlView(self)
         self.slicer_manager = SlicerEngineManager(self)
+
+
+    def write_config(self):
+        config = RawConfigParser()
+        config.add_section('settings')
+        config.set('settings', 'printer', self.settings['printer'])
+        config.set('settings', 'debug', str(self.settings['debug']))
+        config.set('settings', 'automatic_placing', str(self.settings['automatic_placing']))
+        config.set('settings', 'language', self.settings['language'])
+
+        with open(self.config_path, 'wb') as configfile:
+            config.write(configfile)
 
 
     def set_language(self, language):
