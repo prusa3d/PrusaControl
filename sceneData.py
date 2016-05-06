@@ -177,19 +177,39 @@ class Model(object):
         scale = numpy.array(self.scaleDefault)
         move = numpy.array(self.pos)
         moveM = Matrix44().from_translation(self.pos)
-        rotateXM = Matrix44().from_x_rotation(self.rot[0])
-        rotateYM = Matrix44().from_y_rotation(self.rot[1])
-        rotateZM = Matrix44().from_z_rotation(self.rot[2])
+        rotateXM = Matrix44().from_x_rotation(math.radians(self.rot[0]))
+        rotateYM = Matrix44().from_y_rotation(math.radians(self.rot[1]))
+        rotateZM = Matrix44().from_z_rotation(math.radians(self.rot[2]))
         scaleM = Matrix44().from_scale(self.scale)
         scaleDM = Matrix44().from_scale(self.scaleDefault)
 
-        f = moveM * rotateZM * rotateYM * rotateXM * scaleM * ~scaleDM
+        r = rotateXM * rotateYM * rotateZM
 
-        #TODO:Add rotation, move and scale
+        f = scaleM * ~r * moveM * ~scaleDM
+
         for i, d in enumerate(zip(self.v0, self.v1, self.v2)):
+            '''
+            d0 = scaleM * Vector3(d[0])
+            d1 = scaleM * Vector3(d[1])
+            d2 = scaleM * Vector3(d[2])
+
+            d0 = ~r * d0
+            d1 = ~r * d1
+            d2 = ~r * d2
+
+            d0 = moveM * d0
+            d1 = moveM * d1
+            d2 = moveM * d2
+
+            d0 = ~scaleDM * d0
+            d1 = ~scaleDM * d1
+            d2 = ~scaleDM * d2
+            '''
+
             d0 = f * Vector3(d[0])
             d1 = f * Vector3(d[1])
             d2 = f * Vector3(d[2])
+
             data['vectors'][i] = numpy.array([d0, d1, d2])
         #data['vectors'] = data['vectors']/scale
         #move = move / scale

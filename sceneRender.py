@@ -162,7 +162,7 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("gui/background.png")
-        self.image_hotbed = self.texture_from_png("gui/heatbed.png", GL_RGBA)
+        self.image_hotbed = self.texture_from_png("gui/heatbed.png", GL_RGB)
 
         #tools
         #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png", GL_RGBA), [4.,4.], [95, 16])
