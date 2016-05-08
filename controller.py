@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 
 import functools
@@ -8,6 +9,7 @@ import platform
 import time
 import webbrowser
 from ConfigParser import ConfigParser, RawConfigParser
+from pprint import pprint
 
 from shutil import copyfile, Error
 
@@ -42,21 +44,29 @@ class Controller:
         logging.info('Controller instance created')
 
         self.system_platform = platform.system()
+        self.config = ConfigParser()
+
         if self.system_platform in ['Linux']:
             self.tmp_place = '/tmp/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
+            self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
+            self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Darwin']:
             self.tmp_place = '/tmp/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
+            self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
+            self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Windows']:
             self.tmp_place = tempfile.gettempdir() + '\\'
             self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
+            self.printing_parameters_file = os.path.expanduser("data\\printing_parameters.json")
+            self.config.readfp(open('data\\defaults.cfg'))
         else:
             self.tmp_place = './'
             self.config_path = 'prusacontrol.cfg'
+            self.printing_parameters_file = "data/printing_parameters.json"
+            self.config.readfp(open('data/defaults.cfg'))
 
-        self.config = ConfigParser()
-        self.config.readfp(open('defaults.cfg'))
         self.config.read(self.config_path)
 
 
@@ -75,6 +85,7 @@ class Controller:
                 'scaleButton': False
         }
 
+        '''
         self.printing_settings = {
             'materials': ['abs', 'pla', 'flex'],
             'abs': {
@@ -97,6 +108,11 @@ class Controller:
                 'infillRange': [0, 100]
             }
         }
+        '''
+
+        with open(self.printing_parameters_file, 'rb') as json_file:
+            self.printing_settings = json.load(json_file)
+
 
         self.enumeration = {
             'language': {
@@ -114,10 +130,9 @@ class Controller:
             },
             'quality': {
                 'draft': 'Draft',
-                'low': 'Low',
-                'medium': 'Medium',
-                'high': 'High',
-                'ultra_high': 'Ultra high'
+                'normal': 'Normal',
+                'detail': 'Detail',
+                'ultradetail': 'Ultra detail'
             }
         }
 
@@ -192,13 +207,19 @@ class Controller:
         return '1.0.1'
 
     def get_printing_materials(self):
-        return self.printing_settings['materials']
+        #return self.printing_settings['materials']
+        return [i['label'] for i in self.printing_settings['materials'] if i['name'] not in ['default']]
 
-    def get_printing_settings_for_material(self, material_id):
-        material = self.printing_settings['materials'][material_id]
-        #Deep copy, very important
-        printing_settings_tmp = deepcopy(self.printing_settings['default'])
-        printing_settings_tmp.update(self.printing_settings[material] if material in self.printing_settings else {})
+    def get_printing_material_quality(self, index):
+        return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
+
+    def get_printing_settings_for_material(self, material_index):
+        material = self.printing_settings['materials'][material_index]
+
+        #default
+        printing_settings_tmp = deepcopy(self.printing_settings['materials'][-1])
+        printing_settings_tmp.update(material)
+
         return printing_settings_tmp
 
 

@@ -394,7 +394,7 @@ class PrusaControlWidget(QtGui.QWidget):
         #print tab
         self.materialLabel = QtGui.QLabel(self.tr("Material"))
         self.materialCombo = QtGui.QComboBox()
-        printing_materials_ls = [self.controller.get_enumeration('materials', i) for i in self.controller.get_printing_materials()]
+        printing_materials_ls = self.controller.get_printing_materials()
         self.materialCombo.addItems(printing_materials_ls)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
@@ -463,12 +463,14 @@ class PrusaControlWidget(QtGui.QWidget):
             printing_materials_ls = [self.controller.get_enumeration('materials', i) for i in self.controller.get_printing_materials()]
             self.materialCombo.addItems(printing_materials_ls)
 
-        material = self.materialCombo.currentIndex()
-        material_printing_settings = self.controller.get_printing_settings_for_material(material)
+        #material_label = self.materialCombo.currentText()
+        material_index = self.materialCombo.currentIndex()
+
+        material_printing_settings = self.controller.get_printing_settings_for_material(material_index)
 
         #update print quality widget
         self.qualityCombo.clear()
-        material_printing_settings_quality_ls = [self.controller.get_enumeration('quality', i) for i in material_printing_settings['quality']]
+        material_printing_settings_quality_ls = self.controller.get_printing_material_quality(material_index)
         self.qualityCombo.addItems(material_printing_settings_quality_ls)
 
         #infill slider
