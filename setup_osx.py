@@ -10,7 +10,7 @@ from setuptools import setup
 
 APP = ['main.py']
 APP_NAME = 'PrusaControl'
-DATA_FILES = [('', ['gui', 'translation'])]
+DATA_FILES = [('', ['gui', 'translation', 'data'])]
 OPTIONS = {'argv_emulation': True,
 	    'plist':{
 		'CFBundleName': APP_NAME,

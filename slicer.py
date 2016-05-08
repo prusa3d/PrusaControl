@@ -51,7 +51,6 @@ class Slic3rEngineRunner(QObject):
         else:
             self.slicer_place = 'slic3r'
 
-#       self.settings_dir = '/res/'
         self.data = {}
 
         self.step_max = 8
@@ -60,10 +59,11 @@ class Slic3rEngineRunner(QObject):
     def set_data(self, data):
         self.data = data
 
-    def save_configuration(self):
-        #get data from controller
-        #get data from 
-        pass
+    def save_configuration(self, filename):
+        actual_printing_data = self.controller.get_actual_printing_data()
+        material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
+        #write ini file
+        #line by line
 
     def slice(self):
         self.save_configuration(self.controller.tmp_place + 'prusacontrol.ini')

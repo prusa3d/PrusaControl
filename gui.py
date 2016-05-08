@@ -369,6 +369,9 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_print_info_text(self, string):
         self.prusa_control_widget.printing_filament_data.setText(string)
 
+    def get_actual_printing_data(self):
+        return self.prusa_control_widget.get_actual_printing_data()
+
 
 class PrusaControlWidget(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -478,12 +481,19 @@ class PrusaControlWidget(QtGui.QWidget):
         self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
         self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
 
-    def clear_tool_buttons(self):
-        self.toolButtonGroup.setExclusive(False)
-        self.moveButton.setChecked(False)
-        self.rotateButton.setChecked(False)
-        self.scaleButton.setChecked(False)
-        self.toolButtonGroup.setExclusive(True)
+    def get_actual_printing_data(self):
+        material_index = self.materialCombo.currentIndex()
+        quality_index = self.qualityCombo.currentIndex()
+        infill_value = self.infillSlider.value()
+        brim = self.brimCheckBox.checkState()
+        support = self.supportCheckBox.checkState()
+
+        data = {'material': material_index,
+                'quality': quality_index,
+                'infill': infill_value,
+                'brim': brim,
+                'support': support}
+        return data
 
     def set_x_rotation(self, angle):
         self.glWidget.set_x_rotation(angle)

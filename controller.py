@@ -218,9 +218,22 @@ class Controller:
 
         #default
         printing_settings_tmp = deepcopy(self.printing_settings['materials'][-1])
+
         printing_settings_tmp.update(material)
 
         return printing_settings_tmp
+
+    def get_printing_parameters_for_material_quality(self, material_index, quality_index):
+        material_default = self.printing_settings['materials'][material_index]['quality'][-1]['parameters']
+        material_quality = self.printing_settings['materials'][material_index]['quality'][quality_index]['parameters']
+        default_material = deepcopy(self.printing_settings['materials'][-1]['quality'][0]['parameters'])
+        data = default_material
+        data.update(material_default)
+        data.update(material_quality)
+        return data
+
+    def get_actual_printing_data(self):
+        return self.view.get_actual_printing_data()
 
 
     def generate_button_pressed(self):
