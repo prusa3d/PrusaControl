@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import os
 from ConfigParser import ConfigParser
 from abc import ABCMeta, abstractmethod
 
@@ -46,13 +47,14 @@ class Slic3rEngineRunner(QObject):
             #self.slicer_place = './tools/Slic3r-Lite/slic3r'
         #Not tested
         elif system_platform in ['Darwin']:
-            self.slicer_place = './tools/Slic3r'
+            self.slicer_place = '../MacOS/Slic3r'
         elif system_platform in ['Windows']:
             self.slicer_place = 'tools\\Slic3r-Lite\\slic3r.bat'
         else:
             self.slicer_place = 'slic3r'
 
         self.data = {}
+        print(os.getcwd())
 
         self.step_max = 8
         self.step = 0
