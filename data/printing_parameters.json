@@ -177,9 +177,11 @@
       "quality": [
         {
           "name": "default",
-          "label": "",
+          "label": "Draft",
           "parameters": {
-            "end_gcode": "M104 S0 ; turn off temperature\nM140 S0 ; turn off heatbed\nG28 X0  ; home X axis\nM84     ; disable motors",
+            "autocenter" : 1,
+            "end_gcode": "M104 S0 ; turn off temperature\\nM140 S0 ; turn off heatbed\\nG28 X0  ; home X axis\\nM84     ; disable motors",
+            "start_gcode": "G28 ; home all axes\\nG92 E0.0\\nG1 Y75.0 E2.0  F1000.0\\nG1 Y100.0 E2.3  F1000.0\\nG92 Z[layer_height]\\nG92 E0.0",
             "disable_fan_first_layers": 1,
             "avoid_crossing_perimeters": 0,
             "bottom_solid_layers": 8,
@@ -304,12 +306,7 @@
             "vibration_limit": 0,
             "wipe": 0,
             "xy_size_compensation": 0,
-            "z_offset": 0,
-            "infill": 20,
-            "infillRange": [
-              10,
-              90
-            ]
+            "z_offset": 0
           }
         }
       ]

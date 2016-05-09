@@ -485,8 +485,8 @@ class PrusaControlWidget(QtGui.QWidget):
         material_index = self.materialCombo.currentIndex()
         quality_index = self.qualityCombo.currentIndex()
         infill_value = self.infillSlider.value()
-        brim = self.brimCheckBox.checkState()
-        support = self.supportCheckBox.checkState()
+        brim = self.brimCheckBox.isChecked()
+        support = self.supportCheckBox.isChecked()
 
         data = {'material': material_index,
                 'quality': quality_index,

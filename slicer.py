@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from ConfigParser import ConfigParser
 from abc import ABCMeta, abstractmethod
 
 
@@ -59,15 +60,37 @@ class Slic3rEngineRunner(QObject):
     def set_data(self, data):
         self.data = data
 
+    def translate_dictionary(self, old, update):
+        translation_table = [
+            ['fill_density', 'infill', self.percent_transform],
+            ['brim_width', 'brim', self.boolean_transform],
+            ['support_material', 'support', self.boolean_transform]
+        ]
+        for i in translation_table:
+            old[i[0]] = i[2](update[i[1]])
+        return old
+
+    def percent_transform(self, in_value):
+        return "%s" % str(in_value) + '%'
+
+    def boolean_transform(self, in_value):
+        return "%s" % str(int(in_value))
+
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
         material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
+        new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
+        new_config = ConfigParser()
+        new_config.add_section('settings')
+        for i in new_parameters:
+            new_config.set('settings', i, new_parameters[i])
+
         #write ini file
-        #line by line
+        with open(filename, 'w') as ini_file:
+            new_config.write(ini_file)
 
     def slice(self):
         self.save_configuration(self.controller.tmp_place + 'prusacontrol.ini')
-
 
         process = subprocess.Popen([self.slicer_place, self.controller.tmp_place + 'tmp.stl', '--load',
                                     self.controller.tmp_place + 'prusacontrol.ini', '--output',
