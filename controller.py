@@ -47,12 +47,12 @@ class Controller:
         self.config = ConfigParser()
 
         if self.system_platform in ['Linux']:
-            self.tmp_place = '/tmp/'
+            self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
             self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Darwin']:
-            self.tmp_place = '/tmp/'
+            self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
             self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
             self.config.readfp(open('data/defaults.cfg'))
