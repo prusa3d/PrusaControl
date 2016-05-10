@@ -143,9 +143,16 @@ class GLWidget(QGLWidget):
             self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()
 
-    def texture_from_png(self, filename, type=GL_RGB):
+    def texture_from_png(self, filename):
+        mode_to_bpp = {'1':1, 'L':8, 'P':8, 'RGB':24, 'RGBA':32, 'CMYK':32, 'YCbCr':24, 'I':32, 'F':32}
+
         img = open(filename)
         img = img.transpose(FLIP_TOP_BOTTOM)
+        bpp = mode_to_bpp[img.mode]
+        if bpp == 32:
+            type = GL_RGBA
+        else:
+            type = GL_RGB
         img_data = numpy.array(list(img.getdata()), numpy.uint8)
 
         texture = glGenTextures(1)
@@ -161,24 +168,26 @@ class GLWidget(QGLWidget):
 
     def initializeGL(self):
         #load textures
-        self.image_background = self.texture_from_png("gui/background.png")
-        self.image_hotbed = self.texture_from_png("gui/heatbed.png", GL_RGB)
+        self.image_background = self.texture_from_png("data/img/background.png")
 
         #tools
-        #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png", GL_RGBA), [4.,4.], [95, 16])
-        self.moveTool = GlButton(self.texture_from_png("gui/move_n.png", GL_RGBA), [4.,4.], [95,11])
-        self.rotateTool = GlButton(self.texture_from_png("gui/rotate_n.png", GL_RGBA), [4.,4.], [95,6])
-        self.scaleTool = GlButton(self.texture_from_png("gui/scale_n.png", GL_RGBA), [4.,4.], [95,1])
+        #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png"), [4.,4.], [95, 16])
+        self.moveTool = GlButton(self.texture_from_png("data/img/move_n.png"), [4.,4.], [95,11])
+        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95,6])
+        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95,1])
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
         self.moveTool.set_callback(self.parent.controller.move_button_pressed)
         self.rotateTool.set_callback(self.parent.controller.rotate_button_pressed)
         self.scaleTool.set_callback(self.parent.controller.scale_button_pressed)
 
-        self.tool_background = self.texture_from_png("gui/tool_background.png", GL_RGBA)
+        self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
-        self.bed = self.makePrintingBed()
-        self.axis = self.make_axis()
+        self.bed = {}
+        for i in self.parent.controller.printers['printers']:
+            self.bed[i['name']] = self.makePrintingBed(i['texture'], i['printing_space'])
+
+        #self.axis = self.make_axis()
 
         glClearDepth(1.0)
         glShadeModel(GL_FLAT)
@@ -237,8 +246,6 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-            #glFlush()
-
             self.sceneFrameBuffer = self.grabFrameBuffer()
 
             if 'debug' in self.parent.controller.settings:
@@ -261,9 +268,9 @@ class GLWidget(QGLWidget):
         glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
 
         glEnable( GL_BLEND )
-        glCallList(self.bed)
-        glDisable(GL_DEPTH_TEST)
-        glCallList(self.axis)
+        glCallList(self.bed[self.parent.controller.settings['printer']])
+        #glDisable(GL_DEPTH_TEST)
+        #glCallList(self.axis)
         glDisable( GL_BLEND )
 
         #light
@@ -407,8 +414,9 @@ class GLWidget(QGLWidget):
         color = [c.red(), c.green(), c.blue()]
         return color
 
+    def makePrintingBed(self, bed_texture, printing_space):
+        image_hotbed = self.texture_from_png(bed_texture)
 
-    def makePrintingBed(self):
         genList = glGenLists(1)
         glNewList(genList, GL_COMPILE)
 
@@ -416,52 +424,65 @@ class GLWidget(QGLWidget):
 
         glEnable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
-        glBindTexture(GL_TEXTURE_2D, self.image_hotbed)
+        glBindTexture(GL_TEXTURE_2D, image_hotbed)
 
-        glEnable(GL_CULL_FACE)
         glColor3f(1,1,1)
         glBegin(GL_QUADS)
         glNormal3f(.0,.0,1.)
         glTexCoord2f(0, 1)
-        glVertex3d(-10, 10, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, 0)
 
         glTexCoord2f(0, 0)
-        glVertex3d(-10, -10, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
 
         glTexCoord2f(1, 0)
-        glVertex3d(10, -10, 0)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, 0)
 
         glTexCoord2f(1, 1)
-        glVertex3d(10, 10, 0)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, 0)
         glEnd()
         glDisable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
-        glDisable(GL_CULL_FACE)
         glBegin(GL_LINES)
         glColor3f(1,1,1)
-        glVertex3d(-10, 10, 0)
-        glVertex3d(-10, 10, 20)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, printing_space[2])
 
-        glVertex3d(10, 10, 0)
-        glVertex3d(10, 10, 20)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, 0)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, printing_space[2])
 
-        glVertex3d(10, -10, 0)
-        glVertex3d(10, -10, 20)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, printing_space[2])
 
-        glVertex3d(-10, -10, 0)
-        glVertex3d(-10, -10, 20)
-
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, printing_space[2])
         glEnd()
 
         glBegin(GL_LINE_LOOP)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, printing_space[2])
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, printing_space[2])
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, printing_space[2])
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, printing_space[2])
+        glEnd()
 
-        glVertex3d(-10, 10, 20)
-        glVertex3d(10, 10, 20)
-        glVertex3d(10, -10, 20)
-        glVertex3d(-10, -10, 20)
+        #Axis
+        glLineWidth(5)
+        glDisable(GL_DEPTH_TEST)
+        glBegin(GL_LINES)
+        glColor3f(1, 0, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
+        glVertex3d((printing_space[0]*-0.5)-1, printing_space[1]*-0.5, 0)
 
+        glColor3f(0, 1, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*-0.5, (printing_space[1]*-0.5)-1, 0)
+
+        glColor3f(0, 0, 1)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 1)
         glEnd()
         glEndList()
+        glEnable(GL_DEPTH_TEST)
 
         return genList
 
@@ -551,7 +572,7 @@ class GLWidget(QGLWidget):
 
         glColor3f(1,1,1)
         #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
-
+        sH = sW
         for tool in [self.moveTool, self.rotateTool, self.scaleTool]:
             if picking:
                 glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])

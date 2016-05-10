@@ -45,7 +45,6 @@ class Slic3rEngineRunner(QObject):
         if system_platform in ['Linux']:
             self.slicer_place = '../Slic3r/bin/slic3r'
             #self.slicer_place = './tools/Slic3r-Lite/slic3r'
-        #Not tested
         elif system_platform in ['Darwin']:
             self.slicer_place = '../MacOS/Slic3r'
         elif system_platform in ['Windows']:
@@ -54,7 +53,6 @@ class Slic3rEngineRunner(QObject):
             self.slicer_place = 'slic3r'
 
         self.data = {}
-        print(os.getcwd())
 
         self.step_max = 8
         self.step = 0
@@ -99,7 +97,6 @@ class Slic3rEngineRunner(QObject):
                                     self.controller.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
 
-
     def check_progress(self, process):
         #for line in iter(process.stdout.readline, ''):
         while self.step <= 8 and self.is_running is True:
@@ -119,8 +116,6 @@ class Slic3rEngineRunner(QObject):
 
     def end(self):
         self.end_callback()
-
-
 
 class CuraEngine(SlicerEngineAbstract):
     '''

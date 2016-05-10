@@ -1,0 +1,16 @@
+{
+  "printers": [
+    {
+      "name": "i3",
+      "label": "Prusa i3 plus",
+      "texture": "data/img/heatbed.png",
+      "printing_space": [20, 20, 20]
+    },
+    {
+      "name": "i3_mk2",
+      "label": "Prusa i3 mark2",
+      "texture": "data/img/heatbed_mk2.png",
+      "printing_space": [25, 21, 20]
+    }
+  ]
+}

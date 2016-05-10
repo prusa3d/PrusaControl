@@ -10,8 +10,6 @@ class GlButton(object):
         self.color_id = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 
         self.texture = texture
-        #logging.debug('Texture type: ' + str(type(self.texture)))
-        #logging.debug('Texture: ' + str(self.texture))
         self.size = size
         self.position=position
 
@@ -29,10 +27,8 @@ class GlButton(object):
         self.pressed = not(self.pressed)
         self.callback_function()
 
-
     def unpress_button(self):
         self.pressed = False
-
 
     def set_press_variable(self, variable, key, subkey):
         self.press_variable = variable

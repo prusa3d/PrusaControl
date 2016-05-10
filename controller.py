@@ -50,27 +50,29 @@ class Controller:
             self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
             self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
+            self.printers_parameters_file = os.path.expanduser("data/printers.json")
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Darwin']:
             self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
             self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
+            self.printers_parameters_file = os.path.expanduser("data/printers.json")
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Windows']:
             self.tmp_place = tempfile.gettempdir() + '\\'
             self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
             self.printing_parameters_file = os.path.expanduser("data\\printing_parameters.json")
+            self.printers_parameters_file = os.path.expanduser("data\\printers.json")
             self.config.readfp(open('data\\defaults.cfg'))
         else:
             self.tmp_place = './'
             self.config_path = 'prusacontrol.cfg'
             self.printing_parameters_file = "data/printing_parameters.json"
+            self.printers_parameters_file = os.path.expanduser("data/printers.json")
             self.config.readfp(open('data/defaults.cfg'))
 
         self.config.read(self.config_path)
 
-
-        #TODO:Reading settings from file
         self.printing_settings = {}
         self.settings = {}
         if not self.settings:
@@ -113,6 +115,9 @@ class Controller:
         with open(self.printing_parameters_file, 'rb') as json_file:
             self.printing_settings = json.load(json_file)
 
+        with open(self.printers_parameters_file, 'rb') as json_file:
+            self.printers = json.load(json_file)
+
 
         self.enumeration = {
             'language': {
@@ -120,8 +125,8 @@ class Controller:
                 'en_US': 'English'
             },
             'printer': {
-                'prusa_i3': 'Prusa i3',
-                'prusa_i3_mk2': 'Prusa i3 mark2'
+                'i3': 'i3',
+                'i3_mk2': 'i3 mark2'
             },
             'materials': {
                 'pla': 'PLA',
