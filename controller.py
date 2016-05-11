@@ -87,6 +87,7 @@ class Controller:
                 'scaleButton': False
         }
 
+
         '''
         self.printing_settings = {
             'materials': ['abs', 'pla', 'flex'],
@@ -117,7 +118,9 @@ class Controller:
 
         with open(self.printers_parameters_file, 'rb') as json_file:
             self.printers = json.load(json_file)
+            self.printers = self.printers['printers']
 
+        self.set_printer(self.settings['printer'])
 
         self.enumeration = {
             'language': {
@@ -141,24 +144,6 @@ class Controller:
             }
         }
 
-        '''
-            #language
-            'cs': 'Czech',
-            'en': 'English',
-            #printer
-            'prusa_i3': 'Prusa i3',
-            'prusa_i3_v2': 'Prusa i3 v2',
-            #materials
-            'pla': 'PLA',
-            'abs': 'ABS',
-            'flex': 'FLEX',
-            #quality
-            'draft':'Draft',
-            'low':'Low',
-            'medium':'Medium',
-            'high':'High',
-            'ultra_high':'Ultra high'
-        '''
 
         #variables for help
         self.last_pos = QtCore.QPoint()
@@ -172,7 +157,7 @@ class Controller:
         self.translator = QtCore.QTranslator()
         self.set_language(self.settings['language'])
 
-        self.scene = AppScene()
+        self.scene = AppScene(self)
         self.view = PrusaControlView(self)
         self.slicer_manager = SlicerEngineManager(self)
 
@@ -240,7 +225,6 @@ class Controller:
     def get_actual_printing_data(self):
         return self.view.get_actual_printing_data()
 
-
     def generate_button_pressed(self):
         if self.status in ['edit', 'canceled']:
             self.generate_gcode()
@@ -255,6 +239,11 @@ class Controller:
 
     def open_web_browser(self, url):
         webbrowser.open(url, 1)
+
+    def set_printer(self, name):
+        index = [i for i, data in enumerate(self.printers) if data['name']== name]
+        print(str(index))
+        self.actual_printer = self.printers[index[0]]
 
     def send_feedback(self):
         self.open_web_browser("http://www.seznam.cz")

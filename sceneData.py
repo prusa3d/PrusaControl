@@ -26,11 +26,8 @@ class AppScene(object):
     Class holding data of scene, models, positions, parameters
     it can be used for generating sliced data and rendering data
     '''
-    def __init__(self):
-        self.hot_bed_dimension = {
-                                'a': 20,
-                                'b': 20,
-                                'c': 20}
+    def __init__(self, controller):
+        self.controller = controller
         self.model_position_offset = 10.
 
         self.sceneZero = [.0, .0, .0]
@@ -144,16 +141,15 @@ class Model(object):
         self.min = [.0, .0, .0]
         self.max = [.0, .0, .0]
 
-        self.color = [randint(3, 7) * 0.11,
-                      randint(3, 7) * 0.1,
-                      randint(3, 7) * 0.12]
+        #self.color = [75./255., 119./255., 190./255.]
+        self.color = [34./255., 167./255., 240./255.]
 
         #source file data
         #example car.stl
         self.filename = ""
         self.normalization_flag = False
 
-    def is_in_printing_space(self, printing_bad):
+    def is_in_printing_space(self, printer):
         m = Matrix44().from_translation(self.pos)
         x = Matrix44().from_x_rotation(self.rot[0])
         y = Matrix44().from_y_rotation(self.rot[1])
@@ -165,9 +161,9 @@ class Model(object):
         min = f * Vector3(self.min)
         max = f * Vector3(self.max)
 
-        if max[0] <= (printing_bad['a']*.5) and min[0] >= (printing_bad['a']*-.5) and max[1] <= (printing_bad['b']*.5)\
-                and min[1] >= (printing_bad['b']*-.5) and max[2] <= (printing_bad['c']*.5) \
-                and min[2] >= (printing_bad['c']*-.5):
+        if max[0] <= (printer['printing_space'][0]*.5) and min[0] >= (printer['printing_space'][0]*-.5) and max[1] <= (printer['printing_space'][1]*.5)\
+                and min[1] >= (printer['printing_space'][1]*-.5) and max[2] <= (printer['printing_space'][2]*.5) \
+                and min[2] >= (printer['printing_space'][2]*-.5):
             return True
         else:
             return False
@@ -354,15 +350,11 @@ class Model(object):
         if picking:
             glColor3ubv(self.colorId)
         else:
-            if self.is_in_printing_space(self.parent.hot_bed_dimension):
-                if self.selected:
-                    glColor3f(.5, 0, 0)
-                else:
-                    glColor3fv(self.color)
+            if self.is_in_printing_space(self.parent.controller.actual_printer):
+                glColor3fv(self.color)
             else:
                 glColor3f(1., .0, .0)
-                glDisable(GL_DEPTH_TEST)
-                glEnable(GL_BLEND)
+
 
         glRotatef(self.rot[0], 1., 0., 0.)
         glRotatef(self.rot[1], 0., 1., 0.)
@@ -371,8 +363,6 @@ class Model(object):
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 
         glCallList(self.displayList)
-        glDisable(GL_BLEND)
-        glEnable(GL_DEPTH_TEST)
         glPopMatrix()
 
 
@@ -452,8 +442,11 @@ class ModelTypeStl(ModelTypeAbstract):
         #mesh.update_normals()
 
         model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
+        #mesh.normals /= numpy.linalg.norm(mesh.normals)
+        #model.normal = mesh.normals
 
         #scale of imported data
+        #model.points *= model.scaleDefault[0]
         model.v0 = mesh.v0*model.scaleDefault[0]
         model.v1 = mesh.v1*model.scaleDefault[1]
         model.v2 = mesh.v2*model.scaleDefault[2]

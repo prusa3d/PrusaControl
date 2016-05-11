@@ -120,7 +120,7 @@ class GLWidget(QGLWidget):
         return QtCore.QSize(50, 50)
 
     def sizeHint(self):
-        return QtCore.QSize(400, 400)
+        return QtCore.QSize(600, 480)
 
     def set_x_rotation(self, angle):
         angle = self.normalize_angle(angle)
@@ -184,7 +184,7 @@ class GLWidget(QGLWidget):
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
         self.bed = {}
-        for i in self.parent.controller.printers['printers']:
+        for i in self.parent.controller.printers:
             self.bed[i['name']] = self.makePrintingBed(i['texture'], i['printing_space'])
 
         #self.axis = self.make_axis()
@@ -198,26 +198,46 @@ class GLWidget(QGLWidget):
         glAlphaFunc( GL_GREATER, 0. )
         glEnable( GL_ALPHA_TEST )
 
+        #new light settings
+        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(50, 50, 100, 0))
+        glLightfv(GL_LIGHT0, GL_SPECULAR, _gl_vector(.5, .5, 1, 1))
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, _gl_vector(1, 1, 1, 1))
+        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(100, 0, 50, 0))
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, _gl_vector(.5, .5, .5, 1))
+        glLightfv(GL_LIGHT1, GL_SPECULAR, _gl_vector(1, 1, 1, 1))
+        #new light settings
+
+        #new material settings
+        #glMaterialfv(GL_FRONT, GL_AMBIENT, _gl_vector(0.192250, 0.192250, 0.192250))
+        #glMaterialfv(GL_FRONT, GL_DIFFUSE, _gl_vector(0.507540, 0.507540, 0.507540))
+        #glMaterialfv(GL_FRONT, GL_SPECULAR, _gl_vector(.5082730,.5082730,.5082730))
+        #glMaterialf(GL_FRONT, GL_SHININESS, .4 * 128.0);
+        #new material settings
+
+
         #material
         glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
         glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
         #light
-        glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightDiffuse)
-        glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
-        glEnable(GL_LIGHT0)
+        #glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
+        #glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightDiffuse)
+        #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+        #glEnable(GL_LIGHT0)
 
-        glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
-        glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
+
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+        glEnable(GL_COLOR_MATERIAL)
+        #glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
+        #glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
         glBlendFunc(GL_SRC_ALPHA,GL_ONE)
 
-        glEnable(GL_COLOR_MATERIAL)
+        #glEnable(GL_COLOR_MATERIAL)
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
         #glEnable( GL_BLEND )
         glEnable( GL_LIGHT0 )
-
+        glEnable( GL_LIGHT1 )
 
     #@timing
     def paintGL(self, selection = 1):
@@ -233,7 +253,8 @@ class GLWidget(QGLWidget):
             glRotated(-90.0, 1.0, 0.0, 0.0)
             glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
             glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-            glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+            #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+            #glLightfv(GL_LIGHT1, GL_POSITION, self.lightPossition)
             glDisable( GL_LIGHTING )
             #glDisable( GL_LIGHT0 )
             glDisable( GL_BLEND )
@@ -253,7 +274,6 @@ class GLWidget(QGLWidget):
                     self.sceneFrameBuffer.save("select_buffer.png")
 
             glEnable( GL_LIGHTING )
-            #glEnable( GL_LIGHT0 )
 
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -265,7 +285,8 @@ class GLWidget(QGLWidget):
         glRotated(-90.0, 1.0, 0.0, 0.0)
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-        glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+        #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
+        #glLightfv(GL_LIGHT1, GL_POSITION, self.lightPossition)
 
         glEnable( GL_BLEND )
         glCallList(self.bed[self.parent.controller.settings['printer']])
@@ -629,3 +650,14 @@ class GLWidget(QGLWidget):
         if angle > 180:
             angle = 180
         return angle
+
+
+def _gl_vector(array, *args):
+    '''
+    Convert an array and an optional set of args into a flat vector of GLfloat
+    '''
+    array = numpy.array(array)
+    if len(args) > 0:
+        array = numpy.append(array, args)
+    vector = (GLfloat * len(array))(*array)
+    return vector

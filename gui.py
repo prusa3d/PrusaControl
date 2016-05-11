@@ -68,6 +68,7 @@ class SettingsDialog(QDialog):
         result = dialog.exec_()
         data['language'] = controller.enumeration['language'].keys()[dialog.language_combo.currentIndex()]
         data['printer'] = controller.enumeration['printer'].keys()[dialog.printer_combo.currentIndex()]
+        controller.set_printer(data['printer'])
         data['debug'] = dialog.debug_checkbox.isChecked()
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
         return (data, result == QDialog.Accepted)
