@@ -546,30 +546,17 @@ class Controller:
                 model.rotationAxis = []
 
     def find_object_and_scale_axis_by_color(self, event):
+        self.scene.clear_selected_models()
         color = self.view.get_cursor_pixel_color(event)
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
         if find_id == 0:
             return False
         for model in self.scene.models:
-            if model.scaleXId == find_id:
-                model.selected = True
-                model.scaleAxis = 'x'
-                return True
-            elif model.scaleYId == find_id:
-                model.selected = True
-                model.scaleAxis = 'y'
-                return True
-            elif model.scaleZId == find_id:
-                model.selected = True
-                model.scaleAxis = 'z'
-                return True
-            elif model.scaleXYZId == find_id:
+            if model.id == find_id:
                 model.selected = True
                 model.scaleAxis = 'xyz'
                 return True
-            else:
-                model.scaleAxis = None
 
     def reset_scene(self):
         self.scene.clearScene()

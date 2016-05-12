@@ -158,6 +158,7 @@ class Model(object):
 
         f = s * x * y * z * m
 
+        #TODO:Wrong, by transformation matrix multiply vertex data and recalculate min, max
         min = f * Vector3(self.min)
         max = f * Vector3(self.max)
 
@@ -330,6 +331,9 @@ class Model(object):
     def render(self, picking=False, debug=False):
         glPushMatrix()
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+
+        glEnable(GL_VERTEX_ARRAY)
+        glEnable(GL_NORMAL_ARRAY)
         if debug and not picking:
             glDisable(GL_DEPTH_TEST)
 
@@ -363,29 +367,39 @@ class Model(object):
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 
         glCallList(self.displayList)
+        glDisable(GL_VERTEX_ARRAY)
+        glDisable(GL_NORMAL_ARRAY)
         glPopMatrix()
-
 
     def make_display_list(self):
         genList = glGenLists(1)
+
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
+        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
+        glVertexPointerf(self.mesh.vectors)
+
         glNewList(genList, GL_COMPILE)
 
-        glBegin(GL_TRIANGLES)
-        for i in xrange(len(self.v0)):
-            glNormal3fv(self.normal[i])
-            glVertex3fv(self.v0[i])
-            glVertex3fv(self.v1[i])
-            glVertex3fv(self.v2[i])
-        glEnd()
+        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+
         glEndList()
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_NORMAL_ARRAY)
 
         return genList
 
     def recalculate_min_max(self):
-        #TODO:Zrychlit tuto cast
+        #TODO:
+        #transform vertex data from mesh to actual matrix
+        #recalculate min and max for bounding box
+        #tats all
+
         #calculate min and max for BoundingBox and center of object
-        self.max[0] = numpy.max([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
-        self.min[0] = numpy.min([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        #self.max[0] = numpy.max([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
+        #self.min[0] = numpy.min([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
+
         self.boundingSphereCenter[0] = (self.max[0] + self.min[0]) * .5
 
         self.max[1] = numpy.max([a[1] for a in itertools.chain(self.v0, self.v1, self.v2)])
@@ -441,49 +455,48 @@ class ModelTypeStl(ModelTypeAbstract):
         #normalization of normal vectors
         #mesh.update_normals()
 
+        #TODO:Speed up
         model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
-        #mesh.normals /= numpy.linalg.norm(mesh.normals)
-        #model.normal = mesh.normals
+        mesh.normals = numpy.array([i/numpy.linalg.norm(i) for i in mesh.normals])
+        model.normal = mesh.normals
 
         #scale of imported data
-        #model.points *= model.scaleDefault[0]
-        model.v0 = mesh.v0*model.scaleDefault[0]
-        model.v1 = mesh.v1*model.scaleDefault[1]
-        model.v2 = mesh.v2*model.scaleDefault[2]
+        mesh.points *= model.scaleDefault[0]
+        model.v0 = mesh.v0
+        model.v1 = mesh.v1
+        model.v2 = mesh.v2
 
-        model.recalculate_min_max()
+        mesh.update_max()
+        mesh.update_min()
+        #model.recalculate_min_max()
 
-        #TODO:Zrychlit tuto cast
         #calculate min and max for BoundingBox and center of object
-        model.max[0] = numpy.max([a[0] for a in itertools.chain(model.v0, model.v1, model.v2)])
-        model.min[0] = numpy.min([a[0] for a in itertools.chain(model.v0, model.v1, model.v2)])
+        model.max = mesh.max_
+        model.min = mesh.min_
+
         model.boundingSphereCenter[0] = (model.max[0] + model.min[0]) * .5
-
-        model.max[1] = numpy.max([a[1] for a in itertools.chain(model.v0, model.v1, model.v2)])
-        model.min[1] = numpy.min([a[1] for a in itertools.chain(model.v0, model.v1, model.v2)])
         model.boundingSphereCenter[1] = (model.max[1] + model.min[1]) * .5
-
-        model.max[2] = numpy.max([a[2] for a in itertools.chain(model.v0, model.v1, model.v2)])
-        model.min[2] = numpy.min([a[2] for a in itertools.chain(model.v0, model.v1, model.v2)])
         model.boundingSphereCenter[2] = (model.max[2] + model.min[2]) * .5
 
         model.zeroPoint = deepcopy(model.boundingSphereCenter)
         model.zeroPoint[2] = model.min[2]
+        print("normalizace")
 
         #normalize position of object on 0
-
+        #TODO:speed up
         if normalize:
             model.normalize_object()
 
-        #calculate size of BoundingSphere
-        v = Vector(model.boundingSphereCenter)
-        for vert in itertools.chain(model.v0, model.v1, model.v2):
-            vL = abs(v.lenght(vert))
-            if vL > model.boundingSphereSize:
-                model.boundingSphereSize = vL
+        max_l = numpy.linalg.norm(mesh.max_)
+        min_l = numpy.linalg.norm(mesh.min_)
+        if max_l > min_l:
+            model.boundingSphereSize = max_l
+        else:
+            model.boundingSphereSize = min_l
+
+        model.mesh = mesh
 
         model.displayList = model.make_display_list()
-        model.mesh = mesh
 
         return model
 

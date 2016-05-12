@@ -86,8 +86,8 @@ class GLWidget(QGLWidget):
         self.lightDiffuse = [.5, .5, .5, 1.0]
         self.lightPossition = [29.0, -48.0, 37.0, 1.0]
 
-        self.materialSpecular = [.05, .05, .05, .1]
-        self.materialShiness = [0.05]
+        self.materialSpecular = [.1, .1, .1, .1]
+        self.materialShiness = [0.01]
 
         #screen properties
         self.w = 0
@@ -195,6 +195,8 @@ class GLWidget(QGLWidget):
         glDepthFunc(GL_LEQUAL)
         glCullFace(GL_BACK)
 
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+
         glAlphaFunc( GL_GREATER, 0. )
         glEnable( GL_ALPHA_TEST )
 
@@ -290,8 +292,6 @@ class GLWidget(QGLWidget):
 
         glEnable( GL_BLEND )
         glCallList(self.bed[self.parent.controller.settings['printer']])
-        #glDisable(GL_DEPTH_TEST)
-        #glCallList(self.axis)
         glDisable( GL_BLEND )
 
         #light
@@ -343,8 +343,8 @@ class GLWidget(QGLWidget):
 
         if settings['toolButtons']['rotateButton']:
             self.draw_rotation_circles(rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
-        elif settings['toolButtons']['scaleButton']:
-            self.draw_scale_axes(scaleColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
+        #elif settings['toolButtons']['scaleButton']:
+        #    self.draw_scale_axes(scaleColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
 
     def draw_rotation_circles(self, colors, position, radius, picking=False):
         segments = 24
