@@ -48,7 +48,7 @@ class Slic3rEngineRunner(QObject):
         elif system_platform in ['Darwin']:
             self.slicer_place = ['../MacOS/Slic3r']
         elif system_platform in ['Windows']:
-            self.slicer_place = ['tools\\Slic3r-Lite\\perl5.22.1.exe', 'slic3r.pl']
+            self.slicer_place = ['tools\\Slic3r-Lite\\perl5.22.1.exe', 'tools\\Slic3r-Lite\\slic3r.pl']
         else:
             self.slicer_place = ['slic3r']
 
