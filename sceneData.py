@@ -170,6 +170,12 @@ class Model(object):
             return False
 
     def get_mesh(self):
+        #New style
+        self.v0 = self.mesh.v0
+        self.v1 = self.mesh.v1
+        self.v2 = self.mesh.v2
+        print('saving model')
+
         data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
         scale = numpy.array(self.scaleDefault)
         move = numpy.array(self.pos)
@@ -203,11 +209,13 @@ class Model(object):
             d2 = ~scaleDM * d2
             '''
 
+
             d0 = f * Vector3(d[0])
             d1 = f * Vector3(d[1])
             d2 = f * Vector3(d[2])
 
             data['vectors'][i] = numpy.array([d0, d1, d2])
+
         #data['vectors'] = data['vectors']/scale
         #move = move / scale
         #data['vectors'] = data['vectors'] + move
@@ -215,8 +223,11 @@ class Model(object):
         #print(len(data['vectors']))
         #newData = f * data['vectors']
         #print(len(newData))
+        #new_mesh = deepcopy(self.mesh)
+        #new_mesh.vectors = f * new_mesh.vectors
 
         mesh = Mesh(data)
+        print('Mesh created')
         return mesh
 
     def __str__(self):
@@ -310,21 +321,22 @@ class Model(object):
 
 
     def normalize_object(self):
-        sceneCenter = Vector(a=Vector().getRaw(), b=self.boundingSphereCenter)
+        r = numpy.array([.0, .0, .0]) - numpy.array(self.boundingSphereCenter)
 
-        self.v0 = [Vector().minusAB(v, sceneCenter.getRaw()) for v in self.v0]
-        self.v1 = [Vector().minusAB(v, sceneCenter.getRaw()) for v in self.v1]
-        self.v2 = [Vector().minusAB(v, sceneCenter.getRaw()) for v in self.v2]
+        self.mesh.vectors = self.mesh.vectors + r
 
-        self.max = Vector().minusAB(self.max, sceneCenter.getRaw())
-        self.min = Vector().minusAB(self.min, sceneCenter.getRaw())
+        self.update_min_max()
+        self.boundingSphereCenter = numpy.array(self.boundingSphereCenter) + r
+        self.boundingSphereCenter = self.boundingSphereCenter.tolist()
 
-        self.boundingSphereCenter = Vector().minusAB(self.boundingSphereCenter, sceneCenter.getRaw())
-
-        self.zeroPoint = Vector().minusAB(self.zeroPoint, sceneCenter.getRaw())
+        self.zeroPoint = numpy.array(self.zeroPoint) + r
         self.zeroPoint[2] = self.min[2]
 
-        self.pos = Vector().minusAB(Vector().getRaw(), self.zeroPoint)
+        self.pos = numpy.array([.0, .0, .0]) + self.zeroPoint
+        self.pos = self.pos.tolist()
+
+        self.zeroPoint = self.zeroPoint.tolist()
+
         self.normalization_flag = True
 
 
@@ -359,14 +371,15 @@ class Model(object):
             else:
                 glColor3f(1., .0, .0)
 
-
         glRotatef(self.rot[0], 1., 0., 0.)
         glRotatef(self.rot[1], 0., 1., 0.)
         glRotatef(self.rot[2], 0., 0., 1.)
 
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 
+        #glEnable(GL_NORMALIZE)
         glCallList(self.displayList)
+        #glDisable(GL_NORMALIZE)
         glDisable(GL_VERTEX_ARRAY)
         glDisable(GL_NORMAL_ARRAY)
         glPopMatrix()
@@ -385,11 +398,13 @@ class Model(object):
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
 
         glEndList()
+
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
 
         return genList
 
+    '''
     def recalculate_min_max(self):
         #TODO:
         #transform vertex data from mesh to actual matrix
@@ -409,6 +424,13 @@ class Model(object):
         self.max[2] = numpy.max([a[2] for a in itertools.chain(self.v0, self.v1, self.v2)])
         self.min[2] = numpy.min([a[2] for a in itertools.chain(self.v0, self.v1, self.v2)])
         self.boundingSphereCenter[2] = (self.max[2] + self.min[2]) * .5
+    '''
+
+    def update_min_max(self):
+        self.mesh.update_min()
+        self.mesh.update_max()
+        self.min = self.mesh.min_
+        self.min = self.mesh.max_
 
 
 
@@ -447,24 +469,20 @@ class ModelTypeStl(ModelTypeAbstract):
         else:
             model.filename = ""
 
-
         '''
         some magic with model data...
         I need normals, transformations...
         '''
-        #normalization of normal vectors
-        #mesh.update_normals()
+        #model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
+        #mesh.normals = numpy.array([i/numpy.linalg.norm(i) for i in mesh.normals])
 
-        #TODO:Speed up
-        model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
-        mesh.normals = numpy.array([i/numpy.linalg.norm(i) for i in mesh.normals])
-        model.normal = mesh.normals
+        #mesh.normals /= numpy.sqrt(numpy.einsum('...i,...i', mesh.normals, mesh.normals))
+        mesh.normals /= numpy.sqrt((mesh.normals ** 2).sum(-1))[..., numpy.newaxis]
+
+        #model.normal = mesh.normals
 
         #scale of imported data
         mesh.points *= model.scaleDefault[0]
-        model.v0 = mesh.v0
-        model.v1 = mesh.v1
-        model.v2 = mesh.v2
 
         mesh.update_max()
         mesh.update_min()
@@ -482,8 +500,9 @@ class ModelTypeStl(ModelTypeAbstract):
         model.zeroPoint[2] = model.min[2]
         print("normalizace")
 
+        model.mesh = mesh
+
         #normalize position of object on 0
-        #TODO:speed up
         if normalize:
             model.normalize_object()
 
@@ -494,7 +513,6 @@ class ModelTypeStl(ModelTypeAbstract):
         else:
             model.boundingSphereSize = min_l
 
-        model.mesh = mesh
 
         model.displayList = model.make_display_list()
 

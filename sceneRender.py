@@ -241,6 +241,7 @@ class GLWidget(QGLWidget):
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
 
+
     #@timing
     def paintGL(self, selection = 1):
         #print('Coords: ' + str(self.xRot) + ' ' + str(self.yRot) + ' ' + str(self.zRot) + ' ' + str(self.zoom))
@@ -450,16 +451,16 @@ class GLWidget(QGLWidget):
         glColor3f(1,1,1)
         glBegin(GL_QUADS)
         glNormal3f(.0,.0,1.)
-        glTexCoord2f(0, 1)
+        glTexCoord2f(0, printing_space[1]*.5)
         glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, 0)
 
         glTexCoord2f(0, 0)
         glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
 
-        glTexCoord2f(1, 0)
+        glTexCoord2f(printing_space[0]*.5, 0)
         glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, 0)
 
-        glTexCoord2f(1, 1)
+        glTexCoord2f(printing_space[0]*.5, printing_space[1]*.5)
         glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, 0)
         glEnd()
         glDisable(GL_TEXTURE_2D)

@@ -150,8 +150,6 @@ class AboutDialog(QDialog):
             QDialogButtonBox.Ok,
             Qt.Horizontal, self)
         buttons.clicked.connect(self.close)
-        #buttons.accepted.connect(self.accept)
-        #buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
     @staticmethod
