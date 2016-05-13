@@ -344,8 +344,8 @@ class Model(object):
         glPushMatrix()
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
-        glEnable(GL_VERTEX_ARRAY)
-        glEnable(GL_NORMAL_ARRAY)
+        #glEnable(GL_VERTEX_ARRAY)
+        #glEnable(GL_NORMAL_ARRAY)
         if debug and not picking:
             glDisable(GL_DEPTH_TEST)
 
@@ -380,8 +380,8 @@ class Model(object):
         #glEnable(GL_NORMALIZE)
         glCallList(self.displayList)
         #glDisable(GL_NORMALIZE)
-        glDisable(GL_VERTEX_ARRAY)
-        glDisable(GL_NORMAL_ARRAY)
+        #glDisable(GL_VERTEX_ARRAY)
+        #glDisable(GL_NORMAL_ARRAY)
         glPopMatrix()
 
     def make_display_list(self):
