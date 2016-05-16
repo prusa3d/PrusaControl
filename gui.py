@@ -454,9 +454,15 @@ class PrusaControlWidget(QtGui.QWidget):
         self.setLayout(mainLayout)
         self.update_gui_for_material()
 
+        self.qualityCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
+        self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
+        self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
+        self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
+
         self.show()
 
     def update_gui(self):
+        self.controller.scene_was_changed()
         self.update_gui_for_material()
 
     def update_gui_for_material(self, set_materials=0):

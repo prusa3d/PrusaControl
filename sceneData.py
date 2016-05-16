@@ -75,10 +75,8 @@ class AppScene(object):
         self.hot_bed_dimension = param
 
     def save_whole_scene_to_one_stl_file(self, filename):
-        whole_scene = Mesh(numpy.concatenate([i.get_mesh().data.copy() for i in self.models]))
+        whole_scene = Mesh(numpy.concatenate([i.get_mesh().data for i in self.models]))
         whole_scene.save(filename)
-
-
 
 class Model(object):
     '''
@@ -171,64 +169,48 @@ class Model(object):
 
     def get_mesh(self):
         #New style
-        self.v0 = self.mesh.v0
-        self.v1 = self.mesh.v1
-        self.v2 = self.mesh.v2
+        #self.v0 = self.mesh.v0
+        #self.v1 = self.mesh.v1
+        #self.v2 = self.mesh.v2
         print('saving model')
 
-        data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
-        scale = numpy.array(self.scaleDefault)
-        move = numpy.array(self.pos)
-        moveM = Matrix44().from_translation(self.pos)
-        rotateXM = Matrix44().from_x_rotation(math.radians(self.rot[0]))
-        rotateYM = Matrix44().from_y_rotation(math.radians(self.rot[1]))
-        rotateZM = Matrix44().from_z_rotation(math.radians(self.rot[2]))
-        scaleM = Matrix44().from_scale(self.scale)
-        scaleDM = Matrix44().from_scale(self.scaleDefault)
+        #data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
+        #scale = numpy.array(self.scaleDefault)
+        #move = numpy.array(self.pos)
+        #moveM = Matrix44().from_translation(self.pos)
+        #rotateXM = Matrix44().from_x_rotation(math.radians(self.rot[0]))
+        #rotateYM = Matrix44().from_y_rotation(math.radians(self.rot[1]))
+        #rotateZM = Matrix44().from_z_rotation(math.radians(self.rot[2]))
+        #scaleM = Matrix44().from_scale(self.scale)
+        #scaleDM = Matrix44().from_scale(self.scaleDefault)
 
-        r = rotateXM * rotateYM * rotateZM
+        #r = rotateXM * rotateYM * rotateZM
 
-        f = scaleM * ~r * moveM * ~scaleDM
+        #f = scaleM * ~r * moveM * ~scaleDM
 
-        for i, d in enumerate(zip(self.v0, self.v1, self.v2)):
-            '''
-            d0 = scaleM * Vector3(d[0])
-            d1 = scaleM * Vector3(d[1])
-            d2 = scaleM * Vector3(d[2])
+        data = numpy.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
-            d0 = ~r * d0
-            d1 = ~r * d1
-            d2 = ~r * d2
+        mesh = deepcopy(self.mesh)
 
-            d0 = moveM * d0
-            d1 = moveM * d1
-            d2 = moveM * d2
+        mesh.update_min()
+        mesh.update_max()
 
-            d0 = ~scaleDM * d0
-            d1 = ~scaleDM * d1
-            d2 = ~scaleDM * d2
-            '''
+        mesh.vectors *= numpy.array(self.scale)
 
+        mesh.rotate([1., .0, .0], self.rot[0])
+        mesh.rotate([.0, 1., .0], self.rot[1])
+        mesh.rotate([.0, .0, 1.], self.rot[2])
 
-            d0 = f * Vector3(d[0])
-            d1 = f * Vector3(d[1])
-            d2 = f * Vector3(d[2])
+        mesh.vectors += numpy.array(self.pos)
 
-            data['vectors'][i] = numpy.array([d0, d1, d2])
+        mesh.vectors /= numpy.array(self.scaleDefault)
 
-        #data['vectors'] = data['vectors']/scale
-        #move = move / scale
-        #data['vectors'] = data['vectors'] + move
-        #print(f)
-        #print(len(data['vectors']))
-        #newData = f * data['vectors']
-        #print(len(newData))
-        #new_mesh = deepcopy(self.mesh)
-        #new_mesh.vectors = f * new_mesh.vectors
+        data['vectors'] = mesh.vectors
 
-        mesh = Mesh(data)
-        print('Mesh created')
-        return mesh
+        mesh.update_min()
+        mesh.update_max()
+
+        return Mesh(data)
 
     def __str__(self):
         return "Mesh: " + str(self.id) + ' ' + str(self.color)

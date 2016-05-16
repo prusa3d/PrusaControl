@@ -344,6 +344,7 @@ class Controller:
         self.view.open_about_dialog()
 
     def generate_gcode(self):
+        self.set_progress_bar(int(((10. / 9.) * 1) * 10))
         if self.scene.models:
             #self.view.disable_save_gcode_button()
             self.scene.save_whole_scene_to_one_stl_file(self.tmp_place + "tmp.stl")

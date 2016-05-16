@@ -106,8 +106,8 @@ class Slic3rEngineRunner(QObject):
             self.step += 1
             if not line:
                 break
-            print(line.rstrip())
-            self.step_increased.emit(int(((10. / 8.) * self.step) * 10))
+            print(line.rsplit())
+            self.step_increased.emit(int(((10. / 9.) * (self.step + 1)) * 10))
             if self.step == 8:
                 filament_str = line.rsplit()
                 filament_str = filament_str[2:4]
