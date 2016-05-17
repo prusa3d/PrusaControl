@@ -335,6 +335,9 @@ class PrusaControlView(QtGui.QMainWindow):
     def get_cursor_pixel_color(self, event):
         return self.prusa_control_widget.get_cursor_pixel_color(event)
 
+    def get_camera_direction(self, event):
+        return self.prusa_control_widget.get_camera_direction(event)
+
     def set_x_rotation(self, angle):
         self.prusa_control_widget.set_x_rotation(angle)
 
@@ -370,6 +373,9 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def get_actual_printing_data(self):
         return self.prusa_control_widget.get_actual_printing_data()
+
+    def add_camera_position(self, vec):
+        self.prusa_control_widget.add_camera_position(vec)
 
 
 class PrusaControlWidget(QtGui.QWidget):
@@ -500,6 +506,10 @@ class PrusaControlWidget(QtGui.QWidget):
                 'support': support}
         return data
 
+
+    def add_camera_position(self, vec):
+        self.glWidget.camera_position += vec
+
     def set_x_rotation(self, angle):
         self.glWidget.set_x_rotation(angle)
 
@@ -523,6 +533,9 @@ class PrusaControlWidget(QtGui.QWidget):
 
     def get_cursor_pixel_color(self, event):
         return self.glWidget.get_cursor_pixel_color(event)
+
+    def get_camera_direction(self, event):
+        return self.glWidget.get_camera_direction(event)
 
     def get_tool_buttons(self):
         return [self.glWidget.moveTool, self.glWidget.rotateTool, self.glWidget.scaleTool]

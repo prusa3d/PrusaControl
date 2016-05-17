@@ -4,7 +4,6 @@ from abc import ABCMeta, abstractmethod
 from os.path import basename
 
 from PyQt4.QtCore import QObject
-from pyrr.plane import position
 from stl.mesh import Mesh
 from random import randint
 import math
@@ -15,9 +14,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 from copy import deepcopy
-from pyrr import Matrix44, Vector3, geometric_tests, line, ray, plane
-
-
+from pyrr import matrix44, Vector3, geometric_tests, line, ray, plane, matrix33
 
 glutInit()
 
@@ -54,6 +51,9 @@ class AppScene(object):
         if index == 0:
             self.models[0].pos[0] = position_vector[0]
             self.models[0].pos[1] = position_vector[1]
+
+            self.models[0].max_scene = self.models[0].max + self.models[0].pos
+            self.models[0].min_scene = self.models[0].min + self.models[0].pos
             return
         scene_tmp = self.models[:index]
         if index > 0:
@@ -61,6 +61,9 @@ class AppScene(object):
                 for angle in xrange(0, 360, 20):
                     model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
+
+                    model.max_scene = model.max + model.pos
+                    model.min_scene = model.min + model.pos
 
                     #TODO:Add some test for checking if object is inside of printing space of printer
                     if not model.intersection_model_list_model_(scene_tmp):
@@ -121,13 +124,16 @@ class Model(object):
 
         self.mesh = None
 
-        #transformation data
-        self.pos = [.0, .0, .0]
+        #transformation data, connected to scene
+        self.pos = numpy.array([.0, .0, .0])
         self.rot = [.0, .0, .0]
         self.scale = [1., 1., 1.]
         self.scaleDefault = [.1, .1, .1]
+        self.min_scene = [.0, .0, .0]
+        self.max_scene = [.0, .0, .0]
 
-        self.matrix = Matrix44([[1.,0.,0.,0.],[0.,1.,0.,0.],[0.,0.,1.,0.],[0.,0.,0.,1.]])
+        self.matrix = matrix33.create_identity()
+        print("Matice identity\n" + ' ' +str(self.matrix))
 
         #helping data
         self.selected = False
@@ -148,17 +154,8 @@ class Model(object):
         self.normalization_flag = False
 
     def is_in_printing_space(self, printer):
-        m = Matrix44().from_translation(self.pos)
-        x = Matrix44().from_x_rotation(self.rot[0])
-        y = Matrix44().from_y_rotation(self.rot[1])
-        z = Matrix44().from_z_rotation(self.rot[2])
-        s = Matrix44().from_scale(self.scale)
-
-        f = s * x * y * z * m
-
-        #TODO:Wrong, by transformation matrix multiply vertex data and recalculate min, max
-        min = f * Vector3(self.min)
-        max = f * Vector3(self.max)
+        min = self.min_scene
+        max = self.max_scene
 
         if max[0] <= (printer['printing_space'][0]*.5) and min[0] >= (printer['printing_space'][0]*-.5) and max[1] <= (printer['printing_space'][1]*.5)\
                 and min[1] >= (printer['printing_space'][1]*-.5) and max[2] <= (printer['printing_space'][2]*.5) \
@@ -168,26 +165,7 @@ class Model(object):
             return False
 
     def get_mesh(self):
-        #New style
-        #self.v0 = self.mesh.v0
-        #self.v1 = self.mesh.v1
-        #self.v2 = self.mesh.v2
         print('saving model')
-
-        #data = numpy.zeros(len(self.v0), dtype=Mesh.dtype)
-        #scale = numpy.array(self.scaleDefault)
-        #move = numpy.array(self.pos)
-        #moveM = Matrix44().from_translation(self.pos)
-        #rotateXM = Matrix44().from_x_rotation(math.radians(self.rot[0]))
-        #rotateYM = Matrix44().from_y_rotation(math.radians(self.rot[1]))
-        #rotateZM = Matrix44().from_z_rotation(math.radians(self.rot[2]))
-        #scaleM = Matrix44().from_scale(self.scale)
-        #scaleDM = Matrix44().from_scale(self.scaleDefault)
-
-        #r = rotateXM * rotateYM * rotateZM
-
-        #f = scaleM * ~r * moveM * ~scaleDM
-
         data = numpy.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
         mesh = deepcopy(self.mesh)
@@ -197,9 +175,9 @@ class Model(object):
 
         mesh.vectors *= numpy.array(self.scale)
 
-        mesh.rotate([1., .0, .0], self.rot[0])
-        mesh.rotate([.0, 1., .0], self.rot[1])
-        mesh.rotate([.0, .0, 1.], self.rot[2])
+        mesh.rotate([1.0, 0.0, 0.0], self.rot[0])
+        mesh.rotate([0.0, 1.0, 0.0], self.rot[1])
+        mesh.rotate([0.0, 0.0, 1.0], self.rot[2])
 
         mesh.vectors += numpy.array(self.pos)
 
@@ -226,8 +204,8 @@ class Model(object):
 
     def intersection_ray_bounding_sphere(self, start, end):
         v = Vector3(self.boundingSphereCenter)
-        matrix = Matrix44.from_scale(Vector3(self.scale))
-        matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
+        matrix = matrix44.from_scale(Vector3(self.scale))
+        matrix = matrix * matrix44.from_translation(Vector3(self.pos))
 
         v = matrix * v
 
@@ -236,8 +214,9 @@ class Model(object):
         return lenght < self.boundingSphereSize
 
     def intersection_model_model(self, model):
-        vector_model_model = Vector(a=model.pos, b=self.pos)
-        distance = vector_model_model.len()
+        #vector_model_model = Vector(a=model.pos, b=self.pos)
+        vector_model_model = self.pos - model.pos
+        distance = numpy.linalg.norm(vector_model_model)
         #TODO:Add better alg for detecting intersection(now is only detection of BS)
         if distance >= (model.boundingSphereSize+self.boundingSphereSize):
             return False
@@ -252,9 +231,9 @@ class Model(object):
 
     def intersection_ray_model(self, rayStart, rayEnd):
         self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
-        matrix = Matrix44.from_scale(Vector3(self.scale))
+        matrix = matrix44.from_scale(Vector3(self.scale))
         #TODO:Add rotation
-        matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
+        matrix = matrix * matrix44.from_translation(Vector3(self.pos))
 
         w = Vector(rayEnd)
         w.minus(rayStart)
@@ -309,25 +288,32 @@ class Model(object):
 
         self.update_min_max()
         self.boundingSphereCenter = numpy.array(self.boundingSphereCenter) + r
-        self.boundingSphereCenter = self.boundingSphereCenter.tolist()
+        #self.boundingSphereCenter = self.boundingSphereCenter.tolist()
 
         self.zeroPoint = numpy.array(self.zeroPoint) + r
         self.zeroPoint[2] = self.min[2]
 
-        self.pos = numpy.array([.0, .0, .0]) + self.zeroPoint
-        self.pos = self.pos.tolist()
+        self.pos = numpy.array([.0, .0, .0]) - self.zeroPoint
+        #self.pos = self.pos
 
-        self.zeroPoint = self.zeroPoint.tolist()
+        #self.zeroPoint = self.zeroPoint
 
         self.normalization_flag = True
 
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
+        glDisable(GL_DEPTH_TEST)
+        glBegin(GL_POINTS)
+        glColor3f(1,0,0)
+        glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
+        glColor3f(1,0,0)
+        glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
+        glEnd()
+        glEnable(GL_DEPTH_TEST)
+
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
-        #glEnable(GL_VERTEX_ARRAY)
-        #glEnable(GL_NORMAL_ARRAY)
         if debug and not picking:
             glDisable(GL_DEPTH_TEST)
 
@@ -353,17 +339,21 @@ class Model(object):
             else:
                 glColor3f(1., .0, .0)
 
-        glRotatef(self.rot[0], 1., 0., 0.)
-        glRotatef(self.rot[1], 0., 1., 0.)
-        glRotatef(self.rot[2], 0., 0., 1.)
-
         glScalef(self.scale[0], self.scale[1], self.scale[2])
 
-        #glEnable(GL_NORMALIZE)
-        glCallList(self.displayList)
-        #glDisable(GL_NORMALIZE)
-        #glDisable(GL_VERTEX_ARRAY)
-        #glDisable(GL_NORMAL_ARRAY)
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
+        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
+        glVertexPointerf(self.mesh.vectors)
+
+
+        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+
+
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_NORMAL_ARRAY)
+
         glPopMatrix()
 
     def make_display_list(self):
@@ -386,33 +376,100 @@ class Model(object):
 
         return genList
 
-    '''
-    def recalculate_min_max(self):
-        #TODO:
-        #transform vertex data from mesh to actual matrix
-        #recalculate min and max for bounding box
-        #tats all
+    def get_matrix4(self):
+        return matrix44.create_from_matrix33(self.matrix)
 
-        #calculate min and max for BoundingBox and center of object
-        #self.max[0] = numpy.max([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
-        #self.min[0] = numpy.min([a[0] for a in itertools.chain(self.v0, self.v1, self.v2)])
+    def set_move(self, vector):
+        vector = numpy.array(vector)
+        self.pos += vector
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
 
-        self.boundingSphereCenter[0] = (self.max[0] + self.min[0]) * .5
+    def set_rotation(self, vector, alpha):
+        #if vector == [1.0, 0.0, 0.0]:
+        #    m = matrix33.create_from_x_rotation(alpha)
+        #elif vector == [0.0, 1.0, 0.0]:
+        #    m = matrix33.create_from_y_rotation(alpha)
+        #elif vector == [0.0, 0.0, 1.0]:
+        #    m = matrix33.create_from_z_rotation(alpha)
 
-        self.max[1] = numpy.max([a[1] for a in itertools.chain(self.v0, self.v1, self.v2)])
-        self.min[1] = numpy.min([a[1] for a in itertools.chain(self.v0, self.v1, self.v2)])
-        self.boundingSphereCenter[1] = (self.max[1] + self.min[1]) * .5
+        #print("Rotacni\n" + ' ' +str(m))
+        #print("Matice\n" + ' ' +str(self.matrix))
+        #self.matrix = self.matrix * m
+        #print("Matice po nasobeni\n" + ' ' +str(self.matrix))
+        self.mesh.rotate(vector, alpha)
 
-        self.max[2] = numpy.max([a[2] for a in itertools.chain(self.v0, self.v1, self.v2)])
-        self.min[2] = numpy.min([a[2] for a in itertools.chain(self.v0, self.v1, self.v2)])
-        self.boundingSphereCenter[2] = (self.max[2] + self.min[2]) * .5
-    '''
+        self.mesh.update_min()
+        self.mesh.update_max()
+
+        self.min = self.mesh.min_
+        self.max = self.mesh.max_
+        self.min_scene = self.mesh.min_ + self.pos
+        self.max_scene = self.mesh.max_ + self.pos
+
+        self.place_on_zero()
+
+    def set_scale(self, value):
+        #TODO:Omezeni minimalni velikosti
+        #mesh = deepcopy(self.mesh)
+        #if value <= 0.75:
+        #    value = 1.0
+        self.scale += numpy.array(value)
+        self.mesh.vectors *= self.scale
+        self.mesh.update_min()
+        self.mesh.update_max()
+
+        self.min = self.mesh.min_
+        self.max = self.mesh.max_
+
+        '''
+        if (self.max[2] - self.min[2]) < 0.5:
+            self.scale /= numpy.array(value)
+            self.mesh.vectors /= value
+            self.mesh.update_min()
+            self.mesh.update_max()
+
+            self.min = self.mesh.min_
+            self.max = self.mesh.max_
+        '''
+
+        self.min_scene = self.mesh.min_ + self.pos
+        self.max_scene = self.mesh.max_ + self.pos
+
+        self.place_on_zero()
+
+    def place_on_zero(self):
+        min = self.min_scene
+        max = self.max_scene
+        pos = self.pos
+
+        if min[2] < 0.0:
+            diff = min[2] * -1.0
+            pos[2]+=diff
+            self.pos = pos
+        elif min[2] > 0.0:
+            diff = min[2] * -1.0
+            pos[2]+=diff
+            self.pos = pos
+
+        self.min_scene = self.min + pos
+        self.max_scene = self.max + pos
+
+
+    def update_position(self):
+        self.update_min_max()
+        print('Min a Max: ' + str(self.min) + ' ' + str(self.max))
+        if self.min[2] < 0.:
+            len = self.min[2] * -1.0
+            self.pos[2]+=len
+            self.update_min_max()
 
     def update_min_max(self):
         self.mesh.update_min()
         self.mesh.update_max()
-        self.min = self.mesh.min_
-        self.min = self.mesh.max_
+        self.min = self.mesh.min_ + self.pos
+        self.max = self.mesh.max_ + self.pos
+
 
 
 
@@ -480,7 +537,6 @@ class ModelTypeStl(ModelTypeAbstract):
 
         model.zeroPoint = deepcopy(model.boundingSphereCenter)
         model.zeroPoint[2] = model.min[2]
-        print("normalizace")
 
         model.mesh = mesh
 
@@ -495,8 +551,10 @@ class ModelTypeStl(ModelTypeAbstract):
         else:
             model.boundingSphereSize = min_l
 
+        model.min_scene = model.min + model.pos
+        model.max_scene = model.max + model.pos
 
-        model.displayList = model.make_display_list()
+        #model.displayList = model.make_display_list()
 
         return model
 

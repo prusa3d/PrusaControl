@@ -16,6 +16,7 @@ from PyQt4 import QtCore
 from PIL.Image import *
 
 import controller
+#from camera import TargetedCamera
 from glButton import GlButton
 
 #Mesure
@@ -33,18 +34,16 @@ class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
         #TODO:Add camera instance
+        #self.camera = TargetedCamera()
         self.parent = parent
         self.init_parametres()
-
-
-
-
 
         #properties definition
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
         self.zoom = 0
+        self.camera_position = numpy.array([0., -5. ,0.])
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -54,6 +53,13 @@ class GLWidget(QGLWidget):
 
         self.materialSpecular = [.0,.0,.0,.0]
         self.materialShiness = [.0]
+
+        #DEBUG
+        self.rayStart = numpy.array([0., 0. ,0.])
+        self.rayDir = numpy.array([0., 0. ,0.])
+        self.rayUp = numpy.array([0., 0. ,0.])
+        self.rayRight = numpy.array([0., 0. ,0.])
+        #DEBUG
 
         #screen properties
         self.w = 0
@@ -102,9 +108,11 @@ class GLWidget(QGLWidget):
 
     #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
+        #self.camera.add_zoom(diff)
         self.zoom += diff
 
     def get_zoom(self):
+        #return self.camera.get_zoom()
         return self.zoom
 
     def get_x_rotation(self):
@@ -126,21 +134,18 @@ class GLWidget(QGLWidget):
         angle = self.normalize_angle(angle)
         if angle != self.xRot:
             self.xRot = angle
-            self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
             self.updateGL()
 
     def set_y_rotation(self, angle):
         angle = self.normalize_angle(angle)
         if angle != self.yRot:
             self.yRot = angle
-            self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
             self.updateGL()
 
     def set_z_rotation(self, angle):
         angle = self.normalize_angle(angle)
         if angle != self.zRot:
             self.zRot = angle
-            self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()
 
     def texture_from_png(self, filename):
@@ -244,18 +249,18 @@ class GLWidget(QGLWidget):
 
     #@timing
     def paintGL(self, selection = 1):
-        #print('Coords: ' + str(self.xRot) + ' ' + str(self.yRot) + ' ' + str(self.zRot) + ' ' + str(self.zoom))
         if selection:
             glClearColor(0.0, 0.0, 0.0, 1.0)
             #glClearColor(1.0, 1.0, 1.0, 1.0)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glLoadIdentity()
 
-            glTranslatef(0,-5,0)
+            glTranslatef(self.camera_position[0], self.camera_position[1], self.camera_position[2])
             glTranslatef(0.0, 0.0, self.zoom)
             glRotated(-90.0, 1.0, 0.0, 0.0)
             glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
             glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+
             #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
             #glLightfv(GL_LIGHT1, GL_POSITION, self.lightPossition)
             glDisable( GL_LIGHTING )
@@ -283,13 +288,12 @@ class GLWidget(QGLWidget):
         self.draw_background_texture()
         glLoadIdentity()
 
-        glTranslatef(0,-5,0)
+        glTranslatef(self.camera_position[0], self.camera_position[1], self.camera_position[2])
+
         glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-        #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
-        #glLightfv(GL_LIGHT1, GL_POSITION, self.lightPossition)
 
         glEnable( GL_BLEND )
         glCallList(self.bed[self.parent.controller.settings['printer']])
@@ -331,6 +335,7 @@ class GLWidget(QGLWidget):
         glEnable( GL_BLEND )
 
         self.draw_tools()
+        self.draw_debug()
 
         #glFlush()
 
@@ -351,6 +356,7 @@ class GLWidget(QGLWidget):
         segments = 24
         glPushMatrix()
         glTranslatef(position[0], position[1], position[2])
+
         glColor3ubv(colors[0])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):
@@ -366,6 +372,24 @@ class GLWidget(QGLWidget):
         for i in xrange(0, 360, 360/segments):
             glVertex3f(math.cos(math.radians(i)) * radius, 0., math.sin(math.radians(i)) * radius)
         glEnd()
+        glPopMatrix()
+
+    def draw_debug(self):
+        glPushMatrix()
+
+
+        glColor3f(1.,.0,.0)
+        glBegin(GL_LINES)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(self.rayDir[0], self.rayDir[1], self.rayDir[2])
+        glColor3f(0.,1.0,.0)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(self.rayUp[0], self.rayUp[1], self.rayUp[2])
+        glColor3f(0.,.0,.1)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(self.rayRight[0], self.rayRight[1], self.rayRight[2])
+        glEnd()
+
         glPopMatrix()
 
     def draw_scale_axes(self, colors, position, radius, picking=False):
@@ -427,6 +451,28 @@ class GLWidget(QGLWidget):
         rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
 
         return (rayStart, rayEnd)
+
+    def get_camera_direction(self, event):
+        matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
+        matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
+        viewport = glGetIntegerv( GL_VIEWPORT )
+
+        winX = (viewport[2]*.5)
+        winY = (viewport[3]*.5)
+        print("WinX a WinY: " + str(winX) + ' ' + str(winY))
+
+        rayStart = numpy.array(gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport))
+        rayEnd = numpy.array(gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport))
+
+        rayUp = numpy.array(gluUnProject(winX, viewport[3]*1., 0.0, matModelView, matProjection, viewport))
+        rayRight = numpy.array(gluUnProject(viewport[2]*1., winY, 0.0, matModelView, matProjection, viewport))
+
+        self.rayStart = (rayStart/numpy.linalg.norm(rayStart))
+        self.rayDir = (rayEnd - rayStart)/(numpy.linalg.norm(rayEnd - rayStart))
+        self.rayUp = rayUp/numpy.linalg.norm(rayUp)
+        self.rayRight = rayRight/numpy.linalg.norm(rayRight)
+
+        return (rayStart, rayStart - rayEnd, rayUp, rayRight)
 
     def get_cursor_pixel_color(self, event):
         color = []
