@@ -9,6 +9,7 @@ import platform
 import subprocess
 from copy import deepcopy
 
+import cStringIO
 from PyQt4.QtCore import QObject, QThread, pyqtSignal
 
 
@@ -43,7 +44,7 @@ class Slic3rEngineRunner(QObject):
 
         system_platform = platform.system()
         if system_platform in ['Linux']:
-            self.slicer_place = ['../Slic3r/bin/slic3r']
+            self.slicer_place = ['/home/tibor/dev/Slic3r/bin/slic3r']
             #self.slicer_place = './tools/Slic3r-Lite/slic3r'
         elif system_platform in ['Darwin']:
             self.slicer_place = ['../MacOS/Slic3r']
@@ -54,13 +55,9 @@ class Slic3rEngineRunner(QObject):
 
         print(self.slicer_place)
 
-        self.data = {}
-
         self.step_max = 8
         self.step = 0
 
-    def set_data(self, data):
-        self.data = data
 
     def translate_dictionary(self, old, update):
         translation_table = [
@@ -80,6 +77,10 @@ class Slic3rEngineRunner(QObject):
 
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
+        for i in actual_printing_data:
+            if i in ['brim', 'support'] and actual_printing_data[i]==True:
+                self.step_max+=1
+
         material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = ConfigParser()
@@ -89,7 +90,10 @@ class Slic3rEngineRunner(QObject):
 
         #write ini file
         with open(filename, 'w') as ini_file:
-            new_config.write(ini_file)
+            fake_file = cStringIO.StringIO()
+            new_config.write(fake_file)
+            ini_file.write(fake_file.getvalue()[11:])
+
 
     def slice(self):
         self.save_configuration(self.controller.tmp_place + 'prusacontrol.ini')
@@ -101,14 +105,14 @@ class Slic3rEngineRunner(QObject):
 
     def check_progress(self, process):
         #for line in iter(process.stdout.readline, ''):
-        while self.step <= 8 and self.is_running is True:
+        while self.step <= self.step_max and self.is_running is True:
             line = process.stdout.readline()
             self.step += 1
             if not line:
                 break
             print(line.rsplit())
-            self.step_increased.emit(int(((10. / 9.) * (self.step + 1)) * 10))
-            if self.step == 8:
+            self.step_increased.emit(int(((10. / (self.step_max+1)*1.) * (self.step + 1)) * 10))
+            if self.step == self.step_max:
                 filament_str = line.rsplit()
                 filament_str = filament_str[2:4]
                 filament_str = str(filament_str[0] + ' ' + filament_str[1])
@@ -144,16 +148,10 @@ class SlicerEngineManager(object):
         self.slice_engine = None
 
     def slice(self):
-        data = {'material': 'PLA',
-                'quality': 'best',
-                'scene': self.controller.scene
-                }
-
         #self.controller.set_cancel_button()
         self.slice_thread = QThread()
         self.slice_engine = Slic3rEngineRunner(self.controller)
         self.slice_engine.moveToThread(self.slice_thread)
-        self.slice_engine.set_data(data)
         self.slice_thread.started.connect(self.slice_engine.slice)
         self.slice_engine.finished.connect(self.thread_ended)
         self.slice_engine.filament_info.connect(self.controller.set_print_info_text)

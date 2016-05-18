@@ -377,25 +377,32 @@ class Controller:
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
-        #if event.buttons() & QtCore.Qt.LeftButton:
-        #    logging.debug("hledani objektu na oznaceni")
-        #    self.hit_first_object_by_color(event)
         self.hit_tool_button_by_color(event)
         if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hit_first_object_by_color(event)
-        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
-            self.find_object_and_rotation_axis_by_color(event)
+        #elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
+        #    self.find_object_and_rotation_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.MiddleButton:
-            self.last_ray_pos = numpy.array(newRayStart)
+            rayStart,_  = self.view.get_cursor_position(event)
+            self.last_ray_pos = numpy.array(rayStart)
         self.view.update_scene()
 
     def mouse_release_event(self, event):
+        if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
+            for model in self.scene.models:
+                if model.selected:
+                    model.place_on_zero()
         self.scene.clear_selected_models()
         self.view.update_scene()
-        #self.last_ray_pos = numpy.array([.0,.0,.0])
+        self.last_ray_pos = numpy.array([.0,.0,.0])
+
+    def check_rotation_axis(self, event):
+        if self.settings['toolButtons']['rotateButton']:
+            if self.find_object_and_rotation_axis_by_color(event):
+                self.view.update_scene()
 
     def mouse_move_event(self, event):
         dx = event.x() - self.last_pos.x()
@@ -410,7 +417,6 @@ class Controller:
                 res_new = sceneData.Vector.minusAB(res, self.res_old)
                 for model in self.scene.models:
                     if model.selected:
-                        #model.pos = [p+n for p, n in zip(model.pos, res_new)]
                         model.set_move(res_new)
                         self.scene_was_changed()
                     self.res_old = res
@@ -425,13 +431,13 @@ class Controller:
                     #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
                     if model.rotationAxis == 'y':
                         #model.rot[0] = model.rot[0] + dy*45
-                        model.set_rotation([1.0, 0.0, 0.0], dy*-0.25)
+                        model.set_rotation([1.0, 0.0, 0.0], dy*-0.01)
                     elif model.rotationAxis == 'z':
                         #model.rot[1] = model.rot[1] + dy*45
-                        model.set_rotation([0.0, 1.0, 0.0], dy*-0.25)
+                        model.set_rotation([0.0, 1.0, 0.0], dy*-0.01)
                     elif model.rotationAxis == 'x':
                         #model.rot[2] = model.rot[2] + dx*45
-                        model.set_rotation([0.0, 0.0, 1.0], dx*-0.25)
+                        model.set_rotation([0.0, 0.0, 1.0], dx*-0.01)
                     else:
                         res = [.0, .0, .0]
                     self.scene_was_changed()
@@ -442,7 +448,8 @@ class Controller:
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
             res = [.0, .0, .0]
             #find axis(), set scale on model instance
-            data = self.view.get_camera_direction(event)
+            camera_pos, direction, _ ,_   = self.view.get_camera_direction(event)
+            ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
                     #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
@@ -454,7 +461,10 @@ class Controller:
                         model.scale[2] = model.scale[2] + dy*0.25
                     elif model.scaleAxis == 'xyz':
                         #model.scale = [i + dy*0.25 for i in model.scale]
-                        model.set_scale([dy*0.5, dy*0.5, dy*0.5])
+                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, direction*-1))
+                        diff_vec = res - model.zeroPoint
+                        l = numpy.linalg.norm(diff_vec)
+                        model.set_scale(numpy.array([l, l, l]))
                     else:
                         res = [.0, .0, .0]
                     self.scene_was_changed()
@@ -467,11 +477,15 @@ class Controller:
             self.last_pos = QtCore.QPoint(event.pos())
 
         elif event.buttons() & QtCore.Qt.MiddleButton:
-            #pos, normal, up, right = self.view.get_camera_direction(event)
+            #TODO:Make it better
+            pos, _ = self.view.get_cursor_position(event)
             #plane = pyrr.plane.create_from_position(pos, normal)
 
-            new_pos = numpy.array(newRayStart)
-            diff = self.last_ray_pos - new_pos
+            new_pos = numpy.array(pos)
+            #print("Last_ray_pos: " + str(self.last_ray_pos))
+            #print("New_pos: " + str(new_pos))
+            diff = (self.last_ray_pos - new_pos)
+            #print("Diff: " + str(diff))
             self.last_ray_pos = new_pos
             self.view.add_camera_position(diff)
 
@@ -593,6 +607,12 @@ class Controller:
     def import_image(self, path):
         #TODO:Add importing of image(just plane with texture?)
         pass
+
+    def undo_button_pressed(self):
+        print("Undo button pressed")
+
+    def do_button_pressed(self):
+        print("Do button pressed")
 
     def select_button_pressed(self):
         self.clear_tool_button_states()

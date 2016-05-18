@@ -127,7 +127,7 @@ class Model(object):
         #transformation data, connected to scene
         self.pos = numpy.array([.0, .0, .0])
         self.rot = [.0, .0, .0]
-        self.scale = [1., 1., 1.]
+        self.scale = numpy.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
         self.min_scene = [.0, .0, .0]
         self.max_scene = [.0, .0, .0]
@@ -173,11 +173,13 @@ class Model(object):
         mesh.update_min()
         mesh.update_max()
 
+        '''
         mesh.vectors *= numpy.array(self.scale)
 
         mesh.rotate([1.0, 0.0, 0.0], self.rot[0])
         mesh.rotate([0.0, 1.0, 0.0], self.rot[1])
         mesh.rotate([0.0, 0.0, 1.0], self.rot[2])
+        '''
 
         mesh.vectors += numpy.array(self.pos)
 
@@ -313,7 +315,7 @@ class Model(object):
         glEnable(GL_DEPTH_TEST)
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-
+        '''
         if debug and not picking:
             glDisable(GL_DEPTH_TEST)
 
@@ -330,7 +332,7 @@ class Model(object):
             glColor3f(.25, .25, .25)
             glutWireSphere(self.boundingSphereSize+0.1, 16, 10)
             glPopMatrix()
-
+        '''
         if picking:
             glColor3ubv(self.colorId)
         else:
@@ -339,7 +341,7 @@ class Model(object):
             else:
                 glColor3f(1., .0, .0)
 
-        glScalef(self.scale[0], self.scale[1], self.scale[2])
+        #glScalef(self.scale[0], self.scale[1], self.scale[2])
 
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
@@ -347,9 +349,7 @@ class Model(object):
         glNormalPointerf(numpy.tile(self.mesh.normals, 3))
         glVertexPointerf(self.mesh.vectors)
 
-
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
-
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
@@ -407,36 +407,32 @@ class Model(object):
         self.min_scene = self.mesh.min_ + self.pos
         self.max_scene = self.mesh.max_ + self.pos
 
-        self.place_on_zero()
+        #self.place_on_zero()
 
     def set_scale(self, value):
         #TODO:Omezeni minimalni velikosti
-        #mesh = deepcopy(self.mesh)
-        #if value <= 0.75:
-        #    value = 1.0
-        self.scale += numpy.array(value)
-        self.mesh.vectors *= self.scale
-        self.mesh.update_min()
-        self.mesh.update_max()
+        print("Scale vector new: " + str(value))
+        print("Scale vector old: " + str(self.scale))
 
-        self.min = self.mesh.min_
-        self.max = self.mesh.max_
-
-        '''
-        if (self.max[2] - self.min[2]) < 0.5:
-            self.scale /= numpy.array(value)
-            self.mesh.vectors /= value
+        scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
+        scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
+        #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
+        if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
+            print("Make scale")
+            #self.mesh.vectors *= scale_coef/self.scale
+            self.mesh.vectors *= scale_coef
+            #self.scale = value
+            self.scale = scale_coef
             self.mesh.update_min()
             self.mesh.update_max()
 
             self.min = self.mesh.min_
             self.max = self.mesh.max_
-        '''
 
-        self.min_scene = self.mesh.min_ + self.pos
-        self.max_scene = self.mesh.max_ + self.pos
+            self.min_scene = self.mesh.min_ + self.pos
+            self.max_scene = self.mesh.max_ + self.pos
 
-        self.place_on_zero()
+            self.place_on_zero()
 
     def place_on_zero(self):
         min = self.min_scene

@@ -19,9 +19,12 @@ def main():
     app = QtGui.QApplication(sys.argv)
     controller = Controller(app)
     window = controller.get_view()
+    app.installEventFilter(window)
     app.exec_()
     logging.info('PrusaControl exit')
     atexit.register(controller.write_config)
+
+
 
 if __name__ == '__main__':
     FORMAT = "[%(levelname)s][%(filename)s:%(lineno)s:%(funcName)s()]-%(message)s"

@@ -43,7 +43,7 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 0
         self.zoom = 0
-        self.camera_position = numpy.array([0., -5. ,0.])
+        self.camera_position = numpy.array([0., 5. ,0.])
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -77,6 +77,9 @@ class GLWidget(QGLWidget):
         self.rotateTool = None
         self.scaleTool = None
         self.tool_background = None
+        self.do_button = None
+        self.undo_button = None
+
 
     def init_parametres(self):
         #TODO:Add camera instance initialization
@@ -131,7 +134,7 @@ class GLWidget(QGLWidget):
         return QtCore.QSize(600, 480)
 
     def set_x_rotation(self, angle):
-        angle = self.normalize_angle(angle)
+        angle = self.normalize_angle_x(angle)
         if angle != self.xRot:
             self.xRot = angle
             self.updateGL()
@@ -177,16 +180,25 @@ class GLWidget(QGLWidget):
 
         #tools
         #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png"), [4.,4.], [95, 16])
-        self.moveTool = GlButton(self.texture_from_png("data/img/move_n.png"), [4.,4.], [95,11])
-        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95,6])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95,1])
+        self.moveTool = GlButton(self.texture_from_png("data/img/move_n.png"), [4.,4.], [95.,11.])
+        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95.,6.])
+        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95.,1.])
+        #back, forward buttons
+        self.undo_button = GlButton(self.texture_from_png("data/img/undo.png"), [4.,4.], [1.,75.])
+        self.do_button = GlButton(self.texture_from_png("data/img/do.png"), [4.,4.], [6.,75.])
+
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
         self.moveTool.set_callback(self.parent.controller.move_button_pressed)
         self.rotateTool.set_callback(self.parent.controller.rotate_button_pressed)
         self.scaleTool.set_callback(self.parent.controller.scale_button_pressed)
+        self.undo_button.set_callback(self.parent.controller.undo_button_pressed)
+        self.do_button.set_callback(self.parent.controller.do_button_pressed)
+
 
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
+
+        self.tools = [self.moveTool, self.rotateTool, self.scaleTool, self.undo_button, self.do_button]
 
         self.bed = {}
         for i in self.parent.controller.printers:
@@ -255,7 +267,7 @@ class GLWidget(QGLWidget):
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glLoadIdentity()
 
-            glTranslatef(self.camera_position[0], self.camera_position[1], self.camera_position[2])
+            glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
             glTranslatef(0.0, 0.0, self.zoom)
             glRotated(-90.0, 1.0, 0.0, 0.0)
             glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
@@ -270,8 +282,8 @@ class GLWidget(QGLWidget):
 
             if self.parent.controller.scene.models:
                 for model in self.parent.controller.scene.models:
-                    self.draw_tools_helper(model, self.parent.controller.settings, True)
                     model.render(picking=True, debug=False)
+                    self.draw_tools_helper(model, self.parent.controller.settings, True)
 
             self.draw_tools(picking=True)
 
@@ -288,7 +300,7 @@ class GLWidget(QGLWidget):
         self.draw_background_texture()
         glLoadIdentity()
 
-        glTranslatef(self.camera_position[0], self.camera_position[1], self.camera_position[2])
+        glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
         glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
@@ -328,35 +340,49 @@ class GLWidget(QGLWidget):
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
-                self.draw_tools_helper(model, self.parent.controller.settings)
                 model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
+                self.draw_tools_helper(model, self.parent.controller.settings)
 
         glDisable( GL_LIGHTING )
         glEnable( GL_BLEND )
 
         self.draw_tools()
-        self.draw_debug()
+        #self.draw_debug()
 
         #glFlush()
 
     def draw_tools_helper(self, model, settings, picking=False):
         if picking:
             rotateColors = [model.rotateColorXId, model.rotateColorYId, model.rotateColorZId]
-            scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
+            #scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
         else:
-            rotateColors = [[255,0,0],[0,255,0],[0,0,255]]
-            scaleColors = [[255,0,0],[0,255,0],[0,0,255], [255,255,255]]
+            #rotateColors = [[255,0,0],[0,255,0],[0,0,255]]
+            rotateColors = [[180,180,180],[180,180,180],[180,180,180]]
+            #scaleColors = [[255,0,0],[0,255,0],[0,0,255], [255,255,255]]
 
         if settings['toolButtons']['rotateButton']:
-            self.draw_rotation_circles(rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
+            self.draw_rotation_circles(model, rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1, picking)
         #elif settings['toolButtons']['scaleButton']:
         #    self.draw_scale_axes(scaleColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
 
-    def draw_rotation_circles(self, colors, position, radius, picking=False):
-        segments = 24
+    def draw_rotation_circles(self, model, colors, position, radius, picking=False):
+        if not picking:
+            if model.selected and model.rotationAxis == 'x':
+                colors[0] = [255, 204, 0]
+            elif model.selected and model.rotationAxis == 'y':
+                colors[1] = [255, 204, 0]
+            elif model.selected and model.rotationAxis == 'z':
+                colors[2] = [255, 204, 0]
+
+        segments = 32
         glPushMatrix()
         glTranslatef(position[0], position[1], position[2])
-
+        glDisable( GL_LIGHTING )
+        glDisable(GL_DEPTH_TEST)
+        if picking:
+            glLineWidth(10.0)
+        else:
+            glLineWidth(1.0)
         glColor3ubv(colors[0])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):
@@ -372,49 +398,25 @@ class GLWidget(QGLWidget):
         for i in xrange(0, 360, 360/segments):
             glVertex3f(math.cos(math.radians(i)) * radius, 0., math.sin(math.radians(i)) * radius)
         glEnd()
+        glEnable(GL_DEPTH_TEST)
+        glEnable( GL_LIGHTING )
         glPopMatrix()
 
     def draw_debug(self):
         glPushMatrix()
 
-
         glColor3f(1.,.0,.0)
         glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(self.rayDir[0], self.rayDir[1], self.rayDir[2])
+        glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
+        glVertex3f(self.rayDir[0]+self.rayStart[0], self.rayDir[1]+self.rayStart[1], self.rayDir[2]+self.rayStart[2])
         glColor3f(0.,1.0,.0)
-        glVertex3f(0., 0., 0.)
+        glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
         glVertex3f(self.rayUp[0], self.rayUp[1], self.rayUp[2])
         glColor3f(0.,.0,.1)
-        glVertex3f(0., 0., 0.)
+        glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
         glVertex3f(self.rayRight[0], self.rayRight[1], self.rayRight[2])
         glEnd()
 
-        glPopMatrix()
-
-    def draw_scale_axes(self, colors, position, radius, picking=False):
-        glPushMatrix()
-        glTranslatef(position[0], position[1], position[2])
-        glColor3ubv(colors[0])
-        glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(1.*radius, 0., 0.)
-        glEnd()
-        glColor3ubv(colors[1])
-        glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(0., 1.*radius, 0.)
-        glEnd()
-        glColor3ubv(colors[2])
-        glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(0., 0., 1.*radius)
-        glEnd()
-        glColor3ubv(colors[3])
-        glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(1.*radius, 1.*radius, 1.*radius)
-        glEnd()
         glPopMatrix()
 
     def resizeGL(self, width, height):
@@ -423,7 +425,7 @@ class GLWidget(QGLWidget):
         glViewport(0, 0, width, height)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(45, float(width*1./height*1.), 1, 1000)
+        gluPerspective(45., float(width*1./height*1.), 1., 75.)
         glMatrixMode(GL_MODELVIEW)
 
     def mousePressEvent(self, event):
@@ -466,20 +468,29 @@ class GLWidget(QGLWidget):
 
         rayUp = numpy.array(gluUnProject(winX, viewport[3]*1., 0.0, matModelView, matProjection, viewport))
         rayRight = numpy.array(gluUnProject(viewport[2]*1., winY, 0.0, matModelView, matProjection, viewport))
-
-        self.rayStart = (rayStart/numpy.linalg.norm(rayStart))
+        '''
+        self.rayStart = rayStart
         self.rayDir = (rayEnd - rayStart)/(numpy.linalg.norm(rayEnd - rayStart))
-        self.rayUp = rayUp/numpy.linalg.norm(rayUp)
-        self.rayRight = rayRight/numpy.linalg.norm(rayRight)
+        self.rayUp = rayUp
+        self.rayRight = rayRight
+        '''
+        rayDir = (rayEnd - rayStart)/(numpy.linalg.norm(rayEnd - rayStart))
 
-        return (rayStart, rayStart - rayEnd, rayUp, rayRight)
+        return rayStart, rayDir, rayUp, rayRight
 
     def get_cursor_pixel_color(self, event):
         color = []
+
         winX = event.x()
         winY = event.y()
-        c = QColor(self.sceneFrameBuffer.pixel(winX, winY))
-        color = [c.red(), c.green(), c.blue()]
+
+        viewport = glGetIntegerv( GL_VIEWPORT )
+        if winX >= 0 and winX <= viewport[2] and winY >= 0 and winY <= viewport[3]:
+            c = QColor(self.sceneFrameBuffer.pixel(winX, winY))
+            color = [c.red(), c.green(), c.blue()]
+        else:
+            color = [0, 0, 0]
+
         return color
 
     def makePrintingBed(self, bed_texture, printing_space):
@@ -584,7 +595,7 @@ class GLWidget(QGLWidget):
         glPushMatrix()
         glLoadIdentity()
         viewport = glGetIntegerv( GL_VIEWPORT )
-        glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
+        glOrtho(0.0, viewport[2], 0.0, viewport[3], 0.0, 1.0)
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
 
@@ -641,7 +652,7 @@ class GLWidget(QGLWidget):
         glColor3f(1,1,1)
         #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
         sH = sW
-        for tool in [self.moveTool, self.rotateTool, self.scaleTool]:
+        for tool in self.tools:
             if picking:
                 glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])
                 glEnable(GL_TEXTURE_2D)
@@ -692,10 +703,10 @@ class GLWidget(QGLWidget):
         return angle
 
     def normalize_angle_x(self, angle):
-        if angle < 0:
-            angle = 0
-        if angle > 180:
-            angle = 180
+        if angle < -90*16:
+            angle = -90*16
+        if angle > 90*16:
+            angle = 90*16
         return angle
 
 
