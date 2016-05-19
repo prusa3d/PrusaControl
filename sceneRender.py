@@ -383,6 +383,7 @@ class GLWidget(QGLWidget):
             glLineWidth(10.0)
         else:
             glLineWidth(1.0)
+
         glColor3ubv(colors[0])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):

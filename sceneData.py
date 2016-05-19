@@ -126,7 +126,7 @@ class Model(object):
 
         #transformation data, connected to scene
         self.pos = numpy.array([.0, .0, .0])
-        self.rot = [.0, .0, .0]
+        self.rot = [0.0, 0.0, 0.0]
         self.scale = numpy.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
         self.min_scene = [.0, .0, .0]
@@ -379,6 +379,9 @@ class Model(object):
     def get_matrix4(self):
         return matrix44.create_from_matrix33(self.matrix)
 
+    def draw_rotation(self, status=False, pos=[0.,0.,0.]):
+        pass
+
     def set_move(self, vector):
         vector = numpy.array(vector)
         self.pos += vector
@@ -386,19 +389,18 @@ class Model(object):
         self.max_scene = self.max + self.pos
 
     def set_rotation(self, vector, alpha):
-        #if vector == [1.0, 0.0, 0.0]:
-        #    m = matrix33.create_from_x_rotation(alpha)
-        #elif vector == [0.0, 1.0, 0.0]:
-        #    m = matrix33.create_from_y_rotation(alpha)
-        #elif vector == [0.0, 0.0, 1.0]:
-        #    m = matrix33.create_from_z_rotation(alpha)
-
-        #print("Rotacni\n" + ' ' +str(m))
-        #print("Matice\n" + ' ' +str(self.matrix))
-        #self.matrix = self.matrix * m
-        #print("Matice po nasobeni\n" + ' ' +str(self.matrix))
-        self.mesh.rotate(vector, alpha)
-
+        if vector == [1.0, 0.0, 0.0]:
+            if not(self.rot[0] == alpha):
+                self.mesh.rotate(vector, alpha-self.rot[0])
+                self.rot[0] = alpha
+        elif vector == [0.0, 1.0, 0.0]:
+            if not(self.rot[1] == alpha):
+                self.mesh.rotate(vector, alpha-self.rot[1])
+                self.rot[1] = alpha
+        elif vector == [0.0, 0.0, 1.0]:
+            if not(self.rot[2] == alpha):
+                self.mesh.rotate(vector, alpha-self.rot[2])
+                self.rot[2] = alpha
         self.mesh.update_min()
         self.mesh.update_max()
 
@@ -411,14 +413,10 @@ class Model(object):
 
     def set_scale(self, value):
         #TODO:Omezeni minimalni velikosti
-        print("Scale vector new: " + str(value))
-        print("Scale vector old: " + str(self.scale))
-
         scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
         scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
         #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
         if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
-            print("Make scale")
             #self.mesh.vectors *= scale_coef/self.scale
             self.mesh.vectors *= scale_coef
             #self.scale = value

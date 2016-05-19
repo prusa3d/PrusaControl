@@ -153,6 +153,7 @@ class Controller:
         self.ray_start = [.0, .0, .0]
         self.ray_end = [.0, .0, .0]
         self.last_ray_pos = [.0, .0, .0]
+        self.origin_rotation_point = numpy.array([0.,0.,0.])
         self.res_old = []
         self.status = 'edit'
 
@@ -381,7 +382,16 @@ class Controller:
         if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hit_first_object_by_color(event)
-        #elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
+        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
+            for model in self.scene.models:
+                if model.selected and model.rotationAxis:
+                    if model.rotationAxis == 'x':
+                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
+                    elif model.rotationAxis == 'y':
+                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [1.0, 0.0, 0.0]))
+                    elif model.rotationAxis == 'z':
+                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 1.0, 0.0]))
+                    model.draw_rotation(True)
         #    self.find_object_and_rotation_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
@@ -394,6 +404,8 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
+                    model.rot = [0.,0.,0.]
+                    model.draw_rotation(False)
                     model.place_on_zero()
         self.scene.clear_selected_models()
         self.view.update_scene()
@@ -426,20 +438,60 @@ class Controller:
             res = [.0, .0, .0]
             #find plane(axis) in which rotation will be made
             #newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected and model.rotationAxis:
-                    #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
                     if model.rotationAxis == 'y':
-                        #model.rot[0] = model.rot[0] + dy*45
-                        model.set_rotation([1.0, 0.0, 0.0], dy*-0.01)
+                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, [1.0, 0.0, 0.0]))
+                        new_vec = model.pos - res
+                        new_vec /= numpy.linalg.norm(new_vec)
+                        old_vec = model.pos - self.origin_rotation_point
+                        old_vec /= numpy.linalg.norm(old_vec)
+
+                        cosang = numpy.dot(old_vec, new_vec)
+                        sinang = numpy.linalg.norm(numpy.cross(old_vec, new_vec))
+                        neg = numpy.dot(numpy.cross(old_vec, new_vec), [1.0, 0.0, 0.0])
+
+                        alpha = numpy.arctan2(sinang, cosang)
+                        if neg >0:
+                             alpha *= -1.
+
+                        model.set_rotation([1.0, 0.0, 0.0], alpha)
+
                     elif model.rotationAxis == 'z':
-                        #model.rot[1] = model.rot[1] + dy*45
-                        model.set_rotation([0.0, 1.0, 0.0], dy*-0.01)
+                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, [0.0, 1.0, 0.0]))
+                        new_vec = model.pos - res
+                        new_vec /= numpy.linalg.norm(new_vec)
+                        old_vec = model.pos - self.origin_rotation_point
+                        old_vec /= numpy.linalg.norm(old_vec)
+
+                        cosang = numpy.dot(old_vec, new_vec)
+                        sinang = numpy.linalg.norm(numpy.cross(old_vec, new_vec))
+                        neg = numpy.dot(numpy.cross(old_vec, new_vec), [0.0, 1.0, 0.0])
+
+                        alpha = numpy.arctan2(sinang, cosang)
+                        if neg >0:
+                             alpha *= -1.
+
+                        model.set_rotation([0.0, 1.0, 0.0], alpha)
+
                     elif model.rotationAxis == 'x':
-                        #model.rot[2] = model.rot[2] + dx*45
-                        model.set_rotation([0.0, 0.0, 1.0], dx*-0.01)
-                    else:
-                        res = [.0, .0, .0]
+                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, [0.0, 0.0, 1.0]))
+                        new_vec = model.pos - res
+                        new_vec /= numpy.linalg.norm(new_vec)
+                        old_vec = model.pos - self.origin_rotation_point
+                        old_vec /= numpy.linalg.norm(old_vec)
+
+                        cosang = numpy.dot(old_vec, new_vec)
+                        sinang = numpy.linalg.norm(numpy.cross(old_vec, new_vec))
+                        neg = numpy.dot(numpy.cross(old_vec, new_vec), [0.0, 0.0, 1.0])
+
+                        alpha = numpy.arctan2(sinang, cosang)
+                        if neg >0:
+                             alpha *= -1.
+
+                        model.set_rotation([0.0, 0.0, 1.0], alpha)
+
                     self.scene_was_changed()
                 self.res_old = res
             #self.view.updateScene()
