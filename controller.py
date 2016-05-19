@@ -386,11 +386,11 @@ class Controller:
             for model in self.scene.models:
                 if model.selected and model.rotationAxis:
                     if model.rotationAxis == 'x':
-                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
-                    elif model.rotationAxis == 'y':
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [1.0, 0.0, 0.0]))
-                    elif model.rotationAxis == 'z':
+                    elif model.rotationAxis == 'y':
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 1.0, 0.0]))
+                    elif model.rotationAxis == 'z':
+                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
                     model.draw_rotation(True)
         #    self.find_object_and_rotation_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
@@ -441,56 +441,30 @@ class Controller:
             ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected and model.rotationAxis:
-                    if model.rotationAxis == 'y':
-                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, [1.0, 0.0, 0.0]))
-                        new_vec = model.pos - res
-                        new_vec /= numpy.linalg.norm(new_vec)
-                        old_vec = model.pos - self.origin_rotation_point
-                        old_vec /= numpy.linalg.norm(old_vec)
 
-                        cosang = numpy.dot(old_vec, new_vec)
-                        sinang = numpy.linalg.norm(numpy.cross(old_vec, new_vec))
-                        neg = numpy.dot(numpy.cross(old_vec, new_vec), [1.0, 0.0, 0.0])
-
-                        alpha = numpy.arctan2(sinang, cosang)
-                        if neg >0:
-                             alpha *= -1.
-
-                        model.set_rotation([1.0, 0.0, 0.0], alpha)
-
+                    if model.rotationAxis == 'x':
+                        rotation_axis = numpy.array([1.0, 0.0, 0.0])
+                    elif model.rotationAxis == 'y':
+                        rotation_axis = numpy.array([0.0, 1.0, 0.0])
                     elif model.rotationAxis == 'z':
-                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, [0.0, 1.0, 0.0]))
-                        new_vec = model.pos - res
-                        new_vec /= numpy.linalg.norm(new_vec)
-                        old_vec = model.pos - self.origin_rotation_point
-                        old_vec /= numpy.linalg.norm(old_vec)
+                        rotation_axis = numpy.array([0.0, 0.0, 1.0])
 
-                        cosang = numpy.dot(old_vec, new_vec)
-                        sinang = numpy.linalg.norm(numpy.cross(old_vec, new_vec))
-                        neg = numpy.dot(numpy.cross(old_vec, new_vec), [0.0, 1.0, 0.0])
+                    res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, rotation_axis))
+                    print("Intersection: " + str(res))
+                    new_vec = res - model.pos
+                    new_vec /= numpy.linalg.norm(new_vec)
+                    old_vec = self.origin_rotation_point - model.pos
+                    old_vec /= numpy.linalg.norm(old_vec)
 
-                        alpha = numpy.arctan2(sinang, cosang)
-                        if neg >0:
-                             alpha *= -1.
+                    cos_ang = numpy.dot(old_vec, new_vec)
+                    cross = numpy.cross(old_vec, new_vec)
 
-                        model.set_rotation([0.0, 1.0, 0.0], alpha)
+                    neg = numpy.dot(cross, rotation_axis)
+                    sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) *-1.
 
-                    elif model.rotationAxis == 'x':
-                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, [0.0, 0.0, 1.0]))
-                        new_vec = model.pos - res
-                        new_vec /= numpy.linalg.norm(new_vec)
-                        old_vec = model.pos - self.origin_rotation_point
-                        old_vec /= numpy.linalg.norm(old_vec)
+                    alpha = numpy.arctan2(sin_ang, cos_ang)
 
-                        cosang = numpy.dot(old_vec, new_vec)
-                        sinang = numpy.linalg.norm(numpy.cross(old_vec, new_vec))
-                        neg = numpy.dot(numpy.cross(old_vec, new_vec), [0.0, 0.0, 1.0])
-
-                        alpha = numpy.arctan2(sinang, cosang)
-                        if neg >0:
-                             alpha *= -1.
-
-                        model.set_rotation([0.0, 0.0, 1.0], alpha)
+                    model.set_rotation(rotation_axis, alpha)
 
                     self.scene_was_changed()
                 self.res_old = res
@@ -505,13 +479,16 @@ class Controller:
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
                     #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
+                    '''
                     if model.scaleAxis == 'x':
                         model.scale[0] = model.scale[0] + dx*0.25
                     elif model.scaleAxis == 'y':
                         model.scale[1] = model.scale[1] + dx*0.25
                     elif model.scaleAxis == 'z':
                         model.scale[2] = model.scale[2] + dy*0.25
-                    elif model.scaleAxis == 'xyz':
+                    el
+                    '''
+                    if model.scaleAxis == 'xyz':
                         #model.scale = [i + dy*0.25 for i in model.scale]
                         res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, direction*-1))
                         diff_vec = res - model.zeroPoint

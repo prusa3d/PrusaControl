@@ -184,8 +184,8 @@ class GLWidget(QGLWidget):
         self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95.,6.])
         self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95.,1.])
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/undo.png"), [4.,4.], [1.,75.])
-        self.do_button = GlButton(self.texture_from_png("data/img/do.png"), [4.,4.], [6.,75.])
+        self.undo_button = GlButton(self.texture_from_png("data/img/undo-2.png"), [4.,4.], [1.,75.])
+        self.do_button = GlButton(self.texture_from_png("data/img/do-2.png"), [4.,4.], [6.,75.])
 
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
@@ -387,17 +387,17 @@ class GLWidget(QGLWidget):
         glColor3ubv(colors[0])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):
-            glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
+            glVertex3f(0., math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius)
         glEnd()
         glColor3ubv(colors[1])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):
-            glVertex3f(0., math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius)
+            glVertex3f(math.cos(math.radians(i)) * radius, 0., math.sin(math.radians(i)) * radius)
         glEnd()
         glColor3ubv(colors[2])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):
-            glVertex3f(math.cos(math.radians(i)) * radius, 0., math.sin(math.radians(i)) * radius)
+            glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
         glEnd()
         glEnable(GL_DEPTH_TEST)
         glEnable( GL_LIGHTING )
@@ -450,7 +450,7 @@ class GLWidget(QGLWidget):
         winX = event.x() * 1.0
         winY = viewport[3] - (event.y() *1.0)
 
-        rayStart = gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport)
+        rayStart = gluUnProject(winX, winY, -1.0, matModelView, matProjection, viewport)
         rayEnd = gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport)
 
         return (rayStart, rayEnd)

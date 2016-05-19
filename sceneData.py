@@ -305,6 +305,7 @@ class Model(object):
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
+        '''
         glDisable(GL_DEPTH_TEST)
         glBegin(GL_POINTS)
         glColor3f(1,0,0)
@@ -313,7 +314,7 @@ class Model(object):
         glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
         glEnd()
         glEnable(GL_DEPTH_TEST)
-
+        '''
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
         '''
         if debug and not picking:
@@ -389,15 +390,15 @@ class Model(object):
         self.max_scene = self.max + self.pos
 
     def set_rotation(self, vector, alpha):
-        if vector == [1.0, 0.0, 0.0]:
+        if vector.tolist() == [1.0, 0.0, 0.0]:
             if not(self.rot[0] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[0])
                 self.rot[0] = alpha
-        elif vector == [0.0, 1.0, 0.0]:
+        elif vector.tolist() == [0.0, 1.0, 0.0]:
             if not(self.rot[1] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[1])
                 self.rot[1] = alpha
-        elif vector == [0.0, 0.0, 1.0]:
+        elif vector.tolist() == [0.0, 0.0, 1.0]:
             if not(self.rot[2] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[2])
                 self.rot[2] = alpha
