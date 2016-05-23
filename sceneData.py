@@ -316,24 +316,7 @@ class Model(object):
         glEnable(GL_DEPTH_TEST)
         '''
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-        '''
-        if debug and not picking:
-            glDisable(GL_DEPTH_TEST)
 
-            glBegin(GL_POINTS)
-            glColor3f(0,1,0)
-            glVertex3f(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
-            glColor3f(0,0,1)
-            glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
-            glEnd()
-            glEnable(GL_DEPTH_TEST)
-            glPushMatrix()
-            glTranslated(self.boundingSphereCenter[0], self.boundingSphereCenter[1], self.boundingSphereCenter[2])
-            glLineWidth(1)
-            glColor3f(.25, .25, .25)
-            glutWireSphere(self.boundingSphereSize+0.1, 16, 10)
-            glPopMatrix()
-        '''
         if picking:
             glColor3ubv(self.colorId)
         else:

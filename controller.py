@@ -472,7 +472,7 @@ class Controller:
 
                     self.scene_was_changed()
                 self.res_old = res
-            self.view.updateScene()
+            self.view.update_scene()
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
@@ -523,7 +523,7 @@ class Controller:
             self.view.update_scene()
 
 
-        #
+
 
 
     def hit_objects(self, event):

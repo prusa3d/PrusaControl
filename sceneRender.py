@@ -10,7 +10,7 @@ import numpy
 import time
 
 
-from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QColor, QCursor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
@@ -26,7 +26,7 @@ def timing(f):
         time1 = time.time()
         ret = f(*args)
         time2 = time.time()
-        logging.debug('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        print('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
         return ret
     return wrap
 
@@ -240,40 +240,33 @@ class GLWidget(QGLWidget):
         #glMaterialf(GL_FRONT, GL_SHININESS, .4 * 128.0);
         #new material settings
 
-
         #material
         glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
         glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
-        #light
-        #glLightfv(GL_LIGHT0, GL_AMBIENT, self.lightAmbient)
-        #glLightfv(GL_LIGHT0, GL_DIFFUSE, self.lightDiffuse)
-        #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
-        #glEnable(GL_LIGHT0)
 
 
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
-        #glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION )
-        #glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE )
         glBlendFunc(GL_SRC_ALPHA,GL_ONE)
 
-        #glEnable(GL_COLOR_MATERIAL)
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
-        #glEnable( GL_BLEND )
+
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
 
 
-    #@timing
+    @timing
     def paintGL(self, selection = 1):
         #print(inspect.stack()[1][3] + " call render")
         if selection:
             glClearColor(0.0, 0.0, 0.0, 1.0)
             #glClearColor(1.0, 1.0, 1.0, 1.0)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            #glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glClear(GL_COLOR_BUFFER_BIT)
             glLoadIdentity()
+            glDepthMask(GL_FALSE)
 
             glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
             glTranslatef(0.0, 0.0, self.zoom)
@@ -281,12 +274,9 @@ class GLWidget(QGLWidget):
             glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
             glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-            #glLightfv(GL_LIGHT0, GL_POSITION, self.lightPossition)
-            #glLightfv(GL_LIGHT1, GL_POSITION, self.lightPossition)
             glDisable( GL_LIGHTING )
-            #glDisable( GL_LIGHT0 )
             glDisable( GL_BLEND )
-            glEnable(GL_DEPTH_TEST)
+            #glEnable(GL_DEPTH_TEST)
 
             if self.parent.controller.scene.models:
                 for model in self.parent.controller.scene.models:
@@ -295,14 +285,29 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-            self.sceneFrameBuffer = self.grabFrameBuffer()
+            #color picking, save color buffer to picture
+            '''
+            p = self.mapFromGlobal(QCursor.pos())
+            self.set_mouse_pos(p)
+            print("p: " + str(p.x()) + ' ' + str(p.y()))
+            print("mouse : " + str(self.mouse_pos_x) + ' ' + str(self.mouse_pos_y))
+            glReadPixels(self.mouse_pos_x, self.mouse_pos_y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, self.mouse_pixel_color)
+            print("mouse color: " + str(type(self.mouse_pixel_color)))
+            print("mouse color: " + str(self.mouse_pixel_color[0]) + ' ' + str(self.mouse_pixel_color[1]) + ' ' + str(self.mouse_pixel_color[2]) + ' ' + str(self.mouse_pixel_color[3]))
+            '''
 
+
+            self.sceneFrameBuffer = self.grabFrameBuffer()
             if 'debug' in self.parent.controller.settings:
                 if self.parent.controller.settings['debug']:
+                    #save picture to filesystem
                     self.sceneFrameBuffer.save("select_buffer.png")
 
-            glEnable( GL_LIGHTING )
 
+        #color picking
+
+        glDepthMask(GL_TRUE)
+        glEnable( GL_LIGHTING )
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         self.draw_background_texture()
@@ -319,13 +324,6 @@ class GLWidget(QGLWidget):
         glCallList(self.bed[self.parent.controller.settings['printer']])
         glDisable( GL_BLEND )
 
-        #light
-        glPointSize(5)
-        glColor3f(0,1,1)
-        glBegin(GL_POINTS)
-        glVertex3fv(self.lightPossition[:3])
-        glEnd()
-        glEnable(GL_DEPTH_TEST)
 
         if 'debug' in self.parent.controller.settings:
             if self.parent.controller.settings['debug']:
@@ -341,20 +339,23 @@ class GLWidget(QGLWidget):
                 glVertex3fv(self.parent.controller.ray_end)
                 glEnd()
 
-        '''
-        draw scene with all objects
-        '''
-        glDisable( GL_BLEND )
+        glEnable(GL_DEPTH_TEST)
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
                 model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
+        glDisable( GL_LIGHTING )
+
+
+        if self.parent.controller.scene.models:
+            for model in self.parent.controller.scene.models:
                 self.draw_tools_helper(model, self.parent.controller.settings)
 
-        glDisable( GL_LIGHTING )
-        glEnable( GL_BLEND )
+
+        #glEnable( GL_BLEND )
 
         self.draw_tools()
+
         #self.draw_debug()
 
         #glFlush()
@@ -654,7 +655,7 @@ class GLWidget(QGLWidget):
         sH = viewport[3]
 
         glLoadIdentity()
-        glDisable(GL_LIGHTING)
+        #glDisable(GL_LIGHTING)
         glDisable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
 
