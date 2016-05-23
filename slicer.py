@@ -36,6 +36,7 @@ class Slic3rEngineRunner(QObject):
     step_increased = pyqtSignal(int)
     filament_info = pyqtSignal(str)
     finished = pyqtSignal()
+    send_message = pyqtSignal(str)
 
     def __init__(self, controller):
         super(Slic3rEngineRunner, self).__init__()
@@ -104,13 +105,11 @@ class Slic3rEngineRunner(QObject):
         self.check_progress(process)
 
     def check_progress(self, process):
-        #for line in iter(process.stdout.readline, ''):
         while self.step <= self.step_max and self.is_running is True:
             line = process.stdout.readline()
             self.step += 1
             if not line:
                 break
-            print(line.rsplit())
             self.step_increased.emit(int(((10. / (self.step_max+1)*1.) * (self.step + 1)) * 10))
             if self.step == self.step_max:
                 filament_str = line.rsplit()
@@ -119,6 +118,11 @@ class Slic3rEngineRunner(QObject):
                 self.filament_info.emit(filament_str)
                 self.finished.emit()
                 break
+            else:
+                text = line.rsplit()[1:]
+                if text[0] == 'Exporting':
+                    text = text[:2]
+                self.send_message.emit(" ".join(text))
 
     def end(self):
         self.end_callback()
@@ -147,6 +151,7 @@ class SlicerEngineManager(object):
         self.slice_thread = None
         self.slice_engine = None
 
+
     def slice(self):
         #self.controller.set_cancel_button()
         self.slice_thread = QThread()
@@ -156,6 +161,7 @@ class SlicerEngineManager(object):
         self.slice_engine.finished.connect(self.thread_ended)
         self.slice_engine.filament_info.connect(self.controller.set_print_info_text)
         self.slice_engine.step_increased.connect(self.controller.set_progress_bar)
+        self.slice_engine.send_message.connect(self.controller.show_message_on_status_bar)
 
         self.slice_thread.start()
 

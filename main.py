@@ -17,6 +17,7 @@ DEBUG = False
 def main():
     logging.info('PrusaControl start')
     app = QtGui.QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
     controller = Controller(app)
     window = controller.get_view()
     app.installEventFilter(window)

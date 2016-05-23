@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import inspect
 import logging
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -37,6 +38,9 @@ class GLWidget(QGLWidget):
         #self.camera = TargetedCamera()
         self.parent = parent
         self.init_parametres()
+
+        self.last_time = time.time()
+        self.delta_t = 0.016
 
         #properties definition
         self.xRot = 0
@@ -107,7 +111,13 @@ class GLWidget(QGLWidget):
     def update_scene(self, reset=False):
         if reset:
             self.init_parametres()
-        self.updateGL()
+        actual_time = time.time()
+        print("actual_time: " + str(actual_time))
+        delta = actual_time-self.last_time
+        print("delta: " + str(delta))
+        if delta >= self.delta_t:
+            self.updateGL()
+            self.last_time = actual_time
 
     #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
@@ -137,19 +147,16 @@ class GLWidget(QGLWidget):
         angle = self.normalize_angle_x(angle)
         if angle != self.xRot:
             self.xRot = angle
-            self.updateGL()
 
     def set_y_rotation(self, angle):
         angle = self.normalize_angle(angle)
         if angle != self.yRot:
             self.yRot = angle
-            self.updateGL()
 
     def set_z_rotation(self, angle):
         angle = self.normalize_angle(angle)
         if angle != self.zRot:
             self.zRot = angle
-            self.updateGL()
 
     def texture_from_png(self, filename):
         mode_to_bpp = {'1':1, 'L':8, 'P':8, 'RGB':24, 'RGBA':32, 'CMYK':32, 'YCbCr':24, 'I':32, 'F':32}
@@ -261,6 +268,7 @@ class GLWidget(QGLWidget):
 
     #@timing
     def paintGL(self, selection = 1):
+        #print(inspect.stack()[1][3] + " call render")
         if selection:
             glClearColor(0.0, 0.0, 0.0, 1.0)
             #glClearColor(1.0, 1.0, 1.0, 1.0)

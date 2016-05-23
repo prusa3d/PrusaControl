@@ -375,6 +375,7 @@ class Controller:
         self.view.update_scene()
 
     def mouse_press_event(self, event):
+        #print("mouse press event")
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
@@ -401,6 +402,7 @@ class Controller:
         self.view.update_scene()
 
     def mouse_release_event(self, event):
+        #print("mouse release event")
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
@@ -417,6 +419,7 @@ class Controller:
                 self.view.update_scene()
 
     def mouse_move_event(self, event):
+        #print("mouse move event")
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         diff = numpy.linalg.norm(numpy.array([dx, dy]))
@@ -432,6 +435,7 @@ class Controller:
                         model.set_move(res_new)
                         self.scene_was_changed()
                     self.res_old = res
+                self.view.update_scene()
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
@@ -450,7 +454,7 @@ class Controller:
                         rotation_axis = numpy.array([0.0, 0.0, 1.0])
 
                     res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, rotation_axis))
-                    print("Intersection: " + str(res))
+                    #print("Intersection: " + str(res))
                     new_vec = res - model.pos
                     new_vec /= numpy.linalg.norm(new_vec)
                     old_vec = self.origin_rotation_point - model.pos
@@ -468,7 +472,7 @@ class Controller:
 
                     self.scene_was_changed()
                 self.res_old = res
-            #self.view.updateScene()
+            self.view.updateScene()
 
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
@@ -498,12 +502,14 @@ class Controller:
                         res = [.0, .0, .0]
                     self.scene_was_changed()
                 self.res_old = res
+            self.view.update_scene()
 
         elif event.buttons() & QtCore.Qt.RightButton:
             #TODO:Add controll of camera instance
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             self.last_pos = QtCore.QPoint(event.pos())
+            self.view.update_scene()
 
         elif event.buttons() & QtCore.Qt.MiddleButton:
             #TODO:Make it better
@@ -511,17 +517,14 @@ class Controller:
             #plane = pyrr.plane.create_from_position(pos, normal)
 
             new_pos = numpy.array(pos)
-            #print("Last_ray_pos: " + str(self.last_ray_pos))
-            #print("New_pos: " + str(new_pos))
             diff = (self.last_ray_pos - new_pos)
-            #print("Diff: " + str(diff))
             self.last_ray_pos = new_pos
             self.view.add_camera_position(diff)
-
+            self.view.update_scene()
 
 
         #
-        self.view.update_scene()
+
 
     def hit_objects(self, event):
         possible_hit = []
@@ -675,6 +678,8 @@ class Controller:
     def clear_tool_button_states(self):
         self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}
 
+    def show_message_on_status_bar(self, string):
+        self.view.statusBar().showMessage(string)
 
     def open_file(self, url):
         '''
