@@ -520,7 +520,7 @@ class Controller:
             diff = (self.last_ray_pos - new_pos)
             self.last_ray_pos = new_pos
             self.view.add_camera_position(diff)
-            self.view.update_scene()
+            #self.view.update_scene()
 
 
 
