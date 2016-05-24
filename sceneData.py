@@ -157,11 +157,18 @@ class Model(object):
         min = self.min_scene
         max = self.max_scene
 
-        if max[0] <= (printer['printing_space'][0]*.5) and min[0] >= (printer['printing_space'][0]*-.5) and max[1] <= (printer['printing_space'][1]*.5)\
-                and min[1] >= (printer['printing_space'][1]*-.5) and max[2] <= (printer['printing_space'][2]*.5) \
-                and min[2] >= (printer['printing_space'][2]*-.5):
-            return True
+        if max[0] <= (printer['printing_space'][0]*.5) and min[0] >= (printer['printing_space'][0]*-.5):
+                if max[1] <= (printer['printing_space'][1]*.5) and min[1] >= (printer['printing_space'][1]*-.5):
+                    if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
+                        return True
+                    else:
+                        print("naruseni v Z")
+                        return False
+                else:
+                    print("naruseni v Y")
+                    return False
         else:
+            print("naruseni v X")
             return False
 
     def get_mesh(self):

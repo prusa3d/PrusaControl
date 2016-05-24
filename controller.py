@@ -393,7 +393,6 @@ class Controller:
                     elif model.rotationAxis == 'z':
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
                     model.draw_rotation(True)
-        #    self.find_object_and_rotation_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.MiddleButton:
@@ -426,7 +425,6 @@ class Controller:
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
-
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
                 res_new = sceneData.Vector.minusAB(res, self.res_old)
@@ -575,6 +573,7 @@ class Controller:
     def hit_tool_button_by_color(self, event):
         color = self.view.get_cursor_pixel_color(event)
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        print("Id color: " + str(find_id))
         if find_id == 0:
             return False
         id_list = [i.id for i in self.view.get_tool_buttons()]

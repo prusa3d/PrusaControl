@@ -546,7 +546,7 @@ class PrusaControlWidget(QtGui.QWidget):
         return self.glWidget.get_camera_direction(event)
 
     def get_tool_buttons(self):
-        return [self.glWidget.moveTool, self.glWidget.rotateTool, self.glWidget.scaleTool]
+        return self.glWidget.tools
 
     def update_scene(self, reset=False):
         self.glWidget.update_scene(reset)

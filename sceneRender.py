@@ -112,9 +112,7 @@ class GLWidget(QGLWidget):
         if reset:
             self.init_parametres()
         actual_time = time.time()
-        print("actual_time: " + str(actual_time))
         delta = actual_time-self.last_time
-        print("delta: " + str(delta))
         if delta >= self.delta_t:
             self.updateGL()
             self.last_time = actual_time
@@ -191,8 +189,8 @@ class GLWidget(QGLWidget):
         self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95.,6.])
         self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95.,1.])
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/undo-2.png"), [4.,4.], [1.,75.])
-        self.do_button = GlButton(self.texture_from_png("data/img/do-2.png"), [4.,4.], [6.,75.])
+        self.undo_button = GlButton(self.texture_from_png("data/img/undo-2.png"), [4.,4.], [1.,75.], True)
+        self.do_button = GlButton(self.texture_from_png("data/img/do-2.png"), [4.,4.], [6.,75.], True)
 
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
@@ -257,7 +255,7 @@ class GLWidget(QGLWidget):
         glEnable( GL_LIGHT1 )
 
 
-    @timing
+    #@timing
     def paintGL(self, selection = 1):
         #print(inspect.stack()[1][3] + " call render")
         if selection:
@@ -314,6 +312,9 @@ class GLWidget(QGLWidget):
         glLoadIdentity()
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
+
+        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(0, 10, 50, 0))
+        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(50, 10, 50, 0))
 
         glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
@@ -655,7 +656,7 @@ class GLWidget(QGLWidget):
         sH = viewport[3]
 
         glLoadIdentity()
-        #glDisable(GL_LIGHTING)
+        glDisable(GL_LIGHTING)
         glDisable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
 
@@ -686,6 +687,7 @@ class GLWidget(QGLWidget):
             if tool.pressed and not picking:
                 glDisable(GL_TEXTURE_2D)
                 glColor3f(1.,.0,.0)
+                glLineWidth(2.)
                 glBegin(GL_LINE_LOOP)
                 glVertex3f(tool.position[0] * (sW*.01), tool.position[1]* (sH*.01), 0)
                 glVertex3f(tool.position[0] * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
