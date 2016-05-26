@@ -380,13 +380,15 @@ class GLWidget(QGLWidget):
     def draw_rotation_circles(self, model, colors, position, radius, picking=False):
         if not picking:
             if model.selected and model.rotationAxis == 'x':
-                colors[0] = [255, 204, 0]
+                colors[0] = [255, 255, 0]
             elif model.selected and model.rotationAxis == 'y':
-                colors[1] = [255, 204, 0]
+                colors[1] = [255, 255, 0]
             elif model.selected and model.rotationAxis == 'z':
-                colors[2] = [255, 204, 0]
-
-        segments = 32
+                colors[2] = [255, 255, 0]
+        if picking:
+            segments = 16
+        else:
+            segments = 64
         glPushMatrix()
         glTranslatef(position[0], position[1], position[2])
         glDisable( GL_LIGHTING )
@@ -522,16 +524,16 @@ class GLWidget(QGLWidget):
         glBegin(GL_QUADS)
         glNormal3f(.0,.0,1.)
         glTexCoord2f(0, printing_space[1]*.5)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, -0.001)
 
         glTexCoord2f(0, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, -0.001)
 
         glTexCoord2f(printing_space[0]*.5, 0)
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, -0.001)
 
         glTexCoord2f(printing_space[0]*.5, printing_space[1]*.5)
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, 0)
+        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, -0.001)
         glEnd()
         glDisable(GL_TEXTURE_2D)
         glEnable(GL_BLEND)
