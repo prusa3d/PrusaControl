@@ -250,7 +250,8 @@ class GLWidget(QGLWidget):
 
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
-
+        glEnable(GL_POINT_SMOOTH)
+        glEnable(GL_POLYGON_SMOOTH)
 
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
