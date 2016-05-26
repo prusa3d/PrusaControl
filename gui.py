@@ -220,10 +220,11 @@ class PrusaControlView(QtGui.QMainWindow):
         self.file_menu.addAction(self.tr('Close'), self.controller.close)
         #file menu definition
 
+        #TODO:Uncoment after new function created/tested
         #printer menu
-        self.printer_menu = self.menubar.addMenu(self.tr('&Printer'))
-        self.printer_menu.addAction(self.tr('Printer info'), self.controller.open_printer_info)
-        self.printer_menu.addAction(self.tr('Update firmware'), self.controller.open_update_firmware)
+        #self.printer_menu = self.menubar.addMenu(self.tr('&Printer'))
+        #self.printer_menu.addAction(self.tr('Printer info'), self.controller.open_printer_info)
+        #self.printer_menu.addAction(self.tr('Update firmware'), self.controller.open_update_firmware)
         #printer menu
 
         #Settings menu

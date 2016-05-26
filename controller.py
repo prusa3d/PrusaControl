@@ -335,6 +335,7 @@ class Controller:
         self.view.update_scene()
 
     def save_project(self, path):
+        self.scene.check_models_name()
         project_file = ProjectFile(self.scene)
         project_file.save(path)
 
@@ -390,7 +391,6 @@ class Controller:
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 1.0, 0.0]))
                     elif model.rotationAxis == 'z':
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
-                    model.draw_rotation(True)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.MiddleButton:
@@ -403,8 +403,7 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
-                    model.rot = [0.,0.,0.]
-                    model.draw_rotation(False)
+                    model.rot = numpy.array([0.,0.,0.])
                     model.place_on_zero()
         self.scene.clear_selected_models()
         self.view.update_scene()

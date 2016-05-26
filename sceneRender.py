@@ -366,16 +366,11 @@ class GLWidget(QGLWidget):
     def draw_tools_helper(self, model, settings, picking=False):
         if picking:
             rotateColors = [model.rotateColorXId, model.rotateColorYId, model.rotateColorZId]
-            #scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
         else:
-            #rotateColors = [[255,0,0],[0,255,0],[0,0,255]]
             rotateColors = [[180,180,180],[180,180,180],[180,180,180]]
-            #scaleColors = [[255,0,0],[0,255,0],[0,0,255], [255,255,255]]
 
         if settings['toolButtons']['rotateButton']:
             self.draw_rotation_circles(model, rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1, picking)
-        #elif settings['toolButtons']['scaleButton']:
-        #    self.draw_scale_axes(scaleColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1)
 
     def draw_rotation_circles(self, model, colors, position, radius, picking=False):
         if not picking:
@@ -453,7 +448,6 @@ class GLWidget(QGLWidget):
         self.parent.controller.mouse_move_event(event)
 
     def wheelEvent(self, event):
-        logging.info('MouseWheel')
         self.parent.controller.wheel_event(event)
 
     def get_cursor_position(self, event):
@@ -476,7 +470,6 @@ class GLWidget(QGLWidget):
 
         winX = (viewport[2]*.5)
         winY = (viewport[3]*.5)
-        print("WinX a WinY: " + str(winX) + ' ' + str(winY))
 
         rayStart = numpy.array(gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport))
         rayEnd = numpy.array(gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport))

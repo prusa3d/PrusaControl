@@ -97,9 +97,11 @@ class Version_1_0(VersionAbstract):
                 logging.debug("Jmeno souboru je: " + m['file_name'])
                 mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
                 model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
-                model.rot = m['rotation']
-                model.pos = m['position']
-                model.scale = m['scale']
+                model.rot = numpy.array(m['rotation'])
+                model.pos = numpy.array(m['position'])
+                model.scale = numpy.array(m['scale'])
+                model.update_min_max()
+                model.parent = scene
 
                 scene.models.append(model)
 
@@ -114,9 +116,12 @@ class Version_1_0(VersionAbstract):
             for model in scene.models:
                 model_element = ET.SubElement(models_tag, "model", name=model.filename)
                 ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
-                ET.SubElement(model_element, "position").text=str(model.pos)
-                ET.SubElement(model_element, "rotation").text=str(model.rot)
-                ET.SubElement(model_element, "scale").text=str(model.scale)
+                ET.SubElement(model_element, "position").text=str(model.pos.tolist())
+                #ET.SubElement(model_element, "rotation").text=str(model.rot.tolist())
+                #ET.SubElement(model_element, "scale").text=str(model.scale.tolist())
+                ET.SubElement(model_element, "rotation").text=str([.0, .0, .0])
+                ET.SubElement(model_element, "scale").text=str([1., 1., 1.])
+
 
             #save xml file to new created zip file
             newXml = ET.tostring(root)
@@ -126,7 +131,7 @@ class Version_1_0(VersionAbstract):
             for model in scene.models:
                 #transform data to stl file
                 #mesh = self._create_mesh_from_model(model)
-                mesh = model.get_mesh()
+                mesh = model.get_mesh(transform=False)
 
                 #generate ascii format of stl(bug in numpy-stl)
                 #fileHandler = opened_zipfile.write(model.filename)

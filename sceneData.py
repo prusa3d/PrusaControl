@@ -43,6 +43,18 @@ class AppScene(object):
         #move pointer of transformation to +1 or leave on last
         pass
 
+    def check_models_name(self):
+        for m in self.models:
+            number = 0
+            for o in self.models:
+                if m.filename == o.filename:
+                    number+=1
+                if number>1:
+                    name_list = o.filename.split(".")
+                    name_list[0] = "%s%s" % (name_list[0], str(number))
+                    o.filename = ".".join(name_list)
+
+
     def clearScene(self):
         self.models = []
 
@@ -138,7 +150,7 @@ class Model(object):
 
         #transformation data, connected to scene
         self.pos = numpy.array([.0, .0, .0])
-        self.rot = [0.0, 0.0, 0.0]
+        self.rot = numpy.array([.0, .0, .0])
         self.scale = numpy.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
         self.min_scene = [.0, .0, .0]
@@ -187,7 +199,7 @@ class Model(object):
             self.parent.controller.set_printable(False)
             return False
 
-    def get_mesh(self):
+    def get_mesh(self, transform=True):
         print('saving model')
         data = numpy.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
@@ -204,7 +216,8 @@ class Model(object):
         mesh.rotate([0.0, 0.0, 1.0], self.rot[2])
         '''
 
-        mesh.vectors += numpy.array(self.pos)
+        if transform:
+            mesh.vectors += numpy.array(self.pos)
 
         mesh.vectors /= numpy.array(self.scaleDefault)
 
@@ -328,7 +341,7 @@ class Model(object):
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
-        '''
+
         glDisable(GL_DEPTH_TEST)
         glBegin(GL_POINTS)
         glColor3f(1,0,0)
@@ -337,7 +350,7 @@ class Model(object):
         glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
         glEnd()
         glEnable(GL_DEPTH_TEST)
-        '''
+
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
         if picking:
@@ -386,8 +399,6 @@ class Model(object):
     def get_matrix4(self):
         return matrix44.create_from_matrix33(self.matrix)
 
-    def draw_rotation(self, status=False, pos=[0.,0.,0.]):
-        pass
 
     def set_move(self, vector):
         vector = numpy.array(vector)
@@ -459,7 +470,6 @@ class Model(object):
 
     def update_position(self):
         self.update_min_max()
-        print('Min a Max: ' + str(self.min) + ' ' + str(self.max))
         if self.min[2] < 0.:
             len = self.min[2] * -1.0
             self.pos[2]+=len
@@ -468,8 +478,11 @@ class Model(object):
     def update_min_max(self):
         self.mesh.update_min()
         self.mesh.update_max()
-        self.min = self.mesh.min_ + self.pos
-        self.max = self.mesh.max_ + self.pos
+        self.min = self.mesh.min_
+        self.max = self.mesh.max_
+
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
 
 
 
