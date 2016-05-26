@@ -251,7 +251,10 @@ class Controller:
         self.actual_printer = self.printers[index[0]]
 
     def send_feedback(self):
-        self.open_web_browser("http://www.seznam.cz")
+        if self.settings['language'] == 'cs_CZ':
+            self.open_web_browser("http://goo.gl/forms/7jFBgXjOoqMbQ1wl1")
+        else:
+            self.open_web_browser("http://goo.gl/forms/nhKwtXvrtaZey0B02")
 
     def open_help(self):
         self.open_web_browser("http://www.prusa3d.com")
@@ -328,13 +331,10 @@ class Controller:
         self.view.update_scene()
 
     def import_project(self, path):
-        #TODO:Add code for read zip file, in memory open it and read xml file scene(with transformations of objects) and object files in stl
-        #open zip file
         project_file = ProjectFile(self.scene, path)
         self.view.update_scene()
 
     def save_project(self, path):
-        #TODO:Save project file
         project_file = ProjectFile(self.scene)
         project_file.save(path)
 
@@ -351,7 +351,6 @@ class Controller:
     def generate_gcode(self):
         self.set_progress_bar(int(((10. / 9.) * 1) * 10))
         if self.scene.models:
-            #self.view.disable_save_gcode_button()
             self.scene.save_whole_scene_to_one_stl_file(self.tmp_place + "tmp.stl")
             self.slicer_manager.slice()
 
@@ -375,7 +374,6 @@ class Controller:
         self.view.update_scene()
 
     def mouse_press_event(self, event):
-        #print("mouse press event")
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
@@ -521,8 +519,18 @@ class Controller:
             #self.view.update_scene()
 
 
+    def set_printable(self, is_printable):
+        self.scene.printable = is_printable
+        if is_printable == False:
+            self.disable_generate_button()
+        else:
+            self.enable_generate_button()
 
+    def disable_generate_button(self):
+        self.view.disable_generate_button()
 
+    def enable_generate_button(self):
+        self.view.enable_generate_button()
 
     def hit_objects(self, event):
         possible_hit = []

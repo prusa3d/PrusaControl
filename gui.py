@@ -264,6 +264,12 @@ class PrusaControlView(QtGui.QMainWindow):
     def open_firmware_dialog(self):
         data, ok = FirmwareUpdateDialog.get_firmware_update(self.controller, self.parent())
 
+    def disable_generate_button(self):
+        self.prusa_control_widget.generateButton.setDisabled(True)
+
+    def enable_generate_button(self):
+        self.prusa_control_widget.generateButton.setDisabled(False)
+
     def open_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"
         title = 'Open project file'

@@ -47,7 +47,7 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 0
         self.zoom = 0
-        self.camera_position = numpy.array([0., 5. ,0.])
+        self.camera_position = numpy.array([0., 0. ,0.])
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -251,6 +251,7 @@ class GLWidget(QGLWidget):
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
 
+
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
 
@@ -313,7 +314,7 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(0, 10, 50, 0))
+        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(0, 50, 100, 0))
         glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(50, 10, 50, 0))
 
         glTranslatef(0.0, 0.0, self.zoom)

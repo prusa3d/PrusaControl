@@ -31,6 +31,18 @@ class AppScene(object):
         self.models = []
         self.printable = True
 
+        self.transformation_list = []
+        self.actual_list_position = 0
+
+
+    def make_undo(self):
+        #just move pointer of transformation to -1 or leave on 0
+        pass
+
+    def make_do(self):
+        #move pointer of transformation to +1 or leave on last
+        pass
+
     def clearScene(self):
         self.models = []
 
@@ -160,15 +172,19 @@ class Model(object):
         if max[0] <= (printer['printing_space'][0]*.5) and min[0] >= (printer['printing_space'][0]*-.5):
                 if max[1] <= (printer['printing_space'][1]*.5) and min[1] >= (printer['printing_space'][1]*-.5):
                     if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
+                        self.parent.controller.set_printable(True)
                         return True
                     else:
                         print("naruseni v Z")
+                        self.parent.controller.set_printable(False)
                         return False
                 else:
                     print("naruseni v Y")
+                    self.parent.controller.set_printable(False)
                     return False
         else:
             print("naruseni v X")
+            self.parent.controller.set_printable(False)
             return False
 
     def get_mesh(self):
