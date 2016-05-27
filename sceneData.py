@@ -8,6 +8,7 @@ from stl.mesh import Mesh
 from random import randint
 import math
 import itertools
+from pprint import pprint
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -34,14 +35,30 @@ class AppScene(object):
         self.transformation_list = []
         self.actual_list_position = 0
 
+    def save_change(self, instance, change_type, value):
+        if not(self.actual_list_position == len(self.transformation_list)):
+            #TODO:Vymyslet lepe, toto reseni je nestabilni...
+            self.transformation_list = deepcopy(self.transformation_list[:self.actual_list_position])
+        self.transformation_list.append([instance, change_type, value])
+        self.actual_list_position = len(self.transformation_list)
 
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
-        pass
+        print(str(self.transformation_list))
+        if self.actual_list_position > 1:
+            self.actual_list_position -= 1
+            instance, change_type, data = self.transformation_list[self.actual_list_position]
+            print("Undo: " + change_type +' '+ str(data))
+            instance.make_change(False, change_type, data)
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
-        pass
+        print(str(self.transformation_list))
+        if self.actual_list_position < len(self.transformation_list):
+            self.actual_list_position += 1
+            instance, change_type, data = self.transformation_list[self.actual_list_position]
+            print("Do: " + change_type +' '+ str(data))
+            instance.make_change(True, change_type, data)
 
     def check_models_name(self):
         for m in self.models:
@@ -403,6 +420,7 @@ class Model(object):
     def set_move(self, vector):
         vector = numpy.array(vector)
         self.pos += vector
+        self.parent.save_change(self, 'move', [vector])
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
@@ -410,14 +428,17 @@ class Model(object):
         if vector.tolist() == [1.0, 0.0, 0.0]:
             if not(self.rot[0] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[0])
+                self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[0]])
                 self.rot[0] = alpha
         elif vector.tolist() == [0.0, 1.0, 0.0]:
             if not(self.rot[1] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[1])
+                self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[1]])
                 self.rot[1] = alpha
         elif vector.tolist() == [0.0, 0.0, 1.0]:
             if not(self.rot[2] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[2])
+                self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[2]])
                 self.rot[2] = alpha
         self.mesh.update_min()
         self.mesh.update_max()
@@ -437,6 +458,7 @@ class Model(object):
         if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
             #self.mesh.vectors *= scale_coef/self.scale
             self.mesh.vectors *= scale_coef
+            self.parent.save_change(self, 'scale', [scale_coef])
             #self.scale = value
             self.scale = scale_coef
             self.mesh.update_min()
@@ -449,6 +471,29 @@ class Model(object):
             self.max_scene = self.mesh.max_ + self.pos
 
             self.place_on_zero()
+
+
+    def make_change(self, do, change_type, data):
+        if do:
+            direction = 1.
+        else:
+            direction = -1.0
+
+        if change_type == 'move':
+            print("undo move")
+            self.set_move(data[0]*direction)
+        elif change_type == 'rotation':
+            print("undo rotation")
+            self.set_rotation(data[0], data[1]*direction)
+        elif change_type == 'scale':
+            print("undo scale")
+            #TODO:Je jeste potreba doplnit pokladani na podlozku
+            #TODO:Skontrolovat koeficient scalu-jestli nebude potreba ho nejak prepocitat
+            self.set_scale(data[0])
+
+
+
+
 
     def place_on_zero(self):
         min = self.min_scene

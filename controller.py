@@ -648,9 +648,11 @@ class Controller:
 
     def undo_button_pressed(self):
         print("Undo button pressed")
+        self.scene.make_undo()
 
     def do_button_pressed(self):
         print("Do button pressed")
+        self.scene.make_do()
 
     def select_button_pressed(self):
         self.clear_tool_button_states()
