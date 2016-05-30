@@ -36,27 +36,28 @@ class AppScene(object):
         self.actual_list_position = 0
 
     def save_change(self, instance, change_type, value):
-        if not(self.actual_list_position == len(self.transformation_list)):
-            #TODO:Vymyslet lepe, toto reseni je nestabilni...
-            self.transformation_list = deepcopy(self.transformation_list[:self.actual_list_position])
+        print("Snaha o ulozeni dalsiho stavu")
+        #if not(self.actual_list_position == len(self.transformation_list)-1) and self.transformation_list:
+        #    print("nebyli jsem na konci listu")
+        #    self.transformation_list = self.transformation_list[:self.actual_list_position]
         self.transformation_list.append([instance, change_type, value])
-        self.actual_list_position = len(self.transformation_list)
+        self.actual_list_position = len(self.transformation_list)-1
+        print("Actual index and len of list: " + str(self.actual_list_position) + ' ' + str(len(self.transformation_list)))
+        print("Data in list: " + str(self.transformation_list))
 
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
-        print(str(self.transformation_list))
-        if self.actual_list_position > 1:
-            self.actual_list_position -= 1
+        if self.actual_list_position >= 1:
             instance, change_type, data = self.transformation_list[self.actual_list_position]
+            self.actual_list_position -= 1
             print("Undo: " + change_type +' '+ str(data))
             instance.make_change(False, change_type, data)
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
-        print(str(self.transformation_list))
-        if self.actual_list_position < len(self.transformation_list):
-            self.actual_list_position += 1
+        if self.actual_list_position < len(self.transformation_list)-1:
             instance, change_type, data = self.transformation_list[self.actual_list_position]
+            self.actual_list_position += 1
             print("Do: " + change_type +' '+ str(data))
             instance.make_change(True, change_type, data)
 
@@ -168,6 +169,7 @@ class Model(object):
         #transformation data, connected to scene
         self.pos = numpy.array([.0, .0, .0])
         self.rot = numpy.array([.0, .0, .0])
+        self.rot_scene = numpy.array([.0, .0, .0])
         self.scale = numpy.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
         self.min_scene = [.0, .0, .0]
@@ -189,10 +191,19 @@ class Model(object):
         #self.color = [75./255., 119./255., 190./255.]
         self.color = [34./255., 167./255., 240./255.]
 
+        #status of object
+        self.is_changed = False
+
         #source file data
         #example car.stl
         self.filename = ""
         self.normalization_flag = False
+
+    def clear_state(self):
+        self.is_changed = False
+
+    def changing(self):
+        self.is_changed = True
 
     def is_in_printing_space(self, printer):
         min = self.min_scene
@@ -247,6 +258,204 @@ class Model(object):
 
     def __str__(self):
         return "Mesh: " + str(self.id) + ' ' + str(self.color)
+
+    def normalize_object(self):
+        r = numpy.array([.0, .0, .0]) - numpy.array(self.boundingSphereCenter)
+
+        self.mesh.vectors = self.mesh.vectors + r
+
+        self.update_min_max()
+        self.boundingSphereCenter = numpy.array(self.boundingSphereCenter) + r
+
+        self.zeroPoint = numpy.array(self.zeroPoint) + r
+        self.zeroPoint[2] = self.min[2]
+
+        self.pos = numpy.array([.0, .0, .0]) - self.zeroPoint
+
+        self.normalization_flag = True
+
+
+    def set_move(self, vector, add=True):
+        vector = numpy.array(vector)
+        if add:
+            self.pos += vector
+        else:
+            self.pos = vector
+        self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
+
+    def set_rotation(self, vector, alpha):
+        if vector.tolist() == [1.0, 0.0, 0.0]:
+            if not(self.rot[0] == alpha):
+                self.mesh.rotate(vector, alpha-self.rot[0])
+                #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[0]])
+                self.rot[0] = alpha
+                self.parent.controller.show_message_on_status_bar("Uhel X: " + str(numpy.degrees(self.rot[0])))
+        elif vector.tolist() == [0.0, 1.0, 0.0]:
+            if not(self.rot[1] == alpha):
+                self.mesh.rotate(vector, alpha-self.rot[1])
+                #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[1]])
+                self.rot[1] = alpha
+                self.parent.controller.show_message_on_status_bar("Uhel Y: " + str(numpy.degrees(self.rot[1])))
+        elif vector.tolist() == [0.0, 0.0, 1.0]:
+            if not(self.rot[2] == alpha):
+                self.mesh.rotate(vector, alpha-self.rot[2])
+                #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[2]])
+                self.rot[2] = alpha
+                self.parent.controller.show_message_on_status_bar("Uhel Z: " + str(numpy.degrees(self.rot[2])))
+        self.mesh.update_min()
+        self.mesh.update_max()
+
+        self.min = self.mesh.min_
+        self.max = self.mesh.max_
+        self.min_scene = self.mesh.min_ + self.pos
+        self.max_scene = self.mesh.max_ + self.pos
+
+        #self.place_on_zero()
+
+    def set_scale(self, value):
+        #TODO:Omezeni minimalni velikosti
+        scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
+        scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
+        #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
+        if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
+            #self.mesh.vectors *= scale_coef/self.scale
+            self.mesh.vectors *= scale_coef
+            #self.parent.save_change(self, 'scale', [scale_coef])
+            #self.scale = value
+            self.scale = scale_coef
+            self.parent.controller.show_message_on_status_bar("Nastaven scale: " + str(self.scale[0]))
+            self.mesh.update_min()
+            self.mesh.update_max()
+
+            self.min = self.mesh.min_
+            self.max = self.mesh.max_
+
+            self.min_scene = self.mesh.min_ + self.pos
+            self.max_scene = self.mesh.max_ + self.pos
+
+            self.place_on_zero()
+
+
+    def make_change(self, do, change_type, data):
+        if do:
+            direction = 1.
+        else:
+            direction = -1.0
+
+        if change_type == 'move':
+            print("undo move")
+            self.set_move(data[0], False)
+        elif change_type == 'rotation':
+            print("undo rotation")
+            self.set_rotation(data[0], data[1]*direction)
+            self.rot = numpy.array([0., 0., 0.])
+            self.place_on_zero()
+        elif change_type == 'scale':
+            print("undo scale")
+            #TODO:Je jeste potreba doplnit pokladani na podlozku
+            #TODO:Skontrolovat koeficient scalu-jestli nebude potreba ho nejak prepocitat
+            self.set_scale(data[0])
+            self.place_on_zero()
+
+
+
+
+    def place_on_zero(self):
+        min = self.min_scene
+        max = self.max_scene
+        pos = self.pos
+
+        if min[2] < 0.0:
+            diff = min[2] * -1.0
+            pos[2]+=diff
+            self.pos = pos
+        elif min[2] > 0.0:
+            diff = min[2] * -1.0
+            pos[2]+=diff
+            self.pos = pos
+
+        self.min_scene = self.min + pos
+        self.max_scene = self.max + pos
+
+
+    def update_position(self):
+        self.update_min_max()
+        if self.min[2] < 0.:
+            len = self.min[2] * -1.0
+            self.pos[2]+=len
+            self.update_min_max()
+
+    def update_min_max(self):
+        self.mesh.update_min()
+        self.mesh.update_max()
+        self.min = self.mesh.min_
+        self.max = self.mesh.max_
+
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
+
+
+    def render(self, picking=False, debug=False):
+        glPushMatrix()
+
+        glDisable(GL_DEPTH_TEST)
+        glBegin(GL_POINTS)
+        glColor3f(1,0,0)
+        glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
+        glColor3f(1,0,0)
+        glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
+        glEnd()
+        glEnable(GL_DEPTH_TEST)
+
+        glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+
+        if picking:
+            glColor3ubv(self.colorId)
+        else:
+            if self.is_in_printing_space(self.parent.controller.actual_printer):
+                glColor3fv(self.color)
+            else:
+                glColor3f(1., .0, .0)
+
+        #glScalef(self.scale[0], self.scale[1], self.scale[2])
+
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
+        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
+        glVertexPointerf(self.mesh.vectors)
+
+        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_NORMAL_ARRAY)
+
+        glPopMatrix()
+
+    def make_display_list(self):
+        genList = glGenLists(1)
+
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
+        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
+        glVertexPointerf(self.mesh.vectors)
+
+        glNewList(genList, GL_COMPILE)
+
+        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+
+        glEndList()
+
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_NORMAL_ARRAY)
+
+        return genList
+
+    def get_matrix4(self):
+        return matrix44.create_from_matrix33(self.matrix)
 
     def closest_point(self, a, b, p):
         ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
@@ -334,203 +543,6 @@ class Model(object):
             else:
                 continue
         return False
-
-
-    def normalize_object(self):
-        r = numpy.array([.0, .0, .0]) - numpy.array(self.boundingSphereCenter)
-
-        self.mesh.vectors = self.mesh.vectors + r
-
-        self.update_min_max()
-        self.boundingSphereCenter = numpy.array(self.boundingSphereCenter) + r
-        #self.boundingSphereCenter = self.boundingSphereCenter.tolist()
-
-        self.zeroPoint = numpy.array(self.zeroPoint) + r
-        self.zeroPoint[2] = self.min[2]
-
-        self.pos = numpy.array([.0, .0, .0]) - self.zeroPoint
-        #self.pos = self.pos
-
-        #self.zeroPoint = self.zeroPoint
-
-        self.normalization_flag = True
-
-
-    def render(self, picking=False, debug=False):
-        glPushMatrix()
-
-        glDisable(GL_DEPTH_TEST)
-        glBegin(GL_POINTS)
-        glColor3f(1,0,0)
-        glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
-        glColor3f(1,0,0)
-        glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
-        glEnd()
-        glEnable(GL_DEPTH_TEST)
-
-        glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-
-        if picking:
-            glColor3ubv(self.colorId)
-        else:
-            if self.is_in_printing_space(self.parent.controller.actual_printer):
-                glColor3fv(self.color)
-            else:
-                glColor3f(1., .0, .0)
-
-        #glScalef(self.scale[0], self.scale[1], self.scale[2])
-
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_NORMAL_ARRAY)
-
-        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
-        glVertexPointerf(self.mesh.vectors)
-
-        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
-
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisableClientState(GL_NORMAL_ARRAY)
-
-        glPopMatrix()
-
-    def make_display_list(self):
-        genList = glGenLists(1)
-
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_NORMAL_ARRAY)
-
-        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
-        glVertexPointerf(self.mesh.vectors)
-
-        glNewList(genList, GL_COMPILE)
-
-        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
-
-        glEndList()
-
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisableClientState(GL_NORMAL_ARRAY)
-
-        return genList
-
-    def get_matrix4(self):
-        return matrix44.create_from_matrix33(self.matrix)
-
-
-    def set_move(self, vector):
-        vector = numpy.array(vector)
-        self.pos += vector
-        self.parent.save_change(self, 'move', [vector])
-        self.min_scene = self.min + self.pos
-        self.max_scene = self.max + self.pos
-
-    def set_rotation(self, vector, alpha):
-        if vector.tolist() == [1.0, 0.0, 0.0]:
-            if not(self.rot[0] == alpha):
-                self.mesh.rotate(vector, alpha-self.rot[0])
-                self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[0]])
-                self.rot[0] = alpha
-        elif vector.tolist() == [0.0, 1.0, 0.0]:
-            if not(self.rot[1] == alpha):
-                self.mesh.rotate(vector, alpha-self.rot[1])
-                self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[1]])
-                self.rot[1] = alpha
-        elif vector.tolist() == [0.0, 0.0, 1.0]:
-            if not(self.rot[2] == alpha):
-                self.mesh.rotate(vector, alpha-self.rot[2])
-                self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[2]])
-                self.rot[2] = alpha
-        self.mesh.update_min()
-        self.mesh.update_max()
-
-        self.min = self.mesh.min_
-        self.max = self.mesh.max_
-        self.min_scene = self.mesh.min_ + self.pos
-        self.max_scene = self.mesh.max_ + self.pos
-
-        #self.place_on_zero()
-
-    def set_scale(self, value):
-        #TODO:Omezeni minimalni velikosti
-        scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
-        scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
-        #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
-        if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
-            #self.mesh.vectors *= scale_coef/self.scale
-            self.mesh.vectors *= scale_coef
-            self.parent.save_change(self, 'scale', [scale_coef])
-            #self.scale = value
-            self.scale = scale_coef
-            self.mesh.update_min()
-            self.mesh.update_max()
-
-            self.min = self.mesh.min_
-            self.max = self.mesh.max_
-
-            self.min_scene = self.mesh.min_ + self.pos
-            self.max_scene = self.mesh.max_ + self.pos
-
-            self.place_on_zero()
-
-
-    def make_change(self, do, change_type, data):
-        if do:
-            direction = 1.
-        else:
-            direction = -1.0
-
-        if change_type == 'move':
-            print("undo move")
-            self.set_move(data[0]*direction)
-        elif change_type == 'rotation':
-            print("undo rotation")
-            self.set_rotation(data[0], data[1]*direction)
-        elif change_type == 'scale':
-            print("undo scale")
-            #TODO:Je jeste potreba doplnit pokladani na podlozku
-            #TODO:Skontrolovat koeficient scalu-jestli nebude potreba ho nejak prepocitat
-            self.set_scale(data[0])
-
-
-
-
-
-    def place_on_zero(self):
-        min = self.min_scene
-        max = self.max_scene
-        pos = self.pos
-
-        if min[2] < 0.0:
-            diff = min[2] * -1.0
-            pos[2]+=diff
-            self.pos = pos
-        elif min[2] > 0.0:
-            diff = min[2] * -1.0
-            pos[2]+=diff
-            self.pos = pos
-
-        self.min_scene = self.min + pos
-        self.max_scene = self.max + pos
-
-
-    def update_position(self):
-        self.update_min_max()
-        if self.min[2] < 0.:
-            len = self.min[2] * -1.0
-            self.pos[2]+=len
-            self.update_min_max()
-
-    def update_min_max(self):
-        self.mesh.update_min()
-        self.mesh.update_max()
-        self.min = self.mesh.min_
-        self.max = self.mesh.max_
-
-        self.min_scene = self.min + self.pos
-        self.max_scene = self.max + self.pos
-
-
-
 
 class ModelTypeAbstract(object):
     '''

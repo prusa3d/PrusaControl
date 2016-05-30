@@ -328,6 +328,7 @@ class Controller:
         self.scene.models.append(model)
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
+        self.scene.save_change(model, 'move', [deepcopy(model.pos)])
         self.view.update_scene()
 
     def import_project(self, path):
@@ -403,8 +404,28 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
+                    if model.rotationAxis == 'x':
+                        vector = numpy.array([1., 0., 0.])
+                        self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[0])])
+                    elif model.rotationAxis == 'y':
+                        vector = numpy.array([0., 1., 0.])
+                        self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[1])])
+                    elif model.rotationAxis == 'z':
+                        vector = numpy.array([0., 0., 1.])
+                        self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[2])])
+
                     model.rot = numpy.array([0.,0.,0.])
                     model.place_on_zero()
+        elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
+            for model in self.scene.models:
+                if model.selected:
+                    self.scene.save_change(model, 'move', [deepcopy(model.pos)])
+        elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
+            for model in self.scene.models:
+                if model.selected and model.scaleAxis:
+                    self.scene.save_change(model, 'scale', [deepcopy(model.scale)])
+
+
         self.scene.clear_selected_models()
         self.view.update_scene()
         self.last_ray_pos = numpy.array([.0,.0,.0])
