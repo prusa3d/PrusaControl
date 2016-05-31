@@ -47,7 +47,7 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 0
         self.zoom = 0
-        self.camera_position = numpy.array([0., 0. ,0.])
+        self.camera_position = numpy.array([0., 4. ,0.])
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -107,6 +107,7 @@ class GLWidget(QGLWidget):
         self.h = 0
 
         self.sceneFrameBuffer = []
+        self.tools = []
 
     def update_scene(self, reset=False):
         if reset:
@@ -261,8 +262,14 @@ class GLWidget(QGLWidget):
     def paintGL(self, selection = 1):
         #print(inspect.stack()[1][3] + " call render")
         if selection:
-            glClearColor(0.0, 0.0, 0.0, 1.0)
-            #glClearColor(1.0, 1.0, 1.0, 1.0)
+            if 'debug' in self.parent.controller.settings:
+                if self.parent.controller.settings['debug']:
+                    glClearColor(1.0, 1.0, 1.0, 1.0)
+                else:
+                    glClearColor(0.0, 0.0, 0.0, 1.0)
+            else:
+                glClearColor(0.0, 0.0, 0.0, 1.0)
+
             #glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glClear(GL_COLOR_BUFFER_BIT)
             glLoadIdentity()
@@ -498,7 +505,6 @@ class GLWidget(QGLWidget):
             color = [c.red(), c.green(), c.blue()]
         else:
             color = [0, 0, 0]
-
         return color
 
     def makePrintingBed(self, bed_texture, printing_space):

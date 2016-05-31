@@ -328,7 +328,7 @@ class Controller:
         self.scene.models.append(model)
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
-        self.scene.save_change(model, 'move', [deepcopy(model.pos)])
+        self.scene.save_change(model, 'init', [deepcopy(model.pos)])
         self.view.update_scene()
 
     def import_project(self, path):
@@ -378,11 +378,15 @@ class Controller:
     def mouse_press_event(self, event):
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
+        print("mouse_pres_event")
 
         self.hit_tool_button_by_color(event)
         if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hit_first_object_by_color(event)
+            for model in self.scene.models:
+                if model.selected:
+                    model.pos_old = deepcopy(model.pos)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected and model.rotationAxis:
@@ -419,7 +423,8 @@ class Controller:
         elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
             for model in self.scene.models:
                 if model.selected:
-                    self.scene.save_change(model, 'move', [deepcopy(model.pos)])
+                    print("rozdilovy vektor: " + str(model.pos-model.pos_old))
+                    self.scene.save_change(model, 'move', [model.pos-model.pos_old])
         elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
@@ -601,7 +606,6 @@ class Controller:
     def hit_tool_button_by_color(self, event):
         color = self.view.get_cursor_pixel_color(event)
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
-        print("Id color: " + str(find_id))
         if find_id == 0:
             return False
         id_list = [i.id for i in self.view.get_tool_buttons()]
@@ -611,6 +615,7 @@ class Controller:
                     toolButton.press_button()
                 else:
                     toolButton.unpress_button()
+        return False
 
     def hit_first_object_by_color(self, event):
         self.scene.clear_selected_models()
@@ -618,9 +623,11 @@ class Controller:
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
         if find_id == 0:
+            print("Nenasli jsme nic")
             return False
         for model in self.scene.models:
             if model.id == find_id:
+                print("Nasli jsme objekt")
                 model.selected = True
                 return True
 
@@ -668,10 +675,12 @@ class Controller:
         pass
 
     def undo_button_pressed(self):
+        self.clear_tool_button_states()
         print("Undo button pressed")
         self.scene.make_undo()
 
     def do_button_pressed(self):
+        self.clear_tool_button_states()
         print("Do button pressed")
         self.scene.make_do()
 

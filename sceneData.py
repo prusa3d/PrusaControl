@@ -37,12 +37,16 @@ class AppScene(object):
 
     def save_change(self, instance, change_type, value):
         print("Snaha o ulozeni dalsiho stavu")
-        #if not(self.actual_list_position == len(self.transformation_list)-1) and self.transformation_list:
-        #    print("nebyli jsem na konci listu")
-        #    self.transformation_list = self.transformation_list[:self.actual_list_position]
+        if not(self.actual_list_position == len(self.transformation_list)-1) and len(self.transformation_list)>0:
+            print("nebyli jsem na konci listu")
+            self.actual_list_position +=1
+            print("Jen pro porovnani A: " + str(self.actual_list_position))
+            self.transformation_list = self.transformation_list[:self.actual_list_position]
         self.transformation_list.append([instance, change_type, value])
+
         self.actual_list_position = len(self.transformation_list)-1
-        print("Actual index and len of list: " + str(self.actual_list_position) + ' ' + str(len(self.transformation_list)))
+        self.controller.show_message_on_status_bar("Save new change %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
+        print("Actual index and maximal index in list: " + str(self.actual_list_position) + ' ' + str(len(self.transformation_list)-1))
         print("Data in list: " + str(self.transformation_list))
 
     def make_undo(self):
@@ -52,14 +56,25 @@ class AppScene(object):
             self.actual_list_position -= 1
             print("Undo: " + change_type +' '+ str(data))
             instance.make_change(False, change_type, data)
+            self.controller.show_message_on_status_bar("make Undo step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
+
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
-        if self.actual_list_position < len(self.transformation_list)-1:
-            instance, change_type, data = self.transformation_list[self.actual_list_position]
+        if (self.actual_list_position < len(self.transformation_list)-1) and self.actual_list_position>0:
+            print("prvni")
             self.actual_list_position += 1
+            instance, change_type, data = self.transformation_list[self.actual_list_position]
+
             print("Do: " + change_type +' '+ str(data))
             instance.make_change(True, change_type, data)
+        elif self.actual_list_position==0 and len(self.transformation_list)>0:
+            print("druhy")
+            self.actual_list_position += 1
+            instance, change_type, data = self.transformation_list[self.actual_list_position]
+            print("Do: " + change_type +' '+ str(data))
+            instance.make_change(True, change_type, data)
+        self.controller.show_message_on_status_bar("make Do step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
 
     def check_models_name(self):
         for m in self.models:
@@ -75,6 +90,8 @@ class AppScene(object):
 
     def clearScene(self):
         self.models = []
+        self.transformation_list = []
+        self.actual_list_position = 0
 
     def clear_selected_models(self):
         for model in self.models:
@@ -168,6 +185,7 @@ class Model(object):
 
         #transformation data, connected to scene
         self.pos = numpy.array([.0, .0, .0])
+        self.pos_old = numpy.array([.0, .0, .0])
         self.rot = numpy.array([.0, .0, .0])
         self.rot_scene = numpy.array([.0, .0, .0])
         self.scale = numpy.array([1., 1., 1.])
@@ -176,7 +194,6 @@ class Model(object):
         self.max_scene = [.0, .0, .0]
 
         self.matrix = matrix33.create_identity()
-        print("Matice identity\n" + ' ' +str(self.matrix))
 
         #helping data
         self.selected = False
@@ -187,6 +204,8 @@ class Model(object):
         self.zeroPoint = [.0, .0, .0]
         self.min = [.0, .0, .0]
         self.max = [.0, .0, .0]
+        self.size = numpy.array([.0, .0, .0])
+        self.size_origin = numpy.array([.0, .0, .0])
 
         #self.color = [75./255., 119./255., 190./255.]
         self.color = [34./255., 167./255., 240./255.]
@@ -215,15 +234,15 @@ class Model(object):
                         self.parent.controller.set_printable(True)
                         return True
                     else:
-                        print("naruseni v Z")
+                        #print("naruseni v Z")
                         self.parent.controller.set_printable(False)
                         return False
                 else:
-                    print("naruseni v Y")
+                    #print("naruseni v Y")
                     self.parent.controller.set_printable(False)
                     return False
         else:
-            print("naruseni v X")
+            #print("naruseni v X")
             self.parent.controller.set_printable(False)
             return False
 
@@ -314,28 +333,36 @@ class Model(object):
 
         #self.place_on_zero()
 
-    def set_scale(self, value):
+    def set_scale(self, value, absolut=False):
         #TODO:Omezeni minimalni velikosti
-        scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
-        scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
-        #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
-        if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
-            #self.mesh.vectors *= scale_coef/self.scale
-            self.mesh.vectors *= scale_coef
-            #self.parent.save_change(self, 'scale', [scale_coef])
-            #self.scale = value
-            self.scale = scale_coef
-            self.parent.controller.show_message_on_status_bar("Nastaven scale: " + str(self.scale[0]))
-            self.mesh.update_min()
-            self.mesh.update_max()
+        if absolut:
+            self.mesh.vectors *= value[0]
+        else:
+            scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
+            scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
+            #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
+            if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
+                #self.mesh.vectors *= scale_coef/self.scale
+                self.mesh.vectors *= scale_coef
+                #self.parent.save_change(self, 'scale', [scale_coef])
+                #self.scale = value
+                self.scale = scale_coef
 
-            self.min = self.mesh.min_
-            self.max = self.mesh.max_
+                self.mesh.update_min()
+                self.mesh.update_max()
 
-            self.min_scene = self.mesh.min_ + self.pos
-            self.max_scene = self.mesh.max_ + self.pos
+                self.min = self.mesh.min_
+                self.max = self.mesh.max_
 
-            self.place_on_zero()
+                self.size = self.max - self.min
+                percent = int((self.size[0]/self.size_origin[0])*100)
+                print(str(percent))
+                self.parent.controller.show_message_on_status_bar("Scale: %s" % ('{:3}'.format(percent)) + "%")
+
+                self.min_scene = self.mesh.min_ + self.pos
+                self.max_scene = self.mesh.max_ + self.pos
+
+                self.place_on_zero()
 
 
     def make_change(self, do, change_type, data):
@@ -346,7 +373,7 @@ class Model(object):
 
         if change_type == 'move':
             print("undo move")
-            self.set_move(data[0], False)
+            self.set_move(data[0]*direction)
         elif change_type == 'rotation':
             print("undo rotation")
             self.set_rotation(data[0], data[1]*direction)
@@ -358,6 +385,9 @@ class Model(object):
             #TODO:Skontrolovat koeficient scalu-jestli nebude potreba ho nejak prepocitat
             self.set_scale(data[0])
             self.place_on_zero()
+        elif change_type == 'init':
+            print("init")
+            self.set_move(data[0], False)
 
 
 
@@ -583,13 +613,9 @@ class ModelTypeStl(ModelTypeAbstract):
         some magic with model data...
         I need normals, transformations...
         '''
-        #model.normal = [[nor[0]/numpy.linalg.norm(nor), nor[1]/numpy.linalg.norm(nor), nor[2]/numpy.linalg.norm(nor)] for nor in mesh.normals]
-        #mesh.normals = numpy.array([i/numpy.linalg.norm(i) for i in mesh.normals])
 
         #mesh.normals /= numpy.sqrt(numpy.einsum('...i,...i', mesh.normals, mesh.normals))
         mesh.normals /= numpy.sqrt((mesh.normals ** 2).sum(-1))[..., numpy.newaxis]
-
-        #model.normal = mesh.normals
 
         #scale of imported data
         mesh.points *= model.scaleDefault[0]
@@ -624,6 +650,9 @@ class ModelTypeStl(ModelTypeAbstract):
 
         model.min_scene = model.min + model.pos
         model.max_scene = model.max + model.pos
+
+        model.size = model.max-model.min
+        model.size_origin = deepcopy(model.size)
 
         #model.displayList = model.make_display_list()
 
