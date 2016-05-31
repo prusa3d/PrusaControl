@@ -36,18 +36,18 @@ class AppScene(object):
         self.actual_list_position = 0
 
     def save_change(self, instance, change_type, value):
-        print("Snaha o ulozeni dalsiho stavu")
+        #print("Snaha o ulozeni dalsiho stavu")
         if not(self.actual_list_position == len(self.transformation_list)-1) and len(self.transformation_list)>0:
-            print("nebyli jsem na konci listu")
+            #print("nebyli jsem na konci listu")
             self.actual_list_position +=1
-            print("Jen pro porovnani A: " + str(self.actual_list_position))
+            #print("Jen pro porovnani A: " + str(self.actual_list_position))
             self.transformation_list = self.transformation_list[:self.actual_list_position]
         self.transformation_list.append([instance, change_type, value])
 
         self.actual_list_position = len(self.transformation_list)-1
-        self.controller.show_message_on_status_bar("Save new change %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
-        print("Actual index and maximal index in list: " + str(self.actual_list_position) + ' ' + str(len(self.transformation_list)-1))
-        print("Data in list: " + str(self.transformation_list))
+        #self.controller.show_message_on_status_bar("Save new change %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
+        #print("Actual index and maximal index in list: " + str(self.actual_list_position) + ' ' + str(len(self.transformation_list)-1))
+        #print("Data in list: " + str(self.transformation_list))
 
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
@@ -56,7 +56,7 @@ class AppScene(object):
             self.actual_list_position -= 1
             print("Undo: " + change_type +' '+ str(data))
             instance.make_change(False, change_type, data)
-            self.controller.show_message_on_status_bar("make Undo step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
+            #self.controller.show_message_on_status_bar("make Undo step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
 
 
     def make_do(self):
@@ -74,7 +74,7 @@ class AppScene(object):
             instance, change_type, data = self.transformation_list[self.actual_list_position]
             print("Do: " + change_type +' '+ str(data))
             instance.make_change(True, change_type, data)
-        self.controller.show_message_on_status_bar("make Do step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
+        #self.controller.show_message_on_status_bar("make Do step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
 
     def check_models_name(self):
         for m in self.models:
@@ -310,19 +310,19 @@ class Model(object):
                 self.mesh.rotate(vector, alpha-self.rot[0])
                 #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[0]])
                 self.rot[0] = alpha
-                self.parent.controller.show_message_on_status_bar("Uhel X: " + str(numpy.degrees(self.rot[0])))
+                self.parent.controller.show_message_on_status_bar("Angle X: " + str(numpy.degrees(self.rot[0])))
         elif vector.tolist() == [0.0, 1.0, 0.0]:
             if not(self.rot[1] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[1])
                 #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[1]])
                 self.rot[1] = alpha
-                self.parent.controller.show_message_on_status_bar("Uhel Y: " + str(numpy.degrees(self.rot[1])))
+                self.parent.controller.show_message_on_status_bar("Angle Y: " + str(numpy.degrees(self.rot[1])))
         elif vector.tolist() == [0.0, 0.0, 1.0]:
             if not(self.rot[2] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[2])
                 #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[2]])
                 self.rot[2] = alpha
-                self.parent.controller.show_message_on_status_bar("Uhel Z: " + str(numpy.degrees(self.rot[2])))
+                self.parent.controller.show_message_on_status_bar("Angle Z: " + str(numpy.degrees(self.rot[2])))
         self.mesh.update_min()
         self.mesh.update_max()
 
@@ -335,13 +335,17 @@ class Model(object):
 
     def set_scale(self, value, absolut=False):
         #TODO:Omezeni minimalni velikosti
+
         if absolut:
             self.mesh.vectors *= value[0]
         else:
             scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
+            size = self.size * scale_coef
+            printing_space = self.parent.controller.actual_printer['printing_space']
             scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
             #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
-            if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2]):
+            if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2])\
+                    and not((size[0] >= printing_space[0]) or (size[1] >= printing_space[1]) or (size[2] >= printing_space[2])):
                 #self.mesh.vectors *= scale_coef/self.scale
                 self.mesh.vectors *= scale_coef
                 #self.parent.save_change(self, 'scale', [scale_coef])

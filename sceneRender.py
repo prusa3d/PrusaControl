@@ -121,7 +121,9 @@ class GLWidget(QGLWidget):
     #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
         #self.camera.add_zoom(diff)
-        self.zoom += diff
+        if (self.zoom + diff >= -60.0) and (self.zoom + diff <= -10.0):
+            self.zoom += diff
+
 
     def get_zoom(self):
         #return self.camera.get_zoom()
