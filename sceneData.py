@@ -429,7 +429,7 @@ class Model(object):
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
-
+        '''
         glDisable(GL_DEPTH_TEST)
         glBegin(GL_POINTS)
         glColor3f(1,0,0)
@@ -438,7 +438,7 @@ class Model(object):
         glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
         glEnd()
         glEnable(GL_DEPTH_TEST)
-
+        '''
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
         if picking:

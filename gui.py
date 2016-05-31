@@ -123,7 +123,7 @@ class AboutDialog(QDialog):
         self.controller = controller
         self.different_version = True
         self.actual_version = '1.0.2'
-        self.your_version = '1.0.1'
+        self.your_version = '0.8.1_beta'
 
         layout = QVBoxLayout(self)
 
@@ -134,7 +134,7 @@ class AboutDialog(QDialog):
 
         self.local_version_label = QtGui.QLabel("Your version is %s" % self.your_version)
 
-        self.check_version_button = QtGui.QPushButton(self.tr("Check version"))
+        #self.check_version_button = QtGui.QPushButton(self.tr("Check version"))
         #TODO:Doplnit
         #self.checkVersionButton.clicked.connect(self.controller.checkVersion)
         #self.checkVersionButton.setEnabled(self.differentVersion)
@@ -143,7 +143,7 @@ class AboutDialog(QDialog):
         layout.addWidget(self.prusa_control_text)
 
         layout.addWidget(self.local_version_label)
-        layout.addWidget(self.check_version_button)
+        #layout.addWidget(self.check_version_button)
 
         # Close button
         buttons = QDialogButtonBox(
@@ -241,7 +241,7 @@ class PrusaControlView(QtGui.QMainWindow):
         #Help menu
 
         self.statusBar().showMessage('Ready')
-        self.setWindowTitle(self.tr("PrusaControl"))
+        self.setWindowTitle(self.tr("PrusaControl 0.8 Beta"))
         self.show()
 
     def eventFilter(self, source, event):
