@@ -192,8 +192,8 @@ class GLWidget(QGLWidget):
         self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95.,6.])
         self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95.,1.])
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/undo-2.png"), [4.,4.], [1.,75.], True)
-        self.do_button = GlButton(self.texture_from_png("data/img/do-2.png"), [4.,4.], [6.,75.], True)
+        self.undo_button = GlButton(self.texture_from_png("data/img/undo.png"), [4.,4.], [1.,75.], True)
+        self.do_button = GlButton(self.texture_from_png("data/img/do.png"), [4.,4.], [6.,75.], True)
 
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)

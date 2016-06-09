@@ -152,9 +152,10 @@ class Controller:
         self.last_pos = QtCore.QPoint()
         self.ray_start = [.0, .0, .0]
         self.ray_end = [.0, .0, .0]
+        self.hitPoint = [.0, .0, .0]
         self.last_ray_pos = [.0, .0, .0]
         self.origin_rotation_point = numpy.array([0.,0.,0.])
-        self.res_old = []
+        self.res_old = numpy.array([0.,0.,0.])
         self.status = 'edit'
 
         self.app = app
@@ -378,11 +379,14 @@ class Controller:
     def mouse_press_event(self, event):
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
+        if event.buttons() & QtCore.Qt.LeftButton:
+            self.ray_start, self.ray_end = self.view.get_cursor_position(event)
         print("mouse_pres_event")
 
         self.hit_tool_button_by_color(event)
         if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            self.hitPoint = deepcopy(self.res_old)
             self.hit_first_object_by_color(event)
             for model in self.scene.models:
                 if model.selected:
@@ -396,6 +400,7 @@ class Controller:
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 1.0, 0.0]))
                     elif model.rotationAxis == 'z':
                         self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
+                    self.hitPoint = deepcopy(self.origin_rotation_point)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
         elif event.buttons() & QtCore.Qt.MiddleButton:
@@ -428,7 +433,9 @@ class Controller:
         elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
-                    self.scene.save_change(model, 'scale', [deepcopy(model.scale)])
+                    print("Scale save: " + str(model.size/model.size_origin))
+                    #TODO:Redesign!!!
+                    #self.scene.save_change(model, 'scale', [model.size/model.size_origin])
 
 
         self.scene.clear_selected_models()
@@ -450,7 +457,9 @@ class Controller:
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
-                res_new = sceneData.Vector.minusAB(res, self.res_old)
+                print(str(res))
+                #res_new = sceneData.Vector.minusAB(res, self.res_old)
+                res_new = res - self.res_old
                 for model in self.scene.models:
                     if model.selected:
                         model.set_move(res_new)
@@ -475,7 +484,6 @@ class Controller:
                         rotation_axis = numpy.array([0.0, 0.0, 1.0])
 
                     res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, rotation_axis))
-                    #print("Intersection: " + str(res))
                     new_vec = res - model.pos
                     new_vec /= numpy.linalg.norm(new_vec)
                     old_vec = self.origin_rotation_point - model.pos
@@ -511,7 +519,7 @@ class Controller:
                         model.scale[1] = model.scale[1] + dx*0.25
                     elif model.scaleAxis == 'z':
                         model.scale[2] = model.scale[2] + dy*0.25
-                    el
+                    else
                     '''
                     if model.scaleAxis == 'xyz':
                         #model.scale = [i + dy*0.25 for i in model.scale]

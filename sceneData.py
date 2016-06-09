@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import numpy
+import numpy as np
 from abc import ABCMeta, abstractmethod
 from os.path import basename
 
@@ -137,7 +137,7 @@ class AppScene(object):
         self.hot_bed_dimension = param
 
     def save_whole_scene_to_one_stl_file(self, filename):
-        whole_scene = Mesh(numpy.concatenate([i.get_mesh().data for i in self.models]))
+        whole_scene = Mesh(np.concatenate([i.get_mesh().data for i in self.models]))
         whole_scene.save(filename)
 
 class Model(object):
@@ -184,11 +184,11 @@ class Model(object):
         self.mesh = None
 
         #transformation data, connected to scene
-        self.pos = numpy.array([.0, .0, .0])
-        self.pos_old = numpy.array([.0, .0, .0])
-        self.rot = numpy.array([.0, .0, .0])
-        self.rot_scene = numpy.array([.0, .0, .0])
-        self.scale = numpy.array([1., 1., 1.])
+        self.pos = np.array([.0, .0, .0])
+        self.pos_old = np.array([.0, .0, .0])
+        self.rot = np.array([.0, .0, .0])
+        self.rot_scene = np.array([.0, .0, .0])
+        self.scale = np.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
         self.min_scene = [.0, .0, .0]
         self.max_scene = [.0, .0, .0]
@@ -204,8 +204,8 @@ class Model(object):
         self.zeroPoint = [.0, .0, .0]
         self.min = [.0, .0, .0]
         self.max = [.0, .0, .0]
-        self.size = numpy.array([.0, .0, .0])
-        self.size_origin = numpy.array([.0, .0, .0])
+        self.size = np.array([.0, .0, .0])
+        self.size_origin = np.array([.0, .0, .0])
 
         #self.color = [75./255., 119./255., 190./255.]
         self.color = [34./255., 167./255., 240./255.]
@@ -248,7 +248,7 @@ class Model(object):
 
     def get_mesh(self, transform=True):
         print('saving model')
-        data = numpy.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
+        data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
         mesh = deepcopy(self.mesh)
 
@@ -256,7 +256,7 @@ class Model(object):
         mesh.update_max()
 
         '''
-        mesh.vectors *= numpy.array(self.scale)
+        mesh.vectors *= np.array(self.scale)
 
         mesh.rotate([1.0, 0.0, 0.0], self.rot[0])
         mesh.rotate([0.0, 1.0, 0.0], self.rot[1])
@@ -264,9 +264,9 @@ class Model(object):
         '''
 
         if transform:
-            mesh.vectors += numpy.array(self.pos)
+            mesh.vectors += np.array(self.pos)
 
-        mesh.vectors /= numpy.array(self.scaleDefault)
+        mesh.vectors /= np.array(self.scaleDefault)
 
         data['vectors'] = mesh.vectors
 
@@ -279,23 +279,23 @@ class Model(object):
         return "Mesh: " + str(self.id) + ' ' + str(self.color)
 
     def normalize_object(self):
-        r = numpy.array([.0, .0, .0]) - numpy.array(self.boundingSphereCenter)
+        r = np.array([.0, .0, .0]) - np.array(self.boundingSphereCenter)
 
         self.mesh.vectors = self.mesh.vectors + r
 
         self.update_min_max()
-        self.boundingSphereCenter = numpy.array(self.boundingSphereCenter) + r
+        self.boundingSphereCenter = np.array(self.boundingSphereCenter) + r
 
-        self.zeroPoint = numpy.array(self.zeroPoint) + r
+        self.zeroPoint = np.array(self.zeroPoint) + r
         self.zeroPoint[2] = self.min[2]
 
-        self.pos = numpy.array([.0, .0, .0]) - self.zeroPoint
+        self.pos = np.array([.0, .0, .0]) - self.zeroPoint
 
         self.normalization_flag = True
 
 
     def set_move(self, vector, add=True):
-        vector = numpy.array(vector)
+        vector = np.array(vector)
         if add:
             self.pos += vector
         else:
@@ -310,19 +310,19 @@ class Model(object):
                 self.mesh.rotate(vector, alpha-self.rot[0])
                 #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[0]])
                 self.rot[0] = alpha
-                self.parent.controller.show_message_on_status_bar("Angle X: " + str(numpy.degrees(self.rot[0])))
+                self.parent.controller.show_message_on_status_bar("Angle X: " + str(np.degrees(self.rot[0])))
         elif vector.tolist() == [0.0, 1.0, 0.0]:
             if not(self.rot[1] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[1])
                 #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[1]])
                 self.rot[1] = alpha
-                self.parent.controller.show_message_on_status_bar("Angle Y: " + str(numpy.degrees(self.rot[1])))
+                self.parent.controller.show_message_on_status_bar("Angle Y: " + str(np.degrees(self.rot[1])))
         elif vector.tolist() == [0.0, 0.0, 1.0]:
             if not(self.rot[2] == alpha):
                 self.mesh.rotate(vector, alpha-self.rot[2])
                 #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[2]])
                 self.rot[2] = alpha
-                self.parent.controller.show_message_on_status_bar("Angle Z: " + str(numpy.degrees(self.rot[2])))
+                self.parent.controller.show_message_on_status_bar("Angle Z: " + str(np.degrees(self.rot[2])))
         self.mesh.update_min()
         self.mesh.update_max()
 
@@ -337,12 +337,36 @@ class Model(object):
         #TODO:Omezeni minimalni velikosti
 
         if absolut:
-            self.mesh.vectors *= value[0]
+            #this time is in value absolut size of scale
+            print("Scale: " + str(value[0]))
+
+            aktual = self.size/self.size_origin
+            print("Aktual: " + str(aktual))
+            scale_coef = value[0]/aktual
+            print("Scale_coef: " + str(scale_coef))
+
+            self.mesh.vectors *= scale_coef
+
+            self.mesh.update_min()
+            self.mesh.update_max()
+
+            self.min = self.mesh.min_
+            self.max = self.mesh.max_
+
+            self.size = self.max - self.min
+            percent = int((self.size[0]/self.size_origin[0])*100)
+
+            self.parent.controller.show_message_on_status_bar("Scale: %s" % ('{:3}'.format(percent)) + "%")
+
+            self.min_scene = self.mesh.min_ + self.pos
+            self.max_scene = self.mesh.max_ + self.pos
+
+            self.place_on_zero()
         else:
-            scale_coef = value[0]/(numpy.linalg.norm(self.max)*0.5)
+            scale_coef = value[0]/(np.linalg.norm(self.max)*0.5)
             size = self.size * scale_coef
             printing_space = self.parent.controller.actual_printer['printing_space']
-            scale_coef = numpy.array([scale_coef, scale_coef, scale_coef])
+            scale_coef = np.array([scale_coef, scale_coef, scale_coef])
             #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
             if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2])\
                     and not((size[0] >= printing_space[0]) or (size[1] >= printing_space[1]) or (size[2] >= printing_space[2])):
@@ -381,13 +405,13 @@ class Model(object):
         elif change_type == 'rotation':
             print("undo rotation")
             self.set_rotation(data[0], data[1]*direction)
-            self.rot = numpy.array([0., 0., 0.])
+            self.rot = np.array([0., 0., 0.])
             self.place_on_zero()
         elif change_type == 'scale':
             print("undo scale")
             #TODO:Je jeste potreba doplnit pokladani na podlozku
             #TODO:Skontrolovat koeficient scalu-jestli nebude potreba ho nejak prepocitat
-            self.set_scale(data[0])
+            self.set_scale(data[0], True)
             self.place_on_zero()
         elif change_type == 'init':
             print("init")
@@ -458,7 +482,7 @@ class Model(object):
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
+        glNormalPointerf(np.tile(self.mesh.normals, 3))
         glVertexPointerf(self.mesh.vectors)
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
@@ -474,7 +498,7 @@ class Model(object):
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        glNormalPointerf(numpy.tile(self.mesh.normals, 3))
+        glNormalPointerf(np.tile(self.mesh.normals, 3))
         glVertexPointerf(self.mesh.vectors)
 
         glNewList(genList, GL_COMPILE)
@@ -493,9 +517,9 @@ class Model(object):
 
     def closest_point(self, a, b, p):
         ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
-        abSquare = numpy.dot(ab.getRaw(), ab.getRaw())
+        abSquare = np.dot(ab.getRaw(), ab.getRaw())
         ap = Vector([p.x-a.x, p.y-a.y, p.z-a.z])
-        apDotAB = numpy.dot(ap.getRaw(), ab.getRaw())
+        apDotAB = np.dot(ap.getRaw(), ab.getRaw())
         t = apDotAB / abSquare
         q = Vector([a.x+ab.x*t, a.y+ab.y*t, a.z+ab.z*t])
         return q
@@ -514,7 +538,7 @@ class Model(object):
     def intersection_model_model(self, model):
         #vector_model_model = Vector(a=model.pos, b=self.pos)
         vector_model_model = self.pos - model.pos
-        distance = numpy.linalg.norm(vector_model_model)
+        distance = np.linalg.norm(vector_model_model)
         #TODO:Add better alg for detecting intersection(now is only detection of BS)
         if distance >= (model.boundingSphereSize+self.boundingSphereSize):
             return False
@@ -553,25 +577,25 @@ class Model(object):
 
             n = Vector(self.normal[i])
 
-            q = numpy.cross(w.getRaw(), e2.getRaw())
-            a = numpy.dot(e1.getRaw(), q)
+            q = np.cross(w.getRaw(), e2.getRaw())
+            a = np.dot(e1.getRaw(), q)
 
-            if((numpy.dot(n.getRaw(), w.getRaw())>= .0) or (abs(a) <=.0001)):
+            if((np.dot(n.getRaw(), w.getRaw())>= .0) or (abs(a) <=.0001)):
                 continue
 
             s = Vector(rayStart)
             s.minus(v0)
             s.sqrt(a)
 
-            r = numpy.cross(s.getRaw(), e1.getRaw())
-            b[0] = numpy.dot(s.getRaw(), q)
-            b[1] = numpy.dot(r, w.getRaw())
+            r = np.cross(s.getRaw(), e1.getRaw())
+            b[0] = np.dot(s.getRaw(), q)
+            b[1] = np.dot(r, w.getRaw())
             b[2] = 1.0 - b[0] - b[1]
 
             if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
                 continue
 
-            t = numpy.dot(e2.getRaw(), r)
+            t = np.dot(e2.getRaw(), r)
             if (t >= .0):
                 return True
             else:
@@ -618,8 +642,8 @@ class ModelTypeStl(ModelTypeAbstract):
         I need normals, transformations...
         '''
 
-        #mesh.normals /= numpy.sqrt(numpy.einsum('...i,...i', mesh.normals, mesh.normals))
-        mesh.normals /= numpy.sqrt((mesh.normals ** 2).sum(-1))[..., numpy.newaxis]
+        #mesh.normals /= np.sqrt(np.einsum('...i,...i', mesh.normals, mesh.normals))
+        mesh.normals /= np.sqrt((mesh.normals ** 2).sum(-1))[..., np.newaxis]
 
         #scale of imported data
         mesh.points *= model.scaleDefault[0]
@@ -645,8 +669,8 @@ class ModelTypeStl(ModelTypeAbstract):
         if normalize:
             model.normalize_object()
 
-        max_l = numpy.linalg.norm(mesh.max_)
-        min_l = numpy.linalg.norm(mesh.min_)
+        max_l = np.linalg.norm(mesh.max_)
+        min_l = np.linalg.norm(mesh.min_)
         if max_l > min_l:
             model.boundingSphereSize = max_l
         else:
@@ -663,10 +687,23 @@ class ModelTypeStl(ModelTypeAbstract):
         return model
 
 
-def intersection_ray_plane(start, end, pos=[.0, .0, .0], n=[.0, .0, 1.]):
+def intersection_ray_plane(start, end, pos=np.array([.0, .0, .0]), n=np.array([.0, .0, 1.])):
     r = ray.create_from_line(line.create_from_points(start, end))
-    res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(pos, n))
+    res = geometric_tests.ray_intersect_plane(r, plane.create_from_position(-pos, n))
     return res
+
+def intersection_ray_plane2(O, D, P=np.array([0., 0., 0.]), N=np.array([.0, .0, 1.])):
+    # Return the distance from O to the intersection of the ray (O, D) with the 
+    # plane (P, N), or +inf if there is no intersection.
+    # O and P are 3D points, D and N (normal) are normalized vectors.
+    denom = np.dot(D, N)
+    if np.abs(denom) < 1e-6:
+        return np.inf
+    d = np.dot(P - O, N) / denom
+    if d < 0:
+        return np.inf
+    res = D*d + O
+    return np.array([res[0], res[1], res[2]])
 
 
 #math
