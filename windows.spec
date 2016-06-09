@@ -1,15 +1,25 @@
 # -*- mode: python -*-
-from kivy.tools.packaging.pyinstaller_hooks import install_hooks 
-install_hooks(globals()) 
+
+block_cipher = None
+
 
 a = Analysis(['main.py'],
-             pathex=['/home/tibor/projects/PrusaControll'],
-             runtime_hooks=None)
-pyz = PYZ(a.pure)
+             pathex=['C:\\projects\\slave\\PrusaControl_Windows\\build'],
+             binaries=None,
+             datas=None,
+             hiddenimports=[],
+             hookspath=None,
+             runtime_hooks=None,
+             excludes=None,
+             win_no_prefer_redirects=None,
+             win_private_assemblies=None,
+             cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='main',
+          name='PrusaControl',
           debug=False,
           strip=None,
           upx=True,
@@ -20,4 +30,4 @@ coll = COLLECT(exe,
                a.datas,
                strip=None,
                upx=True,
-               name='main')
+               name='PrusaControl')
