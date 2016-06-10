@@ -193,6 +193,20 @@ class Model(object):
         self.min_scene = [.0, .0, .0]
         self.max_scene = [.0, .0, .0]
 
+        self.scale_matrix = np.array([[ 1.,  0.,  0.],
+                                            [ 0.,  1.,  0.],
+                                            [ 0.,  0.,  1.]])
+        self.temp_scale = np.array([[ 1.,  0.,  0.],
+                                            [ 0.,  1.,  0.],
+                                            [ 0.,  0.,  1.]])
+
+        self.rotation_matrix = np.array([[ 1.,  0.,  0.],
+                                            [ 0.,  1.,  0.],
+                                            [ 0.,  0.,  1.]])
+        self.temp_rotation = np.array([[ 1.,  0.,  0.],
+                                            [ 0.,  1.,  0.],
+                                            [ 0.,  0.,  1.]])
+
         self.matrix = matrix33.create_identity()
 
         #helping data
@@ -275,6 +289,8 @@ class Model(object):
 
         return Mesh(data)
 
+
+
     def __str__(self):
         return "Mesh: " + str(self.id) + ' ' + str(self.color)
 
@@ -306,23 +322,17 @@ class Model(object):
 
     def set_rotation(self, vector, alpha):
         if vector.tolist() == [1.0, 0.0, 0.0]:
-            if not(self.rot[0] == alpha):
-                self.mesh.rotate(vector, alpha-self.rot[0])
-                #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[0]])
-                self.rot[0] = alpha
-                self.parent.controller.show_message_on_status_bar("Angle X: " + str(np.degrees(self.rot[0])))
+            self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
+            self.parent.controller.show_message_on_status_bar("Angle X: " + str(np.degrees(alpha)))
         elif vector.tolist() == [0.0, 1.0, 0.0]:
-            if not(self.rot[1] == alpha):
-                self.mesh.rotate(vector, alpha-self.rot[1])
-                #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[1]])
-                self.rot[1] = alpha
-                self.parent.controller.show_message_on_status_bar("Angle Y: " + str(np.degrees(self.rot[1])))
+            self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
+            self.parent.controller.show_message_on_status_bar("Angle Y: " + str(np.degrees(alpha)))
         elif vector.tolist() == [0.0, 0.0, 1.0]:
-            if not(self.rot[2] == alpha):
-                self.mesh.rotate(vector, alpha-self.rot[2])
-                #self.parent.save_change(self, 'rotation', [vector, alpha-self.rot[2]])
-                self.rot[2] = alpha
-                self.parent.controller.show_message_on_status_bar("Angle Z: " + str(np.degrees(self.rot[2])))
+            self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
+            self.parent.controller.show_message_on_status_bar("Angle Z: " + str(np.degrees(alpha)))
+
+        #TODO:Doplnit funkcnost prepocitani bounding boxu pro omezeni ze je objekt na podlozce
+        #TODO:Umisteni na podlozku
         self.mesh.update_min()
         self.mesh.update_max()
 
@@ -333,9 +343,23 @@ class Model(object):
 
         #self.place_on_zero()
 
+    def apply_rotation(self):
+        self.rotation_matrix = np.dot(self.rotation_matrix, self.temp_rotation)
+        self.temp_rotation = np.array([[ 1.,  0.,  0.],
+                                        [ 0.,  1.,  0.],
+                                        [ 0.,  0.,  1.]])
+        print(str(self.rotation_matrix))
+
     def set_scale(self, value, absolut=False):
         #TODO:Omezeni minimalni velikosti
+        #TODO:Omezeni maximalni velikosti
+        #TODO:Umisteni na podlozku
 
+        self.temp_scale = np.array([[ 1.,  0.,  0.],
+                                        [ 0.,  1.,  0.],
+                                        [ 0.,  0.,  1.]]) * value
+
+        '''
         if absolut:
             #this time is in value absolut size of scale
             print("Scale: " + str(value[0]))
@@ -391,7 +415,14 @@ class Model(object):
                 self.max_scene = self.mesh.max_ + self.pos
 
                 self.place_on_zero()
+        '''
 
+    def apply_scale(self):
+        self.scale_matrix = np.dot(self.scale_matrix, self.temp_scale)
+        self.temp_scale = np.array([[ 1.,  0.,  0.],
+                                        [ 0.,  1.,  0.],
+                                        [ 0.,  0.,  1.]])
+        print(str(self.scale_matrix))
 
     def make_change(self, do, change_type, data):
         if do:
@@ -482,10 +513,20 @@ class Model(object):
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        glNormalPointerf(np.tile(self.mesh.normals, 3))
-        glVertexPointerf(self.mesh.vectors)
+        mesh = deepcopy(self.mesh)
 
-        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+        final_matrix = np.dot(np.dot(self.rotation_matrix, self.temp_rotation),
+                              np.dot(self.temp_scale, self.scale_matrix))
+
+        #print(str(final_matrix))
+
+        for i in range(3):
+            mesh.vectors[:, i] = mesh.vectors[:, i].dot(final_matrix)
+
+        glNormalPointerf(np.tile(mesh.normals, 3))
+        glVertexPointerf(mesh.vectors)
+
+        glDrawArrays(GL_TRIANGLES, 0, len(mesh.vectors)*3)
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)

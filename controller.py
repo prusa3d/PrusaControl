@@ -413,6 +413,8 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
+                    #TODO:Redesign
+                    '''
                     if model.rotationAxis == 'x':
                         vector = numpy.array([1., 0., 0.])
                         self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[0])])
@@ -422,7 +424,8 @@ class Controller:
                     elif model.rotationAxis == 'z':
                         vector = numpy.array([0., 0., 1.])
                         self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[2])])
-
+                    '''
+                    model.apply_rotation()
                     model.rot = numpy.array([0.,0.,0.])
                     model.place_on_zero()
         elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
@@ -434,9 +437,11 @@ class Controller:
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
                     print("Scale save: " + str(model.size/model.size_origin))
+                    model.apply_scale()
                     #TODO:Redesign!!!
-                    #self.scene.save_change(model, 'scale', [model.size/model.size_origin])
-
+                    '''
+                    self.scene.save_change(model, 'scale', [model.size/model.size_origin])
+                    '''
 
         self.scene.clear_selected_models()
         self.view.update_scene()
@@ -523,9 +528,13 @@ class Controller:
                     '''
                     if model.scaleAxis == 'xyz':
                         #model.scale = [i + dy*0.25 for i in model.scale]
-                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, direction*-1))
+                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, direction))
+                        self.hitPoint = res
                         diff_vec = res - model.zeroPoint
                         l = numpy.linalg.norm(diff_vec)
+                        print("Delka vektoru: " + str(l))
+                        #new = (l/numpy.linalg.norm(model.size_origin))*2.
+                        #print("Novy koeficient: " + str(new))
                         model.set_scale(numpy.array([l, l, l]))
                     else:
                         res = [.0, .0, .0]

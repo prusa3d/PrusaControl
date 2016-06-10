@@ -336,7 +336,20 @@ class GLWidget(QGLWidget):
         glCallList(self.bed[self.parent.controller.settings['printer']])
         glDisable( GL_BLEND )
 
+        if 'debug' in self.parent.controller.settings:
+            if self.parent.controller.settings['debug']:
+                glPointSize(10)
+                glBegin(GL_POINTS)
+                glColor3f(1,0,0)
+                glVertex3fv(self.parent.controller.hitPoint)
+                glEnd()
 
+                glLineWidth(5)
+                glBegin(GL_LINES)
+                glColor3f(0,1,0)
+                glVertex3fv(self.parent.controller.ray_start)
+                glVertex3fv(self.parent.controller.ray_end)
+                glEnd()
 
         glEnable(GL_DEPTH_TEST)
         glEnable ( GL_LIGHTING )
