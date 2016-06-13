@@ -35,46 +35,44 @@ class AppScene(object):
         self.transformation_list = []
         self.actual_list_position = 0
 
-    def save_change(self, instance, change_type, value):
+    def save_change(self, old_instance):
         #print("Snaha o ulozeni dalsiho stavu")
-        if not(self.actual_list_position == len(self.transformation_list)-1) and len(self.transformation_list)>0:
-            #print("nebyli jsem na konci listu")
+        if not(self.actual_list_position == len(self.transformation_list)-1) and len(self.transformation_list)>=0:
+            print("nebyli jsem na konci listu " + str(self.actual_list_position) + " " + str(len(self.transformation_list)))
             self.actual_list_position +=1
-            #print("Jen pro porovnani A: " + str(self.actual_list_position))
             self.transformation_list = self.transformation_list[:self.actual_list_position]
-        self.transformation_list.append([instance, change_type, value])
+            print("List: " + str(self.transformation_list))
+        self.transformation_list.append([old_instance, deepcopy(old_instance.scale_matrix), deepcopy(old_instance.rotation_matrix), deepcopy(old_instance.pos)])
 
         self.actual_list_position = len(self.transformation_list)-1
-        #self.controller.show_message_on_status_bar("Save new change %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
-        #print("Actual index and maximal index in list: " + str(self.actual_list_position) + ' ' + str(len(self.transformation_list)-1))
-        #print("Data in list: " + str(self.transformation_list))
+        self.controller.show_message_on_status_bar("Save new change %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+
 
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
         if self.actual_list_position >= 1:
-            instance, change_type, data = self.transformation_list[self.actual_list_position]
             self.actual_list_position -= 1
-            print("Undo: " + change_type +' '+ str(data))
-            instance.make_change(False, change_type, data)
-            #self.controller.show_message_on_status_bar("make Undo step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
-
+            print("Actual possition in list: " + str(self.actual_list_position))
+            old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
+            old_instance.scale_matrix = scale
+            old_instance.rotation_matrix = rot
+            old_instance.pos = pos
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
         if (self.actual_list_position < len(self.transformation_list)-1) and self.actual_list_position>0:
+            self.actual_list_position += 1
+            old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
+            old_instance.scale_matrix = scale
+            old_instance.rotation_matrix = rot
+            old_instance.pos = pos
+        elif self.actual_list_position==0 and len(self.transformation_list)>0:
             print("prvni")
             self.actual_list_position += 1
-            instance, change_type, data = self.transformation_list[self.actual_list_position]
-
-            print("Do: " + change_type +' '+ str(data))
-            instance.make_change(True, change_type, data)
-        elif self.actual_list_position==0 and len(self.transformation_list)>0:
-            print("druhy")
-            self.actual_list_position += 1
-            instance, change_type, data = self.transformation_list[self.actual_list_position]
-            print("Do: " + change_type +' '+ str(data))
-            instance.make_change(True, change_type, data)
-        #self.controller.show_message_on_status_bar("make Do step %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list)-1)))
+            old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
+            old_instance.scale_matrix = scale
+            old_instance.rotation_matrix = rot
+            old_instance.pos = pos
 
     def check_models_name(self):
         for m in self.models:
@@ -207,7 +205,7 @@ class Model(object):
                                             [ 0.,  1.,  0.],
                                             [ 0.,  0.,  1.]])
 
-        self.matrix = matrix33.create_identity()
+        #self.matrix = matrix33.create_identity()
 
         #helping data
         self.selected = False
@@ -348,16 +346,18 @@ class Model(object):
         self.temp_rotation = np.array([[ 1.,  0.,  0.],
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
-        print(str(self.rotation_matrix))
 
     def set_scale(self, value, absolut=False):
         #TODO:Omezeni minimalni velikosti
         #TODO:Omezeni maximalni velikosti
         #TODO:Umisteni na podlozku
 
+        #if
+
         self.temp_scale = np.array([[ 1.,  0.,  0.],
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]]) * value
+        self.place_on_zero()
 
         '''
         if absolut:

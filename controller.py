@@ -154,6 +154,8 @@ class Controller:
         self.ray_end = [.0, .0, .0]
         self.hitPoint = [.0, .0, .0]
         self.last_ray_pos = [.0, .0, .0]
+        self.original_scale = 0.0
+        self.original_scale_point = numpy.array([0.,0.,0.])
         self.origin_rotation_point = numpy.array([0.,0.,0.])
         self.res_old = numpy.array([0.,0.,0.])
         self.status = 'edit'
@@ -329,7 +331,7 @@ class Controller:
         self.scene.models.append(model)
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
-        self.scene.save_change(model, 'init', [deepcopy(model.pos)])
+        self.scene.save_change(model)
         self.view.update_scene()
 
     def import_project(self, path):
@@ -381,7 +383,6 @@ class Controller:
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
         if event.buttons() & QtCore.Qt.LeftButton:
             self.ray_start, self.ray_end = self.view.get_cursor_position(event)
-        print("mouse_pres_event")
 
         self.hit_tool_button_by_color(event)
         if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
@@ -403,6 +404,14 @@ class Controller:
                     self.hitPoint = deepcopy(self.origin_rotation_point)
         elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
             self.find_object_and_scale_axis_by_color(event)
+            for model in self.scene.models:
+                if model.selected and model.scaleAxis:
+                    camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+                    ray_start, ray_end = self.view.get_cursor_position(event)
+                    self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.zeroPoint, direction))
+                    self.original_scale = numpy.linalg.norm(self.original_scale_point - model.zeroPoint)
+                    self.hitPoint = deepcopy(self.original_scale_point)
+
         elif event.buttons() & QtCore.Qt.MiddleButton:
             rayStart,_  = self.view.get_cursor_position(event)
             self.last_ray_pos = numpy.array(rayStart)
@@ -413,35 +422,20 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
-                    #TODO:Redesign
-                    '''
-                    if model.rotationAxis == 'x':
-                        vector = numpy.array([1., 0., 0.])
-                        self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[0])])
-                    elif model.rotationAxis == 'y':
-                        vector = numpy.array([0., 1., 0.])
-                        self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[1])])
-                    elif model.rotationAxis == 'z':
-                        vector = numpy.array([0., 0., 1.])
-                        self.scene.save_change(model, 'rotation', [vector, deepcopy(model.rot[2])])
-                    '''
                     model.apply_rotation()
                     model.rot = numpy.array([0.,0.,0.])
                     model.place_on_zero()
+                    self.scene.save_change(model)
         elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
             for model in self.scene.models:
                 if model.selected:
-                    print("rozdilovy vektor: " + str(model.pos-model.pos_old))
-                    self.scene.save_change(model, 'move', [model.pos-model.pos_old])
+                    self.scene.save_change(model)
         elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
-                    print("Scale save: " + str(model.size/model.size_origin))
                     model.apply_scale()
-                    #TODO:Redesign!!!
-                    '''
-                    self.scene.save_change(model, 'scale', [model.size/model.size_origin])
-                    '''
+                    self.scene.save_change(model)
+
 
         self.scene.clear_selected_models()
         self.view.update_scene()
@@ -511,30 +505,14 @@ class Controller:
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
             res = [.0, .0, .0]
-            #find axis(), set scale on model instance
             camera_pos, direction, _ ,_   = self.view.get_camera_direction(event)
             ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected and model.scaleAxis:
-                    #position = [i+o for i,o in zip(model.boundingSphereCenter, model.pos)]
-                    '''
-                    if model.scaleAxis == 'x':
-                        model.scale[0] = model.scale[0] + dx*0.25
-                    elif model.scaleAxis == 'y':
-                        model.scale[1] = model.scale[1] + dx*0.25
-                    elif model.scaleAxis == 'z':
-                        model.scale[2] = model.scale[2] + dy*0.25
-                    else
-                    '''
                     if model.scaleAxis == 'xyz':
-                        #model.scale = [i + dy*0.25 for i in model.scale]
-                        res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, direction))
-                        self.hitPoint = res
-                        diff_vec = res - model.zeroPoint
-                        l = numpy.linalg.norm(diff_vec)
-                        print("Delka vektoru: " + str(l))
-                        #new = (l/numpy.linalg.norm(model.size_origin))*2.
-                        #print("Novy koeficient: " + str(new))
+                        new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.zeroPoint, direction))
+                        new_scale_vec = new_scale_point - model.zeroPoint
+                        l = numpy.linalg.norm(new_scale_vec)/self.original_scale
                         model.set_scale(numpy.array([l, l, l]))
                     else:
                         res = [.0, .0, .0]
@@ -640,11 +618,9 @@ class Controller:
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
         if find_id == 0:
-            print("Nenasli jsme nic")
             return False
         for model in self.scene.models:
             if model.id == find_id:
-                print("Nasli jsme objekt")
                 model.selected = True
                 return True
 
