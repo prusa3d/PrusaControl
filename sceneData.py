@@ -36,43 +36,36 @@ class AppScene(object):
         self.actual_list_position = 0
 
     def save_change(self, old_instance):
-        #print("Snaha o ulozeni dalsiho stavu")
-        if not(self.actual_list_position == len(self.transformation_list)-1) and len(self.transformation_list)>=0:
-            print("nebyli jsem na konci listu " + str(self.actual_list_position) + " " + str(len(self.transformation_list)))
-            self.actual_list_position +=1
-            self.transformation_list = self.transformation_list[:self.actual_list_position]
-            print("List: " + str(self.transformation_list))
-        self.transformation_list.append([old_instance, deepcopy(old_instance.scale_matrix), deepcopy(old_instance.rotation_matrix), deepcopy(old_instance.pos)])
+        if self.actual_list_position < len(self.transformation_list)-1:
+            self.transformation_list = self.transformation_list[:self.actual_list_position+1]
 
+        self.transformation_list.append([old_instance, deepcopy(old_instance.scale_matrix), deepcopy(old_instance.rotation_matrix), deepcopy(old_instance.pos)])
         self.actual_list_position = len(self.transformation_list)-1
-        self.controller.show_message_on_status_bar("Save new change %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+        self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+        print(str(self.transformation_list))
 
 
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
         if self.actual_list_position >= 1:
             self.actual_list_position -= 1
-            print("Actual possition in list: " + str(self.actual_list_position))
             old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
             old_instance.scale_matrix = scale
             old_instance.rotation_matrix = rot
             old_instance.pos = pos
+            old_instance.is_changed = True
+            self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
-        if (self.actual_list_position < len(self.transformation_list)-1) and self.actual_list_position>0:
+        if self.actual_list_position < len(self.transformation_list)-1:
             self.actual_list_position += 1
             old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
             old_instance.scale_matrix = scale
             old_instance.rotation_matrix = rot
             old_instance.pos = pos
-        elif self.actual_list_position==0 and len(self.transformation_list)>0:
-            print("prvni")
-            self.actual_list_position += 1
-            old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = scale
-            old_instance.rotation_matrix = rot
-            old_instance.pos = pos
+            old_instance.is_changed = True
+            self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
     def check_models_name(self):
         for m in self.models:
@@ -180,6 +173,7 @@ class Model(object):
         self.displayList = []
 
         self.mesh = None
+        self.temp_mesh = None
 
         #transformation data, connected to scene
         self.pos = np.array([.0, .0, .0])
@@ -210,10 +204,10 @@ class Model(object):
         #helping data
         self.selected = False
         self.boundingSphereSize = .0
-        self.boundingSphereCenter = [.0, .0, .0]
+        self.boundingSphereCenter = np.array([.0, .0, .0])
         self.boundingBox = []
         self.boundingMinimalPoint = [.0, .0, .0]
-        self.zeroPoint = [.0, .0, .0]
+        self.zeroPoint = np.array([.0, .0, .0])
         self.min = [.0, .0, .0]
         self.max = [.0, .0, .0]
         self.size = np.array([.0, .0, .0])
@@ -262,18 +256,10 @@ class Model(object):
         print('saving model')
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
-        mesh = deepcopy(self.mesh)
+        mesh = deepcopy(self.temp_mesh)
 
-        mesh.update_min()
-        mesh.update_max()
-
-        '''
-        mesh.vectors *= np.array(self.scale)
-
-        mesh.rotate([1.0, 0.0, 0.0], self.rot[0])
-        mesh.rotate([0.0, 1.0, 0.0], self.rot[1])
-        mesh.rotate([0.0, 0.0, 1.0], self.rot[2])
-        '''
+        #mesh.update_min()
+        #mesh.update_max()
 
         if transform:
             mesh.vectors += np.array(self.pos)
@@ -309,6 +295,7 @@ class Model(object):
 
 
     def set_move(self, vector, add=True):
+        #TODO:Add units in message(US inches, EU cm, ...)
         vector = np.array(vector)
         if add:
             self.pos += vector
@@ -317,6 +304,7 @@ class Model(object):
         self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
+
 
     def set_rotation(self, vector, alpha):
         if vector.tolist() == [1.0, 0.0, 0.0]:
@@ -329,8 +317,6 @@ class Model(object):
             self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
             self.parent.controller.show_message_on_status_bar("Angle Z: " + str(np.degrees(alpha)))
 
-        #TODO:Doplnit funkcnost prepocitani bounding boxu pro omezeni ze je objekt na podlozce
-        #TODO:Umisteni na podlozku
         self.mesh.update_min()
         self.mesh.update_max()
 
@@ -341,6 +327,8 @@ class Model(object):
 
         #self.place_on_zero()
 
+        self.is_changed = True
+
     def apply_rotation(self):
         self.rotation_matrix = np.dot(self.rotation_matrix, self.temp_rotation)
         self.temp_rotation = np.array([[ 1.,  0.,  0.],
@@ -348,107 +336,20 @@ class Model(object):
                                         [ 0.,  0.,  1.]])
 
     def set_scale(self, value, absolut=False):
-        #TODO:Omezeni minimalni velikosti
-        #TODO:Omezeni maximalni velikosti
-        #TODO:Umisteni na podlozku
-
-        #if
-
-        self.temp_scale = np.array([[ 1.,  0.,  0.],
+        printing_space = self.parent.controller.actual_printer['printing_space']
+        new_size = np.dot(self.size_origin, self.scale_matrix*value)
+        if new_size[0] < printing_space[0]*0.98 and new_size[1] < printing_space[1]*0.98 and new_size[2] < printing_space[2]*0.98 and new_size[0] > 0.5 and new_size[1] > 0.5 and new_size[2] > 0.5:
+            self.temp_scale = np.array([[ 1.,  0.,  0.],
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]]) * value
-        self.place_on_zero()
+            self.is_changed = True
 
-        '''
-        if absolut:
-            #this time is in value absolut size of scale
-            print("Scale: " + str(value[0]))
-
-            aktual = self.size/self.size_origin
-            print("Aktual: " + str(aktual))
-            scale_coef = value[0]/aktual
-            print("Scale_coef: " + str(scale_coef))
-
-            self.mesh.vectors *= scale_coef
-
-            self.mesh.update_min()
-            self.mesh.update_max()
-
-            self.min = self.mesh.min_
-            self.max = self.mesh.max_
-
-            self.size = self.max - self.min
-            percent = int((self.size[0]/self.size_origin[0])*100)
-
-            self.parent.controller.show_message_on_status_bar("Scale: %s" % ('{:3}'.format(percent)) + "%")
-
-            self.min_scene = self.mesh.min_ + self.pos
-            self.max_scene = self.mesh.max_ + self.pos
-
-            self.place_on_zero()
-        else:
-            scale_coef = value[0]/(np.linalg.norm(self.max)*0.5)
-            size = self.size * scale_coef
-            printing_space = self.parent.controller.actual_printer['printing_space']
-            scale_coef = np.array([scale_coef, scale_coef, scale_coef])
-            #if not(self.scale[0] == value[0] and self.scale[1] == value[1] and self.scale[2] == value[2]):
-            if not(self.scale[0] == scale_coef[0] and self.scale[1] == scale_coef[1] and self.scale[2] == scale_coef[2])\
-                    and not((size[0] >= printing_space[0]) or (size[1] >= printing_space[1]) or (size[2] >= printing_space[2])):
-                #self.mesh.vectors *= scale_coef/self.scale
-                self.mesh.vectors *= scale_coef
-                #self.parent.save_change(self, 'scale', [scale_coef])
-                #self.scale = value
-                self.scale = scale_coef
-
-                self.mesh.update_min()
-                self.mesh.update_max()
-
-                self.min = self.mesh.min_
-                self.max = self.mesh.max_
-
-                self.size = self.max - self.min
-                percent = int((self.size[0]/self.size_origin[0])*100)
-                print(str(percent))
-                self.parent.controller.show_message_on_status_bar("Scale: %s" % ('{:3}'.format(percent)) + "%")
-
-                self.min_scene = self.mesh.min_ + self.pos
-                self.max_scene = self.mesh.max_ + self.pos
-
-                self.place_on_zero()
-        '''
 
     def apply_scale(self):
         self.scale_matrix = np.dot(self.scale_matrix, self.temp_scale)
         self.temp_scale = np.array([[ 1.,  0.,  0.],
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
-        print(str(self.scale_matrix))
-
-    def make_change(self, do, change_type, data):
-        if do:
-            direction = 1.
-        else:
-            direction = -1.0
-
-        if change_type == 'move':
-            print("undo move")
-            self.set_move(data[0]*direction)
-        elif change_type == 'rotation':
-            print("undo rotation")
-            self.set_rotation(data[0], data[1]*direction)
-            self.rot = np.array([0., 0., 0.])
-            self.place_on_zero()
-        elif change_type == 'scale':
-            print("undo scale")
-            #TODO:Je jeste potreba doplnit pokladani na podlozku
-            #TODO:Skontrolovat koeficient scalu-jestli nebude potreba ho nejak prepocitat
-            self.set_scale(data[0], True)
-            self.place_on_zero()
-        elif change_type == 'init':
-            print("init")
-            self.set_move(data[0], False)
-
-
 
 
     def place_on_zero(self):
@@ -488,16 +389,23 @@ class Model(object):
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
-        '''
-        glDisable(GL_DEPTH_TEST)
-        glBegin(GL_POINTS)
-        glColor3f(1,0,0)
-        glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
-        glColor3f(1,0,0)
-        glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
-        glEnd()
-        glEnable(GL_DEPTH_TEST)
-        '''
+        if debug:
+            #Draw BoundingBox
+            glDisable(GL_DEPTH_TEST)
+            glPointSize(5)
+            glBegin(GL_POINTS)
+            glColor3f(1,0,0)
+            glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
+            glVertex3f(self.max_scene[0], self.min_scene[1], self.min_scene[2])
+            glVertex3f(self.min_scene[0], self.max_scene[1], self.min_scene[2])
+            glVertex3f(self.min_scene[0], self.min_scene[1], self.max_scene[2])
+            glVertex3f(self.max_scene[0], self.min_scene[1], self.max_scene[2])
+            glVertex3f(self.max_scene[0], self.max_scene[1], self.min_scene[2])
+            glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
+            glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
+            glEnd()
+            glEnable(GL_DEPTH_TEST)
+
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
         if picking:
@@ -508,25 +416,35 @@ class Model(object):
             else:
                 glColor3f(1., .0, .0)
 
-        #glScalef(self.scale[0], self.scale[1], self.scale[2])
-
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        mesh = deepcopy(self.mesh)
+        if self.is_changed:
+            self.temp_mesh = deepcopy(self.mesh)
 
-        final_matrix = np.dot(np.dot(self.rotation_matrix, self.temp_rotation),
-                              np.dot(self.temp_scale, self.scale_matrix))
+            final_matrix = np.dot(np.dot(self.rotation_matrix, self.temp_rotation),
+                                  np.dot(self.temp_scale, self.scale_matrix))
 
-        #print(str(final_matrix))
+            for i in range(3):
+                self.temp_mesh.vectors[:, i] = self.temp_mesh.vectors[:, i].dot(final_matrix)
 
-        for i in range(3):
-            mesh.vectors[:, i] = mesh.vectors[:, i].dot(final_matrix)
+            #TODO:Update Min/Max
+            self.temp_mesh.update_min()
+            self.temp_mesh.update_max()
 
-        glNormalPointerf(np.tile(mesh.normals, 3))
-        glVertexPointerf(mesh.vectors)
+            self.min = self.temp_mesh.min_
+            self.max = self.temp_mesh.max_
+            self.min_scene = self.min + self.pos
+            self.max_scene = self.max + self.pos
 
-        glDrawArrays(GL_TRIANGLES, 0, len(mesh.vectors)*3)
+            self.place_on_zero()
+
+            self.is_changed = False
+
+        glNormalPointerf(np.tile(self.temp_mesh.normals, 3))
+        glVertexPointerf(self.temp_mesh.vectors)
+
+        glDrawArrays(GL_TRIANGLES, 0, len(self.temp_mesh.vectors)*3)
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
@@ -553,9 +471,6 @@ class Model(object):
 
         return genList
 
-    def get_matrix4(self):
-        return matrix44.create_from_matrix33(self.matrix)
-
     def closest_point(self, a, b, p):
         ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
         abSquare = np.dot(ab.getRaw(), ab.getRaw())
@@ -577,10 +492,9 @@ class Model(object):
         return lenght < self.boundingSphereSize
 
     def intersection_model_model(self, model):
-        #vector_model_model = Vector(a=model.pos, b=self.pos)
+        #TODO:Add better alg for detecting intersection(now is only detection of BS)
         vector_model_model = self.pos - model.pos
         distance = np.linalg.norm(vector_model_model)
-        #TODO:Add better alg for detecting intersection(now is only detection of BS)
         if distance >= (model.boundingSphereSize+self.boundingSphereSize):
             return False
         else:
@@ -592,56 +506,6 @@ class Model(object):
                 return True
         return False
 
-    def intersection_ray_model(self, rayStart, rayEnd):
-        self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
-        matrix = matrix44.from_scale(Vector3(self.scale))
-        #TODO:Add rotation
-        matrix = matrix * matrix44.from_translation(Vector3(self.pos))
-
-        w = Vector(rayEnd)
-        w.minus(rayStart)
-        w.normalize()
-
-        for i, tri in enumerate(self.dataTmp):
-            v0 = matrix * Vector3(tri[0])
-            v1 = matrix * Vector3(tri[1])
-            v2 = matrix * Vector3(tri[2])
-            v0 = v0.tolist()
-            v1 = v1.tolist()
-            v2 = v2.tolist()
-
-            b = [.0,.0,.0]
-            e1 = Vector(v1)
-            e1.minus(v0)
-            e2 = Vector(v2)
-            e2.minus(v0)
-
-            n = Vector(self.normal[i])
-
-            q = np.cross(w.getRaw(), e2.getRaw())
-            a = np.dot(e1.getRaw(), q)
-
-            if((np.dot(n.getRaw(), w.getRaw())>= .0) or (abs(a) <=.0001)):
-                continue
-
-            s = Vector(rayStart)
-            s.minus(v0)
-            s.sqrt(a)
-
-            r = np.cross(s.getRaw(), e1.getRaw())
-            b[0] = np.dot(s.getRaw(), q)
-            b[1] = np.dot(r, w.getRaw())
-            b[2] = 1.0 - b[0] - b[1]
-
-            if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
-                continue
-
-            t = np.dot(e2.getRaw(), r)
-            if (t >= .0):
-                return True
-            else:
-                continue
-        return False
 
 class ModelTypeAbstract(object):
     '''
@@ -722,6 +586,8 @@ class ModelTypeStl(ModelTypeAbstract):
 
         model.size = model.max-model.min
         model.size_origin = deepcopy(model.size)
+
+        model.temp_mesh = deepcopy(mesh)
 
         #model.displayList = model.make_display_list()
 
