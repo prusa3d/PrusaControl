@@ -456,7 +456,6 @@ class Controller:
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
-                print(str(res))
                 #res_new = sceneData.Vector.minusAB(res, self.res_old)
                 res_new = res - self.res_old
                 for model in self.scene.models:
@@ -669,12 +668,10 @@ class Controller:
 
     def undo_button_pressed(self):
         self.clear_tool_button_states()
-        print("Undo button pressed")
         self.scene.make_undo()
 
     def do_button_pressed(self):
         self.clear_tool_button_states()
-        print("Do button pressed")
         self.scene.make_do()
 
     def select_button_pressed(self):

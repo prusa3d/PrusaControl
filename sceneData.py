@@ -41,31 +41,29 @@ class AppScene(object):
 
         self.transformation_list.append([old_instance, deepcopy(old_instance.scale_matrix), deepcopy(old_instance.rotation_matrix), deepcopy(old_instance.pos)])
         self.actual_list_position = len(self.transformation_list)-1
-        self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
-        print(str(self.transformation_list))
-
+        #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
         if self.actual_list_position >= 1:
             self.actual_list_position -= 1
             old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = scale
-            old_instance.rotation_matrix = rot
-            old_instance.pos = pos
+            old_instance.scale_matrix = deepcopy(scale)
+            old_instance.rotation_matrix = deepcopy(rot)
+            old_instance.pos = deepcopy(pos)
             old_instance.is_changed = True
-            self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+            #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
         if self.actual_list_position < len(self.transformation_list)-1:
             self.actual_list_position += 1
             old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = scale
-            old_instance.rotation_matrix = rot
-            old_instance.pos = pos
+            old_instance.scale_matrix = deepcopy(scale)
+            old_instance.rotation_matrix = deepcopy(rot)
+            old_instance.pos = deepcopy(pos)
             old_instance.is_changed = True
-            self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+            #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
     def check_models_name(self):
         for m in self.models:
@@ -253,7 +251,6 @@ class Model(object):
             return False
 
     def get_mesh(self, transform=True):
-        print('saving model')
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
         mesh = deepcopy(self.temp_mesh)
@@ -325,8 +322,6 @@ class Model(object):
         self.min_scene = self.mesh.min_ + self.pos
         self.max_scene = self.mesh.max_ + self.pos
 
-        #self.place_on_zero()
-
         self.is_changed = True
 
     def apply_rotation(self):
@@ -335,7 +330,7 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
 
-    def set_scale(self, value, absolut=False):
+    def set_scale(self, value):
         printing_space = self.parent.controller.actual_printer['printing_space']
         new_size = np.dot(self.size_origin, self.scale_matrix*value)
         if new_size[0] < printing_space[0]*0.98 and new_size[1] < printing_space[1]*0.98 and new_size[2] < printing_space[2]*0.98 and new_size[0] > 0.5 and new_size[1] > 0.5 and new_size[2] > 0.5:
@@ -421,12 +416,14 @@ class Model(object):
 
         if self.is_changed:
             self.temp_mesh = deepcopy(self.mesh)
-
-            final_matrix = np.dot(np.dot(self.rotation_matrix, self.temp_rotation),
-                                  np.dot(self.temp_scale, self.scale_matrix))
+            final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
+            final_scale = np.dot(self.temp_scale, self.scale_matrix)
+            final_matrix = np.dot(final_rotation, final_scale)
 
             for i in range(3):
                 self.temp_mesh.vectors[:, i] = self.temp_mesh.vectors[:, i].dot(final_matrix)
+
+            self.temp_mesh.normals = self.temp_mesh.normals.dot(final_rotation)
 
             #TODO:Update Min/Max
             self.temp_mesh.update_min()

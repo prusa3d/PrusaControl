@@ -188,12 +188,12 @@ class GLWidget(QGLWidget):
 
         #tools
         #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png"), [4.,4.], [95, 16])
-        self.moveTool = GlButton(self.texture_from_png("data/img/move_n.png"), [4.,4.], [95.,11.])
-        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [4.,4.], [95.,6.])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [4.,4.], [95.,1.])
+        self.moveTool = GlButton(self.texture_from_png("data/img/move_n.png"), [3.,3.], [95.5, 12.])
+        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [3.,3.], [95.5, 6.])
+        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [3.,3.], [95.5, 1.])
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/undo.png"), [4.,4.], [1.,75.], True)
-        self.do_button = GlButton(self.texture_from_png("data/img/do.png"), [4.,4.], [6.,75.], True)
+        self.undo_button = GlButton(self.texture_from_png("data/img/undo_.png"), [3.,3.], [1., 94], True)
+        self.do_button = GlButton(self.texture_from_png("data/img/do_.png"), [3.,3.], [4.5, 94], True)
 
 
         #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
@@ -222,7 +222,7 @@ class GLWidget(QGLWidget):
 
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
-        glAlphaFunc( GL_GREATER, 0. )
+        glAlphaFunc( GL_GREATER, 0.0 )
         glEnable( GL_ALPHA_TEST )
 
         #new light settings
@@ -249,7 +249,7 @@ class GLWidget(QGLWidget):
 
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE)
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
@@ -293,18 +293,6 @@ class GLWidget(QGLWidget):
                     self.draw_tools_helper(model, self.parent.controller.settings, True)
 
             self.draw_tools(picking=True)
-
-            #color picking, save color buffer to picture
-            '''
-            p = self.mapFromGlobal(QCursor.pos())
-            self.set_mouse_pos(p)
-            print("p: " + str(p.x()) + ' ' + str(p.y()))
-            print("mouse : " + str(self.mouse_pos_x) + ' ' + str(self.mouse_pos_y))
-            glReadPixels(self.mouse_pos_x, self.mouse_pos_y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, self.mouse_pixel_color)
-            print("mouse color: " + str(type(self.mouse_pixel_color)))
-            print("mouse color: " + str(self.mouse_pixel_color[0]) + ' ' + str(self.mouse_pixel_color[1]) + ' ' + str(self.mouse_pixel_color[2]) + ' ' + str(self.mouse_pixel_color[3]))
-            '''
-
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
             if 'debug' in self.parent.controller.settings:
@@ -659,8 +647,8 @@ class GLWidget(QGLWidget):
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
 
-        sW = viewport[2]
-        sH = viewport[3]
+        sW = viewport[2]*0.01
+        sH = viewport[3]*0.01
 
         glLoadIdentity()
         glDisable(GL_LIGHTING)
@@ -669,37 +657,39 @@ class GLWidget(QGLWidget):
 
         glColor3f(1,1,1)
         #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
-        sH = sW
+        #sH = sW
+        coef = sW/sH
         for tool in self.tools:
             if picking:
                 glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, self.tool_background)
             else:
+                glColor3f(1,1,1)
                 glEnable(GL_TEXTURE_2D)
                 glBindTexture(GL_TEXTURE_2D, tool.texture)
             glBegin(GL_QUADS)
             glTexCoord2f(0, 0)
-            glVertex3f(tool.position[0] * (sW*.01), tool.position[1]* (sH*.01), 0)
+            glVertex3f(tool.position[0] * sW, tool.position[1]* sH, 0)
 
             glTexCoord2f(0, 1)
-            glVertex3f(tool.position[0] * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
+            glVertex3f(tool.position[0] * sW, (tool.position[1]+tool.size[1]* coef) * sH, 0)
 
             glTexCoord2f(1, 1)
-            glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
+            glVertex3f((tool.position[0]+tool.size[0]) * sW, (tool.position[1]+tool.size[1]* coef) * sH , 0)
 
             glTexCoord2f(1, 0)
-            glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), tool.position[1]* (sH*.01), 0)
+            glVertex3f((tool.position[0]+tool.size[0]) * sW, tool.position[1]* sH, 0)
             glEnd()
             if tool.pressed and not picking:
                 glDisable(GL_TEXTURE_2D)
                 glColor3f(1.,.0,.0)
                 glLineWidth(2.)
                 glBegin(GL_LINE_LOOP)
-                glVertex3f(tool.position[0] * (sW*.01), tool.position[1]* (sH*.01), 0)
-                glVertex3f(tool.position[0] * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
-                glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), (tool.position[1]+tool.size[1]) * (sH*.01), 0)
-                glVertex3f((tool.position[0]+tool.size[0]) * (sW*.01), tool.position[1]* (sH*.01), 0)
+                glVertex3f(tool.position[0] * sW, tool.position[1]* sH, 0)
+                glVertex3f(tool.position[0] * sW, (tool.position[1]+tool.size[1] * coef) * sH, 0)
+                glVertex3f((tool.position[0]+tool.size[0]) * sW, (tool.position[1]+tool.size[1] * coef) * sH, 0)
+                glVertex3f((tool.position[0]+tool.size[0]) * sW, tool.position[1]* sH, 0)
                 glEnd()
 
 

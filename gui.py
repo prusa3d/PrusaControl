@@ -437,6 +437,7 @@ class PrusaControlWidget(QtGui.QWidget):
 
         self.generateButton = QtGui.QPushButton(self.tr("Generate"))
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
+        self.generateButton.setEnabled(False)
 
         #printing info place
         self.printingInfoLabel = QtGui.QLabel(self.tr("Print info:"))
