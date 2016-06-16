@@ -91,31 +91,6 @@ class Controller:
         }
 
 
-        '''
-        self.printing_settings = {
-            'materials': ['abs', 'pla', 'flex'],
-            'abs': {
-                'speed': 25,
-                'quality': ['draft', 'low', 'medium'],
-                'infill': 65,
-                'infillRange': [20, 80]
-            },
-            'pla': {
-                'speed': 10,
-                'infill': 20,
-                'infillRange': [0, 100]
-            },
-            'default': {
-                'bed': 100,
-                'hotEnd': 250,
-                'quality': ['draft', 'low', 'medium', 'high', 'ultra_high'],
-                'speed': 20,
-                'infill': 20,
-                'infillRange': [0, 100]
-            }
-        }
-        '''
-
         with open(self.printing_parameters_file, 'rb') as json_file:
             self.printing_settings = json.load(json_file)
 
