@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import glob
 import logging
 import os
 from ConfigParser import ConfigParser
@@ -51,8 +50,7 @@ class Slic3rEngineRunner(QObject):
         elif system_platform in ['Darwin']:
             self.slicer_place = ['../MacOS/Slic3r']
         elif system_platform in ['Windows']:
-            perl_file = glob.glob("tools\\Slic3r-Lite\\perl*.exe")
-            self.slicer_place = ['tools\\Slic3r-Lite\\' + perl_file, 'tools\\Slic3r-Lite\\slic3r.pl']
+            self.slicer_place = ['tools\\Slic3r-Lite\\perl5.24.0.exe', 'tools\\Slic3r-Lite\\slic3r.pl']
         else:
             self.slicer_place = ['slic3r']
 
