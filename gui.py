@@ -123,7 +123,7 @@ class AboutDialog(QDialog):
         self.controller = controller
         self.different_version = True
         #self.actual_version = '1.0.2'
-        self.your_version = '0.9.1-alpha'
+        self.your_version = '0.9.2-alpha'
 
         layout = QVBoxLayout(self)
 
@@ -241,7 +241,7 @@ class PrusaControlView(QtGui.QMainWindow):
         #Help menu
 
         self.statusBar().showMessage('Ready')
-        self.setWindowTitle(self.tr("PrusaControl 0.9.1-alpha"))
+        self.setWindowTitle(self.tr("PrusaControl 0.9.2-alpha"))
         self.show()
 
     def eventFilter(self, source, event):
