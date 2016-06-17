@@ -153,7 +153,6 @@ class SlicerEngineManager(object):
 
 
     def slice(self):
-        #self.controller.set_cancel_button()
         self.slice_thread = QThread()
         self.slice_engine = Slic3rEngineRunner(self.controller)
         self.slice_engine.moveToThread(self.slice_thread)

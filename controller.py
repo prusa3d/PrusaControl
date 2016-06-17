@@ -354,6 +354,7 @@ class Controller:
         self.view.update_scene()
 
     def mouse_press_event(self, event):
+        print("mouse press event")
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
         if event.buttons() & QtCore.Qt.LeftButton:
@@ -393,7 +394,7 @@ class Controller:
         self.view.update_scene()
 
     def mouse_release_event(self, event):
-        #print("mouse release event")
+        print("mouse release event")
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
@@ -422,7 +423,7 @@ class Controller:
                 self.view.update_scene()
 
     def mouse_move_event(self, event):
-        #print("mouse move event")
+        print("mouse move event")
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         diff = numpy.linalg.norm(numpy.array([dx, dy]))

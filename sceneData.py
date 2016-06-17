@@ -121,10 +121,6 @@ class AppScene(object):
                 position_vector[1] += model.boundingSphereSize*.1
 
 
-    #TODO:Doplnit setovani hot_bed dimension from settings->controller
-    def define_hot_bed(self, param):
-        self.hot_bed_dimension = param
-
     def save_whole_scene_to_one_stl_file(self, filename):
         whole_scene = Mesh(np.concatenate([i.get_mesh().data for i in self.models]))
         whole_scene.save(filename)
@@ -197,8 +193,6 @@ class Model(object):
                                             [ 0.,  1.,  0.],
                                             [ 0.,  0.,  1.]])
 
-        #self.matrix = matrix33.create_identity()
-
         #helping data
         self.selected = False
         self.boundingSphereSize = .0
@@ -215,7 +209,7 @@ class Model(object):
         self.color = [34./255., 167./255., 240./255.]
 
         #status of object
-        self.is_changed = False
+        self.is_changed = True
 
         #source file data
         #example car.stl
@@ -255,9 +249,6 @@ class Model(object):
 
         mesh = deepcopy(self.temp_mesh)
 
-        #mesh.update_min()
-        #mesh.update_max()
-
         if transform:
             mesh.vectors += np.array(self.pos)
 
@@ -270,10 +261,6 @@ class Model(object):
 
         return Mesh(data)
 
-
-
-    def __str__(self):
-        return "Mesh: " + str(self.id) + ' ' + str(self.color)
 
     def normalize_object(self):
         r = np.array([.0, .0, .0]) - np.array(self.boundingSphereCenter)
@@ -381,12 +368,16 @@ class Model(object):
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
+    def put_array_to_gl(self):
+        glNormalPointerf(np.tile(self.temp_mesh.normals, 3))
+        glVertexPointerf(self.temp_mesh.vectors)
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
+        '''
         if debug:
             #Draw BoundingBox
-            glDisable(GL_DEPTH_TEST)
+            #glDisable(GL_DEPTH_TEST)
             glPointSize(5)
             glBegin(GL_POINTS)
             glColor3f(1,0,0)
@@ -399,7 +390,8 @@ class Model(object):
             glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
             glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
             glEnd()
-            glEnable(GL_DEPTH_TEST)
+            #glEnable(GL_DEPTH_TEST)
+        '''
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
@@ -410,9 +402,6 @@ class Model(object):
                 glColor3fv(self.color)
             else:
                 glColor3f(1., .0, .0)
-
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_NORMAL_ARRAY)
 
         if self.is_changed:
             self.temp_mesh = deepcopy(self.mesh)
@@ -425,7 +414,6 @@ class Model(object):
 
             self.temp_mesh.normals = self.temp_mesh.normals.dot(final_rotation)
 
-            #TODO:Update Min/Max
             self.temp_mesh.update_min()
             self.temp_mesh.update_max()
 
@@ -437,14 +425,9 @@ class Model(object):
             self.place_on_zero()
 
             self.is_changed = False
-
-        glNormalPointerf(np.tile(self.temp_mesh.normals, 3))
-        glVertexPointerf(self.temp_mesh.vectors)
+            self.put_array_to_gl()
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.temp_mesh.vectors)*3)
-
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisableClientState(GL_NORMAL_ARRAY)
 
         glPopMatrix()
 

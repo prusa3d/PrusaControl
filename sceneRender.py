@@ -42,6 +42,7 @@ class GLWidget(QGLWidget):
         self.last_time = time.time()
         self.delta_t = 0.016
 
+
         #properties definition
         self.xRot = 0
         self.yRot = 0
@@ -115,7 +116,10 @@ class GLWidget(QGLWidget):
         actual_time = time.time()
         delta = actual_time-self.last_time
         if delta >= self.delta_t:
+            t0 = time.time()
             self.updateGL()
+            t1 = time.time()
+            self.parent.controller.show_message_on_status_bar("FPS: %s" % (1./(t1-t0)))
             self.last_time = actual_time
 
     #TODO:All this function will be changed to controll camera instance
@@ -212,13 +216,15 @@ class GLWidget(QGLWidget):
         for i in self.parent.controller.printers:
             self.bed[i['name']] = self.makePrintingBed(i['texture'], i['printing_space'])
 
-        #self.axis = self.make_axis()
 
         glClearDepth(1.0)
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
         glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
-        glCullFace(GL_BACK)
+
+        #NICE
+        glCullFace(GL_FRONT)
 
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
@@ -246,23 +252,27 @@ class GLWidget(QGLWidget):
         glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
 
-
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 
-        glEnable(GL_MULTISAMPLE)
-        glEnable(GL_LINE_SMOOTH)
-        glEnable(GL_POINT_SMOOTH)
-        glEnable(GL_POLYGON_SMOOTH)
+        #glEnable(GL_MULTISAMPLE)
+        #glEnable(GL_LINE_SMOOTH)
+        #glEnable(GL_POINT_SMOOTH)
+        #glEnable(GL_POLYGON_SMOOTH)
 
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
 
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
 
     #@timing
     def paintGL(self, selection = 1):
+        print("render")
         #print(inspect.stack()[1][3] + " call render")
+
         if selection:
             if 'debug' in self.parent.controller.settings:
                 if self.parent.controller.settings['debug']:
@@ -300,13 +310,13 @@ class GLWidget(QGLWidget):
                     #save picture to filesystem
                     self.sceneFrameBuffer.save("select_buffer.png")
 
-
         #color picking
 
         glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
         glClearColor(0.0, 0.47, 0.62, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
         self.draw_background_texture()
         glLoadIdentity()
 
@@ -320,26 +330,10 @@ class GLWidget(QGLWidget):
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        glEnable( GL_BLEND )
         glCallList(self.bed[self.parent.controller.settings['printer']])
-        glDisable( GL_BLEND )
-
-        if 'debug' in self.parent.controller.settings:
-            if self.parent.controller.settings['debug']:
-                glPointSize(10)
-                glBegin(GL_POINTS)
-                glColor3f(1,0,0)
-                glVertex3fv(self.parent.controller.hitPoint)
-                glEnd()
-
-                glLineWidth(5)
-                glBegin(GL_LINES)
-                glColor3f(0,1,0)
-                glVertex3fv(self.parent.controller.ray_start)
-                glVertex3fv(self.parent.controller.ray_end)
-                glEnd()
 
         glEnable(GL_DEPTH_TEST)
+
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
@@ -351,14 +345,9 @@ class GLWidget(QGLWidget):
             for model in self.parent.controller.scene.models:
                 self.draw_tools_helper(model, self.parent.controller.settings)
 
-
-        #glEnable( GL_BLEND )
-
         self.draw_tools()
 
-        #self.draw_debug()
 
-        #glFlush()
 
     def draw_tools_helper(self, model, settings, picking=False):
         if picking:
@@ -388,7 +377,7 @@ class GLWidget(QGLWidget):
         if picking:
             glLineWidth(10.0)
         else:
-            glLineWidth(1.0)
+            glLineWidth(3.5)
 
         glColor3ubv(colors[0])
         glBegin(GL_LINE_LOOP)
