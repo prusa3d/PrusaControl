@@ -425,7 +425,7 @@ class Model(object):
             self.place_on_zero()
 
             self.is_changed = False
-            self.put_array_to_gl()
+        self.put_array_to_gl()
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.temp_mesh.vectors)*3)
 
