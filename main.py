@@ -14,8 +14,6 @@ __author__ = 'Tibor Vavra'
 
 DEBUG = False
 
-import psyco
-psyco.full()
 
 def main():
     logging.info('PrusaControl start')
