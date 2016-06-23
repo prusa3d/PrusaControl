@@ -14,9 +14,9 @@
     },
     {
       "name": "default",
-      "label": "Prusa i3 mark2",
+      "label": "",
       "texture": "data/img/checker.png",
-      "printing_space": [25, 21, 20]
+      "printing_space": [20, 20, 20]
     }
   ]
 }

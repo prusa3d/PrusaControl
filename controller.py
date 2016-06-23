@@ -3,13 +3,12 @@ import json
 import logging
 
 import functools
-import os
-import platform
+
 
 import time
 import webbrowser
-from ConfigParser import ConfigParser, RawConfigParser
 from pprint import pprint
+from ConfigParser import RawConfigParser
 
 from shutil import copyfile, Error
 
@@ -18,12 +17,14 @@ import pyrr
 from PyQt4.QtGui import QApplication
 
 import sceneData
+from analyzer import Analyzer
 from gui import PrusaControlView
+from parameters import AppParameters
 from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
 from copy import deepcopy
-import tempfile
+
 
 import xml.etree.cElementTree as ET
 from zipfile import ZipFile
@@ -47,43 +48,16 @@ class Controller:
     def __init__(self, app):
         logging.info('Controller instance created')
 
-        self.system_platform = platform.system()
-        self.config = ConfigParser()
-
-        if self.system_platform in ['Linux']:
-            self.tmp_place = tempfile.gettempdir() + '/'
-            self.config_path = os.path.expanduser("~/.prusacontrol")
-            self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
-            self.printers_parameters_file = os.path.expanduser("data/printers.json")
-            self.config.readfp(open('data/defaults.cfg'))
-        elif self.system_platform in ['Darwin']:
-            self.tmp_place = tempfile.gettempdir() + '/'
-            self.config_path = os.path.expanduser("~/.prusacontrol")
-            self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
-            self.printers_parameters_file = os.path.expanduser("data/printers.json")
-            self.config.readfp(open('data/defaults.cfg'))
-        elif self.system_platform in ['Windows']:
-            self.tmp_place = tempfile.gettempdir() + '\\'
-            self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
-            self.printing_parameters_file = os.path.expanduser("data\\printing_parameters.json")
-            self.printers_parameters_file = os.path.expanduser("data\\printers.json")
-            self.config.readfp(open('data\\defaults.cfg'))
-        else:
-            self.tmp_place = './'
-            self.config_path = 'prusacontrol.cfg'
-            self.printing_parameters_file = "data/printing_parameters.json"
-            self.printers_parameters_file = os.path.expanduser("data/printers.json")
-            self.config.readfp(open('data/defaults.cfg'))
-
-        self.config.read(self.config_path)
+        self.app_config = AppParameters()
+        self.analyzer = Analyzer()
 
         self.printing_settings = {}
         self.settings = {}
         if not self.settings:
-            self.settings['debug'] = self.config.getboolean('settings', 'debug')
-            self.settings['automatic_placing'] = self.config.getboolean('settings', 'automatic_placing')
-            self.settings['language'] = self.config.get('settings', 'language')
-            self.settings['printer'] = self.config.get('settings', 'printer')
+            self.settings['debug'] = self.app_config.config.getboolean('settings', 'debug')
+            self.settings['automatic_placing'] = self.app_config.config.getboolean('settings', 'automatic_placing')
+            self.settings['language'] = self.app_config.config.get('settings', 'language')
+            self.settings['printer'] = self.app_config.config.get('settings', 'printer')
 
             self.settings['toolButtons'] = {
                 'selectButton': False,
@@ -93,10 +67,10 @@ class Controller:
         }
 
 
-        with open(self.printing_parameters_file, 'rb') as json_file:
+        with open(self.app_config.printing_parameters_file, 'rb') as json_file:
             self.printing_settings = json.load(json_file)
 
-        with open(self.printers_parameters_file, 'rb') as json_file:
+        with open(self.app_config.printers_parameters_file, 'rb') as json_file:
             self.printers = json.load(json_file)
             self.printers = self.printers['printers']
 
@@ -146,6 +120,8 @@ class Controller:
         self.view = PrusaControlView(self)
         self.slicer_manager = SlicerEngineManager(self)
 
+        self.analyze_result = []
+
 
     def write_config(self):
         config = RawConfigParser()
@@ -155,7 +131,7 @@ class Controller:
         config.set('settings', 'automatic_placing', str(self.settings['automatic_placing']))
         config.set('settings', 'language', self.settings['language'])
 
-        with open(self.config_path, 'wb') as configfile:
+        with open(self.app_config.config_path, 'wb') as configfile:
             config.write(configfile)
 
 
@@ -212,15 +188,51 @@ class Controller:
 
     def generate_button_pressed(self):
         if self.status in ['edit', 'canceled']:
+            #prepared to be g-code generated
+            self.analyze_result = self.analyzer.make_analyze(self.scene)
+            self.make_reaction_on_analyzation_result(self.analyze_result)
+
+            '''
             self.generate_gcode()
             self.set_cancel_button()
             self.status = 'generating'
+            '''
+
         elif self.status == 'generating':
+            #generating in progress
             self.cancel_generation()
             self.status = 'canceled'
             self.set_generate_button()
         elif self.status == 'generated':
+            #already generated
             self.save_gcode_file()
+
+
+    def make_reaction_on_analyzation_result(self, result):
+        result_text = [i['message'] for i in result if i['result']==True]
+        if result_text:
+            result_text = "\n".join(result_text)
+
+            msg = QtGui.QMessageBox()
+            msg.setIcon(QtGui.QMessageBox.Warning)
+
+            msg.setText("Do you want to apply recommended settings?")
+            msg.setInformativeText("PrusaControl make analyze of printing scene, recommending different printing settings")
+            msg.setWindowTitle("Analyze of printing scene")
+            msg.setDetailedText(result_text)
+            msg.setStandardButtons(QtGui.QMessageBox.Close | QtGui.QMessageBox.Apply)
+            msg.buttonClicked.connect(self.reaction_button_pressed)
+
+            retval = msg.exec_()
+
+    def reaction_button_pressed(self, i):
+        if i.text() == 'Apply':
+            for res in self.analyze_result:
+                if res['result']:
+                    widget_list = self.view.get_changable_widgets()
+                    widget = widget_list[res['gui_name']]
+                    widget.setChecked(True)
+                    
 
     def open_web_browser(self, url):
         webbrowser.open(url, 1)
@@ -710,7 +722,7 @@ class Controller:
         function for resolve which file type will be loaded
         '''
         #self.view.statusBar().showMessage('Load file name: ')
-        if url[0] == '/' and self.system_platform in ['Windows']:
+        if url[0] == '/' and self.app_config.system_platform in ['Windows']:
             url = url[1:]
 
         urlSplited = url.split('.')

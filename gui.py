@@ -123,7 +123,7 @@ class AboutDialog(QDialog):
         self.controller = controller
         self.different_version = True
         #self.actual_version = '1.0.2'
-        self.your_version = '0.9.2-alpha'
+        self.your_version = self.controller.app_config.version
 
         layout = QVBoxLayout(self)
 
@@ -241,7 +241,7 @@ class PrusaControlView(QtGui.QMainWindow):
         #Help menu
 
         self.statusBar().showMessage('Ready')
-        self.setWindowTitle(self.tr("PrusaControl 0.9.2-alpha"))
+        self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
         self.show()
 
     def eventFilter(self, source, event):
@@ -307,6 +307,9 @@ class PrusaControlView(QtGui.QMainWindow):
         data = QtGui.QFileDialog.getSaveFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data
+
+    def get_changable_widgets(self):
+        return self.prusa_control_widget.get_changable_widgets()
 
     def update_gui(self):
         self.prusa_control_widget.update_gui()
@@ -407,6 +410,8 @@ class PrusaControlWidget(QtGui.QWidget):
 
         self.infillValue = 20
 
+        self.changable_widgets = {}
+
         self.init_gui()
 
     def init_gui(self):
@@ -483,7 +488,13 @@ class PrusaControlWidget(QtGui.QWidget):
         self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
+        self.changable_widgets['brimCheckBox'] = self.brimCheckBox
+        self.changable_widgets['supportCheckBox'] = self.supportCheckBox
+
         self.show()
+
+    def get_changable_widgets(self):
+        return self.changable_widgets
 
     def update_gui(self):
         self.controller.scene_was_changed()
