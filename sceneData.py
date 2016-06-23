@@ -26,11 +26,12 @@ class AppScene(object):
     '''
     def __init__(self, controller):
         self.controller = controller
-        self.model_position_offset = 10.
+        self.model_position_offset = 0.1
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
         self.printable = True
+        self.camera_vector = np.array([0.,0.,0.])
 
         self.transformation_list = []
         self.actual_list_position = 0
@@ -88,7 +89,9 @@ class AppScene(object):
 
     def automatic_models_position(self):
         #sort objects over size of bounding sphere
-        self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
+
+        #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
+        self.models = sorted(self.models, key=lambda k: np.linalg.norm(k.size), reverse=True)
         #place biggest object(first one) on center
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
         for i, m in enumerate(self.models):
@@ -97,7 +100,7 @@ class AppScene(object):
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
-            self.models[0].pos[0] = position_vector[0]
+            self.models[0 ].pos[0] = position_vector[0]
             self.models[0].pos[1] = position_vector[1]
 
             self.models[0].max_scene = self.models[0].max + self.models[0].pos
@@ -106,7 +109,8 @@ class AppScene(object):
         scene_tmp = self.models[:index]
         if index > 0:
             while model.intersection_model_list_model_(scene_tmp):
-                for angle in xrange(0, 360, 20):
+                #for angle in xrange(0, 360, 20):
+                for angle in xrange(0, 360, 5):
                     model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
 
@@ -372,6 +376,9 @@ class Model(object):
         glNormalPointerf(np.tile(self.temp_mesh.normals, 3))
         glVertexPointerf(self.temp_mesh.vectors)
 
+        #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
+        #glVertexPointerf(self.draw_mesh['vectors'])
+
     def render(self, picking=False, debug=False):
         glPushMatrix()
         '''
@@ -399,9 +406,12 @@ class Model(object):
             glColor3ubv(self.colorId)
         else:
             if self.is_in_printing_space(self.parent.controller.actual_printer):
-                glColor3fv(self.color)
+                if self.selected:
+                    glColor3f(.75, .75, 0.)
+                else:
+                    glColor3fv(self.color)
             else:
-                glColor3f(1., .0, .0)
+                glColor3f(0.75, .0, .0)
 
         if self.is_changed:
             self.temp_mesh = deepcopy(self.mesh)
@@ -425,6 +435,7 @@ class Model(object):
             self.place_on_zero()
 
             self.is_changed = False
+
         self.put_array_to_gl()
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.temp_mesh.vectors)*3)
@@ -471,8 +482,17 @@ class Model(object):
         lenght = pt.lenght(v.tolist())
         return lenght < self.boundingSphereSize
 
-    def intersection_model_model(self, model):
-        #TODO:Add better alg for detecting intersection(now is only detection of BS)
+    def intersection_model_model_by_BB(self, model):
+        #intersection by collision of BB
+        min = self.min_scene
+        max = self.max_scene
+        model_min = model.min_scene
+        model_max = model.max_scene
+        d = self.parent.model_position_offset
+        return not(max[0]+d<model_min[0] or model_max[0]<min[0]-d or max[1]+d<model_min[1] or model_max[1]<min[1]-d)
+
+    def intersection_model_model_by_BS(self, model):
+        #intersection by collision of BS
         vector_model_model = self.pos - model.pos
         distance = np.linalg.norm(vector_model_model)
         if distance >= (model.boundingSphereSize+self.boundingSphereSize):
@@ -482,7 +502,8 @@ class Model(object):
 
     def intersection_model_list_model_(self, list):
         for m in list:
-            if self.intersection_model_model(m):
+            #if self.intersection_model_model_by_BS(m):
+            if self.intersection_model_model_by_BB(m):
                 return True
         return False
 
@@ -499,7 +520,6 @@ class ModelTypeAbstract(object):
     @abstractmethod
     def load(self, filename):
         logging.debug("This is abstract model type")
-
         return None
 
 
