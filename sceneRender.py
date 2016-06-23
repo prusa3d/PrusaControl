@@ -42,6 +42,7 @@ class GLWidget(QGLWidget):
         self.last_time = time.time()
         self.delta_t = 0.016
 
+
         #properties definition
         self.xRot = 0
         self.yRot = 0
@@ -190,16 +191,16 @@ class GLWidget(QGLWidget):
         self.image_background = self.texture_from_png("data/img/background.png")
 
         #tools
-        self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
-        self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
-        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_ns.png"), [3.,3.], [95.5, 6.])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_ns.png"), [3.,3.], [95.5, 1.])
+        #self.selectTool = GlButton(self.texture_from_png("gui/select_n.png"), [4.,4.], [95, 16])
+        self.moveTool = GlButton(self.texture_from_png("data/img/move_n.png"), [3.,3.], [95.5, 12.])
+        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_n.png"), [3.,3.], [95.5, 6.])
+        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_n.png"), [3.,3.], [95.5, 1.])
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/undo_s.png"), [3.,3.], [1., 94], True)
-        self.do_button = GlButton(self.texture_from_png("data/img/do_s.png"), [3.,3.], [4.5, 94], True)
+        self.undo_button = GlButton(self.texture_from_png("data/img/undo_.png"), [3.,3.], [1., 94], True)
+        self.do_button = GlButton(self.texture_from_png("data/img/do_.png"), [3.,3.], [4.5, 94], True)
 
 
-        self.selectTool.set_callback(self.parent.controller.select_button_pressed)
+        #self.selectTool.set_callback(self.parent.controller.selectButtonPressed)
         self.moveTool.set_callback(self.parent.controller.move_button_pressed)
         self.rotateTool.set_callback(self.parent.controller.rotate_button_pressed)
         self.scaleTool.set_callback(self.parent.controller.scale_button_pressed)
@@ -209,7 +210,7 @@ class GLWidget(QGLWidget):
 
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
-        self.tools = [self.selectTool, self.moveTool, self.rotateTool, self.scaleTool, self.undo_button, self.do_button]
+        self.tools = [self.moveTool, self.rotateTool, self.scaleTool, self.undo_button, self.do_button]
 
         self.bed = {}
         for i in self.parent.controller.printers:
@@ -227,8 +228,8 @@ class GLWidget(QGLWidget):
 
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
-        #glAlphaFunc( GL_GREATER, 0.0 )
-        #glEnable( GL_ALPHA_TEST )
+        glAlphaFunc( GL_GREATER, 0.0 )
+        glEnable( GL_ALPHA_TEST )
 
         #new light settings
         glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(50, 50, 100, 0))
@@ -269,7 +270,7 @@ class GLWidget(QGLWidget):
 
     #@timing
     def paintGL(self, selection = 1):
-        #print("render")
+        print("render")
         #print(inspect.stack()[1][3] + " call render")
 
         if selection:
@@ -299,8 +300,7 @@ class GLWidget(QGLWidget):
             if self.parent.controller.scene.models:
                 for model in self.parent.controller.scene.models:
                     model.render(picking=True, debug=False)
-                    if model.selected:
-                        self.draw_tools_helper(model, self.parent.controller.settings, True)
+                    self.draw_tools_helper(model, self.parent.controller.settings, True)
 
             self.draw_tools(picking=True)
 
@@ -340,10 +340,10 @@ class GLWidget(QGLWidget):
                 model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
         glDisable( GL_LIGHTING )
 
+
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
-                if model.selected:
-                    self.draw_tools_helper(model, self.parent.controller.settings)
+                self.draw_tools_helper(model, self.parent.controller.settings)
 
         self.draw_tools()
 
@@ -641,9 +641,9 @@ class GLWidget(QGLWidget):
 
         glLoadIdentity()
         glDisable(GL_LIGHTING)
+        glDisable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
 
-        glEnable(GL_BLEND)
         glColor3f(1,1,1)
         #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
         #sH = sW

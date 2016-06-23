@@ -85,7 +85,6 @@ class Controller:
             self.settings['printer'] = self.config.get('settings', 'printer')
 
             self.settings['toolButtons'] = {
-                'selectButton': False,
                 'moveButton': False,
                 'rotateButton': False,
                 'scaleButton': False
@@ -226,7 +225,7 @@ class Controller:
 
     def set_printer(self, name):
         index = [i for i, data in enumerate(self.printers) if data['name']== name]
-        #print(str(index))
+        print(str(index))
         self.actual_printer = self.printers[index[0]]
 
     def send_feedback(self):
@@ -355,19 +354,17 @@ class Controller:
         self.view.update_scene()
 
     def mouse_press_event(self, event):
-        #print("mouse press event")
+        print("mouse press event")
         self.last_pos = QtCore.QPoint(event.pos())
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
         if event.buttons() & QtCore.Qt.LeftButton:
             self.ray_start, self.ray_end = self.view.get_cursor_position(event)
 
         self.hit_tool_button_by_color(event)
-        if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['selectButton']:
-            self.hit_first_object_by_color(event)
-        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
+        if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hitPoint = deepcopy(self.res_old)
-            #self.hit_first_object_by_color(event)
+            self.hit_first_object_by_color(event)
             for model in self.scene.models:
                 if model.selected:
                     model.pos_old = deepcopy(model.pos)
@@ -397,7 +394,7 @@ class Controller:
         self.view.update_scene()
 
     def mouse_release_event(self, event):
-        #print("mouse release event")
+        print("mouse release event")
         if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             for model in self.scene.models:
                 if model.selected:
@@ -416,7 +413,7 @@ class Controller:
                     self.scene.save_change(model)
 
 
-        #self.scene.clear_selected_models()
+        self.scene.clear_selected_models()
         self.view.update_scene()
         self.last_ray_pos = numpy.array([.0,.0,.0])
 
@@ -426,7 +423,7 @@ class Controller:
                 self.view.update_scene()
 
     def mouse_move_event(self, event):
-        #print("mouse move event")
+        print("mouse move event")
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         diff = numpy.linalg.norm(numpy.array([dx, dy]))
@@ -503,8 +500,6 @@ class Controller:
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             self.last_pos = QtCore.QPoint(event.pos())
-            camera_pos, direction, _ ,_   = self.view.get_camera_direction(event)
-            self.scene.camera_vector = direction - camera_pos
             self.view.update_scene()
 
         elif event.buttons() & QtCore.Qt.MiddleButton:
@@ -593,6 +588,7 @@ class Controller:
         return False
 
     def hit_first_object_by_color(self, event):
+        self.scene.clear_selected_models()
         color = self.view.get_cursor_pixel_color(event)
         #color to id
         find_id = color[0] + (color[1]*256) + (color[2]*256*256)
@@ -602,7 +598,6 @@ class Controller:
             if model.id == find_id:
                 model.selected = True
                 return True
-        self.scene.clear_selected_models()
 
     def find_object_and_rotation_axis_by_color(self, event):
         color = self.view.get_cursor_pixel_color(event)
@@ -657,7 +652,7 @@ class Controller:
 
     def select_button_pressed(self):
         self.clear_tool_button_states()
-        self.settings['toolButtons']['selectButton'] = True
+        self.settings['toolButtons']['moveButton'] = True
         self.view.update_scene()
 
     def move_button_pressed(self):
