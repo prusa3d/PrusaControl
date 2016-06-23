@@ -78,6 +78,24 @@ class AppScene(object):
                     o.filename = ".".join(name_list)
 
 
+    def delete_selected_models(self):
+        delete = False
+        print("N: " + str(len(self.models)) + ' ' + str(self.models))
+        temp = []
+        for m in self.models:
+            if m.selected:
+                temp.append(m)
+                delete = True
+
+        for t in temp:
+            self.models.remove(t)
+            print("Deleted")
+        print("N: " + str(len(self.models)) + ' ' + str(self.models))
+
+        if delete:
+            self.controller.view.update_scene()
+
+
     def clearScene(self):
         self.models = []
         self.transformation_list = []

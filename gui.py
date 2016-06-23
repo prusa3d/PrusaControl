@@ -250,6 +250,8 @@ class PrusaControlView(QtGui.QMainWindow):
                 #source.set_mouse_event(event)
                 if self.controller.settings['toolButtons']['rotateButton']:
                     self.controller.check_rotation_axis(event)
+        elif event.type() == QtCore.QEvent.KeyPress:
+            self.controller.key_press_event(event)
         return QtGui.QMainWindow.eventFilter(self, source, event)
 
     def open_settings_dialog(self):
