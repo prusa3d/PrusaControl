@@ -97,11 +97,11 @@ class Slic3rEngineRunner(QObject):
 
 
     def slice(self):
-        self.save_configuration(self.controller.tmp_place + 'prusacontrol.ini')
+        self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
 
-        process = subprocess.Popen(self.slicer_place + [self.controller.tmp_place + 'tmp.stl', '--load',
-                                    self.controller.tmp_place + 'prusacontrol.ini', '--output',
-                                    self.controller.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
+                                    self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
+                                    self.controller.app_config.tmp_place + 'out.gcode'], stdout=subprocess.PIPE)
         self.check_progress(process)
 
     def check_progress(self, process):

@@ -330,7 +330,7 @@ class GLWidget(QGLWidget):
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        glCallList(self.bed[self.parent.controller.settings['printer']])
+        #glCallList(self.bed[self.parent.controller.settings['printer']])
 
         glEnable(GL_DEPTH_TEST)
 
@@ -344,6 +344,13 @@ class GLWidget(QGLWidget):
             for model in self.parent.controller.scene.models:
                 if model.selected:
                     self.draw_tools_helper(model, self.parent.controller.settings)
+
+        glDisable(GL_DEPTH_TEST)
+        if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
+            glColor3f(1., .0, .0)
+            glVertexPointerf(self.parent.controller.scene.analyze_result_data_tmp)
+            glDrawArrays(GL_TRIANGLES, 0, len(self.parent.controller.scene.analyze_result_data_tmp)*3)
+        glEnable(GL_DEPTH_TEST)
 
         self.draw_tools()
 

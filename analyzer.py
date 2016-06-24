@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import numpy as np
 
 __author__ = 'Tibor Vavra'
 
 
 class Analyzer(object):
-    def __init__(self):
-        pass
+    def __init__(self, controller):
+        self.controller = controller
 
     def make_analyze(self, scene):
         #Some initialization
@@ -41,6 +41,12 @@ class Analyzer(object):
     def is_support_needed(self, scene):
         #detect angles between normal vector of face and normal of printing surface
         #angel bigger than something is problem
+        data = self.controller.scene.get_faces_by_smaller_angel_normal_and_vector(np.array([0.,0.,-1.]), 40.)
+        #something returned? problematic printing without support, recommended to turn it on
+        if len(data) == 0:
+            return False
+        else:
+            return True
 
         return True
 

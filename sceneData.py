@@ -36,6 +36,9 @@ class AppScene(object):
         self.transformation_list = []
         self.actual_list_position = 0
 
+        self.analyze_result_data_tmp = []
+
+
     def save_change(self, old_instance):
         if self.actual_list_position < len(self.transformation_list)-1:
             self.transformation_list = self.transformation_list[:self.actual_list_position+1]
@@ -77,6 +80,28 @@ class AppScene(object):
                     name_list[0] = "%s%s" % (name_list[0], str(number))
                     o.filename = ".".join(name_list)
 
+    def get_faces_by_smaller_angel_normal_and_vector(self, vector, angle):
+        #calculate angel between normal vector and given vector
+        #return list of faces with smaller
+        whole_scene = self.get_whole_scene_in_one_mesh()
+        critical_angle0 = np.deg2rad(angle)
+        critical_angle1 = np.deg2rad(0.)
+        #print("Critical angle0: " + str(critical_angle0))
+        #print("Critical angle1: " + str(critical_angle1))
+        #self.analyze_result_data_tmp = whole_scene.vectors[(np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)) <= critical_angle0) & (critical_angle1 <= np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)))]
+
+        self.analyze_result_data_tmp = np.array([i for n, i in enumerate(whole_scene.vectors) if AppScene.calc_angle(whole_scene.normals[n], vector) <= angle ])
+        print("Out: " + str(self.analyze_result_data_tmp))
+        self.analyze_result_data_tmp *= np.array([.1001, .1001, .1001])
+        #print(str(self.analyze_result_data_tmp))
+
+        return self.analyze_result_data_tmp
+
+    @staticmethod
+    def calc_angle(normal, vector):
+        cos_ang = np.dot(normal, vector)
+        sin_ang = np.linalg.norm(np.cross(normal, vector))
+        return np.degrees(np.arctan2(sin_ang, cos_ang))
 
     def delete_selected_models(self):
         delete = False
@@ -142,9 +167,11 @@ class AppScene(object):
                 position_vector[0] += model.boundingSphereSize*.1
                 position_vector[1] += model.boundingSphereSize*.1
 
+    def get_whole_scene_in_one_mesh(self):
+        return Mesh(np.concatenate([i.get_mesh().data for i in self.models]))
 
     def save_whole_scene_to_one_stl_file(self, filename):
-        whole_scene = Mesh(np.concatenate([i.get_mesh().data for i in self.models]))
+        whole_scene = self.get_whole_scene_in_one_mesh()
         whole_scene.save(filename)
 
 class Model(object):

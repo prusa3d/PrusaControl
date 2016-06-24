@@ -49,7 +49,7 @@ class Controller:
         logging.info('Controller instance created')
 
         self.app_config = AppParameters()
-        self.analyzer = Analyzer()
+        self.analyzer = Analyzer(self)
 
         self.printing_settings = {}
         self.settings = {}
@@ -110,6 +110,8 @@ class Controller:
         self.origin_rotation_point = numpy.array([0.,0.,0.])
         self.res_old = numpy.array([0.,0.,0.])
         self.status = 'edit'
+        self.canceled = False
+
 
         self.app = app
 
@@ -190,13 +192,13 @@ class Controller:
         if self.status in ['edit', 'canceled']:
             #prepared to be g-code generated
             self.analyze_result = self.analyzer.make_analyze(self.scene)
+            self.canceled = False
             self.make_reaction_on_analyzation_result(self.analyze_result)
 
-            '''
-            self.generate_gcode()
-            self.set_cancel_button()
-            self.status = 'generating'
-            '''
+            if not self.canceled:
+                self.generate_gcode()
+                self.set_cancel_button()
+                self.status = 'generating'
 
         elif self.status == 'generating':
             #generating in progress
@@ -220,7 +222,7 @@ class Controller:
             msg.setInformativeText("PrusaControl make analyze of printing scene, recommending different printing settings")
             msg.setWindowTitle("Analyze of printing scene")
             msg.setDetailedText(result_text)
-            msg.setStandardButtons(QtGui.QMessageBox.Close | QtGui.QMessageBox.Apply)
+            msg.setStandardButtons(QtGui.QMessageBox.Ignore | QtGui.QMessageBox.Apply | QtGui.QMessageBox.Cancel)
             msg.buttonClicked.connect(self.reaction_button_pressed)
 
             retval = msg.exec_()
@@ -232,7 +234,9 @@ class Controller:
                     widget_list = self.view.get_changable_widgets()
                     widget = widget_list[res['gui_name']]
                     widget.setChecked(True)
-                    
+        elif i.text() == '&Cancel':
+            self.canceled = True
+
 
     def open_web_browser(self, url):
         webbrowser.open(url, 1)
@@ -345,7 +349,7 @@ class Controller:
     def generate_gcode(self):
         self.set_progress_bar(int(((10. / 9.) * 1) * 10))
         if self.scene.models:
-            self.scene.save_whole_scene_to_one_stl_file(self.tmp_place + "tmp.stl")
+            self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")
             self.slicer_manager.slice()
 
     def gcode_generated(self):
