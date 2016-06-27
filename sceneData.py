@@ -84,24 +84,27 @@ class AppScene(object):
         #calculate angel between normal vector and given vector
         #return list of faces with smaller
         whole_scene = self.get_whole_scene_in_one_mesh()
-        critical_angle0 = np.deg2rad(angle)
-        critical_angle1 = np.deg2rad(0.)
-        #print("Critical angle0: " + str(critical_angle0))
-        #print("Critical angle1: " + str(critical_angle1))
-        #self.analyze_result_data_tmp = whole_scene.vectors[(np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)) <= critical_angle0) & (critical_angle1 <= np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)))]
+        #self.analyze_result_data_tmp = whole_scene.vectors[(np.degrees(np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)) <= angle)]
+        d = 0.1
+        self.analyze_result_data_tmp = np.array([i+whole_scene.normals[n]*d for n, i in enumerate(whole_scene.vectors) if AppScene.calc_angle(whole_scene.normals[n], vector) <= 90.-angle ])
+        self.analyze_result_data_tmp = np.array([i for n, i in enumerate(self.analyze_result_data_tmp) if not (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1)])
+        #TODO:add filtration for faces bigger(in direction of z-axis) than 1cm for example
 
-        self.analyze_result_data_tmp = np.array([i for n, i in enumerate(whole_scene.vectors) if AppScene.calc_angle(whole_scene.normals[n], vector) <= angle ])
-        print("Out: " + str(self.analyze_result_data_tmp))
-        self.analyze_result_data_tmp *= np.array([.1001, .1001, .1001])
+        #print("Out: " + str(self.analyze_result_data_tmp))
+        self.analyze_result_data_tmp *= np.array([.1, .1, .1])
         #print(str(self.analyze_result_data_tmp))
 
         return self.analyze_result_data_tmp
 
     @staticmethod
     def calc_angle(normal, vector):
+        normal /= np.linalg.norm(normal)
+        vector /= np.linalg.norm(vector)
         cos_ang = np.dot(normal, vector)
         sin_ang = np.linalg.norm(np.cross(normal, vector))
-        return np.degrees(np.arctan2(sin_ang, cos_ang))
+        deg = np.degrees(np.arctan2(sin_ang, cos_ang))
+        #print("Uhel: " + str(deg))
+        return deg
 
     def delete_selected_models(self):
         delete = False

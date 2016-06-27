@@ -345,12 +345,12 @@ class GLWidget(QGLWidget):
                 if model.selected:
                     self.draw_tools_helper(model, self.parent.controller.settings)
 
-        glDisable(GL_DEPTH_TEST)
+        #glDisable(GL_DEPTH_TEST)
         if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
             glColor3f(1., .0, .0)
             glVertexPointerf(self.parent.controller.scene.analyze_result_data_tmp)
             glDrawArrays(GL_TRIANGLES, 0, len(self.parent.controller.scene.analyze_result_data_tmp)*3)
-        glEnable(GL_DEPTH_TEST)
+        #glEnable(GL_DEPTH_TEST)
 
         self.draw_tools()
 
