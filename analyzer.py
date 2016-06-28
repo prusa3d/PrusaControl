@@ -52,7 +52,8 @@ class Analyzer(object):
 
     def is_brim_needed(self, scene):
         #detect small area on printing surface, it is need to generate brim
-        return True
+        #something returned? problematic printing without brim, recommended to turn it on
+        return self.controller.scene.get_contact_faces_with_area_smaller_than(2.)
 
 
 

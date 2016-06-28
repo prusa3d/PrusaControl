@@ -80,18 +80,75 @@ class AppScene(object):
                     name_list[0] = "%s%s" % (name_list[0], str(number))
                     o.filename = ".".join(name_list)
 
+    @staticmethod
+    def get_area_of_triangle(triangle):
+        a = np.linalg.norm(triangle[2]-triangle[1])
+        b = np.linalg.norm(triangle[2]-triangle[0])
+        c = np.linalg.norm(triangle[1]-triangle[0])
+        s = (a+b+c)/2.
+        area_tmp = s*((s-a)*(s-b)*(s-c))
+        area = np.sqrt(area_tmp)
+
+        return area
+
+    def get_contact_faces_with_area_smaller_than(self, area_size):
+        whole_scene = self.get_whole_scene_in_one_mesh()
+
+        tmp_brim = np.array([i+whole_scene.normals[n]*0.001 for n, i in enumerate(whole_scene.vectors) if (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1)])
+
+        whole_scene.update_max()
+        whole_scene.update_min()
+
+        boundingSphereCenter = np.array([0., 0., 0.])
+        boundingSphereCenter[0] = (whole_scene.max_[0] + whole_scene.min_[0]) * .5
+        boundingSphereCenter[1] = (whole_scene.max_[1] + whole_scene.min_[1]) * .5
+        boundingSphereCenter[2] = (whole_scene.max_[2] + whole_scene.min_[2]) * .5
+
+        max_l = np.linalg.norm(whole_scene.max_)
+        min_l = np.linalg.norm(whole_scene.min_)
+        if max_l > min_l:
+            boundingSphereSize = max_l
+        else:
+            boundingSphereSize = min_l
+
+        object_space = 4.189*(boundingSphereSize*.5)**3
+
+        areas = [AppScene.get_area_of_triangle(i) for i in tmp_brim]
+        connection_area = np.sum(areas)
+
+        if not len(tmp_brim) == 0:
+            tmp_brim *= np.array([.1, .1, .1])
+
+        if connection_area == 0:
+            brim = True
+        elif object_space/connection_area <= 300.:
+            brim = False
+        else:
+            brim = True
+
+        if len(self.analyze_result_data_tmp) == 0 and len(tmp_brim) == 0:
+            self.analyze_result_data_tmp = []
+        elif len(self.analyze_result_data_tmp) == 0:
+            self.analyze_result_data_tmp = tmp_brim
+        elif not (len(tmp_brim) == 0) and not (len(self.analyze_result_data_tmp) == 0):
+            np.concatenate((tmp_brim, self.analyze_result_data_tmp), axis=0)
+
+        return brim
+
+
     def get_faces_by_smaller_angel_normal_and_vector(self, vector, angle):
         #calculate angel between normal vector and given vector
         #return list of faces with smaller
         whole_scene = self.get_whole_scene_in_one_mesh()
         #self.analyze_result_data_tmp = whole_scene.vectors[(np.degrees(np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)) <= angle)]
         d = 0.1
+        self.analyze_result_data_tmp = np.array([])
         self.analyze_result_data_tmp = np.array([i+whole_scene.normals[n]*d for n, i in enumerate(whole_scene.vectors) if AppScene.calc_angle(whole_scene.normals[n], vector) <= 90.-angle ])
-        self.analyze_result_data_tmp = np.array([i for n, i in enumerate(self.analyze_result_data_tmp) if not (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1)])
-        #TODO:add filtration for faces bigger(in direction of z-axis) than 1cm for example
+        self.analyze_result_data_tmp = np.array([i for n, i in enumerate(self.analyze_result_data_tmp) if not (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1) and AppScene.is_length_in_z_bigger_then(i, 0.75)])
 
         #print("Out: " + str(self.analyze_result_data_tmp))
-        self.analyze_result_data_tmp *= np.array([.1, .1, .1])
+        if not len(self.analyze_result_data_tmp) == 0:
+            self.analyze_result_data_tmp *= np.array([.1, .1, .1])
         #print(str(self.analyze_result_data_tmp))
 
         return self.analyze_result_data_tmp
@@ -103,8 +160,17 @@ class AppScene(object):
         cos_ang = np.dot(normal, vector)
         sin_ang = np.linalg.norm(np.cross(normal, vector))
         deg = np.degrees(np.arctan2(sin_ang, cos_ang))
-        #print("Uhel: " + str(deg))
         return deg
+
+    @staticmethod
+    def is_length_in_z_bigger_then(triangle, minimal_z):
+        max_z = max([i[2] for i in triangle])
+        min_z = min([i[2] for i in triangle])
+        length = max_z - min_z
+        if length >= minimal_z:
+            return True
+        else:
+            return False
 
     def delete_selected_models(self):
         delete = False
