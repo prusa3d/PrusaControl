@@ -3,4 +3,4 @@
 
 import vcversioner
 
-version = release = vcversioner.find_version(root='.').version
+version = release = vcversioner.find_version(root='.', version_file='%(root)s/v.txt').version

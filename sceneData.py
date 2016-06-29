@@ -94,7 +94,15 @@ class AppScene(object):
     def get_contact_faces_with_area_smaller_than(self, area_size):
         whole_scene = self.get_whole_scene_in_one_mesh()
 
-        tmp_brim = np.array([i+whole_scene.normals[n]*0.001 for n, i in enumerate(whole_scene.vectors) if (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1)])
+
+        b= whole_scene.vectors[:, :, 2] < 0.1
+        print(str(b))
+        b_tmp = np.array([i.all() for i in b])
+        print(str(b_tmp))
+        tmp_brim = whole_scene.vectors[b_tmp]
+        print(str(tmp_brim))
+
+        #tmp_brim = np.array([i+whole_scene.normals[n]*0.001 for n, i in enumerate(whole_scene.vectors) if (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1)])
 
         whole_scene.update_max()
         whole_scene.update_min()
@@ -140,16 +148,13 @@ class AppScene(object):
         #calculate angel between normal vector and given vector
         #return list of faces with smaller
         whole_scene = self.get_whole_scene_in_one_mesh()
-        #self.analyze_result_data_tmp = whole_scene.vectors[(np.degrees(np.arccos(np.clip(np.dot(whole_scene.normals[:,:], vector), -1.0, 1.0)) <= angle)]
         d = 0.1
         self.analyze_result_data_tmp = np.array([])
         self.analyze_result_data_tmp = np.array([i+whole_scene.normals[n]*d for n, i in enumerate(whole_scene.vectors) if AppScene.calc_angle(whole_scene.normals[n], vector) <= 90.-angle ])
         self.analyze_result_data_tmp = np.array([i for n, i in enumerate(self.analyze_result_data_tmp) if not (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1) and AppScene.is_length_in_z_bigger_then(i, 0.75)])
 
-        #print("Out: " + str(self.analyze_result_data_tmp))
         if not len(self.analyze_result_data_tmp) == 0:
             self.analyze_result_data_tmp *= np.array([.1, .1, .1])
-        #print(str(self.analyze_result_data_tmp))
 
         return self.analyze_result_data_tmp
 

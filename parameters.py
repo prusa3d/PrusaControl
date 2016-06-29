@@ -51,7 +51,7 @@ class AppParameters(object):
         self.config.read(self.config_path)
 
         #read from version.txt
-        with open("version.txt", 'r') as version_file:
+        with open("v.txt", 'r') as version_file:
             self.version_full = version_file.read()
             self.version = self.version_full.split('-')
             self.version = self.version[:2]
