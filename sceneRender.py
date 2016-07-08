@@ -35,8 +35,8 @@ class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
 
-        #self.timer = QTimer()
-        #self.timer.timeout.connect(self.updateGL)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update)
 
         #TODO:Add camera instance
         #self.camera = TargetedCamera()
@@ -119,8 +119,9 @@ class GLWidget(QGLWidget):
 
         if reset:
             self.init_parametres()
-        #self.timer.start(0)
+        self.timer.start(0)
 
+        '''
         actual_time = time.time()
         delta = actual_time-self.last_time
         if delta >= self.delta_t:
@@ -132,7 +133,7 @@ class GLWidget(QGLWidget):
             self.last_fps = 1./(t1-t0)
             self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
             self.last_time = actual_time
-
+        '''
 
     #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
@@ -383,6 +384,10 @@ class GLWidget(QGLWidget):
 
         self.draw_tools()
 
+        t1 = time.time()
+        self.last_fps = 1./(t1-t0)
+        self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
+
 
 
     def draw_tools_helper(self, model, settings, picking=False):
@@ -515,13 +520,15 @@ class GLWidget(QGLWidget):
 
         winX = event.x()
         winY = event.y()
-
+        '''
         viewport = glGetIntegerv( GL_VIEWPORT )
         if winX >= 0 and winX <= viewport[2] and winY >= 0 and winY <= viewport[3]:
             c = QColor(self.sceneFrameBuffer.pixel(winX, winY))
             color = [c.red(), c.green(), c.blue()]
         else:
             color = [0, 0, 0]
+        '''
+        color = [0, 0, 0]
         return color
 
     def makePrintingBed(self, bed_texture, printing_space):
