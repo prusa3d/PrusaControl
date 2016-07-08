@@ -41,6 +41,7 @@ class GLWidget(QGLWidget):
 
         self.last_time = time.time()
         self.delta_t = 0.016
+        self.last_fps = 100.
 
         #properties definition
         self.xRot = 0
@@ -92,6 +93,7 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 5576
         self.zoom = -39
+        self.last_fps = 100.
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -118,7 +120,8 @@ class GLWidget(QGLWidget):
             t0 = time.time()
             self.updateGL()
             t1 = time.time()
-            self.parent.controller.show_message_on_status_bar("FPS: %s" % (1./(t1-t0)))
+            self.last_fps = 1./(t1-t0)
+            self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
             self.last_time = actual_time
 
     #TODO:All this function will be changed to controll camera instance
@@ -255,10 +258,11 @@ class GLWidget(QGLWidget):
         glEnable(GL_COLOR_MATERIAL)
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 
-        #glEnable(GL_MULTISAMPLE)
-        #glEnable(GL_LINE_SMOOTH)
-        #glEnable(GL_POINT_SMOOTH)
-        #glEnable(GL_POLYGON_SMOOTH)
+
+        glEnable(GL_MULTISAMPLE)
+        glEnable(GL_LINE_SMOOTH)
+        glEnable(GL_POINT_SMOOTH)
+        glEnable(GL_POLYGON_SMOOTH)
 
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
@@ -296,6 +300,12 @@ class GLWidget(QGLWidget):
             glDisable( GL_BLEND )
             #glEnable(GL_DEPTH_TEST)
 
+            glDisable(GL_MULTISAMPLE)
+            glDisable(GL_LINE_SMOOTH)
+            glDisable(GL_POINT_SMOOTH)
+            glDisable(GL_POLYGON_SMOOTH)
+
+
             if self.parent.controller.scene.models:
                 for model in self.parent.controller.scene.models:
                     model.render(picking=True, debug=False)
@@ -309,8 +319,14 @@ class GLWidget(QGLWidget):
                 if self.parent.controller.settings['debug']:
                     #save picture to filesystem
                     self.sceneFrameBuffer.save("select_buffer.png")
-
         #color picking
+
+        if self.last_fps >= 40.:
+            glEnable(GL_MULTISAMPLE)
+            glEnable(GL_LINE_SMOOTH)
+            glEnable(GL_POINT_SMOOTH)
+            glEnable(GL_POLYGON_SMOOTH)
+
 
         glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
@@ -330,7 +346,7 @@ class GLWidget(QGLWidget):
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        #glCallList(self.bed[self.parent.controller.settings['printer']])
+        glCallList(self.bed[self.parent.controller.settings['printer']])
 
         glEnable(GL_DEPTH_TEST)
 
