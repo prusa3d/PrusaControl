@@ -9,7 +9,7 @@ import math
 import numpy
 import time
 
-
+from PyQt4.QtCore import QTimer
 from PyQt4.QtGui import QColor, QCursor
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
@@ -34,6 +34,10 @@ def timing(f):
 class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
+
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.updateGL)
+
         #TODO:Add camera instance
         #self.camera = TargetedCamera()
         self.parent = parent
@@ -112,8 +116,11 @@ class GLWidget(QGLWidget):
         self.tools = []
 
     def update_scene(self, reset=False):
+
         if reset:
             self.init_parametres()
+        #self.timer.start(0)
+
         actual_time = time.time()
         delta = actual_time-self.last_time
         if delta >= self.delta_t:
@@ -121,9 +128,11 @@ class GLWidget(QGLWidget):
             #self.updateGL()
             self.update()
             t1 = time.time()
+            print(str((t1-t0)))
             self.last_fps = 1./(t1-t0)
             self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
             self.last_time = actual_time
+
 
     #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
@@ -274,6 +283,7 @@ class GLWidget(QGLWidget):
 
     #@timing
     def paintGL(self, selection = 1):
+        t0 = time.time()
         #print("render")
         #print(inspect.stack()[1][3] + " call render")
 
@@ -315,19 +325,21 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
+            '''
             self.sceneFrameBuffer = self.grabFrameBuffer()
             if 'debug' in self.parent.controller.settings:
                 if self.parent.controller.settings['debug']:
                     #save picture to filesystem
                     self.sceneFrameBuffer.save("select_buffer.png")
+            '''
         #color picking
-
+        '''
         if self.last_fps >= 40.:
             glEnable(GL_MULTISAMPLE)
             glEnable(GL_LINE_SMOOTH)
             glEnable(GL_POINT_SMOOTH)
             glEnable(GL_POLYGON_SMOOTH)
-
+        '''
 
         glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
