@@ -118,7 +118,8 @@ class GLWidget(QGLWidget):
         delta = actual_time-self.last_time
         if delta >= self.delta_t:
             t0 = time.time()
-            self.updateGL()
+            #self.updateGL()
+            self.update()
             t1 = time.time()
             self.last_fps = 1./(t1-t0)
             self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
