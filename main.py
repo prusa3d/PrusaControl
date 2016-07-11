@@ -9,6 +9,9 @@ from sceneData import *
 import logging
 import profile
 
+#import psyco
+#psyco.full()
+
 
 __author__ = 'Tibor Vavra'
 

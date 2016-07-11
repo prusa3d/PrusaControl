@@ -10,14 +10,19 @@ import math
 import itertools
 from pprint import pprint
 
+
+import OpenGL
+OpenGL.ERROR_CHECKING = False
+OpenGL.ERROR_LOGGING = False
+
 from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
+#from OpenGL.GLU import *
+#from OpenGL.GLUT import *
 
 from copy import deepcopy
 from pyrr import matrix44, Vector3, geometric_tests, line, ray, plane, matrix33
 
-glutInit()
+#glutInit()
 
 class AppScene(object):
     '''
@@ -316,6 +321,8 @@ class Model(object):
                                             [ 0.,  1.,  0.],
                                             [ 0.,  0.,  1.]])
 
+        self.tiled_normals = np.array([])
+
         #helping data
         self.selected = False
         self.boundingSphereSize = .0
@@ -370,7 +377,7 @@ class Model(object):
     def get_mesh(self, transform=True):
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
-        mesh = deepcopy(self.temp_mesh)
+        mesh = Mesh(self.temp_mesh.data.copy())
 
         if transform:
             mesh.vectors += np.array(self.pos)
@@ -434,6 +441,9 @@ class Model(object):
 
         self.is_changed = True
 
+    def make_normals(self):
+        self.tiled_normals = np.tile(self.temp_mesh.normals, 3)
+
     def apply_rotation(self):
         self.rotation_matrix = np.dot(self.rotation_matrix, self.temp_rotation)
         self.temp_rotation = np.array([[ 1.,  0.,  0.],
@@ -492,8 +502,8 @@ class Model(object):
         self.max_scene = self.max + self.pos
 
     def put_array_to_gl(self):
-        glNormalPointerf(np.tile(self.temp_mesh.normals, 3))
-        glVertexPointerf(self.temp_mesh.vectors)
+        glNormalPointerf(self.tiled_normals.ctypes.get_as_parameter())
+        glVertexPointerf(self.temp_mesh.vectors.ctypes.get_as_parameter())
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])
@@ -533,7 +543,8 @@ class Model(object):
                 glColor3f(0.75, .0, .0)
 
         if self.is_changed:
-            self.temp_mesh = deepcopy(self.mesh)
+            self.temp_mesh = Mesh(self.mesh.data.copy())
+
             final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
             final_scale = np.dot(self.temp_scale, self.scale_matrix)
             final_matrix = np.dot(final_rotation, final_scale)
@@ -542,6 +553,7 @@ class Model(object):
                 self.temp_mesh.vectors[:, i] = self.temp_mesh.vectors[:, i].dot(final_matrix)
 
             self.temp_mesh.normals = self.temp_mesh.normals.dot(final_rotation)
+            self.make_normals()
 
             self.temp_mesh.update_min()
             self.temp_mesh.update_max()
@@ -648,7 +660,7 @@ class ModelTypeStl(ModelTypeAbstract):
     '''
 
     def load(self, filename):
-        logging.debug("this is STL file reader")
+        #logging.debug("this is STL file reader")
         mesh = Mesh.from_file(filename)
         return ModelTypeStl.load_from_mesh(mesh, filename, True)
 
@@ -707,6 +719,7 @@ class ModelTypeStl(ModelTypeAbstract):
         model.size_origin = deepcopy(model.size)
 
         model.temp_mesh = deepcopy(mesh)
+        model.make_normals()
 
         #model.displayList = model.make_display_list()
 

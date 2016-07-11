@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
-import inspect
-import logging
+#import inspect
+#import logging
+
+import OpenGL
+OpenGL.ERROR_CHECKING = False
+OpenGL.ERROR_LOGGING = False
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -35,8 +40,8 @@ class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update)
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.update)
 
         #TODO:Add camera instance
         #self.camera = TargetedCamera()
@@ -119,21 +124,21 @@ class GLWidget(QGLWidget):
 
         if reset:
             self.init_parametres()
-        self.timer.start(0)
+        #self.timer.start(0)
 
-        '''
+
         actual_time = time.time()
         delta = actual_time-self.last_time
         if delta >= self.delta_t:
             t0 = time.time()
-            #self.updateGL()
-            self.update()
+            self.updateGL()
+            #self.update()
             t1 = time.time()
-            print(str((t1-t0)))
+            #print(str((t1-t0)))
             self.last_fps = 1./(t1-t0)
             self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
             self.last_time = actual_time
-        '''
+
 
     #TODO:All this function will be changed to controll camera instance
     def set_zoom(self, diff):
@@ -284,7 +289,7 @@ class GLWidget(QGLWidget):
 
     #@timing
     def paintGL(self, selection = 1):
-        t0 = time.time()
+        #t0 = time.time()
         #print("render")
         #print(inspect.stack()[1][3] + " call render")
 
@@ -326,13 +331,13 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-            '''
+
             self.sceneFrameBuffer = self.grabFrameBuffer()
             if 'debug' in self.parent.controller.settings:
                 if self.parent.controller.settings['debug']:
                     #save picture to filesystem
                     self.sceneFrameBuffer.save("select_buffer.png")
-            '''
+
         #color picking
         '''
         if self.last_fps >= 40.:
@@ -384,9 +389,9 @@ class GLWidget(QGLWidget):
 
         self.draw_tools()
 
-        t1 = time.time()
-        self.last_fps = 1./(t1-t0)
-        self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
+        #t1 = time.time()
+        #self.last_fps = 1./(t1-t0)
+        #self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
 
 
 
@@ -520,15 +525,12 @@ class GLWidget(QGLWidget):
 
         winX = event.x()
         winY = event.y()
-        '''
         viewport = glGetIntegerv( GL_VIEWPORT )
         if winX >= 0 and winX <= viewport[2] and winY >= 0 and winY <= viewport[3]:
             c = QColor(self.sceneFrameBuffer.pixel(winX, winY))
             color = [c.red(), c.green(), c.blue()]
         else:
             color = [0, 0, 0]
-        '''
-        color = [0, 0, 0]
         return color
 
     def makePrintingBed(self, bed_texture, printing_space):
