@@ -48,7 +48,7 @@ class AppScene(object):
         if self.actual_list_position < len(self.transformation_list)-1:
             self.transformation_list = self.transformation_list[:self.actual_list_position+1]
 
-        self.transformation_list.append([old_instance, deepcopy(old_instance.scale_matrix), deepcopy(old_instance.rotation_matrix), deepcopy(old_instance.pos)])
+        self.transformation_list.append([old_instance, np.copy(old_instance.scale_matrix), np.copy(old_instance.rotation_matrix), np.copy(old_instance.pos)])
         self.actual_list_position = len(self.transformation_list)-1
         #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
@@ -57,8 +57,8 @@ class AppScene(object):
         if self.actual_list_position >= 1:
             self.actual_list_position -= 1
             old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = deepcopy(scale)
-            old_instance.rotation_matrix = deepcopy(rot)
+            old_instance.scale_matrix = np.copy(scale)
+            old_instance.rotation_matrix = np.copy(rot)
             old_instance.pos = deepcopy(pos)
             old_instance.is_changed = True
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
@@ -68,8 +68,8 @@ class AppScene(object):
         if self.actual_list_position < len(self.transformation_list)-1:
             self.actual_list_position += 1
             old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = deepcopy(scale)
-            old_instance.rotation_matrix = deepcopy(rot)
+            old_instance.scale_matrix = np.copy(scale)
+            old_instance.rotation_matrix = np.copy(rot)
             old_instance.pos = deepcopy(pos)
             old_instance.is_changed = True
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
@@ -502,8 +502,8 @@ class Model(object):
         self.max_scene = self.max + self.pos
 
     def put_array_to_gl(self):
-        glNormalPointerf(self.tiled_normals.ctypes.get_as_parameter())
-        glVertexPointerf(self.temp_mesh.vectors.ctypes.get_as_parameter())
+        glNormalPointerf(self.tiled_normals)
+        glVertexPointerf(self.temp_mesh.vectors)
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])
@@ -543,6 +543,7 @@ class Model(object):
                 glColor3f(0.75, .0, .0)
 
         if self.is_changed:
+            print("Changed")
             self.temp_mesh = Mesh(self.mesh.data.copy())
 
             final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
@@ -569,7 +570,13 @@ class Model(object):
 
         self.put_array_to_gl()
 
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_NORMAL_ARRAY)
+
         glDrawArrays(GL_TRIANGLES, 0, len(self.temp_mesh.vectors)*3)
+
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_NORMAL_ARRAY)
 
         glPopMatrix()
 
@@ -650,7 +657,7 @@ class ModelTypeAbstract(object):
 
     @abstractmethod
     def load(self, filename):
-        logging.debug("This is abstract model type")
+        #logging.debug("This is abstract model type")
         return None
 
 
@@ -743,61 +750,3 @@ def intersection_ray_plane2(O, D, P=np.array([0., 0., 0.]), N=np.array([.0, .0, 
         return np.inf
     res = D*d + O
     return np.array([res[0], res[1], res[2]])
-
-
-#math
-class Vector(object):
-    def __init__(self, v=[.0, .0, .0], a=[], b=[]):
-        if a and b:
-            self.x = b[0]-a[0]
-            self.y = b[1]-a[1]
-            self.z = b[2]-a[2]
-        else:
-            self.x = v[0]
-            self.y = v[1]
-            self.z = v[2]
-
-
-    def minus(self, v):
-        self.x -= v[0]
-        self.y -= v[1]
-        self.z -= v[2]
-
-    def sqrt(self, n):
-        self.x /= n
-        self.y /= n
-        self.z /= n
-
-    def plus(self, v):
-        self.x += v[0]
-        self.y += v[1]
-        self.z += v[2]
-
-    def normalize(self):
-        l = self.len()
-        self.x /= l
-        self.y /= l
-        self.z /= l
-
-    def lenght(self, v):
-        x = v[0] - self.x
-        y = v[1] - self.y
-        z = v[2] - self.z
-        return math.sqrt((x*x)+(y*y)+(z*z))
-
-    def len(self):
-        x = self.x
-        y = self.y
-        z = self.z
-        return math.sqrt((x*x)+(y*y)+(z*z))
-
-    def getRaw(self):
-        return [self.x, self.y, self.z]
-
-    @staticmethod
-    def minusAB(a, b):
-        c =[0,0,0]
-        c[0] = a[0]-b[0]
-        c[1] = a[1]-b[1]
-        c[2] = a[2]-b[2]
-        return c

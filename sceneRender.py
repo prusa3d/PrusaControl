@@ -40,8 +40,8 @@ class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
 
-        #self.timer = QTimer()
-        #self.timer.timeout.connect(self.update)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update)
 
         #TODO:Add camera instance
         #self.camera = TargetedCamera()
@@ -124,9 +124,9 @@ class GLWidget(QGLWidget):
 
         if reset:
             self.init_parametres()
-        #self.timer.start(0)
+        self.timer.start(0)
 
-
+        '''
         actual_time = time.time()
         delta = actual_time-self.last_time
         if delta >= self.delta_t:
@@ -138,6 +138,7 @@ class GLWidget(QGLWidget):
             self.last_fps = 1./(t1-t0)
             self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
             self.last_time = actual_time
+        '''
 
 
     #TODO:All this function will be changed to controll camera instance
@@ -289,7 +290,7 @@ class GLWidget(QGLWidget):
 
     #@timing
     def paintGL(self, selection = 1):
-        #t0 = time.time()
+        t0 = time.time()
         #print("render")
         #print(inspect.stack()[1][3] + " call render")
 
@@ -302,8 +303,8 @@ class GLWidget(QGLWidget):
             else:
                 glClearColor(0.0, 0.0, 0.0, 1.0)
 
-            #glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            glClear(GL_COLOR_BUFFER_BIT)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            #glClear(GL_COLOR_BUFFER_BIT)
             glLoadIdentity()
             glDepthMask(GL_FALSE)
 
@@ -331,12 +332,13 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-
             self.sceneFrameBuffer = self.grabFrameBuffer()
+            '''
             if 'debug' in self.parent.controller.settings:
                 if self.parent.controller.settings['debug']:
                     #save picture to filesystem
                     self.sceneFrameBuffer.save("select_buffer.png")
+            '''
 
         #color picking
         '''
@@ -383,15 +385,19 @@ class GLWidget(QGLWidget):
         #glDisable(GL_DEPTH_TEST)
         if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
             glColor3f(1., .0, .0)
+            glEnableClientState(GL_VERTEX_ARRAY)
+            glEnableClientState(GL_NORMAL_ARRAY)
             glVertexPointerf(self.parent.controller.scene.analyze_result_data_tmp)
             glDrawArrays(GL_TRIANGLES, 0, len(self.parent.controller.scene.analyze_result_data_tmp)*3)
+            glDisableClientState(GL_VERTEX_ARRAY)
+            glDisableClientState(GL_NORMAL_ARRAY)
         #glEnable(GL_DEPTH_TEST)
 
         self.draw_tools()
 
-        #t1 = time.time()
-        #self.last_fps = 1./(t1-t0)
-        #self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
+        t1 = time.time()
+        self.last_fps = 1./(t1-t0)
+        self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
 
 
 
