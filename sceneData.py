@@ -511,8 +511,9 @@ class Model(object):
     def render(self, picking=False, debug=False):
         glPushMatrix()
 
-        #glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+        glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
+        '''
         if picking:
             glColor3ubv(self.colorId)
         else:
@@ -523,6 +524,7 @@ class Model(object):
                     glColor3fv(self.color)
             else:
                 glColor3f(0.75, .0, .0)
+        '''
 
         final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
         final_scale = np.dot(self.temp_scale, self.scale_matrix)
