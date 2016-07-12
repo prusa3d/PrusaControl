@@ -244,6 +244,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
         self.show()
 
+    '''
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:
             if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
@@ -253,6 +254,7 @@ class PrusaControlView(QtGui.QMainWindow):
         elif event.type() == QtCore.QEvent.KeyPress:
             self.controller.key_press_event(event)
         return QtGui.QMainWindow.eventFilter(self, source, event)
+    '''
 
     def open_settings_dialog(self):
         data, ok = SettingsDialog.get_settings_data(self.controller, self.parent())

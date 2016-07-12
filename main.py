@@ -25,6 +25,7 @@ def main():
     glf = QGLFormat.defaultFormat()
     glf.setSampleBuffers(True)
     glf.setSamples(4)
+    glf.setDirectRendering(True)
     QGLFormat.setDefaultFormat(glf)
     controller = Controller(app)
     window = controller.get_view()

@@ -291,19 +291,14 @@ class GLWidget(QGLWidget):
     #@timing
     def paintGL(self, selection = 1):
         t0 = time.time()
+        self.makeCurrent()
         #print("render")
         #print(inspect.stack()[1][3] + " call render")
 
         if selection:
-            if 'debug' in self.parent.controller.settings:
-                if self.parent.controller.settings['debug']:
-                    glClearColor(1.0, 1.0, 1.0, 1.0)
-                else:
-                    glClearColor(0.0, 0.0, 0.0, 1.0)
-            else:
-                glClearColor(0.0, 0.0, 0.0, 1.0)
+            glClearColor(0.0, 0.0, 0.0, 1.0)
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glClear(GL_COLOR_BUFFER_BIT)
             #glClear(GL_COLOR_BUFFER_BIT)
             glLoadIdentity()
             glDepthMask(GL_FALSE)
@@ -332,7 +327,7 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-            self.sceneFrameBuffer = self.grabFrameBuffer()
+            #self.sceneFrameBuffer = self.grabFrameBuffer()
             '''
             if 'debug' in self.parent.controller.settings:
                 if self.parent.controller.settings['debug']:
@@ -529,6 +524,7 @@ class GLWidget(QGLWidget):
     def get_cursor_pixel_color(self, event):
         color = []
 
+        '''
         winX = event.x()
         winY = event.y()
         viewport = glGetIntegerv( GL_VIEWPORT )
@@ -537,6 +533,8 @@ class GLWidget(QGLWidget):
             color = [c.red(), c.green(), c.blue()]
         else:
             color = [0, 0, 0]
+        '''
+        color = [0, 0, 0]
         return color
 
     def makePrintingBed(self, bed_texture, printing_space):
