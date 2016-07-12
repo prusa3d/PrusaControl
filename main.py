@@ -22,13 +22,14 @@ def main():
     logging.info('PrusaControl start')
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
-    '''
+
     glf = QGLFormat.defaultFormat()
-    glf.setSampleBuffers(True)
-    glf.setSamples(4)
-    glf.setDirectRendering(True)
+    glf.setSwapInterval( 0 )
+    #glf.setSampleBuffers(True)
+    #glf.setSamples(4)
+    #glf.setDirectRendering(True)
     QGLFormat.setDefaultFormat(glf)
-    '''
+
     controller = Controller(app)
     window = controller.get_view()
     app.installEventFilter(window)

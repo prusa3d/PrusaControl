@@ -328,7 +328,7 @@ class GLWidget(QGLWidget):
 
             self.draw_tools(picking=True)
 
-            #self.sceneFrameBuffer = self.grabFrameBuffer()
+            self.sceneFrameBuffer = self.grabFrameBuffer()
 
             #if 'debug' in self.parent.controller.settings:
             #    if self.parent.controller.settings['debug']:
@@ -348,10 +348,10 @@ class GLWidget(QGLWidget):
         self.draw_background_texture()
         glLoadIdentity()
 
-        glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
+        #glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(0, 50, 100, 0))
-        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(50, 10, 50, 0))
+        glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
+        glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
 
         glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
@@ -384,7 +384,8 @@ class GLWidget(QGLWidget):
             glDisableClientState(GL_NORMAL_ARRAY)
         #glEnable(GL_DEPTH_TEST)
 
-        self.draw_tools()
+        #self.draw_tools()
+
 
 
         t1 = time.time()
