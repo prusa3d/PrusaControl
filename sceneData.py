@@ -529,7 +529,7 @@ class Model(object):
         final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
         final_scale = np.dot(self.temp_scale, self.scale_matrix)
         final_matrix = np.dot(final_rotation, final_scale)
-        #print(str(final_matrix))
+
 
         '''
 
@@ -572,11 +572,16 @@ class Model(object):
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
         '''
-
-        #glMultMatrixf(final_matrix.tolist())
+        glColor3fv(self.color)
+        glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
         glCallList(self.displayList)
 
         glPopMatrix()
+
+    def matrix3_to_matrix4(self, matrix3):
+        mat = [i+[0.] for i in matrix3.tolist()]
+        mat += [[0.,0.,0.,1.]]
+        return mat
 
 
     def make_display_list(self):
