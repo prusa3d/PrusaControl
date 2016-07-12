@@ -316,6 +316,18 @@ class PrusaControlView(QtGui.QMainWindow):
     def update_gui(self):
         self.prusa_control_widget.update_gui()
 
+    def mousePressEvent(self, event):
+        self.controller.mouse_press_event(event)
+
+    def mouseReleaseEvent(self, event):
+        self.controller.mouse_release_event(event)
+
+    def mouseMoveEvent(self, event):
+        self.controller.mouse_move_event(event)
+
+    def wheelEvent(self, event):
+        self.controller.wheel_event(event)
+
     #TODO:Move to controller class
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():

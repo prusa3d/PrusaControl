@@ -46,7 +46,7 @@ def timing(f):
 
 class Controller:
     def __init__(self, app):
-        logging.info('Controller instance created')
+        #logging.info('Controller instance created')
 
         self.app_config = AppParameters()
         self.analyzer = Analyzer(self)
@@ -290,12 +290,12 @@ class Controller:
             data = url
         else:
             data = self.view.open_project_file_dialog()
-        logging.debug('open project file %s' %data)
+        #logging.debug('open project file %s' %data)
         self.import_project(data)
 
     def save_project_file(self):
         data = self.view.save_project_file_dialog()
-        logging.debug('save project file %s' %data)
+        #logging.debug('save project file %s' %data)
         self.save_project(data)
 
     def save_gcode_file(self):
@@ -314,7 +314,7 @@ class Controller:
 
     def open_model_file(self):
         data = self.view.open_model_file_dialog()
-        logging.debug('open model file %s' %data)
+        #logging.debug('open model file %s' %data)
         self.import_model(data)
 
     def import_model(self, path):
@@ -452,6 +452,8 @@ class Controller:
         if self.settings['toolButtons']['rotateButton']:
             if self.find_object_and_rotation_axis_by_color(event):
                 self.view.update_scene()
+
+
 
     def mouse_move_event(self, event):
         #print("mouse move event")

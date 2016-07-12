@@ -510,24 +510,6 @@ class Model(object):
 
     def render(self, picking=False, debug=False):
         glPushMatrix()
-        '''
-        if debug:
-            #Draw BoundingBox
-            #glDisable(GL_DEPTH_TEST)
-            glPointSize(5)
-            glBegin(GL_POINTS)
-            glColor3f(1,0,0)
-            glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
-            glVertex3f(self.max_scene[0], self.min_scene[1], self.min_scene[2])
-            glVertex3f(self.min_scene[0], self.max_scene[1], self.min_scene[2])
-            glVertex3f(self.min_scene[0], self.min_scene[1], self.max_scene[2])
-            glVertex3f(self.max_scene[0], self.min_scene[1], self.max_scene[2])
-            glVertex3f(self.max_scene[0], self.max_scene[1], self.min_scene[2])
-            glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
-            glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
-            glEnd()
-            #glEnable(GL_DEPTH_TEST)
-        '''
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
@@ -541,6 +523,10 @@ class Model(object):
                     glColor3fv(self.color)
             else:
                 glColor3f(0.75, .0, .0)
+
+        '''
+
+
 
         if self.is_changed:
             print("Changed")
@@ -567,7 +553,8 @@ class Model(object):
             self.place_on_zero()
 
             self.is_changed = False
-
+        '''
+        '''
         self.put_array_to_gl()
 
         glEnableClientState(GL_VERTEX_ARRAY)
@@ -577,8 +564,11 @@ class Model(object):
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
+        '''
+        glCallList(self.displayList)
 
         glPopMatrix()
+
 
     def make_display_list(self):
         genList = glGenLists(1)
@@ -728,7 +718,7 @@ class ModelTypeStl(ModelTypeAbstract):
         model.temp_mesh = deepcopy(mesh)
         model.make_normals()
 
-        #model.displayList = model.make_display_list()
+        model.displayList = model.make_display_list()
 
         return model
 

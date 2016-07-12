@@ -41,7 +41,7 @@ class GLWidget(QGLWidget):
         QGLWidget.__init__(self, parent)
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update)
+        self.timer.timeout.connect(self.updateGL)
 
         #TODO:Add camera instance
         #self.camera = TargetedCamera()
@@ -292,9 +292,10 @@ class GLWidget(QGLWidget):
     def paintGL(self, selection = 1):
         t0 = time.time()
         self.makeCurrent()
+
         #print("render")
         #print(inspect.stack()[1][3] + " call render")
-
+        '''
         if selection:
             glClearColor(0.0, 0.0, 0.0, 1.0)
 
@@ -328,21 +329,16 @@ class GLWidget(QGLWidget):
             self.draw_tools(picking=True)
 
             #self.sceneFrameBuffer = self.grabFrameBuffer()
-            '''
-            if 'debug' in self.parent.controller.settings:
-                if self.parent.controller.settings['debug']:
-                    #save picture to filesystem
-                    self.sceneFrameBuffer.save("select_buffer.png")
-            '''
+
+            #if 'debug' in self.parent.controller.settings:
+            #    if self.parent.controller.settings['debug']:
+            #        #save picture to filesystem
+            #        self.sceneFrameBuffer.save("select_buffer.png")
+
 
         #color picking
         '''
-        if self.last_fps >= 40.:
-            glEnable(GL_MULTISAMPLE)
-            glEnable(GL_LINE_SMOOTH)
-            glEnable(GL_POINT_SMOOTH)
-            glEnable(GL_POLYGON_SMOOTH)
-        '''
+
 
         glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
@@ -389,6 +385,7 @@ class GLWidget(QGLWidget):
         #glEnable(GL_DEPTH_TEST)
 
         self.draw_tools()
+
 
         t1 = time.time()
         self.last_fps = 1./(t1-t0)
@@ -472,18 +469,6 @@ class GLWidget(QGLWidget):
         glLoadIdentity()
         gluPerspective(45., float(width*1./height*1.), 1., 75.)
         glMatrixMode(GL_MODELVIEW)
-
-    def mousePressEvent(self, event):
-        self.parent.controller.mouse_press_event(event)
-
-    def mouseReleaseEvent(self, event):
-        self.parent.controller.mouse_release_event(event)
-
-    def mouseMoveEvent(self, event):
-        self.parent.controller.mouse_move_event(event)
-
-    def wheelEvent(self, event):
-        self.parent.controller.wheel_event(event)
 
     def get_cursor_position(self, event):
         matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
