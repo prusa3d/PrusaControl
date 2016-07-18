@@ -574,6 +574,7 @@ class Model(object):
         '''
         glColor3fv(self.color)
         glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
+
         glCallList(self.displayList)
 
         glPopMatrix()
@@ -585,6 +586,10 @@ class Model(object):
 
 
     def make_display_list(self):
+        #vert = [[ 1., 0., 0.], [ 0., 1., 0.], [ 1., 1., 0.]]
+        #norm = [[ 0., 0., 1.], [ 0., 0., 1.], [ 0., 0., 1.]]
+
+
         genList = glGenLists(1)
 
         glEnableClientState(GL_VERTEX_ARRAY)
@@ -592,6 +597,10 @@ class Model(object):
 
         glNormalPointerf(np.tile(self.mesh.normals, 3))
         glVertexPointerf(self.mesh.vectors)
+
+        #glNormalPointerf(norm)
+        #glVertexPointerf(vert)
+
 
         glNewList(genList, GL_COMPILE)
 

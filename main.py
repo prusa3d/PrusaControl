@@ -7,7 +7,7 @@ from controller import Controller
 from sceneRender import *
 from sceneData import *
 import logging
-import profile
+import cProfile
 
 #import psyco
 #psyco.full()
@@ -44,6 +44,6 @@ if __name__ == '__main__':
     logging.basicConfig(format=FORMAT, filemode='w', level=logging.INFO)
 
     if DEBUG:
-        profile.run('main()')
+        cProfile.runctx('main()', globals(),locals())
     else:
         main()

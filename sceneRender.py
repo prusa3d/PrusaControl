@@ -51,6 +51,9 @@ class GLWidget(QGLWidget):
         self.last_time = time.time()
         self.delta_t = 0.016
         self.last_fps = 100.
+        self.fps_count = 0
+        self.fps_time = 0.
+
 
         #properties definition
         self.xRot = 0
@@ -103,6 +106,8 @@ class GLWidget(QGLWidget):
         self.zRot = 5576
         self.zoom = -39
         self.last_fps = 100.
+        self.fps_count = 0
+        self.fps_time = 0.
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -384,14 +389,21 @@ class GLWidget(QGLWidget):
             glDisableClientState(GL_NORMAL_ARRAY)
         #glEnable(GL_DEPTH_TEST)
 
-        #self.draw_tools()
+        self.draw_tools()
 
 
 
         t1 = time.time()
-        self.last_fps = 1./(t1-t0)
-        self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
 
+
+        if self.fps_count==200:
+            self.last_fps = 1./(self.fps_time/self.fps_count)
+            self.fps_count = 0
+            self.fps_time = 0.
+            self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
+        else:
+            self.fps_count+=1
+            self.fps_time+=t1-t0
 
 
     def draw_tools_helper(self, model, settings, picking=False):

@@ -204,6 +204,8 @@ class PrusaControlView(QtGui.QMainWindow):
         super(PrusaControlView, self).__init__()
         self.setAcceptDrops(True)
 
+        self.setVisible(False)
+
         self.prusa_control_widget = PrusaControlWidget(self)
         self.setCentralWidget(self.prusa_control_widget)
 
@@ -242,6 +244,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.statusBar().showMessage('Ready')
         self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
+
+        self.setVisible(True)
         self.show()
 
     '''
@@ -415,6 +419,7 @@ class PrusaControlView(QtGui.QMainWindow):
 class PrusaControlWidget(QtGui.QWidget):
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
+        self.setVisible(False)
         if parent:
             self.parent = parent
             self.controller = parent.controller
@@ -429,6 +434,7 @@ class PrusaControlWidget(QtGui.QWidget):
         self.init_gui()
 
     def init_gui(self):
+
         self.glWidget = sceneRender.GLWidget(self)
 
         self.rightPanel = QtGui.QWidget()
@@ -506,6 +512,7 @@ class PrusaControlWidget(QtGui.QWidget):
         self.changable_widgets['supportCheckBox'] = self.supportCheckBox
 
         self.show()
+        self.setVisible(True)
 
     def get_changable_widgets(self):
         return self.changable_widgets
