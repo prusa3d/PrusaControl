@@ -51,6 +51,8 @@ class Controller:
         self.app_config = AppParameters()
         self.analyzer = Analyzer(self)
 
+
+
         self.printing_settings = {}
         self.settings = {}
         if not self.settings:

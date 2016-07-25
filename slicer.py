@@ -28,6 +28,7 @@ class SlicerEngineAbstract():
         pass
 
 
+#TODO:This is wrong design,
 class Slic3rEngineRunner(QObject):
     '''
     This is just connector to console version of Slic3r software
@@ -154,6 +155,7 @@ class SlicerEngineManager(object):
 
     def slice(self):
         self.slice_thread = QThread()
+        #TODO:Make it universal(for other slice engines)
         self.slice_engine = Slic3rEngineRunner(self.controller)
         self.slice_engine.moveToThread(self.slice_thread)
         self.slice_thread.started.connect(self.slice_engine.slice)

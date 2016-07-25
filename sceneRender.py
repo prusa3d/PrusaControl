@@ -39,13 +39,12 @@ def timing(f):
 class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         QGLWidget.__init__(self, parent)
-
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.updateGL)
+        self.setMouseTracking(True)
 
         #TODO:Add camera instance
         #self.camera = TargetedCamera()
         self.parent = parent
+        self.controller = self.parent.controller
         self.init_parametres()
 
         self.last_time = time.time()
@@ -125,24 +124,38 @@ class GLWidget(QGLWidget):
         self.sceneFrameBuffer = []
         self.tools = []
 
+
+    def mousePressEvent(self, event):
+        self.controller.mouse_press_event(event)
+
+    def mouseReleaseEvent(self, event):
+        self.controller.mouse_release_event(event)
+
+    def mouseMoveEvent(self, event):
+        self.controller.mouse_move_event(event)
+
+    def wheelEvent(self, event):
+        self.controller.wheel_event(event)
+
+
     def update_scene(self, reset=False):
 
-        if reset:
-            self.init_parametres()
-        self.timer.start(0)
+        #if reset:
+        #    self.init_parametres()
+
+
+        #self.updateGL()
+        self.update()
 
         '''
-        actual_time = time.time()
-        delta = actual_time-self.last_time
-        if delta >= self.delta_t:
-            t0 = time.time()
-            self.updateGL()
-            #self.update()
-            t1 = time.time()
-            #print(str((t1-t0)))
-            self.last_fps = 1./(t1-t0)
+        if self.fps_count<100:
+            self.fps_count+= 1
+            self.fps_time += (t1 - t0)
+        else:
+            self.last_fps = self.fps_time / self.fps_count
+            self.fps_time = 0.0
+            self.fps_count = 0
             self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
-            self.last_time = actual_time
         '''
 
 
@@ -235,6 +248,7 @@ class GLWidget(QGLWidget):
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
         self.tools = [self.selectTool, self.moveTool, self.rotateTool, self.scaleTool, self.undo_button, self.do_button]
+        self.tools = []
 
         self.bed = {}
         for i in self.parent.controller.printers:
@@ -276,27 +290,30 @@ class GLWidget(QGLWidget):
         glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
 
-        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 
 
+        '''
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POINT_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
+        '''
 
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
 
+        '''
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
-
+        '''
 
     #@timing
     def paintGL(self, selection = 1):
         t0 = time.time()
-        self.makeCurrent()
+        heat_bed = self.bed[self.parent.controller.settings['printer']]
 
         #print("render")
         #print(inspect.stack()[1][3] + " call render")
@@ -345,12 +362,13 @@ class GLWidget(QGLWidget):
         '''
 
 
-        glDepthMask(GL_TRUE)
+        #glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
-        glClearColor(0.0, 0.47, 0.62, 1.0)
+        #glClearColor(0.0, 0.47, 0.62, 1.0)
+        glClearColor((176./255.),(236/255.) ,(255./255.), 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        self.draw_background_texture()
+        #self.draw_background_texture()
         glLoadIdentity()
 
         #glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
@@ -363,20 +381,22 @@ class GLWidget(QGLWidget):
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        glCallList(self.bed[self.parent.controller.settings['printer']])
+        glCallList(heat_bed)
 
         glEnable(GL_DEPTH_TEST)
 
         glEnable ( GL_LIGHTING )
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
-                model.render(picking=False, debug=self.parent.controller.settings['debug'] or False)
+                model.render(picking=False)
         glDisable( GL_LIGHTING )
 
+        '''
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
                 if model.selected:
                     self.draw_tools_helper(model, self.parent.controller.settings)
+        '''
 
         #glDisable(GL_DEPTH_TEST)
         if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
@@ -389,14 +409,12 @@ class GLWidget(QGLWidget):
             glDisableClientState(GL_NORMAL_ARRAY)
         #glEnable(GL_DEPTH_TEST)
 
-        self.draw_tools()
-
-
+        #self.draw_tools()
 
         t1 = time.time()
 
 
-        if self.fps_count==200:
+        if self.fps_count==100:
             self.last_fps = 1./(self.fps_time/self.fps_count)
             self.fps_count = 0
             self.fps_time = 0.

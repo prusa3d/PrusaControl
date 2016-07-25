@@ -6,44 +6,39 @@ from PyQt4 import QtGui
 from controller import Controller
 from sceneRender import *
 from sceneData import *
-import logging
+#import logging
 import cProfile
-
-#import psyco
-#psyco.full()
 
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = False
+DEBUG = True
 
 
 def main():
-    logging.info('PrusaControl start')
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
 
     glf = QGLFormat.defaultFormat()
     glf.setSwapInterval( 0 )
-    #glf.setSampleBuffers(True)
-    #glf.setSamples(4)
-    #glf.setDirectRendering(True)
+    glf.setSampleBuffers(True)
+    glf.setSamples(4)
+    glf.setDirectRendering(True)
     QGLFormat.setDefaultFormat(glf)
 
     controller = Controller(app)
     window = controller.get_view()
-    app.installEventFilter(window)
+    #app.installEventFilter(window)
     app.exec_()
-    logging.info('PrusaControl exit')
     atexit.register(controller.write_config)
 
 
 
 if __name__ == '__main__':
     FORMAT = "[%(levelname)s][%(filename)s:%(lineno)s:%(funcName)s()]-%(message)s"
-    logging.basicConfig(format=FORMAT, filemode='w', level=logging.INFO)
+    #logging.basicConfig(format=FORMAT, filemode='w', level=logging.INFO)
 
     if DEBUG:
-        cProfile.runctx('main()', globals(),locals())
+        cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
     else:
         main()
