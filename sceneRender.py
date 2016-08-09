@@ -38,11 +38,22 @@ def timing(f):
 
 class GLWidget(QGLWidget):
     def __init__(self, parent=None):
-        QGLWidget.__init__(self, parent)
+        #QGLWidget.__init__(self, parent)
+        if hasattr(QGLFormat, 'setVersion'):
+            f = QGLFormat()
+            f.setVersion(2, 1)
+            f.setDoubleBuffer(True)
+            #f.setSampleBuffers(True)
+            #f.setSamples(4)
+            f.setSwapInterval(1)
+            f.setProfile(QGLFormat.CoreProfile)
+            c = QGLContext(f, None)
+            QGLWidget.__init__(self, c, parent)
+        else:
+            QGLWidget.__init__(self, parent)
+
         self.setMouseTracking(True)
 
-        #TODO:Add camera instance
-        #self.camera = TargetedCamera()
         self.parent = parent
         self.controller = self.parent.controller
         self.init_parametres()
@@ -143,20 +154,8 @@ class GLWidget(QGLWidget):
         #if reset:
         #    self.init_parametres()
 
-
         #self.updateGL()
         self.update()
-
-        '''
-        if self.fps_count<100:
-            self.fps_count+= 1
-            self.fps_time += (t1 - t0)
-        else:
-            self.last_fps = self.fps_time / self.fps_count
-            self.fps_time = 0.0
-            self.fps_count = 0
-            self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
-        '''
 
 
     #TODO:All this function will be changed to controll camera instance
@@ -248,7 +247,7 @@ class GLWidget(QGLWidget):
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
         self.tools = [self.selectTool, self.moveTool, self.rotateTool, self.scaleTool, self.undo_button, self.do_button]
-        self.tools = []
+        #self.tools = []
 
         self.bed = {}
         for i in self.parent.controller.printers:
@@ -311,6 +310,41 @@ class GLWidget(QGLWidget):
         '''
 
     #@timing
+
+    def picking_render(self):
+        glClearColor(0., 0., 0., 0.0)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        glLoadIdentity()
+        glTranslatef(0.0, 0.0, self.zoom)
+        glRotated(-90.0, 1.0, 0.0, 0.0)
+        glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
+        glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
+
+        glDisable(GL_LIGHTING)
+        glDisable(GL_BLEND)
+        glDisable(GL_MULTISAMPLE)
+        glDisable(GL_LINE_SMOOTH)
+        glDisable(GL_POINT_SMOOTH)
+        glDisable(GL_POLYGON_SMOOTH)
+
+
+        for model in self.parent.controller.scene.models:
+            model.render(picking=True, debug=False)
+            if model.selected:
+                self.draw_tools_helper(model, self.parent.controller.settings, True)
+
+        self.draw_tools(picking=True)
+
+
+    def get_id_under_cursor(self, x, y):
+        print("color_picking")
+        self.picking_render()
+        viewport = glGetIntegerv(GL_VIEWPORT)
+        color = glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE)
+        return ord(color[0])+(256*ord(color[1]))+(256*256*ord(color[2]))
+
+
     def paintGL(self, selection = 1):
         t0 = time.time()
         heat_bed = self.bed[self.parent.controller.settings['printer']]
@@ -351,6 +385,7 @@ class GLWidget(QGLWidget):
             self.draw_tools(picking=True)
 
             self.sceneFrameBuffer = self.grabFrameBuffer()
+        '''
 
             #if 'debug' in self.parent.controller.settings:
             #    if self.parent.controller.settings['debug']:
@@ -359,7 +394,7 @@ class GLWidget(QGLWidget):
 
 
         #color picking
-        '''
+
 
 
         #glDepthMask(GL_TRUE)
@@ -386,19 +421,18 @@ class GLWidget(QGLWidget):
         glEnable(GL_DEPTH_TEST)
 
         glEnable ( GL_LIGHTING )
-        if self.parent.controller.scene.models:
-            for model in self.parent.controller.scene.models:
-                model.render(picking=False)
+        for model in self.parent.controller.scene.models:
+            model.render(picking=False)
         glDisable( GL_LIGHTING )
 
-        '''
+
+
         if self.parent.controller.scene.models:
             for model in self.parent.controller.scene.models:
                 if model.selected:
                     self.draw_tools_helper(model, self.parent.controller.settings)
-        '''
 
-        #glDisable(GL_DEPTH_TEST)
+
         if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
             glColor3f(1., .0, .0)
             glEnableClientState(GL_VERTEX_ARRAY)
@@ -407,9 +441,9 @@ class GLWidget(QGLWidget):
             glDrawArrays(GL_TRIANGLES, 0, len(self.parent.controller.scene.analyze_result_data_tmp)*3)
             glDisableClientState(GL_VERTEX_ARRAY)
             glDisableClientState(GL_NORMAL_ARRAY)
-        #glEnable(GL_DEPTH_TEST)
 
-        #self.draw_tools()
+        self.draw_tools()
+        glFlush()
 
         t1 = time.time()
 
@@ -710,7 +744,6 @@ class GLWidget(QGLWidget):
 
         glEnable(GL_BLEND)
         glColor3f(1,1,1)
-        #glBindTexture(GL_TEXTURE_2D, self.selectTool.texture)
         #sH = sW
         coef = sW/sH
         for tool in self.tools:

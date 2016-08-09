@@ -365,8 +365,9 @@ class Controller:
 
     def scene_was_changed(self):
         self.status = 'edit'
-        self.set_generate_button()
-        self.set_progress_bar(0.0)
+        #TODO:repair this bug
+        #self.set_generate_button()
+        #self.set_progress_bar(0.0)
 
     def key_press_event(self, event):
         print("key press event")
@@ -455,13 +456,18 @@ class Controller:
             if self.find_object_and_rotation_axis_by_color(event):
                 self.view.update_scene()
 
-
-
     def mouse_move_event(self, event):
-        #print("mouse move event")
+        if event.buttons() & QtCore.Qt.LeftButton or event.buttons() & QtCore.Qt.RightButton:
+            pass
+        elif self.settings['toolButtons']['rotateButton']:
+            self.check_rotation_axis(event)
+        else:
+            return
+
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         diff = numpy.linalg.norm(numpy.array([dx, dy]))
+
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
         if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
@@ -475,7 +481,6 @@ class Controller:
                         self.scene_was_changed()
                     self.res_old = res
                 self.view.update_scene()
-
 
         elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
             res = [.0, .0, .0]
@@ -611,9 +616,12 @@ class Controller:
         return False
 
 #    @timing
+    def get_id_under_cursor(self, event):
+        return self.view.glWidget.get_id_under_cursor(event.x(), event.y())
+
     def hit_tool_button_by_color(self, event):
-        color = self.view.get_cursor_pixel_color(event)
-        find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        find_id = self.get_id_under_cursor(event)
+        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         id_list = [i.id for i in self.view.get_tool_buttons()]
@@ -628,9 +636,8 @@ class Controller:
     def hit_first_object_by_color(self, event, add=False):
         if not add:
             self.scene.clear_selected_models()
-        color = self.view.get_cursor_pixel_color(event)
-        #color to id
-        find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        find_id = self.get_id_under_cursor(event)
+        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         for model in self.scene.models:
@@ -638,11 +645,11 @@ class Controller:
                 model.selected = not model.selected
                 return True
 
-
     def find_object_and_rotation_axis_by_color(self, event):
-        color = self.view.get_cursor_pixel_color(event)
+        #color = self.view.get_cursor_pixel_color(event)
         #color to id
-        find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        find_id = self.get_id_under_cursor(event)
+        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         for model in self.scene.models:
@@ -663,9 +670,8 @@ class Controller:
 
     def find_object_and_scale_axis_by_color(self, event):
         self.scene.clear_selected_models()
-        color = self.view.get_cursor_pixel_color(event)
-        #color to id
-        find_id = color[0] + (color[1]*256) + (color[2]*256*256)
+        find_id = self.get_id_under_cursor(event)
+        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         for model in self.scene.models:

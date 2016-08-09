@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 from os.path import basename
 
 from PyQt4.QtCore import QObject
+from PyQt4.QtOpenGL import QGLBuffer
 from stl.mesh import Mesh
 from random import randint
 import math
@@ -296,6 +297,8 @@ class Model(object):
 
         self.mesh = None
         self.temp_mesh = None
+        self.vao = None
+
 
         #transformation data, connected to scene
         self.pos = np.array([.0, .0, .0])
@@ -503,7 +506,7 @@ class Model(object):
 
     def put_array_to_gl(self):
         glNormalPointerf(self.tiled_normals)
-        glVertexPointerf(self.temp_mesh.vectors)
+        glVertexPointerf(self.mesh.vectors)
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])
@@ -513,7 +516,7 @@ class Model(object):
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
-        '''
+
         if picking:
             glColor3ubv(self.colorId)
         else:
@@ -524,24 +527,22 @@ class Model(object):
                     glColor3fv(self.color)
             else:
                 glColor3f(0.75, .0, .0)
-        '''
+
 
         final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
         final_scale = np.dot(self.temp_scale, self.scale_matrix)
         final_matrix = np.dot(final_rotation, final_scale)
 
 
+
         '''
-
-
-
         if self.is_changed:
             print("Changed")
             self.temp_mesh = Mesh(self.mesh.data.copy())
 
-            final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
-            final_scale = np.dot(self.temp_scale, self.scale_matrix)
-            final_matrix = np.dot(final_rotation, final_scale)
+            #final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
+            #final_scale = np.dot(self.temp_scale, self.scale_matrix)
+            #final_matrix = np.dot(final_rotation, final_scale)
 
             for i in range(3):
                 self.temp_mesh.vectors[:, i] = self.temp_mesh.vectors[:, i].dot(final_matrix)
@@ -561,7 +562,9 @@ class Model(object):
 
             self.is_changed = False
         '''
-        '''
+
+        glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
+
         self.put_array_to_gl()
 
         glEnableClientState(GL_VERTEX_ARRAY)
@@ -571,13 +574,14 @@ class Model(object):
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
-        '''
-        glColor3fv(self.color)
-        glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
 
-        glCallList(self.displayList)
+
+        #self.render_vao()
+        #glCallList(self.displayList)
 
         glPopMatrix()
+
+
 
     def matrix3_to_matrix4(self, matrix3):
         mat = [i+[0.] for i in matrix3.tolist()]
@@ -742,6 +746,7 @@ class ModelTypeStl(ModelTypeAbstract):
         model.make_normals()
 
         model.displayList = model.make_display_list()
+        #model.make_vao()
 
         return model
 
