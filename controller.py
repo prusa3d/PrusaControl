@@ -394,57 +394,48 @@ class Controller:
 
 
     def mouse_press_event(self, event):
-        #print("mouse press event")
-        self.last_pos = QtCore.QPoint(event.pos())
-        newRayStart, newRayEnd = self.view.get_cursor_position(event)
-        if event.buttons() & QtCore.Qt.LeftButton:
-            self.ray_start, self.ray_end = self.view.get_cursor_position(event)
-
-        self.hit_tool_button_by_color(event)
-        if event.buttons() & QtCore.Qt.LeftButton and not(self.get_id_under_cursor(event)==0):
-            self.over_object = True
-            modifiers = QtGui.QApplication.keyboardModifiers()
-            if modifiers == QtCore.Qt.ControlModifier:
-                add = True
+        print("mouse press event")
+        #je stisknuto prave tlacitko?
+        if event.button() & QtCore.Qt.RightButton:
+            #TODO:add function set_camera_rotation_function(self)
+            self.set_camera_move_function()
+            return
+        # je stisknuto leve tlacitko?
+        elif event.button() & QtCore.Qt.LeftButton:
+            #Je kurzor nad nejakym objektem?
+            object_id = self.get_id_under_cursor(event)
+            if object_id==0:
+                #TODO:add function set_camera_rotation_function(self)
+                self.set_camera_rotation_function()
+                return
             else:
-                add = False
-            if not self.hit_first_object_by_color(event, add):
-                self.scene.clear_selected_models()
-                self.models_selected=False
-            else:
-                self.models_selected=True
-        elif event.buttons() & QtCore.Qt.LeftButton and self.models_selected and not(self.get_id_under_cursor(event)==0):
-            self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
-            self.hitPoint = deepcopy(self.res_old)
-            #self.hit_first_object_by_color(event)
-            for model in self.scene.models:
-                if model.selected:
-                    model.pos_old = deepcopy(model.pos)
-        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['rotateButton']:
-            for model in self.scene.models:
-                if model.selected and model.rotationAxis:
-                    if model.rotationAxis == 'x':
-                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [1.0, 0.0, 0.0]))
-                    elif model.rotationAxis == 'y':
-                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 1.0, 0.0]))
-                    elif model.rotationAxis == 'z':
-                        self.origin_rotation_point = numpy.array(sceneData.intersection_ray_plane(newRayStart, newRayEnd, model.pos, [0.0, 0.0, 1.0]))
-                    self.hitPoint = deepcopy(self.origin_rotation_point)
-        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['scaleButton']:
-            #self.find_object_and_scale_axis_by_color(event)
-            for model in self.scene.models:
-                #if model.selected and model.scaleAxis:
-                if model.selected:
-                    camera_pos, direction, _, _ = self.view.get_camera_direction(event)
-                    ray_start, ray_end = self.view.get_cursor_position(event)
-                    self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.zeroPoint, direction))
-                    self.original_scale = numpy.linalg.norm(self.original_scale_point - model.zeroPoint)
-                    self.hitPoint = deepcopy(self.original_scale_point)
+                #Je pod kurzorem nejaky tool
+                #TODO:add function is_some_tool_under_cursor(self, object_id)
+                if self.is_some_tool_under_cursor(object_id):
+                    #TODO:add function get_tool_by_id(self, object_id)
+                    tool = self.get_tool_by_id(object_id)
+                    #TODO:add function activate_tool(self, object_id), and class tool
+                    tool.activate_tool()
+                    return
+                #Je objekt oznaceny?
+                #TODO:add function is_object_already_selected(self, object_id)
+                elif self.is_object_already_selected(object_id):
+                    #nastav funkci na provedeni toolu
+                    #TODO:add function get_active_tool(self) return class tool
+                    tool = self.get_active_tool()
+                    #TODO:add function do(self) to class tool
+                    tool.do()
+                    return
+                else:
+                    #select object
+                    #TODO:add function select_object(self, object_id)
+                    self.select_object(object_id)
+                    return
 
-        elif event.buttons() & QtCore.Qt.MiddleButton:
-            rayStart,_  = self.view.get_cursor_position(event)
-            self.last_ray_pos = numpy.array(rayStart)
-        self.view.update_scene()
+
+
+
+
 
     def mouse_release_event(self, event):
         #print("mouse release event")
