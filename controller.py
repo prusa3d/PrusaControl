@@ -114,6 +114,9 @@ class Controller:
         self.status = 'edit'
         self.canceled = False
 
+        self.over_object = False
+        self.models_selected = False
+
 
         self.app = app
 
@@ -342,6 +345,9 @@ class Controller:
         #TODO:Add code for update of firmware
         pass
 
+    def open_object_settings_dialog(self, object_id):
+        object_settings = self.view.open_object_settings_dialog(object_id)
+
     def open_settings(self):
         self.settings = self.view.open_settings_dialog()
 
@@ -379,6 +385,14 @@ class Controller:
         self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
         self.view.update_scene()
 
+    def mouse_double_click(self, event):
+        object_id = self.get_id_under_cursor(event)
+        if object_id==0:
+            return
+        else:
+            self.open_object_settings_dialog(object_id)
+
+
     def mouse_press_event(self, event):
         #print("mouse press event")
         self.last_pos = QtCore.QPoint(event.pos())
@@ -387,7 +401,8 @@ class Controller:
             self.ray_start, self.ray_end = self.view.get_cursor_position(event)
 
         self.hit_tool_button_by_color(event)
-        if event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['selectButton']:
+        if event.buttons() & QtCore.Qt.LeftButton and not(self.get_id_under_cursor(event)==0):
+            self.over_object = True
             modifiers = QtGui.QApplication.keyboardModifiers()
             if modifiers == QtCore.Qt.ControlModifier:
                 add = True
@@ -395,7 +410,10 @@ class Controller:
                 add = False
             if not self.hit_first_object_by_color(event, add):
                 self.scene.clear_selected_models()
-        elif event.buttons() & QtCore.Qt.LeftButton and self.settings['toolButtons']['moveButton']:
+                self.models_selected=False
+            else:
+                self.models_selected=True
+        elif event.buttons() & QtCore.Qt.LeftButton and self.models_selected and not(self.get_id_under_cursor(event)==0):
             self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.hitPoint = deepcopy(self.res_old)
             #self.hit_first_object_by_color(event)
@@ -450,6 +468,7 @@ class Controller:
         #self.scene.clear_selected_models()
         self.view.update_scene()
         self.last_ray_pos = numpy.array([.0,.0,.0])
+        self.over_object = False
 
     def check_rotation_axis(self, event):
         if self.settings['toolButtons']['rotateButton']:
@@ -458,7 +477,7 @@ class Controller:
 
     def mouse_move_event(self, event):
         if event.buttons() & QtCore.Qt.LeftButton or event.buttons() & QtCore.Qt.RightButton:
-            pass
+            self.in_move = True
         elif self.settings['toolButtons']['rotateButton']:
             self.check_rotation_axis(event)
         else:
@@ -470,7 +489,7 @@ class Controller:
 
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
 
-        if event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
+        if event.buttons() & QtCore.Qt.LeftButton and self.over_object and self.models_selected:
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
                 #res_new = sceneData.Vector.minusAB(res, self.res_old)
@@ -536,7 +555,7 @@ class Controller:
             self.res_old = res
             self.view.update_scene()
 
-        elif event.buttons() & QtCore.Qt.RightButton:
+        elif event.buttons() & QtCore.Qt.LeftButton and not self.over_object:
             #TODO:Add controll of camera instance
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)

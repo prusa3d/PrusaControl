@@ -73,6 +73,46 @@ class SettingsDialog(QDialog):
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
         return (data, result == QDialog.Accepted)
 
+
+class ObjectSettingsDialog(QDialog):
+    def __init__(self, controller, parent = None, object_id=0):
+        super(ObjectSettingsDialog, self).__init__(parent)
+
+        self.controller = controller
+
+        layout = QVBoxLayout(self)
+
+        # nice widget for editing the date
+        object_label = QtGui.QLabel(self.tr("Object " + str(object_id)))
+        edit_pos_x = QtGui.QLineEdit()
+
+
+
+        layout.addWidget(object_label)
+        layout.addWidget(edit_pos_x)
+
+
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    @staticmethod
+    def get_settings_data(controller, parent = None, object_id = 0):
+        data = controller.settings
+        dialog = ObjectSettingsDialog(controller, parent, object_id)
+        dialog.setWindowTitle("Settings")
+        result = dialog.exec_()
+        data['language'] = controller.enumeration['language'].keys()[dialog.language_combo.currentIndex()]
+        data['printer'] = controller.enumeration['printer'].keys()[dialog.printer_combo.currentIndex()]
+        controller.set_printer(data['printer'])
+        data['debug'] = dialog.debug_checkbox.isChecked()
+        data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
+        return (data, result == QDialog.Accepted)
+
 class FirmwareUpdateDialog(QDialog):
     def __init__(self, controller, parent = None):
         super(FirmwareUpdateDialog, self).__init__(parent)
@@ -333,6 +373,10 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def open_settings_dialog(self):
         data, ok = SettingsDialog.get_settings_data(self.controller, self.parent())
+        return data
+
+    def open_object_settings_dialog(self, object_id):
+        data, ok = ObjectSettingsDialog.get_settings_data(self.controller, self.parent(), object_id)
         return data
 
     def open_printer_info_dialog(self):

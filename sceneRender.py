@@ -43,8 +43,8 @@ class GLWidget(QGLWidget):
             f = QGLFormat()
             f.setVersion(2, 1)
             f.setDoubleBuffer(True)
-            #f.setSampleBuffers(True)
-            #f.setSamples(4)
+            f.setSampleBuffers(True)
+            f.setSamples(4)
             f.setSwapInterval(1)
             f.setProfile(QGLFormat.CoreProfile)
             c = QGLContext(f, None)
@@ -138,6 +138,9 @@ class GLWidget(QGLWidget):
 
     def mousePressEvent(self, event):
         self.controller.mouse_press_event(event)
+
+    def mouseDoubleClickEvent(self, event):
+        self.controller.mouse_double_click(event)
 
     def mouseReleaseEvent(self, event):
         self.controller.mouse_release_event(event)
@@ -294,12 +297,12 @@ class GLWidget(QGLWidget):
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 
 
-        '''
+
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POINT_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
-        '''
+
 
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
@@ -395,6 +398,11 @@ class GLWidget(QGLWidget):
 
         #color picking
 
+        glEnable(GL_MULTISAMPLE)
+        glEnable(GL_LINE_SMOOTH)
+        glEnable(GL_POINT_SMOOTH)
+        glEnable(GL_POLYGON_SMOOTH)
+
 
 
         #glDepthMask(GL_TRUE)
@@ -403,7 +411,7 @@ class GLWidget(QGLWidget):
         glClearColor((176./255.),(236/255.) ,(255./255.), 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        #self.draw_background_texture()
+        self.draw_background_texture()
         glLoadIdentity()
 
         #glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
