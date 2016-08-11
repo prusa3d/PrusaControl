@@ -129,6 +129,10 @@ class Controller:
 
         self.analyze_result = []
 
+        self.tool = ''
+        self.camera_move = False
+        self.camera_rotate = False
+
 
     def write_config(self):
         config = RawConfigParser()
@@ -392,6 +396,94 @@ class Controller:
         else:
             self.open_object_settings_dialog(object_id)
 
+    def set_camera_move_function(self):
+        self.camera_move=True
+        self.camera_rotate=False
+
+    def set_camera_rotation_function(self):
+        self.camera_move = False
+        self.camera_rotate = True
+
+    def set_camera_function_false(self):
+        self.camera_move = False
+        self.camera_rotate = False
+
+    def is_some_tool_under_cursor(self, object_id):
+        #TODO:Add tools list
+        '''
+        for tool in self.tools:
+            if tool.id == object_id:
+                return True
+            else:
+                return False
+        return False
+        '''
+        return False
+
+    def get_tool_by_id(self, object_id):
+        for tool in self.tools:
+            if tool.id == object_id:
+                return tool
+        return None
+
+
+    def get_active_tool(self):
+        return None
+
+    def is_some_tool_helper_under_cursor(self, object_id):
+        return False
+
+    def set_active_tool_helper_by_id(self, object_id):
+        pass
+
+
+    @staticmethod
+    def is_ctrl_pressed():
+        modifiers = QtGui.QApplication.keyboardModifiers()
+        if modifiers == QtCore.Qt.ControlModifier:
+            return True
+        else:
+            return False
+
+    def is_object_already_selected(self, object_id):
+        for model in self.scene.models:
+            #object founded
+            if model.id == object_id:
+                if model.selected:
+                    #object is selected
+                    return True
+                else:
+                    #object is not selected
+                    return False
+        #No object with id in scene.models
+        return None
+
+
+    def unselect_object(self, object_id):
+        for model in self.scene.models:
+            # object founded
+            if model.id == object_id:
+                model.selected = False
+                return True
+        return False
+
+    def select_object(self, object_id):
+        for model in self.scene.models:
+            # object founded
+            if model.id == object_id:
+                model.selected = True
+                return True
+        return False
+
+    def unselect_objects(self):
+        for model in self.scene.models:
+            model.selected = False
+
+    def check_rotation_axis(self, event):
+        if self.settings['toolButtons']['rotateButton']:
+            if self.find_object_and_rotation_axis_by_color(event):
+                self.view.update_scene()
+
 
     def mouse_press_event(self, event):
         print("mouse press event")
@@ -399,7 +491,6 @@ class Controller:
         if event.button() & QtCore.Qt.RightButton:
             #TODO:add function set_camera_rotation_function(self)
             self.set_camera_move_function()
-            return
         # je stisknuto leve tlacitko?
         elif event.button() & QtCore.Qt.LeftButton:
             #Je kurzor nad nejakym objektem?
@@ -407,65 +498,80 @@ class Controller:
             if object_id==0:
                 #TODO:add function set_camera_rotation_function(self)
                 self.set_camera_rotation_function()
-                return
             else:
-                #Je pod kurzorem nejaky tool
+                #Je pod kurzorem nejaky tool?
                 #TODO:add function is_some_tool_under_cursor(self, object_id)
                 if self.is_some_tool_under_cursor(object_id):
                     #TODO:add function get_tool_by_id(self, object_id)
                     tool = self.get_tool_by_id(object_id)
                     #TODO:add function activate_tool(self, object_id), and class tool
                     tool.activate_tool()
-                    return
+                #Je pod kurzorem nejaky tool helper?
+                #TODO:add function
+                elif self.is_some_tool_helper_under_cursor(object_id):
+                    #TODO:add function set_active_tool_helper_by_id(self, object_id)
+                    self.set_active_tool_helper_by_id(object_id)
                 #Je objekt oznaceny?
                 #TODO:add function is_object_already_selected(self, object_id)
+                elif self.is_ctrl_pressed():
+                    if self.is_object_already_selected(object_id):
+                        self.unselect_object(object_id)
+                    else:
+                        self.select_object(object_id)
                 elif self.is_object_already_selected(object_id):
                     #nastav funkci na provedeni toolu
+
+                    self.tool = 'move'
                     #TODO:add function get_active_tool(self) return class tool
-                    tool = self.get_active_tool()
+                    #tool = self.get_active_tool()
                     #TODO:add function do(self) to class tool
-                    tool.do()
-                    return
+                    #tool.do()
                 else:
                     #select object
                     #TODO:add function select_object(self, object_id)
+                    self.unselect_objects()
                     self.select_object(object_id)
-                    return
-
-
-
-
-
+        self.view.update_scene()
 
     def mouse_release_event(self, event):
-        #print("mouse release event")
-        if event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
-            for model in self.scene.models:
-                if model.selected:
-                    model.apply_rotation()
-                    model.rot = numpy.array([0.,0.,0.])
-                    model.place_on_zero()
-                    self.scene.save_change(model)
-        elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['moveButton']:
+        print("mouse release event")
+        self.set_camera_function_false()
+        if self.tool == 'move':
             for model in self.scene.models:
                 if model.selected:
                     self.scene.save_change(model)
-        elif event.button() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
-            for model in self.scene.models:
-                if model.selected and model.scaleAxis:
-                    model.apply_scale()
-                    self.scene.save_change(model)
+        self.tool = ''
 
-        #self.scene.clear_selected_models()
+
+
+    def mouse_move_event(self, event):
+        dx = event.x() - self.last_pos.x()
+        dy = event.y() - self.last_pos.y()
+        #diff = numpy.linalg.norm(numpy.array([dx, dy]))
+        newRayStart, newRayEnd = self.view.get_cursor_position(event)
+        if self.camera_move:
+            print("camera move")
+            pass
+        elif self.camera_rotate:
+            print("camera rotate")
+            self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
+            self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
+            self.last_pos = QtCore.QPoint(event.pos())
+            #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+            #self.scene.camera_vector = direction - camera_pos
+        elif self.tool=='move':
+            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            if res is not None:
+                res_new = res - self.res_old
+                for model in self.scene.models:
+                    if model.selected:
+                        model.set_move(res_new)
+                        self.scene_was_changed()
+                    self.res_old = res
         self.view.update_scene()
-        self.last_ray_pos = numpy.array([.0,.0,.0])
-        self.over_object = False
 
-    def check_rotation_axis(self, event):
-        if self.settings['toolButtons']['rotateButton']:
-            if self.find_object_and_rotation_axis_by_color(event):
-                self.view.update_scene()
 
+    '''
     def mouse_move_event(self, event):
         if event.buttons() & QtCore.Qt.LeftButton or event.buttons() & QtCore.Qt.RightButton:
             self.in_move = True
@@ -565,7 +671,7 @@ class Controller:
             self.last_ray_pos = new_pos
             self.view.add_camera_position(diff)
             #self.view.update_scene()
-
+    '''
 
     def set_printable(self, is_printable):
         self.scene.printable = is_printable
