@@ -10,7 +10,7 @@ from PyQt4 import QtGui
 
 from PyQt4.QtCore import QDateTime, Qt
 from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox
-from PyQt4.QtGui import QVBoxLayout
+from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
@@ -80,16 +80,67 @@ class ObjectSettingsDialog(QDialog):
 
         self.controller = controller
 
-        layout = QVBoxLayout(self)
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
 
-        # nice widget for editing the date
+
+        layout = QGridLayout(self)
+
+        # nice widget for editing position
+
         object_label = QtGui.QLabel(self.tr("Object " + str(object_id)))
+        position = QtGui.QLabel(self.tr("Position"))
         edit_pos_x = QtGui.QLineEdit()
+        edit_pos_x.setText(str(mesh.pos[0]))
+        edit_pos_y = QtGui.QLineEdit()
+        edit_pos_y.setText(str(mesh.pos[1]))
+        edit_pos_z = QtGui.QLineEdit()
+        edit_pos_z.setText(str(mesh.pos[2]))
+
+        rotation = QtGui.QLabel(self.tr("Rotation"))
+        edit_rot_x = QtGui.QLineEdit()
+        edit_rot_x.setText(str(mesh.rot[0]))
+        edit_rot_y = QtGui.QLineEdit()
+        edit_rot_y.setText(str(mesh.rot[1]))
+        edit_rot_z = QtGui.QLineEdit()
+        edit_rot_z.setText(str(mesh.pos[2]))
+
+        scale = QtGui.QLabel(self.tr("Scale"))
+        edit_scale_x = QtGui.QLineEdit()
+        edit_scale_y = QtGui.QLineEdit()
+        edit_scale_z = QtGui.QLineEdit()
 
 
 
-        layout.addWidget(object_label)
-        layout.addWidget(edit_pos_x)
+
+        layout.addWidget(position, 0 ,0)
+        layout.addWidget(QtGui.QLabel('X '), 1, 0)
+        layout.addWidget(edit_pos_x, 1, 1)
+        layout.addWidget(QtGui.QLabel('Y '), 2, 0)
+        layout.addWidget(edit_pos_y, 2, 1)
+        layout.addWidget(QtGui.QLabel('Z '), 3, 0)
+        layout.addWidget(edit_pos_z, 3, 1)
+
+        layout.addWidget(rotation, 4, 0)
+        layout.addWidget(QtGui.QLabel('X '), 5, 0)
+        layout.addWidget(edit_rot_x, 5, 1)
+        layout.addWidget(QtGui.QLabel('Y '), 6, 0)
+        layout.addWidget(edit_rot_y, 6, 1)
+        layout.addWidget(QtGui.QLabel('Z '), 7, 0)
+        layout.addWidget(edit_rot_z, 7, 1)
+
+        layout.addWidget(scale, 8, 0)
+        layout.addWidget(QtGui.QLabel('X '), 9, 0)
+        layout.addWidget(edit_scale_x, 9, 1)
+        layout.addWidget(QtGui.QLabel('Y '), 10, 0)
+        layout.addWidget(edit_scale_y, 10, 1)
+        layout.addWidget(QtGui.QLabel('Z '), 11, 0)
+        layout.addWidget(edit_scale_z, 11, 1)
+
+
+
+
 
 
         # OK and Cancel buttons
@@ -357,19 +408,10 @@ class PrusaControlView(QtGui.QMainWindow):
         self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
 
         self.setVisible(True)
+        self.update_gui()
+
         self.show()
 
-    '''
-    def eventFilter(self, source, event):
-        if event.type() == QtCore.QEvent.MouseMove:
-            if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
-                #source.set_mouse_event(event)
-                if self.controller.settings['toolButtons']['rotateButton']:
-                    self.controller.check_rotation_axis(event)
-        elif event.type() == QtCore.QEvent.KeyPress:
-            self.controller.key_press_event(event)
-        return QtGui.QMainWindow.eventFilter(self, source, event)
-    '''
 
     def open_settings_dialog(self):
         data, ok = SettingsDialog.get_settings_data(self.controller, self.parent())
@@ -489,6 +531,7 @@ class PrusaControlView(QtGui.QMainWindow):
         # update print quality widget
         self.qualityCombo.clear()
         material_printing_settings_quality_ls = self.controller.get_printing_material_quality(material_index)
+        print("ktery material: " + str(material_index))
         self.qualityCombo.addItems(material_printing_settings_quality_ls)
 
         # infill slider
