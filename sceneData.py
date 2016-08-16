@@ -262,6 +262,7 @@ class Model(object):
     def __init__(self):
         #IDs
         self.id = Model.newid()+1
+        print(str(self.id))
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 

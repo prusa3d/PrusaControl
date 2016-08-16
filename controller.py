@@ -110,7 +110,7 @@ class Controller:
         self.original_scale = 0.0
         self.original_scale_point = numpy.array([0.,0.,0.])
         self.origin_rotation_point = numpy.array([0.,0.,0.])
-        self.res_old = numpy.array([0.,0.,0.])
+        self.res_old = numpy.array([0., 0., 0.])
         self.status = 'edit'
         self.canceled = False
 
@@ -129,6 +129,7 @@ class Controller:
 
         self.analyze_result = []
 
+        self.tools = self.view.get_tool_buttons()
         self.tool = ''
         self.camera_move = False
         self.camera_rotate = False
@@ -389,12 +390,7 @@ class Controller:
         self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
         self.view.update_scene()
 
-    def mouse_double_click(self, event):
-        object_id = self.get_id_under_cursor(event)
-        if object_id==0:
-            return
-        else:
-            self.open_object_settings_dialog(object_id)
+
 
     def set_camera_move_function(self):
         self.camera_move=True
@@ -410,20 +406,21 @@ class Controller:
 
     def is_some_tool_under_cursor(self, object_id):
         #TODO:Add tools list
-        '''
         for tool in self.tools:
             if tool.id == object_id:
                 return True
-            else:
-                return False
-        return False
-        '''
         return False
 
     def get_tool_by_id(self, object_id):
         for tool in self.tools:
             if tool.id == object_id:
                 return tool
+        return None
+
+    def get_object_by_id(self, object_id):
+        for model in self.scene.models:
+            if object_id==model.id:
+                return model
         return None
 
 
@@ -479,40 +476,47 @@ class Controller:
         for model in self.scene.models:
             model.selected = False
 
+    def add_camera_position(self, vec):
+        self.view.add_camera_position(vec)
+
     def check_rotation_axis(self, event):
         if self.settings['toolButtons']['rotateButton']:
             if self.find_object_and_rotation_axis_by_color(event):
                 self.view.update_scene()
 
+    def mouse_double_click(self, event):
+        object_id = self.get_id_under_cursor(event)
+        print(str(object_id))
+
+        if object_id == 0 or self.is_some_tool_under_cursor(object_id):
+            return
+        else:
+            self.open_object_settings_dialog(object_id)
+
 
     def mouse_press_event(self, event):
         print("mouse press event")
-        #je stisknuto prave tlacitko?
+        newRayStart, newRayEnd = self.view.get_cursor_position(event)
+        self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+        #Je stisknuto prave tlacitko?
         if event.button() & QtCore.Qt.RightButton:
-            #TODO:add function set_camera_rotation_function(self)
             self.set_camera_move_function()
-        # je stisknuto leve tlacitko?
+        #Je stisknuto leve tlacitko?
         elif event.button() & QtCore.Qt.LeftButton:
             #Je kurzor nad nejakym objektem?
             object_id = self.get_id_under_cursor(event)
+            print(str(object_id))
             if object_id==0:
-                #TODO:add function set_camera_rotation_function(self)
                 self.set_camera_rotation_function()
             else:
                 #Je pod kurzorem nejaky tool?
-                #TODO:add function is_some_tool_under_cursor(self, object_id)
                 if self.is_some_tool_under_cursor(object_id):
-                    #TODO:add function get_tool_by_id(self, object_id)
                     tool = self.get_tool_by_id(object_id)
-                    #TODO:add function activate_tool(self, object_id), and class tool
-                    tool.activate_tool()
+                    #tool.activate_tool()
                 #Je pod kurzorem nejaky tool helper?
-                #TODO:add function
                 elif self.is_some_tool_helper_under_cursor(object_id):
-                    #TODO:add function set_active_tool_helper_by_id(self, object_id)
                     self.set_active_tool_helper_by_id(object_id)
                 #Je objekt oznaceny?
-                #TODO:add function is_object_already_selected(self, object_id)
                 elif self.is_ctrl_pressed():
                     if self.is_object_already_selected(object_id):
                         self.unselect_object(object_id)
@@ -523,12 +527,11 @@ class Controller:
 
                     self.tool = 'move'
                     #TODO:add function get_active_tool(self) return class tool
-                    #tool = self.get_active_tool()
+                    #tool = self.get_toolsactive_tool()
                     #TODO:add function do(self) to class tool
                     #tool.do()
                 else:
                     #select object
-                    #TODO:add function select_object(self, object_id)
                     self.unselect_objects()
                     self.select_object(object_id)
         self.view.update_scene()
@@ -541,25 +544,38 @@ class Controller:
                 if model.selected:
                     self.scene.save_change(model)
         self.tool = ''
+        self.res_old = numpy.array([0.,0.,0.])
 
 
 
     def mouse_move_event(self, event):
+        #TODO:Add PAN function
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
-        newRayStart, newRayEnd = self.view.get_cursor_position(event)
+
         if self.camera_move:
             print("camera move")
-            pass
+            camStart, camDir, camUp, camRight = self.view.get_camera_direction(event)
+            #print("Dx: " + str(dx))
+            print("CamRight: " + str(camRight))
+            print("CamUp: " + str(camUp))
+            right_move = -0.025*dx * camRight
+            up_move = 0.025*dy * camUp
+
+            move_vector = right_move + up_move
+            self.add_camera_position(move_vector)
+            #self.add_camera_position(up_move)
+
+
         elif self.camera_rotate:
             print("camera rotate")
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
-            self.last_pos = QtCore.QPoint(event.pos())
             #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
             #self.scene.camera_vector = direction - camera_pos
-        elif self.tool=='move':
+        elif self.tool== 'move':
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
                 res_new = res - self.res_old
@@ -567,7 +583,8 @@ class Controller:
                     if model.selected:
                         model.set_move(res_new)
                         self.scene_was_changed()
-                    self.res_old = res
+                self.res_old = res
+        self.last_pos = QtCore.QPoint(event.pos())
         self.view.update_scene()
 
 
@@ -840,6 +857,10 @@ class Controller:
             self.clear_tool_button_states()
             self.settings['toolButtons']['scaleButton'] = True
         self.view.update_scene()
+
+    def place_on_face_button_pressed(self):
+        #TODO:Add new tool
+        pass
 
     def clear_tool_button_states(self):
         self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}

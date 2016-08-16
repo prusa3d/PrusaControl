@@ -103,6 +103,7 @@ class GLWidget(QGLWidget):
         self.moveTool = None
         self.rotateTool = None
         self.scaleTool = None
+        self.placeOnFaceTool = None
         self.tool_background = None
         self.do_button = None
         self.undo_button = None
@@ -230,26 +231,28 @@ class GLWidget(QGLWidget):
         self.image_background = self.texture_from_png("data/img/background.png")
 
         #tools
-        self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
-        self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
-        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_ns.png"), [3.,3.], [95.5, 6.])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_ns.png"), [3.,3.], [95.5, 1.])
+        #self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
+        #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
+        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_ns.png"), [3.,3.], [95.5, 12.])
+        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_ns.png"), [3.,3.], [95.5, 7.])
+        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/placeonface.png"), [3.,3.], [95.5, 1.])
         #back, forward buttons
         self.undo_button = GlButton(self.texture_from_png("data/img/undo_s.png"), [3.,3.], [1., 94], True)
         self.do_button = GlButton(self.texture_from_png("data/img/do_s.png"), [3.,3.], [4.5, 94], True)
 
 
-        self.selectTool.set_callback(self.parent.controller.select_button_pressed)
-        self.moveTool.set_callback(self.parent.controller.move_button_pressed)
-        self.rotateTool.set_callback(self.parent.controller.rotate_button_pressed)
-        self.scaleTool.set_callback(self.parent.controller.scale_button_pressed)
-        self.undo_button.set_callback(self.parent.controller.undo_button_pressed)
-        self.do_button.set_callback(self.parent.controller.do_button_pressed)
+        #self.selectTool.set_callback(self.parent.controller.select_button_pressed)
+        #self.moveTool.set_callback(self.parent.controller.move_button_pressed)
+        self.rotateTool.set_callback(self.controller.rotate_button_pressed)
+        self.scaleTool.set_callback(self.controller.scale_button_pressed)
+        self.placeOnFaceTool.set_callback(self.controller.place_on_face_button_pressed)
+        self.undo_button.set_callback(self.controller.undo_button_pressed)
+        self.do_button.set_callback(self.controller.do_button_pressed)
 
 
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
-        self.tools = [self.selectTool, self.moveTool, self.rotateTool, self.scaleTool, self.undo_button, self.do_button]
+        self.tools = [self.rotateTool, self.scaleTool, self.placeOnFaceTool, self.undo_button, self.do_button]
         #self.tools = []
 
         self.bed = {}
@@ -298,10 +301,10 @@ class GLWidget(QGLWidget):
 
 
 
-        glEnable(GL_MULTISAMPLE)
-        glEnable(GL_LINE_SMOOTH)
-        glEnable(GL_POINT_SMOOTH)
-        glEnable(GL_POLYGON_SMOOTH)
+        #glEnable(GL_MULTISAMPLE)
+        #glEnable(GL_LINE_SMOOTH)
+        #glEnable(GL_POINT_SMOOTH)
+        #glEnable(GL_POLYGON_SMOOTH)
 
 
         glEnable( GL_LIGHT0 )
@@ -318,18 +321,21 @@ class GLWidget(QGLWidget):
         glClearColor(0., 0., 0., 0.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+
         glLoadIdentity()
         glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
+        glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
+
         glDisable(GL_LIGHTING)
         glDisable(GL_BLEND)
-        glDisable(GL_MULTISAMPLE)
-        glDisable(GL_LINE_SMOOTH)
-        glDisable(GL_POINT_SMOOTH)
-        glDisable(GL_POLYGON_SMOOTH)
+        #glDisable(GL_MULTISAMPLE)
+        #glDisable(GL_LINE_SMOOTH)
+        #glDisable(GL_POINT_SMOOTH)
+        #glDisable(GL_POLYGON_SMOOTH)
 
 
         for model in self.parent.controller.scene.models:
@@ -352,56 +358,11 @@ class GLWidget(QGLWidget):
         t0 = time.time()
         heat_bed = self.bed[self.parent.controller.settings['printer']]
 
-        #print("render")
-        #print(inspect.stack()[1][3] + " call render")
-        '''
-        if selection:
-            glClearColor(0.0, 0.0, 0.0, 1.0)
 
-            glClear(GL_COLOR_BUFFER_BIT)
-            #glClear(GL_COLOR_BUFFER_BIT)
-            glLoadIdentity()
-            glDepthMask(GL_FALSE)
-
-            glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
-            glTranslatef(0.0, 0.0, self.zoom)
-            glRotated(-90.0, 1.0, 0.0, 0.0)
-            glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
-            glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
-
-            glDisable( GL_LIGHTING )
-            glDisable( GL_BLEND )
-            #glEnable(GL_DEPTH_TEST)
-
-            glDisable(GL_MULTISAMPLE)
-            glDisable(GL_LINE_SMOOTH)
-            glDisable(GL_POINT_SMOOTH)
-            glDisable(GL_POLYGON_SMOOTH)
-
-
-            if self.parent.controller.scene.models:
-                for model in self.parent.controller.scene.models:
-                    model.render(picking=True, debug=False)
-                    if model.selected:
-                        self.draw_tools_helper(model, self.parent.controller.settings, True)
-
-            self.draw_tools(picking=True)
-
-            self.sceneFrameBuffer = self.grabFrameBuffer()
-        '''
-
-            #if 'debug' in self.parent.controller.settings:
-            #    if self.parent.controller.settings['debug']:
-            #        #save picture to filesystem
-            #        self.sceneFrameBuffer.save("select_buffer.png")
-
-
-        #color picking
-
-        glEnable(GL_MULTISAMPLE)
-        glEnable(GL_LINE_SMOOTH)
-        glEnable(GL_POINT_SMOOTH)
-        glEnable(GL_POLYGON_SMOOTH)
+        #glEnable(GL_MULTISAMPLE)
+        #glEnable(GL_LINE_SMOOTH)
+        #glEnable(GL_POINT_SMOOTH)
+        #glEnable(GL_POLYGON_SMOOTH)
 
 
 
@@ -414,19 +375,21 @@ class GLWidget(QGLWidget):
         self.draw_background_texture()
         glLoadIdentity()
 
-        #glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
-
-        glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
-        glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
-
         glTranslatef(0.0, 0.0, self.zoom)
         glRotated(-90.0, 1.0, 0.0, 0.0)
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
+        glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
+
+        glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
+        glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
+
         glCallList(heat_bed)
 
         glEnable(GL_DEPTH_TEST)
+
+        #self.draw_debug()
 
         glEnable ( GL_LIGHTING )
         for model in self.parent.controller.scene.models:
@@ -435,12 +398,12 @@ class GLWidget(QGLWidget):
 
 
 
-        if self.parent.controller.scene.models:
-            for model in self.parent.controller.scene.models:
-                if model.selected:
-                    self.draw_tools_helper(model, self.parent.controller.settings)
+        for model in self.parent.controller.scene.models:
+            if model.selected:
+                self.draw_tools_helper(model, self.parent.controller.settings)
 
 
+        '''
         if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
             glColor3f(1., .0, .0)
             glEnableClientState(GL_VERTEX_ARRAY)
@@ -449,8 +412,11 @@ class GLWidget(QGLWidget):
             glDrawArrays(GL_TRIANGLES, 0, len(self.parent.controller.scene.analyze_result_data_tmp)*3)
             glDisableClientState(GL_VERTEX_ARRAY)
             glDisableClientState(GL_NORMAL_ARRAY)
+        '''
 
         self.draw_tools()
+
+        #self.picking_render()
         glFlush()
 
         t1 = time.time()
@@ -518,7 +484,7 @@ class GLWidget(QGLWidget):
 
     def draw_debug(self):
         glPushMatrix()
-
+        glDisable(GL_LIGHTING)
         glColor3f(1.,.0,.0)
         glBegin(GL_LINES)
         glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
@@ -530,7 +496,7 @@ class GLWidget(QGLWidget):
         glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
         glVertex3f(self.rayRight[0], self.rayRight[1], self.rayRight[2])
         glEnd()
-
+        glEnable(GL_LIGHTING)
         glPopMatrix()
 
 
@@ -567,14 +533,22 @@ class GLWidget(QGLWidget):
         rayStart = numpy.array(gluUnProject(winX, winY, 0.0, matModelView, matProjection, viewport))
         rayEnd = numpy.array(gluUnProject(winX, winY, 1.0, matModelView, matProjection, viewport))
 
-        rayUp = numpy.array(gluUnProject(winX, viewport[3]*1., 0.0, matModelView, matProjection, viewport))
-        rayRight = numpy.array(gluUnProject(viewport[2]*1., winY, 0.0, matModelView, matProjection, viewport))
+        rayUp = numpy.array(gluUnProject(winX, winY + 10., 0.0, matModelView, matProjection, viewport))
+        rayUp = rayUp - rayStart
+        rayUp /= numpy.linalg.norm(rayUp)
+        self.rayUp = rayUp
+
+        rayRight = numpy.array(gluUnProject(winX + 10., winY, 0.0, matModelView, matProjection, viewport))
+        rayRight = rayRight - rayStart
+        rayRight /= numpy.linalg.norm(rayRight)
+        self.rayRight = rayRight
         '''
         self.rayStart = rayStart
         self.rayDir = (rayEnd - rayStart)/(numpy.linalg.norm(rayEnd - rayStart))
         self.rayUp = rayUp
         self.rayRight = rayRight
         '''
+
         rayDir = (rayEnd - rayStart)/(numpy.linalg.norm(rayEnd - rayStart))
 
         return rayStart, rayDir, rayUp, rayRight
