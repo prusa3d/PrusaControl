@@ -486,12 +486,10 @@ class Controller:
 
     def mouse_double_click(self, event):
         object_id = self.get_id_under_cursor(event)
-        print(str(object_id))
-
         if object_id == 0 or self.is_some_tool_under_cursor(object_id):
             return
         else:
-            self.open_object_settings_dialog(object_id)
+            self.open_object_settings(object_id)
 
 
     def mouse_press_event(self, event):
@@ -546,10 +544,10 @@ class Controller:
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])
 
-
+    def open_object_settings(self, object_id):
+        self.view.create_object_settings_menu(object_id)
 
     def mouse_move_event(self, event):
-        #TODO:Add PAN function
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
@@ -565,8 +563,6 @@ class Controller:
 
             move_vector = right_move + up_move
             self.add_camera_position(move_vector)
-            #self.add_camera_position(up_move)
-
 
         elif self.camera_rotate:
             print("camera rotate")

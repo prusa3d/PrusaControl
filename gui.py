@@ -98,46 +98,15 @@ class ObjectSettingsDialog(QDialog):
         edit_pos_z = QtGui.QLineEdit()
         edit_pos_z.setText(str(mesh.pos[2]))
 
-        rotation = QtGui.QLabel(self.tr("Rotation"))
-        edit_rot_x = QtGui.QLineEdit()
-        edit_rot_x.setText(str(mesh.rot[0]))
-        edit_rot_y = QtGui.QLineEdit()
-        edit_rot_y.setText(str(mesh.rot[1]))
-        edit_rot_z = QtGui.QLineEdit()
-        edit_rot_z.setText(str(mesh.pos[2]))
 
-        scale = QtGui.QLabel(self.tr("Scale"))
-        edit_scale_x = QtGui.QLineEdit()
-        edit_scale_y = QtGui.QLineEdit()
-        edit_scale_z = QtGui.QLineEdit()
-
-
-
-
-        layout.addWidget(position, 0 ,0)
-        layout.addWidget(QtGui.QLabel('X '), 1, 0)
-        layout.addWidget(edit_pos_x, 1, 1)
-        layout.addWidget(QtGui.QLabel('Y '), 2, 0)
-        layout.addWidget(edit_pos_y, 2, 1)
-        layout.addWidget(QtGui.QLabel('Z '), 3, 0)
-        layout.addWidget(edit_pos_z, 3, 1)
-
-        layout.addWidget(rotation, 4, 0)
-        layout.addWidget(QtGui.QLabel('X '), 5, 0)
-        layout.addWidget(edit_rot_x, 5, 1)
-        layout.addWidget(QtGui.QLabel('Y '), 6, 0)
-        layout.addWidget(edit_rot_y, 6, 1)
-        layout.addWidget(QtGui.QLabel('Z '), 7, 0)
-        layout.addWidget(edit_rot_z, 7, 1)
-
-        layout.addWidget(scale, 8, 0)
-        layout.addWidget(QtGui.QLabel('X '), 9, 0)
-        layout.addWidget(edit_scale_x, 9, 1)
-        layout.addWidget(QtGui.QLabel('Y '), 10, 0)
-        layout.addWidget(edit_scale_y, 10, 1)
-        layout.addWidget(QtGui.QLabel('Z '), 11, 0)
-        layout.addWidget(edit_scale_z, 11, 1)
-
+        layout.addWidget(object_label, 0, 0)
+        layout.addWidget(position, 1 ,0)
+        layout.addWidget(QtGui.QLabel('X '), 2, 0)
+        layout.addWidget(edit_pos_x, 2, 1)
+        layout.addWidget(QtGui.QLabel('Y '), 3, 0)
+        layout.addWidget(edit_pos_y, 3, 1)
+        layout.addWidget(QtGui.QLabel('Z '), 4, 0)
+        layout.addWidget(edit_pos_z, 4, 1)
 
 
 
@@ -295,11 +264,14 @@ class PrusaControlView(QtGui.QMainWindow):
         super(PrusaControlView, self).__init__()
         self.setAcceptDrops(True)
 
+        self.is_setting_panel_opened = False
+
         self.infillValue = 20
 
         self.setVisible(False)
 
         self.centralWidget = QtGui.QWidget()
+        self.object_settings_panel = None
 
 
         self.menubar = self.menuBar()
@@ -338,6 +310,10 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.prusa_control_widget = PrusaControlWidget(self)
 
         self.glWidget = sceneRender.GLWidget(self)
+
+        self.right_panel = QtGui.QWidget()
+        self.right_panel_layout = QtGui.QHBoxLayout()
+
 
         self.printTab = QtGui.QWidget()
         # print tab
@@ -392,14 +368,83 @@ class PrusaControlView(QtGui.QMainWindow):
         self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
         self.printTabVLayout.addWidget(self.send_feedback_button)
 
+
         self.printTab.setLayout(self.printTabVLayout)
         self.printTab.setMaximumWidth(250)
+
+
+        self.right_panel_layout.addWidget(self.printTab)
+        self.right_panel.setLayout(self.right_panel_layout)
+        self.right_panel.setMaximumWidth(250)
+
+
+        layout = QFormLayout(self)
+
+        # TODO: nice widget for editing position
+        self.object_settings_panel = QWidget()
+        self.object_settings_panel.setVisible(False)
+
+        layout.setAlignment(Qt.AlignLeft)
+
+        position = QtGui.QLabel(self.tr("Position"))
+        self.edit_pos_x = QtGui.QLineEdit("")
+        self.edit_pos_y = QtGui.QLineEdit("")
+        self.edit_pos_z = QtGui.QLineEdit("")
+
+        rotation = QtGui.QLabel(self.tr("Rotation"))
+        self.edit_rot_x = QtGui.QLineEdit("")
+        self.edit_rot_y = QtGui.QLineEdit("")
+        self.edit_rot_z = QtGui.QLineEdit("")
+
+        scale = QtGui.QLabel(self.tr("Scale"))
+        self.edit_scale_x = QtGui.QLineEdit("")
+        self.edit_scale_y = QtGui.QLineEdit("")
+        self.edit_scale_z = QtGui.QLineEdit("")
+
+
+        layout.addWidget(position)
+        layout.addRow(QtGui.QLabel('X'), self.edit_pos_x)
+        layout.addRow(QtGui.QLabel('Y'), self.edit_pos_y)
+        layout.addRow(QtGui.QLabel('Z'), self.edit_pos_z)
+
+        layout.addWidget(rotation)
+        layout.addRow(QtGui.QLabel('X'), self.edit_rot_x)
+        layout.addRow(QtGui.QLabel('Y'), self.edit_rot_y)
+        layout.addRow(QtGui.QLabel('Z'), self.edit_rot_z)
+
+        layout.addWidget(scale)
+        layout.addRow(QtGui.QLabel('X'), self.edit_scale_x)
+        layout.addRow(QtGui.QLabel('Y'), self.edit_scale_y)
+        layout.addRow(QtGui.QLabel('Z'), self.edit_scale_z)
+
+
+        #layout.addWidget(edit_pos_z)
+        #layout.setSpacing(1)
+        #layout.addSpacerItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        apply_button = QPushButton("Apply")
+        apply_button.clicked.connect(self.apply_object_settings)
+
+        cancel_button = QPushButton("Cancel")
+        cancel_button.clicked.connect(self.apply_object_settings)
+
+        layout.addWidget(apply_button)
+        layout.addWidget(cancel_button)
+
+        self.object_settings_panel.setLayout(layout)
+        self.object_settings_panel.setMaximumWidth(150)
+
+        self.line = QFrame()
+        self.line.setVisible(False)
+        self.line.setFrameShape(QFrame.VLine)
+
+        self.right_panel_layout.insertWidget(0, self.object_settings_panel)
+        self.right_panel_layout.insertWidget(1, self.line)
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.setSpacing(0)
         mainLayout.setMargin(0)
         mainLayout.addWidget(self.glWidget)
-        mainLayout.addWidget(self.printTab)
+        mainLayout.addWidget(self.right_panel)
 
         self.centralWidget.setLayout(mainLayout)
         self.setCentralWidget(self.centralWidget)
@@ -411,6 +456,47 @@ class PrusaControlView(QtGui.QMainWindow):
         self.update_gui()
 
         self.show()
+
+    def create_object_settings_menu(self, object_id):
+        if self.is_setting_panel_opened:
+            self.set_gui_for_object(object_id)
+        else:
+
+            mesh = self.controller.get_object_by_id(object_id)
+            if not mesh:
+                return
+
+            self.right_panel.setMaximumWidth(400)
+            self.object_settings_panel.setVisible(True)
+            self.line.setVisible(True)
+            self.set_gui_for_object(object_id)
+
+            self.is_setting_panel_opened = True
+
+    def apply_object_settings(self):
+        self.object_settings_panel.setVisible(False)
+        self.line.setVisible(False)
+        self.right_panel.setMaximumWidth(250)
+        self.is_setting_panel_opened = False
+
+    def set_gui_for_object(self, object_id):
+        print("set gui by object")
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+
+        self.edit_pos_x.setText(str(mesh.pos[0]))
+        self.edit_pos_y.setText(str(mesh.pos[1]))
+        self.edit_pos_z.setText(str(mesh.pos[2]))
+
+        self.edit_rot_x.setText(str(mesh.rot[0]))
+        self.edit_rot_y.setText(str(mesh.rot[1]))
+        self.edit_rot_z.setText(str(mesh.rot[2]))
+
+        self.edit_scale_x.setText(str(mesh.scale[0]))
+        self.edit_scale_y.setText(str(mesh.scale[1]))
+        self.edit_scale_z.setText(str(mesh.scale[2]))
+
 
 
     def open_settings_dialog(self):
