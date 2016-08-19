@@ -728,6 +728,7 @@ class GLWidget(QGLWidget):
         glColor3f(1,1,1)
         #sH = sW
         coef = sW/sH
+
         for tool in self.tools:
             if picking:
                 glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])

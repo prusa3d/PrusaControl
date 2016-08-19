@@ -74,65 +74,6 @@ class SettingsDialog(QDialog):
         return (data, result == QDialog.Accepted)
 
 
-class ObjectSettingsDialog(QDialog):
-    def __init__(self, controller, parent = None, object_id=0):
-        super(ObjectSettingsDialog, self).__init__(parent)
-
-        self.controller = controller
-
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
-            return
-
-
-        layout = QGridLayout(self)
-
-        # nice widget for editing position
-
-        object_label = QtGui.QLabel(self.tr("Object " + str(object_id)))
-        position = QtGui.QLabel(self.tr("Position"))
-        edit_pos_x = QtGui.QLineEdit()
-        edit_pos_x.setText(str(mesh.pos[0]))
-        edit_pos_y = QtGui.QLineEdit()
-        edit_pos_y.setText(str(mesh.pos[1]))
-        edit_pos_z = QtGui.QLineEdit()
-        edit_pos_z.setText(str(mesh.pos[2]))
-
-
-        layout.addWidget(object_label, 0, 0)
-        layout.addWidget(position, 1 ,0)
-        layout.addWidget(QtGui.QLabel('X '), 2, 0)
-        layout.addWidget(edit_pos_x, 2, 1)
-        layout.addWidget(QtGui.QLabel('Y '), 3, 0)
-        layout.addWidget(edit_pos_y, 3, 1)
-        layout.addWidget(QtGui.QLabel('Z '), 4, 0)
-        layout.addWidget(edit_pos_z, 4, 1)
-
-
-
-
-
-        # OK and Cancel buttons
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-            Qt.Horizontal, self)
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
-        layout.addWidget(buttons)
-
-    @staticmethod
-    def get_settings_data(controller, parent = None, object_id = 0):
-        data = controller.settings
-        dialog = ObjectSettingsDialog(controller, parent, object_id)
-        dialog.setWindowTitle("Settings")
-        result = dialog.exec_()
-        data['language'] = controller.enumeration['language'].keys()[dialog.language_combo.currentIndex()]
-        data['printer'] = controller.enumeration['printer'].keys()[dialog.printer_combo.currentIndex()]
-        controller.set_printer(data['printer'])
-        data['debug'] = dialog.debug_checkbox.isChecked()
-        data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
-        return (data, result == QDialog.Accepted)
-
 class FirmwareUpdateDialog(QDialog):
     def __init__(self, controller, parent = None):
         super(FirmwareUpdateDialog, self).__init__(parent)
@@ -268,6 +209,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.infillValue = 20
 
+        self.object_id = 0
+
         self.setVisible(False)
 
         self.centralWidget = QtGui.QWidget()
@@ -388,19 +331,32 @@ class PrusaControlView(QtGui.QMainWindow):
 
         position = QtGui.QLabel(self.tr("Position"))
         self.edit_pos_x = QtGui.QLineEdit("")
+        self.edit_pos_x.setValidator(QDoubleValidator(-99.99,99.99,2))
+        self.edit_pos_x.textChanged.connect(lambda: self.set_pos_x(self.get_object_id(), self.edit_pos_x.text()))
+
         self.edit_pos_y = QtGui.QLineEdit("")
+        self.edit_pos_y.setValidator(QDoubleValidator(0.99, 99.99, 2))
+        self.edit_pos_y.textChanged.connect(lambda: self.set_pos_y(self.get_object_id(), self.edit_pos_y.text()))
+
         self.edit_pos_z = QtGui.QLineEdit("")
+        self.edit_pos_z.setValidator(QDoubleValidator(0.99, 99.99, 2))
+        self.edit_pos_z.textChanged.connect(lambda: self.set_pos_z(self.get_object_id(), self.edit_pos_z.text()))
 
         rotation = QtGui.QLabel(self.tr("Rotation"))
         self.edit_rot_x = QtGui.QLineEdit("")
+        self.edit_rot_x.setValidator(QDoubleValidator(0.99, 99.99, 2))
         self.edit_rot_y = QtGui.QLineEdit("")
+        self.edit_rot_y.setValidator(QDoubleValidator(0.99, 99.99, 2))
         self.edit_rot_z = QtGui.QLineEdit("")
+        self.edit_rot_z.setValidator(QDoubleValidator(0.99, 99.99, 2))
 
         scale = QtGui.QLabel(self.tr("Scale"))
         self.edit_scale_x = QtGui.QLineEdit("")
+        self.edit_scale_x.setValidator(QDoubleValidator(0.99, 99.99, 2))
         self.edit_scale_y = QtGui.QLineEdit("")
+        self.edit_scale_y.setValidator(QDoubleValidator(0.99, 99.99, 2))
         self.edit_scale_z = QtGui.QLineEdit("")
-
+        self.edit_scale_z.setValidator(QDoubleValidator(0.99, 99.99, 2))
 
         layout.addWidget(position)
         layout.addRow(QtGui.QLabel('X'), self.edit_pos_x)
@@ -473,38 +429,79 @@ class PrusaControlView(QtGui.QMainWindow):
 
             self.is_setting_panel_opened = True
 
+    def get_object_id(self):
+        print("return object_id: " + str(self.object_id))
+        return self.object_id
+
     def apply_object_settings(self):
+        #TODO:Apply object settings
+        #self.get_object_id()
+
         self.object_settings_panel.setVisible(False)
         self.line.setVisible(False)
         self.right_panel.setMaximumWidth(250)
         self.is_setting_panel_opened = False
+        self.object_id = 0
 
     def set_gui_for_object(self, object_id):
-        print("set gui by object")
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
             return
+        self.object_id = object_id
 
-        self.edit_pos_x.setText(str(mesh.pos[0]))
-        self.edit_pos_y.setText(str(mesh.pos[1]))
-        self.edit_pos_z.setText(str(mesh.pos[2]))
+        self.edit_pos_x.setText("{:.2f}".format(mesh.pos[0]))
+        self.edit_pos_y.setText("{:.2f}".format(mesh.pos[1]))
+        self.edit_pos_z.setText("{:.2f}".format(mesh.pos[2]))
 
-        self.edit_rot_x.setText(str(mesh.rot[0]))
-        self.edit_rot_y.setText(str(mesh.rot[1]))
-        self.edit_rot_z.setText(str(mesh.rot[2]))
+        self.edit_rot_x.setText("{:.2f}".format(mesh.rot[0]))
+        self.edit_rot_y.setText("{:.2f}".format(mesh.rot[1]))
+        self.edit_rot_z.setText("{:.2f}".format(mesh.rot[2]))
 
-        self.edit_scale_x.setText(str(mesh.scale[0]))
-        self.edit_scale_y.setText(str(mesh.scale[1]))
-        self.edit_scale_z.setText(str(mesh.scale[2]))
+        self.edit_scale_x.setText("{:.2f}".format(mesh.scale[0]))
+        self.edit_scale_y.setText("{:.2f}".format(mesh.scale[1]))
+        self.edit_scale_z.setText("{:.2f}".format(mesh.scale[2]))
+
+    def set_pos_x(self, object_id, x):
+        print("setuji move X u " + str(object_id))
+        model = self.controller.get_object_by_id(object_id)
+        print("Model type je: " + str(type(model)))
+        if not model:
+            return
+        vect = model.pos
+        print("Vector" + str(vect))
+        print("test")
+        vect[0] = x
+        model.set_move(vect, False)
+        #mesh.pos[0] = float(x)
+        self.controller.view.update_scene()
+
+    def set_pos_y(self, object_id, y):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        vect = model.pos
+        vect[1] = y
+        model.set_move(vect, False)
+        #mesh.pos[1] = float(y)
+        self.controller.view.update_scene()
+
+    def set_pos_z(self, object_id, z):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        vect = model.pos
+        vect[2] = z
+        model.set_move(vect, False)
+        #mesh.pos[2] = float(z)
+        self.controller.view.update_scene()
+
+
+
 
 
 
     def open_settings_dialog(self):
         data, ok = SettingsDialog.get_settings_data(self.controller, self.parent())
-        return data
-
-    def open_object_settings_dialog(self, object_id):
-        data, ok = ObjectSettingsDialog.get_settings_data(self.controller, self.parent(), object_id)
         return data
 
     def open_printer_info_dialog(self):
