@@ -413,26 +413,26 @@ class Model(object):
 
 
     def set_move(self, vector, add=True):
-        #TODO:Add units in message(US inches, EU cm, ...)
+
         vector = np.array(vector)
         if add:
             self.pos += vector
         else:
             self.pos = vector
-        self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
+        #self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
 
     def set_rotation(self, vector, alpha):
         if vector.tolist() == [1.0, 0.0, 0.0]:
-            self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
+            self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
             self.parent.controller.show_message_on_status_bar("Angle X: " + str(np.degrees(alpha)))
         elif vector.tolist() == [0.0, 1.0, 0.0]:
-            self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
+            self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
             self.parent.controller.show_message_on_status_bar("Angle Y: " + str(np.degrees(alpha)))
         elif vector.tolist() == [0.0, 0.0, 1.0]:
-            self.temp_rotation = Mesh.rotation_matrix(vector, alpha)
+            self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
             self.parent.controller.show_message_on_status_bar("Angle Z: " + str(np.degrees(alpha)))
 
         self.mesh.update_min()
@@ -488,6 +488,16 @@ class Model(object):
         self.min_scene = self.min + pos
         self.max_scene = self.max + pos
 
+    def set_rot(self, x, y, z):
+        self.rot[0] = x
+        self.rot[1] = y
+        self.rot[2] = z
+
+    def set_scale_abs(self, x, y, z):
+        self.scale[0] = x
+        self.scale[1] = y
+        self.scale[2] = z
+
 
     def update_position(self):
         self.update_min_max()
@@ -530,39 +540,21 @@ class Model(object):
                 glColor3f(0.75, .0, .0)
 
 
-        final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
-        final_scale = np.dot(self.temp_scale, self.scale_matrix)
+        rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
+        ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
+        rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
+
+        print("rotace: " + str(self.rot))
+
+        rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
+
+        scale_matrix = np.array([[ 1.,  0.,  0.],
+                                        [ 0.,  1.,  0.],
+                                        [ 0.,  0.,  1.]]) * self.scale
+
+        final_rotation = rotation_matrix
+        final_scale = scale_matrix
         final_matrix = np.dot(final_rotation, final_scale)
-
-
-
-        '''
-        if self.is_changed:
-            print("Changed")
-            self.temp_mesh = Mesh(self.mesh.data.copy())
-
-            #final_rotation = np.dot(self.rotation_matrix, self.temp_rotation)
-            #final_scale = np.dot(self.temp_scale, self.scale_matrix)
-            #final_matrix = np.dot(final_rotation, final_scale)
-
-            for i in range(3):
-                self.temp_mesh.vectors[:, i] = self.temp_mesh.vectors[:, i].dot(final_matrix)
-
-            self.temp_mesh.normals = self.temp_mesh.normals.dot(final_rotation)
-            self.make_normals()
-
-            self.temp_mesh.update_min()
-            self.temp_mesh.update_max()
-
-            self.min = self.temp_mesh.min_
-            self.max = self.temp_mesh.max_
-            self.min_scene = self.min + self.pos
-            self.max_scene = self.max + self.pos
-
-            self.place_on_zero()
-
-            self.is_changed = False
-        '''
 
         glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
 
@@ -575,10 +567,6 @@ class Model(object):
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
-
-
-        #self.render_vao()
-        #glCallList(self.displayList)
 
         glPopMatrix()
 

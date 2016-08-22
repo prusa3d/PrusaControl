@@ -3,6 +3,7 @@ import logging
 import math
 import os
 
+import numpy as np
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from PyQt4 import *
@@ -330,33 +331,91 @@ class PrusaControlView(QtGui.QMainWindow):
         layout.setAlignment(Qt.AlignLeft)
 
         position = QtGui.QLabel(self.tr("Position"))
-        self.edit_pos_x = QtGui.QLineEdit("")
-        self.edit_pos_x.setValidator(QDoubleValidator(-99.99,99.99,2))
-        self.edit_pos_x.textChanged.connect(lambda: self.set_pos_x(self.get_object_id(), self.edit_pos_x.text()))
+        self.edit_pos_x = QtGui.QDoubleSpinBox()
+        self.edit_pos_x.setMaximum(99.9)
+        self.edit_pos_x.setMinimum(-99.9)
+        self.edit_pos_x.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_x,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_pos_x.value(),
+                                                                                 self.edit_pos_y.value(),
+                                                                                 self.edit_pos_z.value()))
 
-        self.edit_pos_y = QtGui.QLineEdit("")
-        self.edit_pos_y.setValidator(QDoubleValidator(0.99, 99.99, 2))
-        self.edit_pos_y.textChanged.connect(lambda: self.set_pos_y(self.get_object_id(), self.edit_pos_y.text()))
+        self.edit_pos_y = QtGui.QDoubleSpinBox()
+        self.edit_pos_y.setMaximum(99.9)
+        self.edit_pos_y.setMinimum(-99.9)
+        self.edit_pos_y.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_y,
+                                                                                self.get_object_id(),
+                                                                                self.edit_pos_x.value(),
+                                                                                self.edit_pos_y.value(),
+                                                                                self.edit_pos_z.value()))
 
-        self.edit_pos_z = QtGui.QLineEdit("")
-        self.edit_pos_z.setValidator(QDoubleValidator(0.99, 99.99, 2))
-        self.edit_pos_z.textChanged.connect(lambda: self.set_pos_z(self.get_object_id(), self.edit_pos_z.text()))
+        self.edit_pos_z = QtGui.QDoubleSpinBox()
+        self.edit_pos_z.setMaximum(99.9)
+        self.edit_pos_z.setMinimum(-99.9)
+        self.edit_pos_z.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_z,
+                                                                                self.get_object_id(),
+                                                                                self.edit_pos_x.value(),
+                                                                                self.edit_pos_y.value(),
+                                                                                self.edit_pos_z.value()))
+
 
         rotation = QtGui.QLabel(self.tr("Rotation"))
-        self.edit_rot_x = QtGui.QLineEdit("")
-        self.edit_rot_x.setValidator(QDoubleValidator(0.99, 99.99, 2))
-        self.edit_rot_y = QtGui.QLineEdit("")
-        self.edit_rot_y.setValidator(QDoubleValidator(0.99, 99.99, 2))
-        self.edit_rot_z = QtGui.QLineEdit("")
-        self.edit_rot_z.setValidator(QDoubleValidator(0.99, 99.99, 2))
+        self.edit_rot_x = QtGui.QDoubleSpinBox()
+        self.edit_rot_x.setMaximum(360.0)
+        self.edit_rot_x.setMinimum(-360.0)
+        self.edit_rot_x.valueChanged.connect(lambda: self.set_rotation_on_object(self.edit_rot_x,
+                                                                                self.get_object_id(),
+                                                                                self.edit_rot_x.value(),
+                                                                                self.edit_rot_y.value(),
+                                                                                self.edit_rot_z.value()))
+
+        self.edit_rot_y = QtGui.QDoubleSpinBox()
+        self.edit_rot_y.setMaximum(360.0)
+        self.edit_rot_y.setMinimum(-360.0)
+        self.edit_rot_y.valueChanged.connect(lambda: self.set_rotation_on_object(self.edit_rot_y,
+                                                                                self.get_object_id(),
+                                                                                self.edit_rot_x.value(),
+                                                                                self.edit_rot_y.value(),
+                                                                                self.edit_rot_z.value()))
+
+        self.edit_rot_z = QtGui.QDoubleSpinBox()
+        self.edit_rot_z.setMaximum(360.0)
+        self.edit_rot_z.setMinimum(-360.0)
+        self.edit_rot_z.valueChanged.connect(lambda: self.set_rotation_on_object(self.edit_rot_z,
+                                                                                self.get_object_id(),
+                                                                                self.edit_rot_x.value(),
+                                                                                self.edit_rot_y.value(),
+                                                                                self.edit_rot_z.value()))
+
 
         scale = QtGui.QLabel(self.tr("Scale"))
-        self.edit_scale_x = QtGui.QLineEdit("")
-        self.edit_scale_x.setValidator(QDoubleValidator(0.99, 99.99, 2))
-        self.edit_scale_y = QtGui.QLineEdit("")
-        self.edit_scale_y.setValidator(QDoubleValidator(0.99, 99.99, 2))
-        self.edit_scale_z = QtGui.QLineEdit("")
-        self.edit_scale_z.setValidator(QDoubleValidator(0.99, 99.99, 2))
+        self.edit_scale_x = QtGui.QDoubleSpinBox()
+        self.edit_scale_x.setMaximum(99.9)
+        self.edit_scale_x.setMinimum(-99.9)
+        self.edit_scale_x.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_x,
+                                                                                self.get_object_id(),
+                                                                                self.edit_scale_x.value(),
+                                                                                self.edit_scale_y.value(),
+                                                                                self.edit_scale_z.value()))
+
+        self.edit_scale_y = QtGui.QDoubleSpinBox()
+        self.edit_scale_y.setMaximum(99.9)
+        self.edit_scale_y.setMinimum(-99.9)
+        self.edit_scale_y.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_y,
+                                                                                self.get_object_id(),
+                                                                                self.edit_scale_x.value(),
+                                                                                self.edit_scale_y.value(),
+                                                                                self.edit_scale_z.value()))
+
+        self.edit_scale_z = QtGui.QDoubleSpinBox()
+        self.edit_scale_z.setMaximum(99.9)
+        self.edit_scale_z.setMinimum(-99.9)
+        self.edit_scale_z.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_z,
+                                                                                self.get_object_id(),
+                                                                                self.edit_scale_x.value(),
+                                                                                self.edit_scale_y.value(),
+                                                                                self.edit_scale_z.value()))
+
 
         layout.addWidget(position)
         layout.addRow(QtGui.QLabel('X'), self.edit_pos_x)
@@ -413,6 +472,13 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
+    def update_object_settings(self, object_id):
+        if self.is_setting_panel_opened:
+            self.set_gui_for_object(object_id)
+        else:
+            return
+
+
     def create_object_settings_menu(self, object_id):
         if self.is_setting_panel_opened:
             self.set_gui_for_object(object_id)
@@ -443,36 +509,61 @@ class PrusaControlView(QtGui.QMainWindow):
         self.is_setting_panel_opened = False
         self.object_id = 0
 
+    def cancel_object_settings(self):
+        pass
+
     def set_gui_for_object(self, object_id):
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
             return
         self.object_id = object_id
 
-        self.edit_pos_x.setText("{:.2f}".format(mesh.pos[0]))
-        self.edit_pos_y.setText("{:.2f}".format(mesh.pos[1]))
-        self.edit_pos_z.setText("{:.2f}".format(mesh.pos[2]))
+        self.edit_pos_x.setDisabled(True)
+        self.edit_pos_x.setValue(mesh.pos[0])
+        self.edit_pos_x.setDisabled(False)
 
-        self.edit_rot_x.setText("{:.2f}".format(mesh.rot[0]))
-        self.edit_rot_y.setText("{:.2f}".format(mesh.rot[1]))
-        self.edit_rot_z.setText("{:.2f}".format(mesh.rot[2]))
+        self.edit_pos_y.setDisabled(True)
+        self.edit_pos_y.setValue(mesh.pos[1])
+        self.edit_pos_y.setDisabled(False)
 
-        self.edit_scale_x.setText("{:.2f}".format(mesh.scale[0]))
-        self.edit_scale_y.setText("{:.2f}".format(mesh.scale[1]))
-        self.edit_scale_z.setText("{:.2f}".format(mesh.scale[2]))
+        self.edit_pos_z.setDisabled(True)
+        self.edit_pos_z.setValue(mesh.pos[2])
+        self.edit_pos_z.setDisabled(False)
 
+        self.edit_rot_x.setDisabled(True)
+        self.edit_rot_x.setValue(mesh.rot[0])
+        self.edit_rot_x.setDisabled(False)
+
+        self.edit_rot_y.setDisabled(True)
+        self.edit_rot_y.setValue(mesh.rot[1])
+        self.edit_rot_y.setDisabled(False)
+
+        self.edit_rot_z.setDisabled(True)
+        self.edit_rot_z.setValue(mesh.rot[2])
+        self.edit_rot_z.setDisabled(False)
+
+        self.edit_scale_x.setDisabled(True)
+        self.edit_scale_x.setValue(mesh.scale[0])
+        self.edit_scale_x.setDisabled(False)
+
+        self.edit_scale_y.setDisabled(True)
+        self.edit_scale_y.setValue(mesh.scale[1])
+        self.edit_scale_y.setDisabled(False)
+
+        self.edit_scale_z.setDisabled(True)
+        self.edit_scale_z.setValue(mesh.scale[2])
+        self.edit_scale_z.setDisabled(False)
+
+
+
+    '''
     def set_pos_x(self, object_id, x):
-        print("setuji move X u " + str(object_id))
         model = self.controller.get_object_by_id(object_id)
-        print("Model type je: " + str(type(model)))
         if not model:
             return
         vect = model.pos
-        print("Vector" + str(vect))
-        print("test")
         vect[0] = x
         model.set_move(vect, False)
-        #mesh.pos[0] = float(x)
         self.controller.view.update_scene()
 
     def set_pos_y(self, object_id, y):
@@ -482,7 +573,6 @@ class PrusaControlView(QtGui.QMainWindow):
         vect = model.pos
         vect[1] = y
         model.set_move(vect, False)
-        #mesh.pos[1] = float(y)
         self.controller.view.update_scene()
 
     def set_pos_z(self, object_id, z):
@@ -492,11 +582,89 @@ class PrusaControlView(QtGui.QMainWindow):
         vect = model.pos
         vect[2] = z
         model.set_move(vect, False)
-        #mesh.pos[2] = float(z)
+        self.controller.view.update_scene()
+    '''
+
+
+
+    '''
+    def set_rot_x(self, object_id, x):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        model.set_rotation(np.array([1.0, 0.0, 0.0]), np.deg2rad(x))
         self.controller.view.update_scene()
 
+    def set_rot_y(self, object_id, y):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        model.set_rotation(np.array([0.0, 1.0, 0.0]), np.deg2rad(y))
+        self.controller.view.update_scene()
 
+    def set_rot_z(self, object_id, z):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        model.set_rotation(np.array([0.0, 0.0, 1.0]), np.deg2rad(z))
+        self.controller.view.update_scene()
+    '''
 
+    def set_position_on_object(self, widget, object_id, x, y, z):
+        if widget.hasFocus():
+            model = self.controller.get_object_by_id(object_id)
+            if not model:
+                return
+            model.set_move(np.array([x, y, z]), False)
+            self.controller.view.update_scene()
+
+    def set_rotation_on_object(self, widget, object_id, x, y, z):
+        if widget.hasFocus():
+            model = self.controller.get_object_by_id(object_id)
+            if not model:
+                return
+            model.set_rot(np.deg2rad(x), np.deg2rad(y), np.deg2rad(z))
+            self.controller.view.update_scene()
+
+    def set_scale_on_object(self, widget, object_id, x, y, z):
+        if widget.hasFocus():
+            model = self.controller.get_object_by_id(object_id)
+            if not model:
+                return
+            model.set_scale_abs(x, y, z)
+            self.controller.view.update_scene()
+
+    '''
+    def set_scale_x(self, object_id, x):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        vect = np.array([model.scale_matrix[0][0], model.scale_matrix[1][1], model.scale_matrix[2][2]])
+        vect[0] = x
+        print("scale: " + str(vect))
+        model.set_scale(vect)
+        self.controller.view.update_scene()
+
+    def set_scale_y(self, object_id, y):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        vect = np.array([model.scale_matrix[0][0], model.scale_matrix[1][1], model.scale_matrix[2][2]])
+        vect[1] = y
+        print("scale: " + str(vect))
+        model.set_scale(vect)
+        self.controller.view.update_scene()
+
+    def set_scale_z(self, object_id, z):
+        model = self.controller.get_object_by_id(object_id)
+        if not model:
+            return
+        vect = np.array([model.scale_matrix[0][0], model.scale_matrix[1][1], model.scale_matrix[2][2]])
+        vect[2] = z
+        print("scale: " + str(vect))
+        model.set_scale(vect)
+        self.controller.view.update_scene()
+    '''
 
 
 

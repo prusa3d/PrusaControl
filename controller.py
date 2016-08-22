@@ -281,7 +281,7 @@ class Controller:
         self.view.update_gui()
 
     def set_progress_bar(self, value):
-        self.view.set_progress_bar(value)
+        self.view.progressBar.setValue(value)
 
     def get_view(self):
         return self.view
@@ -578,6 +578,7 @@ class Controller:
                 for model in self.scene.models:
                     if model.selected:
                         model.set_move(res_new)
+                        self.view.update_object_settings(model.id)
                         self.scene_was_changed()
                 self.res_old = res
         self.last_pos = QtCore.QPoint(event.pos())
