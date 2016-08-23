@@ -432,6 +432,10 @@ class PrusaControlView(QtGui.QMainWindow):
         layout.addRow(QtGui.QLabel('Y'), self.edit_scale_y)
         layout.addRow(QtGui.QLabel('Z'), self.edit_scale_z)
 
+        self.place_on_zero = QtGui.QCheckBox(self.tr("Place on zero"))
+        self.place_on_zero.setChecked(True)
+        layout.addWidget(self.place_on_zero)
+
 
         #layout.addWidget(edit_pos_z)
         #layout.setSpacing(1)
@@ -440,7 +444,7 @@ class PrusaControlView(QtGui.QMainWindow):
         apply_button.clicked.connect(self.apply_object_settings)
 
         cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(self.apply_object_settings)
+        cancel_button.clicked.connect(self.cancel_object_settings)
 
         layout.addWidget(apply_button)
         layout.addWidget(cancel_button)
@@ -452,8 +456,15 @@ class PrusaControlView(QtGui.QMainWindow):
         self.line.setVisible(False)
         self.line.setFrameShape(QFrame.VLine)
 
+
+        self.gcode_slider = QtGui.QSlider(QtCore.Qt.Vertical)
+        self.gcode_slider.setRange(0, 100)
+        self.gcode_slider.setVisible(False)
+
+
         self.right_panel_layout.insertWidget(0, self.object_settings_panel)
-        self.right_panel_layout.insertWidget(1, self.line)
+        self.right_panel_layout.insertWidget(1, self.gcode_slider)
+        self.right_panel_layout.insertWidget(2, self.line)
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.setSpacing(0)
@@ -472,6 +483,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
+
+
     def update_object_settings(self, object_id):
         if self.is_setting_panel_opened:
             self.set_gui_for_object(object_id)
@@ -483,11 +496,9 @@ class PrusaControlView(QtGui.QMainWindow):
         if self.is_setting_panel_opened:
             self.set_gui_for_object(object_id)
         else:
-
             mesh = self.controller.get_object_by_id(object_id)
             if not mesh:
                 return
-
             self.right_panel.setMaximumWidth(400)
             self.object_settings_panel.setVisible(True)
             self.line.setVisible(True)
@@ -496,26 +507,41 @@ class PrusaControlView(QtGui.QMainWindow):
             self.is_setting_panel_opened = True
 
     def get_object_id(self):
-        print("return object_id: " + str(self.object_id))
         return self.object_id
 
-    def apply_object_settings(self):
-        #TODO:Apply object settings
-        #self.get_object_id()
-
+    def close_object_settings_panel(self):
         self.object_settings_panel.setVisible(False)
         self.line.setVisible(False)
         self.right_panel.setMaximumWidth(250)
         self.is_setting_panel_opened = False
         self.object_id = 0
 
+    def apply_object_settings(self):
+        #TODO:Apply object settings
+        object_id = self.get_object_id()
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        mesh.apply_changes()
+        self.close_object_settings_panel()
+        self.controller.view.update_scene()
+
+
+
     def cancel_object_settings(self):
-        pass
+        object_id = self.get_object_id()
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        mesh.discard_changes()
+        self.close_object_settings_panel()
+        self.controller.view.update_scene()
 
     def set_gui_for_object(self, object_id):
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
             return
+        mesh.start_edit()
         self.object_id = object_id
 
         self.edit_pos_x.setDisabled(True)
@@ -531,15 +557,15 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_z.setDisabled(False)
 
         self.edit_rot_x.setDisabled(True)
-        self.edit_rot_x.setValue(mesh.rot[0])
+        self.edit_rot_x.setValue(np.rad2deg(mesh.rot[0]))
         self.edit_rot_x.setDisabled(False)
 
         self.edit_rot_y.setDisabled(True)
-        self.edit_rot_y.setValue(mesh.rot[1])
+        self.edit_rot_y.setValue(np.rad2deg(mesh.rot[1]))
         self.edit_rot_y.setDisabled(False)
 
         self.edit_rot_z.setDisabled(True)
-        self.edit_rot_z.setValue(mesh.rot[2])
+        self.edit_rot_z.setValue(np.rad2deg(mesh.rot[2]))
         self.edit_rot_z.setDisabled(False)
 
         self.edit_scale_x.setDisabled(True)
@@ -553,62 +579,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_scale_z.setDisabled(True)
         self.edit_scale_z.setValue(mesh.scale[2])
         self.edit_scale_z.setDisabled(False)
-
-
-
-    '''
-    def set_pos_x(self, object_id, x):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        vect = model.pos
-        vect[0] = x
-        model.set_move(vect, False)
-        self.controller.view.update_scene()
-
-    def set_pos_y(self, object_id, y):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        vect = model.pos
-        vect[1] = y
-        model.set_move(vect, False)
-        self.controller.view.update_scene()
-
-    def set_pos_z(self, object_id, z):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        vect = model.pos
-        vect[2] = z
-        model.set_move(vect, False)
-        self.controller.view.update_scene()
-    '''
-
-
-
-    '''
-    def set_rot_x(self, object_id, x):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        model.set_rotation(np.array([1.0, 0.0, 0.0]), np.deg2rad(x))
-        self.controller.view.update_scene()
-
-    def set_rot_y(self, object_id, y):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        model.set_rotation(np.array([0.0, 1.0, 0.0]), np.deg2rad(y))
-        self.controller.view.update_scene()
-
-    def set_rot_z(self, object_id, z):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        model.set_rotation(np.array([0.0, 0.0, 1.0]), np.deg2rad(z))
-        self.controller.view.update_scene()
-    '''
 
     def set_position_on_object(self, widget, object_id, x, y, z):
         if widget.hasFocus():
@@ -633,39 +603,6 @@ class PrusaControlView(QtGui.QMainWindow):
                 return
             model.set_scale_abs(x, y, z)
             self.controller.view.update_scene()
-
-    '''
-    def set_scale_x(self, object_id, x):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        vect = np.array([model.scale_matrix[0][0], model.scale_matrix[1][1], model.scale_matrix[2][2]])
-        vect[0] = x
-        print("scale: " + str(vect))
-        model.set_scale(vect)
-        self.controller.view.update_scene()
-
-    def set_scale_y(self, object_id, y):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        vect = np.array([model.scale_matrix[0][0], model.scale_matrix[1][1], model.scale_matrix[2][2]])
-        vect[1] = y
-        print("scale: " + str(vect))
-        model.set_scale(vect)
-        self.controller.view.update_scene()
-
-    def set_scale_z(self, object_id, z):
-        model = self.controller.get_object_by_id(object_id)
-        if not model:
-            return
-        vect = np.array([model.scale_matrix[0][0], model.scale_matrix[1][1], model.scale_matrix[2][2]])
-        vect[2] = z
-        print("scale: " + str(vect))
-        model.set_scale(vect)
-        self.controller.view.update_scene()
-    '''
-
 
 
     def open_settings_dialog(self):
@@ -721,20 +658,6 @@ class PrusaControlView(QtGui.QMainWindow):
         data = QtGui.QFileDialog.getSaveFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data
-
-    '''
-    def mousePressEvent(self, event):
-        self.controller.mouse_press_event(event)
-
-    def mouseReleaseEvent(self, event):
-        self.controller.mouse_release_event(event)
-
-    def mouseMoveEvent(self, event):
-        self.controller.mouse_move_event(event)
-
-    def wheelEvent(self, event):
-        self.controller.wheel_event(event)
-    '''
 
     #TODO:Move to controller class
     def dragEnterEvent(self, event):

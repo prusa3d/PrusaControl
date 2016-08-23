@@ -49,7 +49,7 @@ class AppScene(object):
         if self.actual_list_position < len(self.transformation_list)-1:
             self.transformation_list = self.transformation_list[:self.actual_list_position+1]
 
-        self.transformation_list.append([old_instance, np.copy(old_instance.scale_matrix), np.copy(old_instance.rotation_matrix), np.copy(old_instance.pos)])
+        self.transformation_list.append([old_instance, old_instance.isVisible, np.copy(old_instance.scale), np.copy(old_instance.rot), np.copy(old_instance.pos)])
         self.actual_list_position = len(self.transformation_list)-1
         #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
@@ -57,10 +57,11 @@ class AppScene(object):
         #just move pointer of transformation to -1 or leave on 0
         if self.actual_list_position >= 1:
             self.actual_list_position -= 1
-            old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = np.copy(scale)
-            old_instance.rotation_matrix = np.copy(rot)
-            old_instance.pos = deepcopy(pos)
+            old_instance, isVisible, scale, rot, pos = self.transformation_list[self.actual_list_position]
+            old_instance.isVisible = deepcopy(isVisible)
+            old_instance.scale = np.copy(scale)
+            old_instance.rot = np.copy(rot)
+            old_instance.pos = np.copy(pos)
             old_instance.is_changed = True
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
@@ -68,12 +69,15 @@ class AppScene(object):
         #move pointer of transformation to +1 or leave on last
         if self.actual_list_position < len(self.transformation_list)-1:
             self.actual_list_position += 1
-            old_instance, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.scale_matrix = np.copy(scale)
-            old_instance.rotation_matrix = np.copy(rot)
-            old_instance.pos = deepcopy(pos)
+            old_instance, isVisible, scale, rot, pos = self.transformation_list[self.actual_list_position]
+            old_instance.isVisible = deepcopy(isVisible)
+            old_instance.scale = np.copy(scale)
+            old_instance.rot = np.copy(rot)
+            old_instance.pos = np.copy(pos)
             old_instance.is_changed = True
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+
+
 
     def check_models_name(self):
         for m in self.models:
@@ -102,11 +106,8 @@ class AppScene(object):
 
 
         b= whole_scene.vectors[:, :, 2] < 0.1
-        print(str(b))
         b_tmp = np.array([i.all() for i in b])
-        print(str(b_tmp))
         tmp_brim = whole_scene.vectors[b_tmp]
-        print(str(tmp_brim))
 
         #tmp_brim = np.array([i+whole_scene.normals[n]*0.001 for n, i in enumerate(whole_scene.vectors) if (i[0][2]<0.1 and i[1][2]<0.1 and i[2][2]<0.1)])
 
@@ -185,17 +186,12 @@ class AppScene(object):
 
     def delete_selected_models(self):
         delete = False
-        print("N: " + str(len(self.models)) + ' ' + str(self.models))
-        temp = []
         for m in self.models:
             if m.selected:
-                temp.append(m)
+                m.isVisible = False
                 delete = True
 
-        for t in temp:
-            self.models.remove(t)
-            print("Deleted")
-        print("N: " + str(len(self.models)) + ' ' + str(self.models))
+        #TODO: Add state to history
 
         if delete:
             self.controller.view.update_scene()
@@ -262,7 +258,8 @@ class Model(object):
     def __init__(self):
         #IDs
         self.id = Model.newid()+1
-        print(str(self.id))
+
+        self.isVisible = True
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 
@@ -310,6 +307,12 @@ class Model(object):
         self.scaleDefault = [.1, .1, .1]
         self.min_scene = [.0, .0, .0]
         self.max_scene = [.0, .0, .0]
+
+        #history state
+        self.pos_hist = np.array([.0, .0, .0])
+        self.rot_hist = np.array([.0, .0, .0])
+        self.scale_hist = np.array([1., 1., 1.])
+        #history state
 
         self.scale_matrix = np.array([[ 1.,  0.,  0.],
                                             [ 0.,  1.,  0.],
@@ -413,7 +416,6 @@ class Model(object):
 
 
     def set_move(self, vector, add=True):
-
         vector = np.array(vector)
         if add:
             self.pos += vector
@@ -453,6 +455,28 @@ class Model(object):
         self.temp_rotation = np.array([[ 1.,  0.,  0.],
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
+
+
+
+    def start_edit(self):
+        self.rot_hist = deepcopy(self.rot)
+        self.scale_hist = deepcopy(self.scale)
+        self.pos_hist = deepcopy(self.pos)
+        self.is_changed = True
+
+    def apply_changes(self):
+        print("Apply changes")
+        self.pos_hist = np.array([.0, .0, .0])
+        self.rot_hist = np.array([.0, .0, .0])
+        self.scale_hist = np.array([1., 1., 1.])
+        self.is_changed = False
+
+    def discard_changes(self):
+        print("Discard changes")
+        self.pos = deepcopy(self.pos_hist)
+        self.scale = deepcopy(self.scale_hist)
+        self.rot = deepcopy(self.rot_hist)
+        self.is_changed = False
 
     def set_scale(self, value):
         printing_space = self.parent.controller.actual_printer['printing_space']
@@ -523,10 +547,11 @@ class Model(object):
         #glVertexPointerf(self.draw_mesh['vectors'])
 
     def render(self, picking=False, debug=False):
+        if not self.isVisible:
+            return
         glPushMatrix()
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-
 
         if picking:
             glColor3ubv(self.colorId)
@@ -544,7 +569,6 @@ class Model(object):
         ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
         rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
 
-        print("rotace: " + str(self.rot))
 
         rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
 

@@ -391,7 +391,6 @@ class Controller:
         self.view.update_scene()
 
 
-
     def set_camera_move_function(self):
         self.camera_move=True
         self.camera_rotate=False
@@ -405,7 +404,7 @@ class Controller:
         self.camera_rotate = False
 
     def is_some_tool_under_cursor(self, object_id):
-        #TODO:Add tools list
+        print("Is some tool under cursor")
         for tool in self.tools:
             if tool.id == object_id:
                 return True
@@ -510,6 +509,11 @@ class Controller:
                 #Je pod kurzorem nejaky tool?
                 if self.is_some_tool_under_cursor(object_id):
                     tool = self.get_tool_by_id(object_id)
+                    for t in self.tools:
+                        if not t == tool:
+                            t.unpress_button()
+                        else:
+                            tool.press_button()
                     #tool.activate_tool()
                 #Je pod kurzorem nejaky tool helper?
                 elif self.is_some_tool_helper_under_cursor(object_id):
@@ -553,11 +557,7 @@ class Controller:
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
 
         if self.camera_move:
-            print("camera move")
             camStart, camDir, camUp, camRight = self.view.get_camera_direction(event)
-            #print("Dx: " + str(dx))
-            print("CamRight: " + str(camRight))
-            print("CamUp: " + str(camUp))
             right_move = -0.025*dx * camRight
             up_move = 0.025*dy * camUp
 
@@ -565,7 +565,6 @@ class Controller:
             self.add_camera_position(move_vector)
 
         elif self.camera_rotate:
-            print("camera rotate")
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
@@ -751,7 +750,6 @@ class Controller:
 
     def hit_tool_button_by_color(self, event):
         find_id = self.get_id_under_cursor(event)
-        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         id_list = [i.id for i in self.view.get_tool_buttons()]
@@ -767,7 +765,6 @@ class Controller:
         if not add:
             self.scene.clear_selected_models()
         find_id = self.get_id_under_cursor(event)
-        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         for model in self.scene.models:
@@ -779,7 +776,6 @@ class Controller:
         #color = self.view.get_cursor_pixel_color(event)
         #color to id
         find_id = self.get_id_under_cursor(event)
-        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         for model in self.scene.models:
@@ -801,7 +797,6 @@ class Controller:
     def find_object_and_scale_axis_by_color(self, event):
         self.scene.clear_selected_models()
         find_id = self.get_id_under_cursor(event)
-        print("founded id: " + str(find_id))
         if find_id == 0:
             return False
         for model in self.scene.models:
@@ -819,10 +814,12 @@ class Controller:
         pass
 
     def undo_button_pressed(self):
+        print("Undo")
         self.clear_tool_button_states()
         self.scene.make_undo()
 
     def do_button_pressed(self):
+        print("Do")
         self.clear_tool_button_states()
         self.scene.make_do()
 
