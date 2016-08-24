@@ -334,7 +334,9 @@ class Controller:
         self.scene.models.append(model)
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
-        self.scene.save_change(model)
+        self.scene.clear_history()
+        for m in self.scene.models:
+            self.scene.save_change(m)
         self.view.update_scene()
 
     def import_project(self, path):

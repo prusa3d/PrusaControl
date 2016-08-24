@@ -152,10 +152,6 @@ class GLWidget(QGLWidget):
     def wheelEvent(self, event):
         self.controller.wheel_event(event)
 
-    def keyPressEvent(self, event):
-        print("Key pressed")
-        self.controller.key_press_event(event)
-
 
     def update_scene(self, reset=False):
 
@@ -166,7 +162,7 @@ class GLWidget(QGLWidget):
         self.update()
 
 
-    #TODO:All this function will be changed to controll camera instance
+    #TODO:All this function will be changed to control camera instance
     def set_zoom(self, diff):
         #self.camera.add_zoom(diff)
         if (self.zoom + diff >= -60.0) and (self.zoom + diff <= -10.0):
@@ -423,39 +419,20 @@ class GLWidget(QGLWidget):
             rotateColors = [[180,180,180],[180,180,180],[180,180,180]]
 
         if settings['toolButtons']['rotateButton']:
-            self.draw_rotation_circles(model, rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize+0.1, picking)
+            self.draw_rotation_circles(model, rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
 
     def draw_rotation_circles(self, model, colors, position, radius, picking=False):
         if not picking:
-            if model.selected and model.rotationAxis == 'x':
-                colors[0] = [255, 255, 0]
-            elif model.selected and model.rotationAxis == 'y':
-                colors[1] = [255, 255, 0]
-            elif model.selected and model.rotationAxis == 'z':
                 colors[2] = [255, 255, 0]
-        if picking:
-            segments = 16
-        else:
-            segments = 64
+
+        segments = 64
         glPushMatrix()
-        glTranslatef(position[0], position[1], position[2])
+        glTranslatef(position[0], position[1], 0.0)
         glDisable( GL_LIGHTING )
         glDisable(GL_DEPTH_TEST)
-        if picking:
-            glLineWidth(10.0)
-        else:
-            glLineWidth(3.5)
-
+        glLineWidth(4.0)
         glColor3ubv(colors[0])
         glBegin(GL_LINE_LOOP)
-        for i in xrange(0, 360, 360/segments):
-            glVertex3f(0., math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius)
-        glEnd()
-        glColor3ubv(colors[1])
-        glBegin(GL_LINE_LOOP)
-        for i in xrange(0, 360, 360/segments):
-            glVertex3f(math.cos(math.radians(i)) * radius, 0., math.sin(math.radians(i)) * radius)
-        glEnd()
         glColor3ubv(colors[2])
         glBegin(GL_LINE_LOOP)
         for i in xrange(0, 360, 360/segments):

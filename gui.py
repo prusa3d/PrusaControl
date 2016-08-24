@@ -483,7 +483,10 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
-
+    def keyPressEvent(self, event):
+        super(PrusaControlView, self).keyPressEvent(event)
+        print("Key pressed")
+        self.controller.key_press_event(event)
 
     def update_object_settings(self, object_id):
         if self.is_setting_panel_opened:
@@ -523,6 +526,7 @@ class PrusaControlView(QtGui.QMainWindow):
         if not mesh:
             return
         mesh.apply_changes()
+        #self.controller.scene.save_change(mesh)
         self.close_object_settings_panel()
         self.controller.view.update_scene()
 

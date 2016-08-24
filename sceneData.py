@@ -44,6 +44,9 @@ class AppScene(object):
 
         self.analyze_result_data_tmp = []
 
+    def clear_history(self):
+        self.transformation_list = []
+        self.actual_list_position = 0
 
     def save_change(self, old_instance):
         if self.actual_list_position < len(self.transformation_list)-1:
