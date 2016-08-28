@@ -137,6 +137,11 @@ class GLWidget(QGLWidget):
         self.tools = []
 
 
+    def keyPressEvent(self, e):
+        print(str(e))
+        if e.key() == QtCore.Qt.Key_Escape:
+            self.close()
+
     def mousePressEvent(self, event):
         self.controller.mouse_press_event(event)
 
@@ -383,18 +388,17 @@ class GLWidget(QGLWidget):
                 self.draw_tools_helper(model, self.parent.controller.settings)
 
 
-        '''
         if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
             glColor3f(1., .0, .0)
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableClientState(GL_NORMAL_ARRAY)
-            glVertexPointerf(self.parent.controller.scene.analyze_result_data_tmp)
-            glDrawArrays(GL_TRIANGLES, 0, len(self.parent.controller.scene.analyze_result_data_tmp)*3)
+            glVertexPointerf(self.controller.scene.analyze_result_data_tmp)
+            glDrawArrays(GL_TRIANGLES, 0, len(self.controller.scene.analyze_result_data_tmp)*3)
             glDisableClientState(GL_VERTEX_ARRAY)
             glDisableClientState(GL_NORMAL_ARRAY)
-        '''
 
-        self.draw_tools()
+        if self.controller.render_status in ['model_view']:
+            self.draw_tools()
 
         #self.picking_render()
         glFlush()

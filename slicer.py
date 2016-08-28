@@ -179,4 +179,6 @@ class SlicerEngineManager(object):
     def thread_ended(self):
         self.slice_thread.quit()
         self.controller.set_save_gcode_button()
+        #TODO: add function to read gcode
+        self.controller.set_gcode_view()
         self.controller.status = 'generated'

@@ -209,6 +209,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.is_setting_panel_opened = False
 
         self.infillValue = 20
+        self.changable_widgets = {}
 
         self.object_id = 0
 
@@ -457,13 +458,27 @@ class PrusaControlView(QtGui.QMainWindow):
         self.line.setFrameShape(QFrame.VLine)
 
 
+        self.gcode_panel = QWidget()
+        self.gcode_label = QLabel("0")
+        self.gcode_label.setMaximumWidth(20)
+        self.gcode_label.setAlignment(Qt.AlignCenter)
         self.gcode_slider = QtGui.QSlider(QtCore.Qt.Vertical)
         self.gcode_slider.setRange(0, 100)
-        self.gcode_slider.setVisible(False)
+        self.gcode_slider.setMaximumWidth(20)
+        self.gcode_cancel_button = QPushButton('X')
+        self.gcode_cancel_button.setMaximumWidth(20)
+        self.gcode_cancel_button.clicked.connect(self.controller.set_model_edit_view)
+        gcode_panel_layout = QVBoxLayout()
+        gcode_panel_layout.addWidget(self.gcode_label)
+        gcode_panel_layout.addWidget(self.gcode_slider)
+        gcode_panel_layout.addWidget(self.gcode_cancel_button)
+        self.gcode_panel.setLayout(gcode_panel_layout)
+        self.gcode_panel.setVisible(False)
+
 
 
         self.right_panel_layout.insertWidget(0, self.object_settings_panel)
-        self.right_panel_layout.insertWidget(1, self.gcode_slider)
+        self.right_panel_layout.insertWidget(1, self.gcode_panel)
         self.right_panel_layout.insertWidget(2, self.line)
 
         mainLayout = QtGui.QHBoxLayout()
@@ -479,21 +494,41 @@ class PrusaControlView(QtGui.QMainWindow):
         self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
 
         self.setVisible(True)
-        self.update_gui()
+        #self.update_gui()
+
+        self.changable_widgets['brimCheckBox'] = self.brimCheckBox
+        self.changable_widgets['supportCheckBox'] = self.supportCheckBox
+
+        self.qualityCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
+        self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
+        self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
+        self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
         self.show()
 
-    def keyPressEvent(self, event):
-        super(PrusaControlView, self).keyPressEvent(event)
-        print("Key pressed")
-        self.controller.key_press_event(event)
+    def set_progress_bar(self, value):
+        self.progressBar.setValue(value)
+
+    def set_save_gcode_button(self):
+        self.generateButton.setText(self.tr("Save G-Code"))
+
+    def set_cancel_button(self):
+        self.generateButton.setText(self.tr("Cancel"))
+
+    def set_generate_button(self):
+        self.generateButton.setText(self.tr("Generate"))
+
+    def set_print_info_text(self, string):
+        self.printing_filament_data.setText(string)
+
+    def get_changable_widgets(self):
+        return self.changable_widgets
 
     def update_object_settings(self, object_id):
         if self.is_setting_panel_opened:
             self.set_gui_for_object(object_id)
         else:
             return
-
 
     def create_object_settings_menu(self, object_id):
         if self.is_setting_panel_opened:
@@ -512,6 +547,7 @@ class PrusaControlView(QtGui.QMainWindow):
     def get_object_id(self):
         return self.object_id
 
+
     def close_object_settings_panel(self):
         self.object_settings_panel.setVisible(False)
         self.line.setVisible(False)
@@ -520,7 +556,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.object_id = 0
 
     def apply_object_settings(self):
-        #TODO:Apply object settings
         object_id = self.get_object_id()
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
@@ -607,6 +642,19 @@ class PrusaControlView(QtGui.QMainWindow):
                 return
             model.set_scale_abs(x, y, z)
             self.controller.view.update_scene()
+
+    def open_gcode_view(self):
+        if self.is_setting_panel_opened:
+            self.cancel_object_settings()
+        self.gcode_panel.setVisible(True)
+        self.line.setVisible(True)
+        self.controller.view.update_scene()
+
+
+    def close_gcode_view(self):
+        self.gcode_panel.setVisible(False)
+        self.line.setVisible(False)
+        self.controller.view.update_scene()
 
 
     def open_settings_dialog(self):
@@ -772,8 +820,8 @@ class PrusaControlView(QtGui.QMainWindow):
         self.infillValue = val
         self.infillLabel.setText(self.tr("Infill") + " " + str(val) + "%")
 
-    def create_slider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100):
-        slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+    def create_slider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100, orientation=QtCore.Qt.Horizontal):
+        slider = QtGui.QSlider(orientation)
 
         slider.setRange(rangeMin, rangeMax)
         slider.setSingleStep(10)

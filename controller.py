@@ -111,6 +111,7 @@ class Controller:
         self.original_scale_point = numpy.array([0.,0.,0.])
         self.origin_rotation_point = numpy.array([0.,0.,0.])
         self.res_old = numpy.array([0., 0., 0.])
+        self.render_status = 'model_view'   #'gcode_view'
         self.status = 'edit'
         self.canceled = False
 
@@ -133,6 +134,7 @@ class Controller:
         self.tool = ''
         self.camera_move = False
         self.camera_rotate = False
+        self.view.update_gui_for_material()
 
 
     def write_config(self):
@@ -145,6 +147,24 @@ class Controller:
 
         with open(self.app_config.config_path, 'wb') as configfile:
             config.write(configfile)
+
+
+
+
+    def set_gcode_view(self):
+        self.render_status = 'gcode_view'
+        self.open_gcode_gui()
+
+    def set_model_edit_view(self):
+        self.render_status = 'model_view'
+        self.view.close_gcode_view()
+
+    def open_gcode_gui(self):
+        self.view.open_gcode_view()
+
+
+    def close_gcode_gui(self):
+        self.view.close_gcode_view()
 
 
     def set_language(self, language):
@@ -204,6 +224,7 @@ class Controller:
             self.analyze_result = self.analyzer.make_analyze(self.scene)
             self.canceled = False
             self.make_reaction_on_analyzation_result(self.analyze_result)
+            print("Canceled:" + str(self.canceled))
 
             if not self.canceled:
                 self.generate_gcode()
@@ -238,13 +259,14 @@ class Controller:
             retval = msg.exec_()
 
     def reaction_button_pressed(self, i):
+        print("resction button: " + str(i.text()))
         if i.text() == 'Apply':
             for res in self.analyze_result:
                 if res['result']:
                     widget_list = self.view.get_changable_widgets()
                     widget = widget_list[res['gui_name']]
                     widget.setChecked(True)
-        elif i.text() == '&Cancel':
+        elif i.text() == 'Cancel':
             self.canceled = True
 
 
@@ -379,13 +401,8 @@ class Controller:
     def scene_was_changed(self):
         self.status = 'edit'
         #TODO:repair this bug
-        #self.set_generate_button()
-        #self.set_progress_bar(0.0)
-
-    def key_press_event(self, event):
-        print("key press event")
-        if event.key() == QtCore.Qt.Key_Delete:
-            self.scene.delete_selected_models()
+        self.set_generate_button()
+        self.set_progress_bar(0.0)
 
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
@@ -437,6 +454,7 @@ class Controller:
 
     @staticmethod
     def is_ctrl_pressed():
+        print("is_ctrl_pressed")
         modifiers = QtGui.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
             return True

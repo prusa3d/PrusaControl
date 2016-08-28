@@ -12,7 +12,7 @@ import cProfile
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = True
+DEBUG = False
 
 
 def main():

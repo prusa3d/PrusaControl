@@ -3,6 +3,7 @@ import numpy as np
 from abc import ABCMeta, abstractmethod
 from os.path import basename
 
+import time
 from PyQt4.QtCore import QObject
 from PyQt4.QtOpenGL import QGLBuffer
 from stl.mesh import Mesh
@@ -24,6 +25,15 @@ from copy import deepcopy
 from pyrr import matrix44, Vector3, geometric_tests, line, ray, plane, matrix33
 
 #glutInit()
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        return ret
+    return wrap
 
 class AppScene(object):
     '''
@@ -104,6 +114,7 @@ class AppScene(object):
 
         return area
 
+    @timing
     def get_contact_faces_with_area_smaller_than(self, area_size):
         whole_scene = self.get_whole_scene_in_one_mesh()
 
@@ -153,7 +164,7 @@ class AppScene(object):
 
         return brim
 
-
+    @timing
     def get_faces_by_smaller_angel_normal_and_vector(self, vector, angle):
         #calculate angel between normal vector and given vector
         #return list of faces with smaller
@@ -451,7 +462,7 @@ class Model(object):
         self.is_changed = True
 
     def make_normals(self):
-        self.tiled_normals = np.tile(self.temp_mesh.normals, 3)
+        self.tiled_normals = np.tile(self.mesh.normals, 3)
 
     def apply_rotation(self):
         self.rotation_matrix = np.dot(self.rotation_matrix, self.temp_rotation)
@@ -459,7 +470,38 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
 
+    def apply_all_transformation(self):
+        rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
+        ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
+        rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
 
+        rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
+
+        scale_matrix = np.array([[1., 0., 0.],
+                                 [0., 1., 0.],
+                                 [0., 0., 1.]]) * self.scale
+
+        final_rotation = rotation_matrix
+        final_scale = scale_matrix
+        final_matrix = np.dot(final_rotation, final_scale)
+
+        for i in range(3):
+            self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
+
+        self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
+        self.make_normals()
+
+        self.temp_mesh.update_min()
+        self.temp_mesh.update_max()
+
+        self.min = self.temp_mesh.min_
+        self.max = self.temp_mesh.max_
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
+
+        self.place_on_zero()
+
+        self.is_changed = False
 
     def start_edit(self):
         self.rot_hist = deepcopy(self.rot)
@@ -479,6 +521,7 @@ class Model(object):
         self.pos = deepcopy(self.pos_hist)
         self.scale = deepcopy(self.scale_hist)
         self.rot = deepcopy(self.rot_hist)
+        self.apply_all_transformation()
         self.is_changed = False
 
     def set_scale(self, value):
@@ -544,7 +587,7 @@ class Model(object):
 
     def put_array_to_gl(self):
         glNormalPointerf(self.tiled_normals)
-        glVertexPointerf(self.mesh.vectors)
+        glVertexPointerf(self.temp_mesh.vectors)
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])
@@ -572,7 +615,6 @@ class Model(object):
         ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
         rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
 
-
         rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
 
         scale_matrix = np.array([[ 1.,  0.,  0.],
@@ -590,7 +632,7 @@ class Model(object):
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        glDrawArrays(GL_TRIANGLES, 0, len(self.temp_mesh.vectors)*3)
+        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
