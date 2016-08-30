@@ -504,6 +504,8 @@ class PrusaControlView(QtGui.QMainWindow):
         self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
+        self.glWidget.setFocusPolicy(Qt.StrongFocus)
+
         self.show()
 
     def set_progress_bar(self, value):
@@ -541,8 +543,11 @@ class PrusaControlView(QtGui.QMainWindow):
             self.object_settings_panel.setVisible(True)
             self.line.setVisible(True)
             self.set_gui_for_object(object_id)
-
             self.is_setting_panel_opened = True
+        self.glWidget.setFocusPolicy(Qt.NoFocus)
+        self.object_settings_panel.setFocusPolicy(Qt.StrongFocus)
+
+
 
     def get_object_id(self):
         return self.object_id
@@ -554,6 +559,8 @@ class PrusaControlView(QtGui.QMainWindow):
         self.right_panel.setMaximumWidth(250)
         self.is_setting_panel_opened = False
         self.object_id = 0
+        self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
+        self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
     def apply_object_settings(self):
         object_id = self.get_object_id()

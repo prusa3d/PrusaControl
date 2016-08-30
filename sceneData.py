@@ -199,16 +199,18 @@ class AppScene(object):
             return False
 
     def delete_selected_models(self):
-        delete = False
+        for i in self.models:
+            print(i.filename + ' ' + str(i.selected))
+
         for m in self.models:
-            if m.selected:
+            if m.selected and m.isVisible:
+                print("Mazu model: " + m.filename + " a jeho visible je " + str(m.isVisible))
                 m.isVisible = False
-                delete = True
+            else:
+                print("Model nebude smazan: " + m.filename + " a jeho visible je " + str(m.isVisible))
 
         #TODO: Add state to history
-
-        if delete:
-            self.controller.view.update_scene()
+        self.controller.view.update_scene()
 
 
     def clearScene(self):
@@ -592,7 +594,7 @@ class Model(object):
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])
 
-    def render(self, picking=False, debug=False):
+    def render(self, picking=False, blending=False):
         if not self.isVisible:
             return
         glPushMatrix()
@@ -602,13 +604,16 @@ class Model(object):
         if picking:
             glColor3ubv(self.colorId)
         else:
-            if self.is_in_printing_space(self.parent.controller.actual_printer):
-                if self.selected:
-                    glColor3f(.75, .75, 0.)
-                else:
-                    glColor3fv(self.color)
+            if blending:
+                glColor4f(.4, .4, .4, .75)
             else:
-                glColor3f(0.75, .0, .0)
+                if self.is_in_printing_space(self.parent.controller.actual_printer):
+                    if self.selected:
+                        glColor3f(.75, .75, 0.)
+                    else:
+                        glColor3fv(self.color)
+                else:
+                    glColor3f(0.75, .0, .0)
 
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
@@ -632,7 +637,32 @@ class Model(object):
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+        '''
+        if blending:
+            glColor4f(.4, .4, .4, .75)
+            glBlendFunc(GL_SRC_COLOR, GL_ONE)
+            glEnable(GL_BLEND)
+            glDisable(GL_LIGHTING)
+            glDisable(GL_DEPTH_TEST)
+
+            glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
+
+            glEnable(GL_DEPTH_TEST)
+            glEnable(GL_LIGHTING)
+            glDisable(GL_BLEND)
+        else:
+            glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
+        '''
+
+        if blending:
+            glDisable(GL_LIGHTING)
+            glDisable(GL_DEPTH_TEST)
+        else:
+            glEnable(GL_LIGHTING)
+            glEnable(GL_DEPTH_TEST)
+
+        glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
+
 
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)

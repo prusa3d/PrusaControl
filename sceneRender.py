@@ -14,8 +14,10 @@ import math
 import numpy
 import time
 
-from PyQt4.QtCore import QTimer
-from PyQt4.QtGui import QColor, QCursor
+#from PyQt4.QtCore import QTimer
+#from PyQt4.QtGui import QColor, QCursor
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
 
@@ -137,13 +139,20 @@ class GLWidget(QGLWidget):
         self.tools = []
 
 
+    '''
     def keyPressEvent(self, e):
         print(str(e))
         if e.key() == QtCore.Qt.Key_Escape:
             self.close()
+    '''
+
+    def keyPressEvent(self, event):
+        self.controller.key_press_event(event)
+
 
     def mousePressEvent(self, event):
         self.controller.mouse_press_event(event)
+
 
     def mouseDoubleClickEvent(self, event):
         self.controller.mouse_double_click(event)
@@ -320,9 +329,9 @@ class GLWidget(QGLWidget):
         for model in self.parent.controller.scene.models:
             if not model.isVisible:
                 break
-            model.render(picking=True, debug=False)
+            model.render(picking=True, blending=True)
             if model.selected:
-                self.draw_tools_helper(model, self.parent.controller.settings, True)
+                self.draw_tools_helper(model, self.controller.settings, True)
 
         self.draw_tools(picking=True)
 
@@ -337,20 +346,14 @@ class GLWidget(QGLWidget):
 
     def paintGL(self, selection = 1):
         t0 = time.time()
-        heat_bed = self.bed[self.parent.controller.settings['printer']]
-
-
-        #glEnable(GL_MULTISAMPLE)
-        #glEnable(GL_LINE_SMOOTH)
-        #glEnable(GL_POINT_SMOOTH)
-        #glEnable(GL_POLYGON_SMOOTH)
-
-
+        heat_bed = self.bed[self.controller.settings['printer']]
+        model_view = self.controller.render_status in ['model_view']
 
         #glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
         #glClearColor(0.0, 0.47, 0.62, 1.0)
-        glClearColor((176./255.),(236/255.) ,(255./255.), 1.0)
+        #glClearColor((176./255.),(236/255.) ,(255./255.), 1.0)
+        glClearColor(0., 0., 0., 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         self.draw_background_texture()
@@ -376,7 +379,7 @@ class GLWidget(QGLWidget):
         for model in self.parent.controller.scene.models:
             if not model.isVisible:
                 break
-            model.render(picking=False)
+            model.render(picking=False, blending=not model_view)
         glDisable( GL_LIGHTING )
 
 
@@ -384,20 +387,21 @@ class GLWidget(QGLWidget):
         for model in self.parent.controller.scene.models:
             if not model.isVisible:
                 break
-            if model.selected:
+            if model.selected and model_view:
                 self.draw_tools_helper(model, self.parent.controller.settings)
 
 
-        if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
-            glColor3f(1., .0, .0)
-            glEnableClientState(GL_VERTEX_ARRAY)
-            glEnableClientState(GL_NORMAL_ARRAY)
-            glVertexPointerf(self.controller.scene.analyze_result_data_tmp)
-            glDrawArrays(GL_TRIANGLES, 0, len(self.controller.scene.analyze_result_data_tmp)*3)
-            glDisableClientState(GL_VERTEX_ARRAY)
-            glDisableClientState(GL_NORMAL_ARRAY)
-
         if self.controller.render_status in ['model_view']:
+
+            if not len(self.parent.controller.scene.analyze_result_data_tmp) == 0:
+                glColor3f(1., .0, .0)
+                glEnableClientState(GL_VERTEX_ARRAY)
+                glEnableClientState(GL_NORMAL_ARRAY)
+                glVertexPointerf(self.controller.scene.analyze_result_data_tmp)
+                glDrawArrays(GL_TRIANGLES, 0, len(self.controller.scene.analyze_result_data_tmp)*3)
+                glDisableClientState(GL_VERTEX_ARRAY)
+                glDisableClientState(GL_NORMAL_ARRAY)
+
             self.draw_tools()
 
         #self.picking_render()

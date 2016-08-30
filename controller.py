@@ -14,6 +14,7 @@ from shutil import copyfile, Error
 
 import numpy
 import pyrr
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QApplication
 
 import sceneData
@@ -149,9 +150,15 @@ class Controller:
             config.write(configfile)
 
 
+    def scene_was_sliced(self):
+        self.set_save_gcode_button()
+        self.set_gcode_view()
+        self.status = 'generated'
+
 
 
     def set_gcode_view(self):
+        self.unselect_objects()
         self.render_status = 'gcode_view'
         self.open_gcode_gui()
 
@@ -224,7 +231,6 @@ class Controller:
             self.analyze_result = self.analyzer.make_analyze(self.scene)
             self.canceled = False
             self.make_reaction_on_analyzation_result(self.analyze_result)
-            print("Canceled:" + str(self.canceled))
 
             if not self.canceled:
                 self.generate_gcode()
@@ -338,7 +344,7 @@ class Controller:
         else:
             filename_out = data + '.gcode'
         try:
-            copyfile(self.tmp_place + "out.gcode", filename_out)
+            copyfile(self.app_config.tmp_place + "out.gcode", filename_out)
         except Error as e:
             logging.debug('Error: %s' % e)
         except IOError as e:
@@ -503,12 +509,20 @@ class Controller:
             if self.find_object_and_rotation_axis_by_color(event):
                 self.view.update_scene()
 
+    def key_press_event(self, event):
+        key = event.key()
+        if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view':
+            self.scene.delete_selected_models()
+
+
+
     def mouse_double_click(self, event):
-        object_id = self.get_id_under_cursor(event)
-        if object_id == 0 or self.is_some_tool_under_cursor(object_id):
-            return
-        else:
-            self.open_object_settings(object_id)
+        if self.render_status == 'model_view':
+            object_id = self.get_id_under_cursor(event)
+            if object_id == 0 or self.is_some_tool_under_cursor(object_id):
+                return
+            else:
+                self.open_object_settings(object_id)
 
 
     def mouse_press_event(self, event):
@@ -521,41 +535,44 @@ class Controller:
         #Je stisknuto leve tlacitko?
         elif event.button() & QtCore.Qt.LeftButton:
             #Je kurzor nad nejakym objektem?
-            object_id = self.get_id_under_cursor(event)
-            print(str(object_id))
-            if object_id==0:
-                self.set_camera_rotation_function()
-            else:
-                #Je pod kurzorem nejaky tool?
-                if self.is_some_tool_under_cursor(object_id):
-                    tool = self.get_tool_by_id(object_id)
-                    for t in self.tools:
-                        if not t == tool:
-                            t.unpress_button()
-                        else:
-                            tool.press_button()
-                    #tool.activate_tool()
-                #Je pod kurzorem nejaky tool helper?
-                elif self.is_some_tool_helper_under_cursor(object_id):
-                    self.set_active_tool_helper_by_id(object_id)
-                #Je objekt oznaceny?
-                elif self.is_ctrl_pressed():
-                    if self.is_object_already_selected(object_id):
-                        self.unselect_object(object_id)
-                    else:
-                        self.select_object(object_id)
-                elif self.is_object_already_selected(object_id):
-                    #nastav funkci na provedeni toolu
-
-                    self.tool = 'move'
-                    #TODO:add function get_active_tool(self) return class tool
-                    #tool = self.get_toolsactive_tool()
-                    #TODO:add function do(self) to class tool
-                    #tool.do()
+            if self.render_status == 'model_view':
+                object_id = self.get_id_under_cursor(event)
+                if object_id==0:
+                    self.set_camera_rotation_function()
                 else:
-                    #select object
-                    self.unselect_objects()
-                    self.select_object(object_id)
+                    #Je pod kurzorem nejaky tool?
+                    if self.is_some_tool_under_cursor(object_id):
+                        tool = self.get_tool_by_id(object_id)
+                        for t in self.tools:
+                            if not t == tool:
+                                t.unpress_button()
+                            else:
+                                tool.press_button()
+                        #tool.activate_tool()
+                    #Je pod kurzorem nejaky tool helper?
+                    elif self.is_some_tool_helper_under_cursor(object_id):
+                        self.set_active_tool_helper_by_id(object_id)
+                    #Je objekt oznaceny?
+                    elif self.is_ctrl_pressed():
+                        if self.is_object_already_selected(object_id):
+                            self.unselect_object(object_id)
+                        else:
+                            self.select_object(object_id)
+                    elif self.is_object_already_selected(object_id):
+                        #nastav funkci na provedeni toolu
+
+                        self.tool = 'move'
+                        #TODO:add function get_active_tool(self) return class tool
+                        #tool = self.get_toolsactive_tool()
+                        #TODO:add function do(self) to class tool
+                        #tool.do()
+                    else:
+                        #select object
+                        self.unselect_objects()
+                        self.select_object(object_id)
+            else:
+                self.unselect_objects()
+                self.set_camera_rotation_function()
         self.view.update_scene()
 
     def mouse_release_event(self, event):
