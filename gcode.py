@@ -26,6 +26,8 @@ class GCode(object):
         self.data_keys = []
         self.actual_z = '0.0'
 
+
+
         #buffering=(2 << 16) + 8
         with open(filename, 'r', buffering=(2 << 16) + 8) as f:
             for line in f:
@@ -44,7 +46,7 @@ class GCode(object):
         if 'Z' in line[1]:
             self.actual_z = line[1][1:]
             return
-        elif 'X' in line[1] and 'Y' in line[2]:
+        elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
             data_x = fast_float(line[1][1:])
             data_y = fast_float(line[2][1:])
             self.add_point(data_x, data_y, self.actual_z)
@@ -59,4 +61,5 @@ class GCode(object):
             self.data_keys.append(key)
             self.data[key] = []
             self.data[key].append([x, y])
+
 

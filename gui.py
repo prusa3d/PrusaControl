@@ -460,15 +460,24 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.gcode_panel = QWidget()
         self.gcode_label = QLabel("0")
-        self.gcode_label.setMaximumWidth(20)
+        self.gcode_label.setMaximumWidth(40)
         self.gcode_label.setAlignment(Qt.AlignCenter)
+
+        self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
+
+        '''
         self.gcode_slider = QtGui.QSlider(QtCore.Qt.Vertical)
         self.gcode_slider.setRange(0, 100)
         self.gcode_slider.setMaximumWidth(20)
+        self.gcode_slider.valueChanged.connect(self.controller.scene_was_changed)
+        '''
+
         self.gcode_cancel_button = QPushButton('X')
-        self.gcode_cancel_button.setMaximumWidth(20)
+        self.gcode_cancel_button.setMaximumWidth(40)
         self.gcode_cancel_button.clicked.connect(self.controller.set_model_edit_view)
         gcode_panel_layout = QVBoxLayout()
+        gcode_panel_layout.setMargin(0)
+        gcode_panel_layout.setSpacing(0)
         gcode_panel_layout.addWidget(self.gcode_label)
         gcode_panel_layout.addWidget(self.gcode_slider)
         gcode_panel_layout.addWidget(self.gcode_cancel_button)
@@ -653,6 +662,7 @@ class PrusaControlView(QtGui.QMainWindow):
     def open_gcode_view(self):
         if self.is_setting_panel_opened:
             self.cancel_object_settings()
+        self.right_panel.setMaximumWidth(350)
         self.gcode_panel.setVisible(True)
         self.line.setVisible(True)
         self.controller.view.update_scene()
@@ -661,6 +671,7 @@ class PrusaControlView(QtGui.QMainWindow):
     def close_gcode_view(self):
         self.gcode_panel.setVisible(False)
         self.line.setVisible(False)
+        self.right_panel.setMaximumWidth(250)
         self.controller.view.update_scene()
 
 
@@ -822,6 +833,10 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def update_scene(self, reset=False):
         self.glWidget.update_scene(reset)
+
+    def set_gcode_slider(self, val):
+        self.controller.set_gcode_layer(val)
+        self.gcode_label.setText(self.controller.gcode.data_keys[val])
 
     def set_infill(self, val):
         self.infillValue = val

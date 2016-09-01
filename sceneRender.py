@@ -347,6 +347,11 @@ class GLWidget(QGLWidget):
     def paintGL(self, selection = 1):
         t0 = time.time()
         heat_bed = self.bed[self.controller.settings['printer']]
+        printer = None
+        for p in self.controller.printers:
+            if p['name'] == self.controller.settings['printer']:
+                printer = p['printing_space']
+
         model_view = self.controller.render_status in ['model_view']
 
         #glDepthMask(GL_TRUE)
@@ -381,6 +386,9 @@ class GLWidget(QGLWidget):
                 break
             model.render(picking=False, blending=not model_view)
         glDisable( GL_LIGHTING )
+
+        if not model_view:
+            self.draw_layer(self.controller.gcode_layer, printer)
 
 
 
@@ -418,6 +426,31 @@ class GLWidget(QGLWidget):
         else:
             self.fps_count+=1
             self.fps_time+=t1-t0
+
+    def draw_layer(self, layer, printing_space):
+        #print("Drawing gcode layer " + str(self.controller.gcode_layer))
+        layer_data = self.controller.gcode.data[self.controller.gcode_layer]
+        #print("Data: " + str(layer_data))
+        glPushMatrix()
+        #TODO: Better solution
+        glTranslatef(printing_space[0]*-0.5, printing_space[1]*-0.5, 0.0)
+
+        glDisable(GL_LIGHTING)
+        glDisable(GL_DEPTH_TEST)
+        glColor3f(1.0, 0.0, 0.0)
+        glLineWidth(1.0)
+
+        glBegin(GL_LINE_STRIP)
+        for p in layer_data:
+            glVertex3f(p[0]*.1, p[1]*.1, float(self.controller.gcode_layer)*.1)
+        glEnd()
+
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_LIGHTING)
+        glPopMatrix()
+        #print(str(self.controller.gcode.data[self.controller.gcode_layer]))
+
+
 
 
     def draw_tools_helper(self, model, settings, picking=False):

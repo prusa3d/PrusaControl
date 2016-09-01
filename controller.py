@@ -19,6 +19,7 @@ from PyQt4.QtGui import QApplication
 
 import sceneData
 from analyzer import Analyzer
+from gcode import GCode
 from gui import PrusaControlView
 from parameters import AppParameters
 from projectFile import ProjectFile
@@ -51,6 +52,7 @@ class Controller:
 
         self.app_config = AppParameters()
         self.analyzer = Analyzer(self)
+        self.gcode = None
 
 
 
@@ -116,6 +118,8 @@ class Controller:
         self.status = 'edit'
         self.canceled = False
 
+        self.gcode_layer = '0.0'
+
         self.over_object = False
         self.models_selected = False
 
@@ -150,11 +154,35 @@ class Controller:
             config.write(configfile)
 
 
+    def read_gcode(self):
+        self.gcode = GCode(self.app_config.tmp_place + 'out.gcode')
+
+        min = 0
+        max = len(self.gcode.data_keys)-1
+
+        self.view.gcode_slider.setMinimum(min)
+        self.view.gcode_slider.setMaximum(max)
+
+        min_l = float(self.gcode.data_keys[0])
+        max_l = float(self.gcode.data_keys[-1])
+
+        self.gcode_layer = self.gcode.data_keys[0]
+
+
+        self.view.gcode_label.setText(self.gcode.data_keys[0])
+        self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
+
+
+    def set_gcode_layer(self, value):
+        self.gcode_layer = self.gcode.data_keys[value]
+        self.view.update_scene()
+
+
     def scene_was_sliced(self):
         self.set_save_gcode_button()
+        self.read_gcode()
         self.set_gcode_view()
         self.status = 'generated'
-
 
 
     def set_gcode_view(self):
