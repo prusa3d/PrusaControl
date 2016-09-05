@@ -442,7 +442,7 @@ class GLWidget(QGLWidget):
         #print("Data: " + str(layer_data))
         glPushMatrix()
         #TODO: Better solution
-        glTranslatef(printing_space[0]*-0.5, printing_space[1]*-0.5, 0.0)
+        #glTranslatef(printing_space[0]*-0.5, printing_space[1]*-0.5, 0.0)
 
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)
