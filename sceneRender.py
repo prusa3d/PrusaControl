@@ -345,6 +345,7 @@ class GLWidget(QGLWidget):
 
 
     def paintGL(self, selection = 1):
+        #print("Draw")
         t0 = time.time()
         heat_bed = self.bed[self.controller.settings['printer']]
         printer = None
@@ -429,7 +430,15 @@ class GLWidget(QGLWidget):
 
     def draw_layer(self, layer, printing_space):
         #print("Drawing gcode layer " + str(self.controller.gcode_layer))
+        #print("Typ dat layer: " + str(type(layer)))
         layer_data = self.controller.gcode.data[self.controller.gcode_layer]
+        #layer_data = self.controller.gcode.all_data
+
+        #if isinstance(self.controller.gcode_layer, int):
+        #    layer_data = self.controller.gcode.data[self.controller.gcode_layer]
+        #else:
+        #    pass
+
         #print("Data: " + str(layer_data))
         glPushMatrix()
         #TODO: Better solution
@@ -438,11 +447,14 @@ class GLWidget(QGLWidget):
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)
         glColor3f(1.0, 0.0, 0.0)
-        glLineWidth(1.0)
+        glLineWidth(0.75)
+
+        glEnable(GL_LINE_SMOOTH)
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
         glBegin(GL_LINE_STRIP)
         for p in layer_data:
-            glVertex3f(p[0]*.1, p[1]*.1, float(self.controller.gcode_layer)*.1)
+            glVertex3f(p[0]*.1, p[1]*.1, p[2]*.1)
         glEnd()
 
         glEnable(GL_DEPTH_TEST)

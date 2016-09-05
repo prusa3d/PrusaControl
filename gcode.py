@@ -1,5 +1,5 @@
 import time
-from fastnumbers import fast_float
+#from fastnumbers import fast_float
 
 def timing(f):
     def wrap(*args):
@@ -23,6 +23,7 @@ class GCode(object):
         """
 
         self.data = {}
+        self.all_data = []
         self.data_keys = []
         self.actual_z = '0.0'
 
@@ -47,19 +48,22 @@ class GCode(object):
             self.actual_z = line[1][1:]
             return
         elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
-            data_x = fast_float(line[1][1:])
-            data_y = fast_float(line[2][1:])
-            self.add_point(data_x, data_y, self.actual_z)
+            data_x = float(line[1][1:])
+            data_y = float(line[2][1:])
+            data_z = float(self.actual_z)
+            self.add_point(data_x, data_y, data_z, self.actual_z)
         return
 
 
-    def add_point(self, x, y, z):
-        key = z
+    def add_point(self, x, y, z, actual_z):
+        key = actual_z
         if key in self.data_keys:
-            self.data[key].append([x,y])
+            self.data[key].append([x, y, z])
+            self.all_data.append([x, y, z])
         else:
             self.data_keys.append(key)
             self.data[key] = []
-            self.data[key].append([x, y])
+            self.data[key].append([x, y, z])
+            self.all_data.append([x, y, z])
 
 
