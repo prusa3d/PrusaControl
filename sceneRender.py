@@ -247,12 +247,22 @@ class GLWidget(QGLWidget):
         #tools
         #self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
         #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
-        self.rotateTool = GlButton(self.texture_from_png("data/img/rotate_ns.png"), [45., 45.], [-50., 100.])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/scale_ns.png"), [45., 45.], [-50., 50])
-        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/placeonface.png"), [45., 45.], [-50., 0])
+        self.rotateTool = GlButton(self.texture_from_png("data/img/new/Rotate_OFF.png"),
+                                   self.texture_from_png("data/img/new/Rotate_ON.png"),
+                                   [30., 30.], [-40., 90.])
+        self.scaleTool = GlButton(self.texture_from_png("data/img/new/Scale_OFF.png"),
+                                  self.texture_from_png("data/img/new/Scale_ON.png"),
+                                  [30., 30.], [-40., 50])
+        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/new/Place_on_Face_OFF.png"),
+                                        self.texture_from_png("data/img/new/Place_on_Face_ON.png"),
+                                        [30., 30.], [-40., 10.])
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/undo_s.png"), [45., 45.], [0, -50], True)
-        self.do_button = GlButton(self.texture_from_png("data/img/do_s.png"), [45., 45.], [45, -50], True)
+        self.undo_button = GlButton(self.texture_from_png("data/img/new/Back_Arrow_OFF.png"),
+                                    self.texture_from_png("data/img/new/Back_Arrow_ON.png"),
+                                    [30., 30.], [10, -40], True)
+        self.do_button = GlButton(self.texture_from_png("data/img/new/Front_Arrow_OFF.png"),
+                                  self.texture_from_png("data/img/new/Front_Arrow_ON.png"),
+                                  [30., 30.], [50, -40], True)
 
 
         #self.selectTool.set_callback(self.parent.controller.select_button_pressed)
@@ -372,8 +382,8 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-        glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
-        glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
+        #glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
+        #glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
 
         glCallList(heat_bed)
 
@@ -746,7 +756,10 @@ class GLWidget(QGLWidget):
             else:
                 glColor3f(1,1,1)
                 glEnable(GL_TEXTURE_2D)
-                glBindTexture(GL_TEXTURE_2D, tool.texture)
+                if tool.pressed:
+                    glBindTexture(GL_TEXTURE_2D, tool.texture_on)
+                else:
+                    glBindTexture(GL_TEXTURE_2D, tool.texture_off)
             glBegin(GL_QUADS)
             glTexCoord2f(0, 0)
             glVertex3f(position_x, position_y, 0)
@@ -757,17 +770,6 @@ class GLWidget(QGLWidget):
             glTexCoord2f(1, 0)
             glVertex3f((position_x + coef_sW), position_y, 0)
             glEnd()
-
-            if tool.pressed and not picking:
-                glDisable(GL_TEXTURE_2D)
-                glColor3f(1.,.0,.0)
-                glLineWidth(2.)
-                glBegin(GL_LINE_LOOP)
-                glVertex3f(position_x, position_y, 0)
-                glVertex3f(position_x, (position_y + coef_sH), 0)
-                glVertex3f((position_x + coef_sW), (position_y + coef_sH), 0)
-                glVertex3f((position_x + coef_sW), position_y, 0)
-                glEnd()
 
 
         glEnable(GL_DEPTH_TEST)

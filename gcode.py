@@ -26,6 +26,7 @@ class GCode(object):
         self.all_data = []
         self.data_keys = []
         self.actual_z = '0.0'
+        self.last_point = []
 
 
 

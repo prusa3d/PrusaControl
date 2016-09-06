@@ -321,6 +321,7 @@ class Model(object):
         self.rot_scene = np.array([.0, .0, .0])
         self.scale = np.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
+
         self.min_scene = [.0, .0, .0]
         self.max_scene = [.0, .0, .0]
 
@@ -397,7 +398,9 @@ class Model(object):
             self.parent.controller.set_printable(False)
             return False
 
+
     def get_mesh(self, transform=True):
+        #TODO: Add all transformation
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
         mesh = Mesh(self.temp_mesh.data.copy())
@@ -430,7 +433,6 @@ class Model(object):
 
         self.normalization_flag = True
 
-
     def set_move(self, vector, add=True):
         vector = np.array(vector)
         if add:
@@ -441,7 +443,7 @@ class Model(object):
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
-
+    '''
     def set_rotation(self, vector, alpha):
         if vector.tolist() == [1.0, 0.0, 0.0]:
             self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
@@ -462,6 +464,7 @@ class Model(object):
         self.max_scene = self.mesh.max_ + self.pos
 
         self.is_changed = True
+    '''
 
     def make_normals(self):
         self.tiled_normals = np.tile(self.mesh.normals, 3)
@@ -471,6 +474,7 @@ class Model(object):
         self.temp_rotation = np.array([[ 1.,  0.,  0.],
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
+
 
     def apply_all_transformation(self):
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
@@ -589,7 +593,7 @@ class Model(object):
 
     def put_array_to_gl(self):
         glNormalPointerf(self.tiled_normals)
-        glVertexPointerf(self.temp_mesh.vectors)
+        glVertexPointerf(self.mesh.vectors)
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])

@@ -535,6 +535,9 @@ class PrusaControlView(QtGui.QMainWindow):
     def get_changable_widgets(self):
         return self.changable_widgets
 
+    def get_object_id(self):
+        return self.object_id
+
     def update_object_settings(self, object_id):
         if self.is_setting_panel_opened:
             self.set_gui_for_object(object_id)
@@ -555,42 +558,6 @@ class PrusaControlView(QtGui.QMainWindow):
             self.is_setting_panel_opened = True
         self.glWidget.setFocusPolicy(Qt.NoFocus)
         self.object_settings_panel.setFocusPolicy(Qt.StrongFocus)
-
-
-
-    def get_object_id(self):
-        return self.object_id
-
-
-    def close_object_settings_panel(self):
-        self.object_settings_panel.setVisible(False)
-        self.line.setVisible(False)
-        self.right_panel.setMaximumWidth(250)
-        self.is_setting_panel_opened = False
-        self.object_id = 0
-        self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
-        self.glWidget.setFocusPolicy(Qt.StrongFocus)
-
-    def apply_object_settings(self):
-        object_id = self.get_object_id()
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
-            return
-        mesh.apply_changes()
-        #self.controller.scene.save_change(mesh)
-        self.close_object_settings_panel()
-        self.controller.view.update_scene()
-
-
-
-    def cancel_object_settings(self):
-        object_id = self.get_object_id()
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
-            return
-        mesh.discard_changes()
-        self.close_object_settings_panel()
-        self.controller.view.update_scene()
 
     def set_gui_for_object(self, object_id):
         mesh = self.controller.get_object_by_id(object_id)
@@ -634,6 +601,34 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_scale_z.setDisabled(True)
         self.edit_scale_z.setValue(mesh.scale[2])
         self.edit_scale_z.setDisabled(False)
+
+    def close_object_settings_panel(self):
+        self.object_settings_panel.setVisible(False)
+        self.line.setVisible(False)
+        self.right_panel.setMaximumWidth(250)
+        self.is_setting_panel_opened = False
+        self.object_id = 0
+        self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
+        self.glWidget.setFocusPolicy(Qt.StrongFocus)
+
+    def apply_object_settings(self):
+        object_id = self.get_object_id()
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        mesh.apply_changes()
+        #self.controller.scene.save_change(mesh)
+        self.close_object_settings_panel()
+        self.controller.view.update_scene()
+
+    def cancel_object_settings(self):
+        object_id = self.get_object_id()
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        mesh.discard_changes()
+        self.close_object_settings_panel()
+        self.controller.view.update_scene()
 
     def set_position_on_object(self, widget, object_id, x, y, z):
         if widget.hasFocus():
