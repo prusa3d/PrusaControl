@@ -63,6 +63,7 @@ class Controller:
             self.settings['automatic_placing'] = self.app_config.config.getboolean('settings', 'automatic_placing')
             self.settings['language'] = self.app_config.config.get('settings', 'language')
             self.settings['printer'] = self.app_config.config.get('settings', 'printer')
+            self.settings['analyze'] = self.app_config.config.getboolean('settings', 'analyze')
 
             self.settings['toolButtons'] = {
                 'selectButton': False,

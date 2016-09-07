@@ -456,15 +456,20 @@ class GLWidget(QGLWidget):
 
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)
-        glColor3f(1.0, 0.0, 0.0)
+
         glLineWidth(0.75)
 
         glEnable(GL_LINE_SMOOTH)
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
-        glBegin(GL_LINE_STRIP)
+        glBegin(GL_LINES)
         for p in layer_data:
-            glVertex3f(p[0]*.1, p[1]*.1, p[2]*.1)
+            if p[2] == 'E':
+                glColor3f(1.0, 0.0, 0.0)
+            else:
+                glColor3f(0.0, 0.0, 1.0)
+            glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
+            glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
         glEnd()
 
         glEnable(GL_DEPTH_TEST)

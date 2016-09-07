@@ -44,6 +44,9 @@ class SettingsDialog(QDialog):
         self.automatic_placing_checkbox = QtGui.QCheckBox(self.tr("Automatic placing"))
         self.automatic_placing_checkbox.setChecked(self.controller.settings['automatic_placing'])
 
+        self.analyze_checkbox = QtGui.QCheckBox(self.tr("Analyzer"))
+        self.analyze_checkbox .setChecked(self.controller.settings['analyze'])
+
         layout.addWidget(self.language_label)
         layout.addWidget(self.language_combo)
 
@@ -52,6 +55,7 @@ class SettingsDialog(QDialog):
 
         layout.addWidget(self.debug_checkbox)
         layout.addWidget(self.automatic_placing_checkbox)
+        layout.addWidget(self.analyze_checkbox)
 
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -72,6 +76,7 @@ class SettingsDialog(QDialog):
         controller.set_printer(data['printer'])
         data['debug'] = dialog.debug_checkbox.isChecked()
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
+        data['analyze'] = dialog.analyze_checkbox.isChecked()
         return (data, result == QDialog.Accepted)
 
 
@@ -737,8 +742,11 @@ class PrusaControlView(QtGui.QMainWindow):
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
-                self.statusBar().showMessage('Dropped file name is ' + str(url.path()))
-                path = self.convert_file_path_to_unicode(url.path())
+                print(str())
+                self.statusBar().showMessage('Dropped file name is ' + str(url.toLocalFile().toLocal8Bit().data()))
+                #TODO: Add network files
+                path = url.toLocalFile().toLocal8Bit().data()
+                #path = self.convert_file_path_to_unicode(url.path())
                 self.controller.open_file(path)
 
             event.acceptProposedAction()

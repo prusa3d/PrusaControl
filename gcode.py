@@ -1,5 +1,7 @@
 import time
 #from fastnumbers import fast_float
+from copy import deepcopy
+
 
 def timing(f):
     def wrap(*args):
@@ -16,8 +18,8 @@ class GCode(object):
         """
             data =
             {
-                '0.0':[[1.0, 2.0],[2.0, 1.2],[3.0,11.0]],
-                '0.15':[[0.0,0.0], [...], ...],
+                '0.0':[[[1.0, 2.0, 0.0],[2.0, 1.2, 0.0], 'E']], [[2.0, 1.2, 0.0], [3.0,11.0, 0.0], 'M'],
+                '0.15':[[[0.0,0.0, 0.15], [...]], [...], ...],
                 ''
             }
         """
@@ -46,14 +48,40 @@ class GCode(object):
     def parse_line(self, text):
         line = text.split(' ')
         if 'Z' in line[1]:
+            #Set of Z axis
             self.actual_z = line[1][1:]
+            self.last_point =[]
             return
+        elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]):
+            #Move point
+            actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
+            if self.last_point:
+                self.add_line(self.last_point, actual_point, self.actual_z, 'M')
+                self.last_point = deepcopy(actual_point)
+            else:
+                self.last_point = deepcopy(actual_point)
         elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
-            data_x = float(line[1][1:])
-            data_y = float(line[2][1:])
-            data_z = float(self.actual_z)
-            self.add_point(data_x, data_y, data_z, self.actual_z)
+            #Extrusion point
+            actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
+            if self.last_point:
+                self.add_line(self.last_point, actual_point, self.actual_z, 'E')
+                self.last_point = deepcopy(actual_point)
+            else:
+                self.last_point = deepcopy(actual_point)
+
         return
+
+    def add_line(self, first_point, second_point, actual_z, type):
+        key = actual_z
+        if key in self.data_keys:
+            self.data[key].append([first_point, second_point, type])
+            self.all_data.append([first_point, second_point, type])
+        else:
+            self.data_keys.append(key)
+            self.data[key] = []
+            self.data[key].append([first_point, second_point, type])
+            self.all_data.append([first_point, second_point, type])
+
 
 
     def add_point(self, x, y, z, actual_z):
