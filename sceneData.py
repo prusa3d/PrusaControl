@@ -115,8 +115,8 @@ class AppScene(object):
         return area
 
     @timing
-    def get_contact_faces_with_area_smaller_than(self, area_size):
-        whole_scene = self.get_whole_scene_in_one_mesh()
+    def get_contact_faces_with_area_smaller_than(self, area_size, whole_scene):
+        #whole_scene = self.get_whole_scene_in_one_mesh()
 
 
         b= whole_scene.vectors[:, :, 2] < 0.1
@@ -165,10 +165,10 @@ class AppScene(object):
         return brim
 
     @timing
-    def get_faces_by_smaller_angel_normal_and_vector(self, vector, angle):
+    def get_faces_by_smaller_angel_normal_and_vector(self, vector, angle, whole_scene):
         #calculate angel between normal vector and given vector
         #return list of faces with smaller
-        whole_scene = self.get_whole_scene_in_one_mesh()
+        #whole_scene = self.get_whole_scene_in_one_mesh()
         d = 0.1
         self.analyze_result_data_tmp = np.array([])
         self.analyze_result_data_tmp = np.array([i+whole_scene.normals[n]*d for n, i in enumerate(whole_scene.vectors) if AppScene.calc_angle(whole_scene.normals[n], vector) <= 90.-angle ])
@@ -223,6 +223,9 @@ class AppScene(object):
             model.selected = False
 
     def automatic_models_position(self):
+        pass
+    '''
+    def automatic_models_position(self):
         #sort objects over size of bounding sphere
 
         #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
@@ -231,6 +234,7 @@ class AppScene(object):
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
         for i, m in enumerate(self.models):
             self.find_new_position(i, m)
+    '''
 
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
@@ -403,33 +407,46 @@ class Model(object):
         #TODO: Add all transformation
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
-        mesh = Mesh(self.temp_mesh.data.copy())
+        #TODO: add rotation
+        #mesh = Mesh(self.temp_mesh.data.copy())
+        vectors = self.mesh.vectors.copy()
+
+        #TODO: add scale
+        #TODO: add possition
+        #TODO: add default scale
+
 
         if transform:
-            mesh.vectors += np.array(self.pos)
+            vectors += self.pos
 
-        mesh.vectors /= np.array(self.scaleDefault)
+        #print("Position: " + str(self.pos+printer_zero))
 
-        data['vectors'] = mesh.vectors
 
-        mesh.update_min()
-        mesh.update_max()
+        vectors /= np.array(self.scaleDefault)
+
+        data['vectors'] = vectors
 
         return Mesh(data)
 
 
     def normalize_object(self):
+        #vektor od nuly po boundingSphereCenter, tedy rozdil ktery je potreba pricist ke vsem souradnicim
         r = np.array([.0, .0, .0]) - np.array(self.boundingSphereCenter)
 
         self.mesh.vectors = self.mesh.vectors + r
 
-        self.update_min_max()
+        self.mesh.update_min()
+        self.mesh.update_max()
+        self.min = self.mesh.min_
+        self.max = self.mesh.max_
+
         self.boundingSphereCenter = np.array(self.boundingSphereCenter) + r
 
         self.zeroPoint = np.array(self.zeroPoint) + r
         self.zeroPoint[2] = self.min[2]
 
         self.pos = np.array([.0, .0, .0]) - self.zeroPoint
+        self.zeroPoint[2] = 0.
 
         self.normalization_flag = True
 
@@ -442,6 +459,8 @@ class Model(object):
         #self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
+
+
 
     '''
     def set_rotation(self, vector, alpha):
@@ -505,7 +524,7 @@ class Model(object):
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
-        self.place_on_zero()
+        #self.place_on_zero()
 
         self.is_changed = False
 
@@ -583,10 +602,31 @@ class Model(object):
             self.update_min_max()
 
     def update_min_max(self):
-        self.mesh.update_min()
-        self.mesh.update_max()
-        self.min = self.mesh.min_
-        self.max = self.mesh.max_
+        self.temp_mesh = deepcopy(self.mesh)
+
+        rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
+        ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
+        rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
+
+        rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
+
+        scale_matrix = np.array([[1., 0., 0.],
+                                 [0., 1., 0.],
+                                 [0., 0., 1.]]) * self.scale
+
+        final_rotation = rotation_matrix
+        final_scale = scale_matrix
+        final_matrix = np.dot(final_rotation, final_scale)
+
+        for i in range(3):
+            self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
+
+        self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
+
+        #self.mesh.update_min()
+        #self.mesh.update_max()
+        self.min = self.temp_mesh.min_
+        self.max = self.temp_mesh.max_
 
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
@@ -603,21 +643,27 @@ class Model(object):
             return
         glPushMatrix()
 
+        glPointSize(5.0)
+        glColor3f(1., .0, .0)
+        glBegin(GL_POINTS)
+        glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
+        glVertex3f(self.max_scene[0], self.min_scene[1], self.min_scene[2])
+        glVertex3f(self.min_scene[0], self.max_scene[1], self.min_scene[2])
+        glVertex3f(self.min_scene[0], self.min_scene[1], self.max_scene[2])
+        glVertex3f(self.max_scene[0], self.min_scene[1], self.max_scene[2])
+        glVertex3f(self.max_scene[0], self.max_scene[1], self.min_scene[2])
+        glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
+        glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
+        glEnd()
+
+        glColor3f(.0, .0, 1.)
+        glBegin(GL_POINTS)
+        glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
+        glEnd()
+
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
-        if picking:
-            glColor3ubv(self.colorId)
-        else:
-            if blending:
-                glColor4f(.4, .4, .4, .75)
-            else:
-                if self.is_in_printing_space(self.parent.controller.actual_printer):
-                    if self.selected:
-                        glColor3f(.75, .75, 0.)
-                    else:
-                        glColor3fv(self.color)
-                else:
-                    glColor3f(0.75, .0, .0)
+
 
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
@@ -641,29 +687,29 @@ class Model(object):
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        '''
-        if blending:
-            glColor4f(.4, .4, .4, .75)
-            glBlendFunc(GL_SRC_COLOR, GL_ONE)
-            glEnable(GL_BLEND)
-            glDisable(GL_LIGHTING)
-            glDisable(GL_DEPTH_TEST)
-
-            glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors)*3)
-
-            glEnable(GL_DEPTH_TEST)
-            glEnable(GL_LIGHTING)
-            glDisable(GL_BLEND)
-        else:
-            glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
-        '''
-
         if blending:
             glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
         else:
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
+
+
+
+
+        if picking:
+            glColor3ubv(self.colorId)
+        else:
+            if blending:
+                glColor4f(.4, .4, .4, .75)
+            else:
+                if self.is_in_printing_space(self.parent.controller.actual_printer):
+                    if self.selected:
+                        glColor3f(.75, .75, 0.)
+                    else:
+                        glColor3fv(self.color)
+                else:
+                    glColor3f(0.75, .0, .0)
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
 
@@ -815,6 +861,8 @@ class ModelTypeStl(ModelTypeAbstract):
         model.zeroPoint = deepcopy(model.boundingSphereCenter)
         model.zeroPoint[2] = model.min[2]
 
+        print(str(model.zeroPoint))
+
         model.mesh = mesh
 
         #normalize position of object on 0
@@ -834,10 +882,10 @@ class ModelTypeStl(ModelTypeAbstract):
         model.size = model.max-model.min
         model.size_origin = deepcopy(model.size)
 
-        model.temp_mesh = deepcopy(mesh)
+        model.temp_mesh = deepcopy(model.mesh)
         model.make_normals()
 
-        model.displayList = model.make_display_list()
+        #model.displayList = model.make_display_list()
         #model.make_vao()
 
         return model

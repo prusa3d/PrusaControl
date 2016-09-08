@@ -255,11 +255,13 @@ class Controller:
         return self.view.get_actual_printing_data()
 
     def generate_button_pressed(self):
+        whole_scene = self.scene.get_whole_scene_in_one_mesh()
         if self.status in ['edit', 'canceled']:
             #prepared to be g-code generated
-            self.analyze_result = self.analyzer.make_analyze(self.scene)
             self.canceled = False
-            self.make_reaction_on_analyzation_result(self.analyze_result)
+            if self.settings['analyze']:
+                self.analyze_result = self.analyzer.make_analyze(whole_scene)
+                self.make_reaction_on_analyzation_result(self.analyze_result)
 
             if not self.canceled:
                 self.generate_gcode()
@@ -435,7 +437,7 @@ class Controller:
 
     def scene_was_changed(self):
         self.status = 'edit'
-        #TODO:repair this bug
+        self.scene.analyze_result_data_tmp = []
         self.set_generate_button()
         self.set_progress_bar(0.0)
 

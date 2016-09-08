@@ -423,7 +423,6 @@ class GLWidget(QGLWidget):
 
             self.draw_tools()
 
-        #self.picking_render()
         glFlush()
 
         t1 = time.time()
