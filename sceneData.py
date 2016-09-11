@@ -586,12 +586,18 @@ class Model(object):
         self.min_scene = self.min + pos
         self.max_scene = self.max + pos
 
-    def set_rot(self, x, y, z):
-        self.rot[0] = x
-        self.rot[1] = y
-        self.rot[2] = z
+    def set_rot(self, x, y, z, add=False):
+        if add:
+            self.rot[0] += x
+            self.rot[1] += y
+            self.rot[2] += z
+        else:
+            self.rot[0] = x
+            self.rot[1] = y
+            self.rot[2] = z
 
         self.update_min_max()
+        self.place_on_zero()
 
     def set_scale_abs(self, x, y, z):
         self.scale[0] = x
@@ -599,6 +605,7 @@ class Model(object):
         self.scale[2] = z
 
         self.update_min_max()
+        self.place_on_zero()
 
 
     def update_position(self):

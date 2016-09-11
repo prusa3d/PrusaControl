@@ -597,7 +597,7 @@ class Controller:
                         #TODO:add function get_active_tool(self) return class tool
                         #tool = self.get_toolsactive_tool()
                         #TODO:add function do(self) to class tool
-                        #tool.do()
+                        self.prepare_tool(event)
                     else:
                         #select object
                         self.unselect_objects()
@@ -606,6 +606,13 @@ class Controller:
                 self.unselect_objects()
                 self.set_camera_rotation_function()
         self.view.update_scene()
+
+    def prepare_tool(self, event):
+        print("prepare tool")
+        if self.tool == 'rotate':
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            self.origin_rotation_point = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+
 
 
     def get_active_tool(self):
@@ -668,22 +675,27 @@ class Controller:
                 res_new = res - self.res_old
                 for model in self.scene.models:
                     if model.selected:
-                        model.set_move(res_new)
+
+
+                        model.set_rot(.0, .0, new_angle, True)
                         self.view.update_object_settings(model.id)
                         self.scene_was_changed()
                 self.res_old = res
+
         #Scale function
         elif self.tool == 'scale':
-            newRayStart, newRayEnd = self.view.get_cursor_position(event)
-            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
-            if res is not None:
-                res_new = res - self.res_old
-                for model in self.scene.models:
-                    if model.selected:
-                        model.set_move(res_new)
-                        self.view.update_object_settings(model.id)
-                        self.scene_was_changed()
-                self.res_old = res
+            ray_start, ray_end = self.view.get_cursor_position(event)
+            camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+
+            for model in self.scene.models:
+                if model.selected:
+                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.zeroPoint, direction))
+                    new_scale_vec = new_scale_point - model.zeroPoint
+                    l = numpy.linalg.norm(new_scale_vec)
+                    model.set_scale_abs(l, l, l)
+                    self.view.update_object_settings(model.id)
+                    self.scene_was_changed()
+
 
         self.last_pos = QtCore.QPoint(event.pos())
         self.view.update_scene()
