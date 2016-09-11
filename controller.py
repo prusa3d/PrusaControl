@@ -296,7 +296,6 @@ class Controller:
             retval = msg.exec_()
 
     def reaction_button_pressed(self, i):
-        print("resction button: " + str(i.text()))
         if i.text() == 'Apply':
             for res in self.analyze_result:
                 if res['result']:
@@ -592,7 +591,9 @@ class Controller:
                     elif self.is_object_already_selected(object_id):
                         #nastav funkci na provedeni toolu
 
-                        self.tool = 'move'
+                        self.tool = self.get_active_tool()
+                        print("Aktualni tool je " + self.tool)
+
                         #TODO:add function get_active_tool(self) return class tool
                         #tool = self.get_toolsactive_tool()
                         #TODO:add function do(self) to class tool
@@ -606,10 +607,19 @@ class Controller:
                 self.set_camera_rotation_function()
         self.view.update_scene()
 
+
+    def get_active_tool(self):
+        for tool in self.tools:
+            if tool.pressed:
+                return tool.tool_name
+        return 'move'
+
     def mouse_release_event(self, event):
         print("mouse release event")
         self.set_camera_function_false()
-        if self.tool == 'move':
+        print("Hodnota v tool je: " + self.tool)
+        if self.tool in ['move', 'rotate', 'scale', 'placeonface']:
+            print("Ukladame nastaveni")
             for model in self.scene.models:
                 if model.selected:
                     self.scene.save_change(model)
@@ -637,6 +647,7 @@ class Controller:
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
             #self.scene.camera_vector = direction - camera_pos
+        #Move function
         elif self.tool== 'move':
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
@@ -648,6 +659,32 @@ class Controller:
                         self.view.update_object_settings(model.id)
                         self.scene_was_changed()
                 self.res_old = res
+
+        #Rotate function
+        elif self.tool == 'rotate':
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            if res is not None:
+                res_new = res - self.res_old
+                for model in self.scene.models:
+                    if model.selected:
+                        model.set_move(res_new)
+                        self.view.update_object_settings(model.id)
+                        self.scene_was_changed()
+                self.res_old = res
+        #Scale function
+        elif self.tool == 'scale':
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            if res is not None:
+                res_new = res - self.res_old
+                for model in self.scene.models:
+                    if model.selected:
+                        model.set_move(res_new)
+                        self.view.update_object_settings(model.id)
+                        self.scene_was_changed()
+                self.res_old = res
+
         self.last_pos = QtCore.QPoint(event.pos())
         self.view.update_scene()
 

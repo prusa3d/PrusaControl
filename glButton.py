@@ -5,7 +5,7 @@ import logging
 class GlButton(object):
 
     newid = itertools.count().next
-    def __init__(self, texture_off=None, texture_on=None, size=[10., 10.], position=[0.0, 0.0], auto_release=False):
+    def __init__(self, texture_off=None, texture_on=None, size=[10., 10.], position=[0.0, 0.0], auto_release=False, tool_name=''):
         self.id = (GlButton.newid()+1) * 7013
         self.color_id = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 
@@ -22,6 +22,8 @@ class GlButton(object):
 
         self.key = None
         self.subkey = None
+
+        self.tool_name=tool_name
 
     def set_callback(self, func):
         self.callback_function = func

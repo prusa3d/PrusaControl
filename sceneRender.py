@@ -249,13 +249,13 @@ class GLWidget(QGLWidget):
         #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
         self.rotateTool = GlButton(self.texture_from_png("data/img/new/Rotate_OFF.png"),
                                    self.texture_from_png("data/img/new/Rotate_ON.png"),
-                                   [30., 30.], [-40., 90.])
+                                   [30., 30.], [-40., 90.], False, 'rotate')
         self.scaleTool = GlButton(self.texture_from_png("data/img/new/Scale_OFF.png"),
                                   self.texture_from_png("data/img/new/Scale_ON.png"),
-                                  [30., 30.], [-40., 50])
+                                  [30., 30.], [-40., 50], False, 'scale')
         self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/new/Place_on_Face_OFF.png"),
                                         self.texture_from_png("data/img/new/Place_on_Face_ON.png"),
-                                        [30., 30.], [-40., 10.])
+                                        [30., 30.], [-40., 10.], False, 'placeonface')
         #back, forward buttons
         self.undo_button = GlButton(self.texture_from_png("data/img/new/Back_Arrow_OFF.png"),
                                     self.texture_from_png("data/img/new/Back_Arrow_ON.png"),

@@ -223,9 +223,6 @@ class AppScene(object):
             model.selected = False
 
     def automatic_models_position(self):
-        pass
-    '''
-    def automatic_models_position(self):
         #sort objects over size of bounding sphere
 
         #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
@@ -234,7 +231,7 @@ class AppScene(object):
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
         for i, m in enumerate(self.models):
             self.find_new_position(i, m)
-    '''
+
 
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
@@ -402,32 +399,36 @@ class Model(object):
             self.parent.controller.set_printable(False)
             return False
 
-
     def get_mesh(self, transform=True):
-        #TODO: Add all transformation
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
-        #TODO: add rotation
-        #mesh = Mesh(self.temp_mesh.data.copy())
         vectors = self.mesh.vectors.copy()
 
-        #TODO: add scale
-        #TODO: add possition
-        #TODO: add default scale
+        rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
+        ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
+        rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
 
+        rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
+
+        scale_matrix = np.array([[1., 0., 0.],
+                                 [0., 1., 0.],
+                                 [0., 0., 1.]]) * self.scale
+
+        final_rotation = rotation_matrix
+        final_scale = scale_matrix
+        final_matrix = np.dot(final_rotation, final_scale)
+
+        for i in range(3):
+            vectors[:, i] = vectors[:, i].dot(final_matrix)
 
         if transform:
             vectors += self.pos
-
-        #print("Position: " + str(self.pos+printer_zero))
-
 
         vectors /= np.array(self.scaleDefault)
 
         data['vectors'] = vectors
 
         return Mesh(data)
-
 
     def normalize_object(self):
         #vektor od nuly po boundingSphereCenter, tedy rozdil ktery je potreba pricist ke vsem souradnicim
@@ -459,8 +460,6 @@ class Model(object):
         #self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
-
-
 
     '''
     def set_rotation(self, vector, alpha):
@@ -494,7 +493,7 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
 
-
+    '''
     def apply_all_transformation(self):
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
         ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
@@ -527,6 +526,7 @@ class Model(object):
         #self.place_on_zero()
 
         self.is_changed = False
+    '''
 
     def start_edit(self):
         self.rot_hist = deepcopy(self.rot)
@@ -539,6 +539,9 @@ class Model(object):
         self.pos_hist = np.array([.0, .0, .0])
         self.rot_hist = np.array([.0, .0, .0])
         self.scale_hist = np.array([1., 1., 1.])
+
+        self.update_min_max()
+
         self.is_changed = False
 
     def discard_changes(self):
@@ -588,10 +591,14 @@ class Model(object):
         self.rot[1] = y
         self.rot[2] = z
 
+        self.update_min_max()
+
     def set_scale_abs(self, x, y, z):
         self.scale[0] = x
         self.scale[1] = y
         self.scale[2] = z
+
+        self.update_min_max()
 
 
     def update_position(self):
@@ -601,7 +608,9 @@ class Model(object):
             self.pos[2]+=len
             self.update_min_max()
 
+    @timing
     def update_min_max(self):
+        print("recalculate")
         self.temp_mesh = deepcopy(self.mesh)
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
@@ -621,10 +630,10 @@ class Model(object):
         for i in range(3):
             self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
 
-        self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
+        #self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
 
-        #self.mesh.update_min()
-        #self.mesh.update_max()
+        self.temp_mesh.update_min()
+        self.temp_mesh.update_max()
         self.min = self.temp_mesh.min_
         self.max = self.temp_mesh.max_
 
