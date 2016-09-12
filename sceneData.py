@@ -188,6 +188,8 @@ class AppScene(object):
         deg = np.degrees(np.arctan2(sin_ang, cos_ang))
         return deg
 
+
+
     @staticmethod
     def is_length_in_z_bigger_then(triangle, minimal_z):
         max_z = max([i[2] for i in triangle])
@@ -604,6 +606,7 @@ class Model(object):
         self.scale[1] = y
         self.scale[2] = z
 
+
         self.update_min_max()
         self.place_on_zero()
 
@@ -647,6 +650,14 @@ class Model(object):
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
+    def recalc_bounding_sphere(self):
+        max_l = np.linalg.norm(self.max)
+        min_l = np.linalg.norm(self.min)
+        if max_l > min_l:
+            self.boundingSphereSize = max_l
+        else:
+            self.boundingSphereSize = min_l
+
     def put_array_to_gl(self):
         glNormalPointerf(self.tiled_normals)
         glVertexPointerf(self.mesh.vectors)
@@ -658,7 +669,7 @@ class Model(object):
         if not self.isVisible:
             return
         glPushMatrix()
-
+        '''
         glPointSize(5.0)
         glColor3f(1., .0, .0)
         glBegin(GL_POINTS)
@@ -671,7 +682,7 @@ class Model(object):
         glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
         glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
         glEnd()
-
+        '''
         glColor3f(.0, .0, 1.)
         glBegin(GL_POINTS)
         glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])

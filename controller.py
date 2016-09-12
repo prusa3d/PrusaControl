@@ -482,7 +482,26 @@ class Controller:
         return None
 
     def is_some_tool_helper_under_cursor(self, object_id):
-        return False
+        if object_id == 0:
+            return False
+        for model in self.scene.models:
+            if model.rotateXId == object_id:
+                model.selected = True
+                model.rotationAxis = 'x'
+                self.tool = 'rotate'
+                return True
+            elif model.rotateYId == object_id:
+                model.selected = True
+                model.rotationAxis = 'y'
+                self.tool = 'rotate'
+                return True
+            elif model.rotateZId == object_id:
+                model.selected = True
+                model.rotationAxis = 'z'
+                self.tool = 'rotate'
+                return True
+            else:
+                model.rotationAxis = []
 
     def set_active_tool_helper_by_id(self, object_id):
         pass
@@ -581,6 +600,7 @@ class Controller:
                         #tool.activate_tool()
                     #Je pod kurzorem nejaky tool helper?
                     elif self.is_some_tool_helper_under_cursor(object_id):
+                        print("Nasel tool_helper")
                         self.set_active_tool_helper_by_id(object_id)
                     #Je objekt oznaceny?
                     elif self.is_ctrl_pressed():
@@ -612,6 +632,11 @@ class Controller:
         if self.tool == 'rotate':
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             self.origin_rotation_point = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            self.res_old = self.origin_rotation_point
+            self.view.glWidget.oldHitPoint = numpy.array([0., 0., 0.])
+            self.view.glWidget.hitPoint = numpy.array([0., 0., 0.])
+        #elif self.tool == 'scale':
+
 
 
 
@@ -629,6 +654,8 @@ class Controller:
             print("Ukladame nastaveni")
             for model in self.scene.models:
                 if model.selected:
+                    model.update_min_max()
+                    model.recalc_bounding_sphere()
                     self.scene.save_change(model)
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])
@@ -675,12 +702,39 @@ class Controller:
                 res_new = res - self.res_old
                 for model in self.scene.models:
                     if model.selected:
+                        pos = model.pos
+                        pos[2] = 0.
+
+                        #New
+                        new_vec = res - pos
+                        self.view.glWidget.hitPoint = deepcopy(new_vec)
+                        new_vect_leng = numpy.linalg.norm(new_vec)
+                        new_vec /= new_vect_leng
+
+                        old_vec = self.res_old - pos
+                        self.view.glWidget.oldHitPoint = deepcopy(old_vec)
+                        old_vec /= numpy.linalg.norm(old_vec)
 
 
-                        model.set_rot(.0, .0, new_angle, True)
+                        cos_ang = numpy.dot(old_vec, new_vec)
+                        cross = numpy.cross(old_vec, new_vec)
+
+                        neg = numpy.dot(cross, numpy.array([0., 0., 1.]))
+                        sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) * -1.
+
+                        alpha = numpy.arctan2(sin_ang, cos_ang)
+
+                        if new_vect_leng<=model.boundingSphereSize:
+                            model.set_rot(model.rot[0], model.rot[1], alpha)
+                            print("New angle: " + str(numpy.degrees(alpha)))
+                        else:
+                            alpha_new = numpy.degrees(alpha) // 45
+                            print("New round angle: " + str(alpha_new*45.))
+                            model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25))
+
                         self.view.update_object_settings(model.id)
                         self.scene_was_changed()
-                self.res_old = res
+                #self.res_old = res
 
         #Scale function
         elif self.tool == 'scale':
@@ -689,8 +743,10 @@ class Controller:
 
             for model in self.scene.models:
                 if model.selected:
-                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.zeroPoint, direction))
-                    new_scale_vec = new_scale_point - model.zeroPoint
+                    pos = model.pos
+                    pos[2] = 0.
+                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, pos, direction))
+                    new_scale_vec = new_scale_point - pos
                     l = numpy.linalg.norm(new_scale_vec)
                     model.set_scale_abs(l, l, l)
                     self.view.update_object_settings(model.id)
