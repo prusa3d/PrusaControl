@@ -55,7 +55,7 @@ class Slic3rEngineRunner(QObject):
         else:
             self.slicer_place = ['slic3r']
 
-        print(self.slicer_place)
+        #print(self.slicer_place)
 
         self.step_max = 8
         self.step = 0

@@ -781,7 +781,7 @@ class Model(object):
         glDisableClientState(GL_NORMAL_ARRAY)
 
         return genList
-
+    '''
     def closest_point(self, a, b, p):
         ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
         abSquare = np.dot(ab.getRaw(), ab.getRaw())
@@ -801,6 +801,7 @@ class Model(object):
         pt = self.closest_point(Vector(start), Vector(end), Vector(v.tolist()))
         lenght = pt.lenght(v.tolist())
         return lenght < self.boundingSphereSize
+    '''
 
     def intersection_model_model_by_BB(self, model):
         #intersection by collision of BB
@@ -810,7 +811,7 @@ class Model(object):
         model_max = model.max_scene
         d = self.parent.model_position_offset
         return not(max[0]+d<model_min[0] or model_max[0]<min[0]-d or max[1]+d<model_min[1] or model_max[1]<min[1]-d)
-
+    '''
     def intersection_model_model_by_BS(self, model):
         #intersection by collision of BS
         vector_model_model = self.pos - model.pos
@@ -819,13 +820,18 @@ class Model(object):
             return False
         else:
             return True
-
+    '''
     def intersection_model_list_model_(self, list):
         for m in list:
             #if self.intersection_model_model_by_BS(m):
             if self.intersection_model_model_by_BB(m):
                 return True
         return False
+
+    def place_on_face(self, normal, ray_start, ray_end):
+        #calc alpha
+        #calc beta
+        pass
 
 
 class ModelTypeAbstract(object):
