@@ -66,6 +66,9 @@ class GLWidget(QGLWidget):
         self.fps_count = 0
         self.fps_time = 0.
 
+        self.hitPoint = numpy.array([0.,0.,0.])
+        self.oldHitPoint = numpy.array([0.,0.,0.])
+
 
         #properties definition
         self.xRot = 0
@@ -497,14 +500,44 @@ class GLWidget(QGLWidget):
         glTranslatef(position[0], position[1], 0.0)
         glDisable( GL_LIGHTING )
         glDisable(GL_DEPTH_TEST)
-        glLineWidth(4.0)
-        glColor3ubv(colors[0])
-        glBegin(GL_LINE_LOOP)
-        glColor3ubv(colors[2])
-        glBegin(GL_LINE_LOOP)
-        for i in xrange(0, 360, 360/segments):
-            glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
-        glEnd()
+
+
+        if picking:
+            glLineWidth(5.0)
+            glColor3ubv(colors[2])
+            glBegin(GL_LINE_LOOP)
+            for i in xrange(0, 360, 360 / segments):
+                glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
+            glEnd()
+        else:
+            glLineWidth(2.0)
+            glColor3ubv(colors[2])
+            glBegin(GL_LINE_LOOP)
+            for i in xrange(0, 360, 360/segments):
+                glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
+            glEnd()
+
+            glBegin(GL_LINE_LOOP)
+            for i in xrange(0, 360, 360 / segments):
+                glVertex3f(math.cos(math.radians(i)) * (radius+.25), math.sin(math.radians(i)) * (radius+.25), 0.0)
+            glEnd()
+
+            glBegin(GL_LINES)
+            for i in xrange(0, 360, 360 / 8):
+                glVertex3f(math.cos(math.radians(i)) * (radius), math.sin(math.radians(i)) * (radius), 0.0)
+                glVertex3f(math.cos(math.radians(i)) * (radius + .25), math.sin(math.radians(i)) * (radius + .25), 0.0)
+            glEnd()
+
+            glColor3f(1., 0., 0.)
+            glBegin(GL_LINES)
+            glVertex3f(0., 0., 0.)
+            glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
+
+            glVertex3f(0., 0., 0.)
+            glVertex3f(self.oldHitPoint[0], self.oldHitPoint[1], self.oldHitPoint[2])
+            glEnd()
+
+
         glEnable(GL_DEPTH_TEST)
         glEnable( GL_LIGHTING )
         glPopMatrix()
