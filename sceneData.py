@@ -262,11 +262,11 @@ class AppScene(object):
                 position_vector[0] += model.boundingSphereSize*.1
                 position_vector[1] += model.boundingSphereSize*.1
 
-    def get_whole_scene_in_one_mesh(self):
-        return Mesh(np.concatenate([i.get_mesh().data for i in self.models]))
+    def get_whole_scene_in_one_mesh(self, gcode_generate=False):
+        return Mesh(np.concatenate([i.get_mesh(True, gcode_generate).data for i in self.models]))
 
     def save_whole_scene_to_one_stl_file(self, filename):
-        whole_scene = self.get_whole_scene_in_one_mesh()
+        whole_scene = self.get_whole_scene_in_one_mesh(True)
         whole_scene.save(filename)
 
 class Model(object):
@@ -401,7 +401,7 @@ class Model(object):
             self.parent.controller.set_printable(False)
             return False
 
-    def get_mesh(self, transform=True):
+    def get_mesh(self, transform=True, generate_gcode=False):
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
         vectors = self.mesh.vectors.copy()
@@ -423,8 +423,13 @@ class Model(object):
         for i in range(3):
             vectors[:, i] = vectors[:, i].dot(final_matrix)
 
-        if transform:
+        if transform and generate_gcode:
+            vectors += self.pos + (np.array([self.parent.controller.actual_printer['printing_space'][0]*0.5,
+                                             self.parent.controller.actual_printer['printing_space'][1]*0.5,
+                                             self.parent.controller.actual_printer['printing_space'][2]*0.5]))
+        elif transform and not generate_gcode:
             vectors += self.pos
+
 
         vectors /= np.array(self.scaleDefault)
 
@@ -828,10 +833,73 @@ class Model(object):
                 return True
         return False
 
-    def place_on_face(self, normal, ray_start, ray_end):
+    '''
+    def intersectionRayModel(self, rayStart, rayEnd):
+        #self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
+        #matrix = Matrix44.from_scale(Vector3(self.scale))
+        #matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
+        #self.temp_mesh
+
+
+        #w = Vector(rayEnd)
+        #w.minus(rayStart)
+        #w.normalize()
+        ray = rayEnd - rayStart
+
+
+        for i, tri in enumerate(self.temp_mesh.vectors):
+            v0 = matrix * Vector3(tri[0])
+            v1 = matrix * Vector3(tri[1])
+            v2 = matrix * Vector3(tri[2])
+            v0 = v0.tolist()
+            v1 = v1.tolist()
+            v2 = v2.tolist()
+
+            b = [.0, .0, .0]
+            e1 = Vector(v1)
+            e1.minus(v0)
+            e2 = Vector(v2)
+            e2.minus(v0)
+
+            n = Vector(self.normal[i])
+
+            q = np.cross(w.getRaw(), e2.getRaw())
+            a = np.dot(e1.getRaw(), q)
+
+            if ((np.dot(n.getRaw(), w.getRaw()) >= .0) or (abs(a) <= .0001)):
+                continue
+
+            s = Vector(rayStart)
+            s.minus(v0)
+            s.sqrt(a)
+
+            r = np.cross(s.getRaw(), e1.getRaw())
+            b[0] = np.dot(s.getRaw(), q)
+            b[1] = np.dot(r, w.getRaw())
+            b[2] = 1.0 - b[0] - b[1]
+
+            if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
+                continue
+
+            t = np.dot(e2.getRaw(), r)
+            if (t >= .0):
+                return True
+            else:
+                continue
+        return False
+    '''
+
+
+    def place_on_face(self, ray_start, ray_end):
+        m = self.get_mesh()
         #calc alpha
+        #rotation around X vector
+        normal_face_vector_tmp1 =[]
+
+
         #calc beta
-        pass
+        #rotation around Y vector
+        normal_face_vector_tmp2 =[]
 
 
 class ModelTypeAbstract(object):

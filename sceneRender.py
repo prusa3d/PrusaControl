@@ -441,20 +441,11 @@ class GLWidget(QGLWidget):
             self.fps_time+=t1-t0
 
     def draw_layer(self, layer, printing_space):
-        #print("Drawing gcode layer " + str(self.controller.gcode_layer))
-        #print("Typ dat layer: " + str(type(layer)))
         layer_data = self.controller.gcode.data[self.controller.gcode_layer]
-        #layer_data = self.controller.gcode.all_data
 
-        #if isinstance(self.controller.gcode_layer, int):
-        #    layer_data = self.controller.gcode.data[self.controller.gcode_layer]
-        #else:
-        #    pass
-
-        #print("Data: " + str(layer_data))
         glPushMatrix()
         #TODO: Better solution
-        #glTranslatef(printing_space[0]*-0.5, printing_space[1]*-0.5, 0.0)
+        glTranslatef(printing_space[0]*-0.5, printing_space[1]*-0.5, 0.0)
 
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)

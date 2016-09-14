@@ -131,7 +131,7 @@ class Version_1_0(VersionAbstract):
             for model in scene.models:
                 #transform data to stl file
                 #mesh = self._create_mesh_from_model(model)
-                mesh = model.get_mesh(transform=False)
+                mesh = model.get_mesh(False, False)
 
                 #generate ascii format of stl(bug in numpy-stl)
                 #fileHandler = opened_zipfile.write(model.filename)

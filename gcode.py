@@ -52,6 +52,9 @@ class GCode(object):
             self.actual_z = line[1][1:]
             self.last_point =[]
             return
+
+        if len(line)<4:
+            return
         elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]):
             #Move point
             actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
@@ -68,7 +71,6 @@ class GCode(object):
                 self.last_point = deepcopy(actual_point)
             else:
                 self.last_point = deepcopy(actual_point)
-
         return
 
     def add_line(self, first_point, second_point, actual_z, type):

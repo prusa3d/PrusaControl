@@ -54,8 +54,6 @@ class Controller:
         self.analyzer = Analyzer(self)
         self.gcode = None
 
-
-
         self.printing_settings = {}
         self.settings = {}
         if not self.settings:
@@ -124,8 +122,8 @@ class Controller:
         self.over_object = False
         self.models_selected = False
 
-
         self.app = app
+        self.app_parameters = app.arguments()
 
         self.translator = QtCore.QTranslator()
         self.set_language(self.settings['language'])
@@ -143,6 +141,14 @@ class Controller:
         self.view.update_gui_for_material()
 
 
+        if len(self.app_parameters) >= 3:
+            print("nasel jsem soubor jako parametr")
+            for file in self.app_parameters[2:]:
+                self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
+
+
+
+
     def write_config(self):
         config = RawConfigParser()
         config.add_section('settings')
@@ -155,8 +161,11 @@ class Controller:
             config.write(configfile)
 
 
-    def read_gcode(self):
-        self.gcode = GCode(self.app_config.tmp_place + 'out.gcode')
+    def read_gcode(self, filename = ''):
+        if filename:
+            self.gcode = GCode(filename)
+        else:
+            self.gcode = GCode(self.app_config.tmp_place + 'out.gcode')
 
         min = 0
         max = len(self.gcode.data_keys)-1
@@ -173,6 +182,8 @@ class Controller:
         self.view.gcode_label.setText(self.gcode.data_keys[0])
         self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
 
+        if filename:
+            self.set_gcode_view()
 
     def set_gcode_layer(self, value):
         self.gcode_layer = self.gcode.data_keys[value]
@@ -635,8 +646,12 @@ class Controller:
             self.res_old = self.origin_rotation_point
             self.view.glWidget.oldHitPoint = numpy.array([0., 0., 0.])
             self.view.glWidget.hitPoint = numpy.array([0., 0., 0.])
-        #elif self.tool == 'scale':
-
+        elif self.tool == 'placeonface':
+            ray_start, ray_end = self.view.get_cursor_position(event)
+            for model in self.scene.models:
+                if model.selected:
+                    face = model.intersectionRayModel(ray_start, ray_end)
+                    print("Nalezen objekt " + str(model))
 
 
 
@@ -1040,6 +1055,7 @@ class Controller:
         function for resolve which file type will be loaded
         '''
         #self.view.statusBar().showMessage('Load file name: ')
+        print("Soubor: %s " % url)
         if url[0] == '/' and self.app_config.system_platform in ['Windows']:
             url = url[1:]
 
@@ -1058,6 +1074,8 @@ class Controller:
         elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
             print('import image')
             self.import_image(url)
+        elif fileEnd in ['gcode']:
+            self.read_gcode(url)
 
 
 
