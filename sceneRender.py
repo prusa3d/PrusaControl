@@ -91,6 +91,9 @@ class GLWidget(QGLWidget):
         self.rayDir = numpy.array([0., 0. ,0.])
         self.rayUp = numpy.array([0., 0. ,0.])
         self.rayRight = numpy.array([0., 0. ,0.])
+        self.v0 = numpy.array([0., 0. ,0.])
+        self.v1 = numpy.array([0., 0., 0.])
+        self.v2 = numpy.array([0., 0., 0.])
         #DEBUG
 
         #screen properties
@@ -392,7 +395,7 @@ class GLWidget(QGLWidget):
 
         glEnable(GL_DEPTH_TEST)
 
-        #self.draw_debug()
+        self.draw_debug()
 
         glEnable ( GL_LIGHTING )
         for model in self.parent.controller.scene.models:
@@ -541,13 +544,22 @@ class GLWidget(QGLWidget):
         glBegin(GL_LINES)
         glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
         glVertex3f(self.rayDir[0]+self.rayStart[0], self.rayDir[1]+self.rayStart[1], self.rayDir[2]+self.rayStart[2])
+        '''
         glColor3f(0.,1.0,.0)
         glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
         glVertex3f(self.rayUp[0], self.rayUp[1], self.rayUp[2])
         glColor3f(0.,.0,.1)
         glVertex3f(self.rayStart[0], self.rayStart[1], self.rayStart[2])
         glVertex3f(self.rayRight[0], self.rayRight[1], self.rayRight[2])
+        '''
         glEnd()
+
+        glBegin(GL_LINE_LOOP)
+        glVertex3f(self.v0[0], self.v0[1], self.v0[2])
+        glVertex3f(self.v1[0], self.v1[1], self.v1[2])
+        glVertex3f(self.v2[0], self.v2[1], self.v2[2])
+        glEnd()
+
         glEnable(GL_LIGHTING)
         glPopMatrix()
 

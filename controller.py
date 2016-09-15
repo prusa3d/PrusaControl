@@ -142,7 +142,6 @@ class Controller:
 
 
         if len(self.app_parameters) >= 3:
-            print("nasel jsem soubor jako parametr")
             for file in self.app_parameters[2:]:
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
 
@@ -650,8 +649,15 @@ class Controller:
             ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected:
-                    face = model.intersectionRayModel(ray_start, ray_end)
-                    print("Nalezen objekt " + str(model))
+                    self.view.glWidget.rayStart = ray_start
+                    self.view.glWidget.rayDir = numpy.array(ray_end) - numpy.array(ray_start)
+                    face = model.place_on_face(ray_start, ray_end)
+                    if not face == []:
+                        self.view.glWidget.v0 = face[0]
+                        self.view.glWidget.v1 = face[1]
+                        self.view.glWidget.v2 = face[2]
+                        print("Nalezen objekt " + str(model))
+
 
 
 

@@ -188,6 +188,17 @@ class AppScene(object):
         deg = np.degrees(np.arctan2(sin_ang, cos_ang))
         return deg
 
+    @staticmethod
+    def calc_angle2(old_vec, new_vec):
+        cos_ang = np.dot(old_vec, new_vec)
+        cross = np.cross(old_vec, new_vec)
+
+        neg = np.dot(cross, np.array([0., 0., 1.]))
+        sin_ang = np.linalg.norm(cross) * np.sign(neg) * -1.
+
+        alpha = np.arctan2(sin_ang, cos_ang)
+
+
 
 
     @staticmethod
@@ -401,7 +412,7 @@ class Model(object):
             self.parent.controller.set_printable(False)
             return False
 
-    def get_mesh(self, transform=True, generate_gcode=False):
+    def get_mesh(self, transform=True, generate_gcode=False, default_scale=True):
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
         vectors = self.mesh.vectors.copy()
@@ -423,6 +434,8 @@ class Model(object):
         for i in range(3):
             vectors[:, i] = vectors[:, i].dot(final_matrix)
 
+
+
         if transform and generate_gcode:
             vectors += self.pos + (np.array([self.parent.controller.actual_printer['printing_space'][0]*0.5,
                                              self.parent.controller.actual_printer['printing_space'][1]*0.5,
@@ -430,8 +443,8 @@ class Model(object):
         elif transform and not generate_gcode:
             vectors += self.pos
 
-
-        vectors /= np.array(self.scaleDefault)
+        if default_scale:
+            vectors /= np.array(self.scaleDefault)
 
         data['vectors'] = vectors
 
@@ -467,29 +480,6 @@ class Model(object):
         #self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
-
-    '''
-    def set_rotation(self, vector, alpha):
-        if vector.tolist() == [1.0, 0.0, 0.0]:
-            self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
-            self.parent.controller.show_message_on_status_bar("Angle X: " + str(np.degrees(alpha)))
-        elif vector.tolist() == [0.0, 1.0, 0.0]:
-            self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
-            self.parent.controller.show_message_on_status_bar("Angle Y: " + str(np.degrees(alpha)))
-        elif vector.tolist() == [0.0, 0.0, 1.0]:
-            self.temp_rotation = np.dot(Mesh.rotation_matrix(vector, alpha), self.temp_rotation)
-            self.parent.controller.show_message_on_status_bar("Angle Z: " + str(np.degrees(alpha)))
-
-        self.mesh.update_min()
-        self.mesh.update_max()
-
-        self.min = self.mesh.min_
-        self.max = self.mesh.max_
-        self.min_scene = self.mesh.min_ + self.pos
-        self.max_scene = self.mesh.max_ + self.pos
-
-        self.is_changed = True
-    '''
 
     def make_normals(self):
         self.tiled_normals = np.tile(self.mesh.normals, 3)
@@ -645,7 +635,7 @@ class Model(object):
         for i in range(3):
             self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
 
-        #self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
+        self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
 
         self.temp_mesh.update_min()
         self.temp_mesh.update_max()
@@ -674,7 +664,7 @@ class Model(object):
         if not self.isVisible:
             return
         glPushMatrix()
-        '''
+
         glPointSize(5.0)
         glColor3f(1., .0, .0)
         glBegin(GL_POINTS)
@@ -687,11 +677,11 @@ class Model(object):
         glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
         glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
         glEnd()
-        '''
-        glColor3f(.0, .0, 1.)
-        glBegin(GL_POINTS)
-        glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
-        glEnd()
+
+        #glColor3f(.0, .0, 1.)
+        #glBegin(GL_POINTS)
+        #glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
+        #glEnd()
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
@@ -833,7 +823,7 @@ class Model(object):
                 return True
         return False
 
-    '''
+
     def intersectionRayModel(self, rayStart, rayEnd):
         #self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
         #matrix = Matrix44.from_scale(Vector3(self.scale))
@@ -841,65 +831,81 @@ class Model(object):
         #self.temp_mesh
 
 
-        #w = Vector(rayEnd)
-        #w.minus(rayStart)
+        #w = deepcopy(rayEnd)
+        #w -= rayStart
         #w.normalize()
-        ray = rayEnd - rayStart
+
+        w = rayEnd - rayStart
+        w /= np.linalg.norm(w)
+
+        data = self.get_mesh(True, False, False)
 
 
-        for i, tri in enumerate(self.temp_mesh.vectors):
-            v0 = matrix * Vector3(tri[0])
-            v1 = matrix * Vector3(tri[1])
-            v2 = matrix * Vector3(tri[2])
-            v0 = v0.tolist()
-            v1 = v1.tolist()
-            v2 = v2.tolist()
+        for i, tri in enumerate(data.vectors):
+            v0 = tri[0]# + self.pos
+            v1 = tri[1]# + self.pos
+            v2 = tri[2]# + self.pos
 
             b = [.0, .0, .0]
-            e1 = Vector(v1)
-            e1.minus(v0)
-            e2 = Vector(v2)
-            e2.minus(v0)
+            e1 = np.array(v1)
+            e1 -= v0
+            e2 = np.array(v2)
+            e2 -= v0
 
-            n = Vector(self.normal[i])
+            n = self.temp_mesh.normals[i]
 
-            q = np.cross(w.getRaw(), e2.getRaw())
-            a = np.dot(e1.getRaw(), q)
+            q = np.cross(w, e2)
+            a = np.dot(e1, q)
 
-            if ((np.dot(n.getRaw(), w.getRaw()) >= .0) or (abs(a) <= .0001)):
+            if (np.dot(n, w) >= .0) or (abs(a) <= .0001):
                 continue
 
-            s = Vector(rayStart)
-            s.minus(v0)
-            s.sqrt(a)
+            s = np.array(rayStart)
+            s -= v0
+            s /= a
 
-            r = np.cross(s.getRaw(), e1.getRaw())
-            b[0] = np.dot(s.getRaw(), q)
-            b[1] = np.dot(r, w.getRaw())
+            r = np.cross(s, e1)
+            b[0] = np.dot(s, q)
+            b[1] = np.dot(r, w)
             b[2] = 1.0 - b[0] - b[1]
 
-            if ((b[0] < .0) or (b[1] < .0) or (b[2] < .0)):
+            if (b[0] < .0) or (b[1] < .0) or (b[2] < .0):
                 continue
 
-            t = np.dot(e2.getRaw(), r)
-            if (t >= .0):
-                return True
+            t = np.dot(e2, r)
+            if t >= .0:
+                return tri, n
             else:
                 continue
         return False
-    '''
+
 
 
     def place_on_face(self, ray_start, ray_end):
-        m = self.get_mesh()
+        value = self.intersectionRayModel(np.array(ray_start), np.array(ray_end))
+        if type(value) == bool:
+            return []
+        else:
+            hit_face, normal = value
+
+        up_vector = np.array([0., 0., -1.])
+
         #calc alpha
         #rotation around X vector
-        normal_face_vector_tmp1 =[]
-
+        normal_face_vector_tmp1 = deepcopy(normal)
+        normal_face_vector_tmp1[0] = 0.
+        alpha = AppScene.calc_angle(up_vector, normal_face_vector_tmp1)
 
         #calc beta
         #rotation around Y vector
-        normal_face_vector_tmp2 =[]
+        normal_face_vector_tmp2 = deepcopy(normal)
+        normal_face_vector_tmp2[1] = 0.
+        beta = AppScene.calc_angle(up_vector, normal_face_vector_tmp2)
+
+
+        print("Nalezeny uhly alpha %s a beta %s" % (str(alpha), str(beta)))
+        self.set_rot(np.deg2rad(alpha), 0., 0.)
+        return deepcopy(hit_face)
 
 
 class ModelTypeAbstract(object):
