@@ -140,9 +140,10 @@ class Controller:
         self.camera_rotate = False
         self.view.update_gui_for_material()
 
-
+        logging.info('Parameters: ')
         if len(self.app_parameters) >= 3:
             for file in self.app_parameters[2:]:
+                logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
 
 

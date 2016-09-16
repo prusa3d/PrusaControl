@@ -6,7 +6,7 @@ from PyQt4 import QtGui
 from controller import Controller
 from sceneRender import *
 from sceneData import *
-#import logging
+import logging
 import cProfile
 
 
@@ -29,7 +29,7 @@ def main():
 
 if __name__ == '__main__':
     FORMAT = "[%(levelname)s][%(filename)s:%(lineno)s:%(funcName)s()]-%(message)s"
-    #logging.basicConfig(format=FORMAT, filemode='w', level=logging.INFO)
+    logging.basicConfig(filename='prusacontrol.log', format=FORMAT, filemode='w', level=logging.INFO)
 
     if DEBUG:
         cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
