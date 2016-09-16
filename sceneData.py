@@ -664,7 +664,7 @@ class Model(object):
         if not self.isVisible:
             return
         glPushMatrix()
-
+        '''
         glPointSize(5.0)
         glColor3f(1., .0, .0)
         glBegin(GL_POINTS)
@@ -682,7 +682,7 @@ class Model(object):
         #glBegin(GL_POINTS)
         #glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
         #glEnd()
-
+        '''
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
 

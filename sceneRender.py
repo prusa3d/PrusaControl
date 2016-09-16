@@ -395,7 +395,7 @@ class GLWidget(QGLWidget):
 
         glEnable(GL_DEPTH_TEST)
 
-        self.draw_debug()
+        #self.draw_debug()
 
         glEnable ( GL_LIGHTING )
         for model in self.parent.controller.scene.models:
