@@ -255,19 +255,24 @@ class GLWidget(QGLWidget):
         #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
         self.rotateTool = GlButton(self.texture_from_png("data/img/new/Rotate_OFF.png"),
                                    self.texture_from_png("data/img/new/Rotate_ON.png"),
+                                   self.texture_from_png("data/img/new/Rotate_Background.png"),
                                    [30., 30.], [-40., 90.], False, 'rotate')
         self.scaleTool = GlButton(self.texture_from_png("data/img/new/Scale_OFF.png"),
                                   self.texture_from_png("data/img/new/Scale_ON.png"),
+                                  self.texture_from_png("data/img/new/Scale_Background.png"),
                                   [30., 30.], [-40., 50], False, 'scale')
         self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/new/Place_on_Face_OFF.png"),
                                         self.texture_from_png("data/img/new/Place_on_Face_ON.png"),
+                                        self.texture_from_png("data/img/new/Place_on_Face_Background.png"),
                                         [30., 30.], [-40., 10.], False, 'placeonface')
         #back, forward buttons
         self.undo_button = GlButton(self.texture_from_png("data/img/new/Back_Arrow_OFF.png"),
                                     self.texture_from_png("data/img/new/Back_Arrow_ON.png"),
+                                    self.texture_from_png("data/img/new/Back_Arrow_Background.png"),
                                     [30., 30.], [10, -40], True)
         self.do_button = GlButton(self.texture_from_png("data/img/new/Front_Arrow_OFF.png"),
                                   self.texture_from_png("data/img/new/Front_Arrow_ON.png"),
+                                  self.texture_from_png("data/img/new/Front_Arrow_Background.png"),
                                   [30., 30.], [50, -40], True)
 
 
@@ -388,6 +393,7 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
+
         #glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
         #glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
 
@@ -429,6 +435,8 @@ class GLWidget(QGLWidget):
 
             self.draw_tools()
 
+
+        #self.picking_render()
         glFlush()
 
         t1 = time.time()
@@ -497,7 +505,7 @@ class GLWidget(QGLWidget):
 
 
         if picking:
-            glLineWidth(5.0)
+            glLineWidth(6.0)
             glColor3ubv(colors[2])
             glBegin(GL_LINE_LOOP)
             for i in xrange(0, 360, 360 / segments):
@@ -792,7 +800,7 @@ class GLWidget(QGLWidget):
             if picking:
                 glColor3ub(tool.color_id[0], tool.color_id[1], tool.color_id[2])
                 glEnable(GL_TEXTURE_2D)
-                glBindTexture(GL_TEXTURE_2D, self.tool_background)
+                glBindTexture(GL_TEXTURE_2D, tool.texture_background)
             else:
                 glColor3f(1,1,1)
                 glEnable(GL_TEXTURE_2D)

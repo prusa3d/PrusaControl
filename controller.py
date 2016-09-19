@@ -140,11 +140,14 @@ class Controller:
         self.camera_rotate = False
         self.view.update_gui_for_material()
 
-        logging.info('Parameters: ')
+        logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
+
+        '''
         if len(self.app_parameters) >= 3:
             for file in self.app_parameters[2:]:
                 logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
+        '''
 
 
 
@@ -746,7 +749,7 @@ class Controller:
 
                         alpha = numpy.arctan2(sin_ang, cos_ang)
 
-                        if new_vect_leng<=model.boundingSphereSize:
+                        if new_vect_leng >= model.boundingSphereSize:
                             model.set_rot(model.rot[0], model.rot[1], alpha)
                             print("New angle: " + str(numpy.degrees(alpha)))
                         else:
