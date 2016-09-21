@@ -497,13 +497,47 @@ class GLWidget(QGLWidget):
         if not picking:
                 colors[2] = [255, 255, 0]
 
-        segments = 64
+        segments = 32
+        if picking:
+            width = 0.45
+        else:
+            width = 0.15
+
+        #calculete points
+        circle0 = [[math.cos(math.radians(i)) * (radius-width*.5), math.sin(math.radians(i)) * (radius-width*.5)] for i in xrange(0, 360 + (360 / segments), 360 / segments)]
+        circle1 = [[math.cos(math.radians(i)) * (radius+width*.5), math.sin(math.radians(i)) * (radius+width*.5)] for i in xrange(0, 360 + (360 / segments), 360 / segments)]
+
         glPushMatrix()
         glTranslatef(position[0], position[1], 0.0)
         glDisable( GL_LIGHTING )
         glDisable(GL_DEPTH_TEST)
 
+        index = list(xrange(0, len(circle0)-1))
+        index.append(0)
 
+        glColor3ubv(colors[2])
+        glBegin(GL_TRIANGLES)
+        for i in index:
+            glVertex3f(circle1[i][0], circle1[i][1], 0.)
+            glVertex3f(circle0[i][0], circle0[i][1], 0.)
+            glVertex3f(circle1[i+1][0], circle1[i+1][1], 0.)
+
+            glVertex3f(circle0[i][0], circle0[i][1], 0.)
+            glVertex3f(circle1[i+1][0], circle1[i+1][1], 0.)
+            glVertex3f(circle0[i+1][0], circle0[i+1][1], 0.)
+        glEnd()
+
+        glColor3f(1., 0., 0.)
+        glBegin(GL_LINES)
+        glVertex3f(0., 0., 0.)
+        glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
+
+        glVertex3f(0., 0., 0.)
+        glVertex3f(self.oldHitPoint[0], self.oldHitPoint[1], self.oldHitPoint[2])
+        glEnd()
+
+
+        '''
         if picking:
             glLineWidth(6.0)
             glColor3ubv(colors[2])
@@ -538,6 +572,7 @@ class GLWidget(QGLWidget):
             glVertex3f(0., 0., 0.)
             glVertex3f(self.oldHitPoint[0], self.oldHitPoint[1], self.oldHitPoint[2])
             glEnd()
+        '''
 
 
         glEnable(GL_DEPTH_TEST)

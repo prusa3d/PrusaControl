@@ -402,10 +402,11 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
         scale = QtGui.QLabel(self.tr("Scale"))
-        self.edit_scale_x = QtGui.QSpinBox()
-        self.edit_scale_x.setMaximum(999)
-        self.edit_scale_x.setMinimum(-999)
+        self.edit_scale_x = QtGui.QDoubleSpinBox()
+        self.edit_scale_x.setMaximum(9999)
+        self.edit_scale_x.setMinimum(1)
         self.edit_scale_x.setSuffix("%")
+        self.edit_scale_x.setDecimals(0)
         self.edit_scale_x.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_x,
                                                                                 'x',
                                                                                 self.get_object_id(),
@@ -413,10 +414,11 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.edit_scale_y.value(),
                                                                                 self.edit_scale_z.value()))
 
-        self.edit_scale_y = QtGui.QSpinBox()
-        self.edit_scale_y.setMaximum(999)
-        self.edit_scale_y.setMinimum(-999)
+        self.edit_scale_y = QtGui.QDoubleSpinBox()
+        self.edit_scale_y.setMaximum(9999)
+        self.edit_scale_y.setMinimum(1)
         self.edit_scale_y.setSuffix("%")
+        self.edit_scale_y.setDecimals(0)
         self.edit_scale_y.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_y,
                                                                                 'y',
                                                                                 self.get_object_id(),
@@ -424,10 +426,11 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.edit_scale_y.value(),
                                                                                 self.edit_scale_z.value()))
 
-        self.edit_scale_z = QtGui.QSpinBox()
-        self.edit_scale_z.setMaximum(999)
-        self.edit_scale_z.setMinimum(-999)
+        self.edit_scale_z = QtGui.QDoubleSpinBox()
+        self.edit_scale_z.setMaximum(9999)
+        self.edit_scale_z.setMinimum(1)
         self.edit_scale_z.setSuffix("%")
+        self.edit_scale_z.setDecimals(0)
         self.edit_scale_z.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_z,
                                                                                 'z',
                                                                                 self.get_object_id(),
@@ -712,31 +715,50 @@ class PrusaControlView(QtGui.QMainWindow):
             self.controller.view.update_scene()
 
     def set_scale_on_object(self, widget, active_axis, object_id, x, y, z):
+
         if widget.hasFocus():
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
             if self.scale_units == 'percent':
                 if self.lock_scale_axis:
+
                     if active_axis=='x':
                         x_recalc = x
                         x_ration = x/(model.scale[0]*100.)
 
                         y_recalc = (model.scale[1]*100.) * x_ration
+                        self.edit_scale_y.setDisabled(True)
+                        self.edit_scale_y.setValue(y_recalc)
+                        self.edit_scale_y.setDisabled(False)
                         z_recalc = (model.scale[2]*100.) * x_ration
+                        self.edit_scale_z.setDisabled(True)
+                        self.edit_scale_z.setValue(z_recalc)
+                        self.edit_scale_z.setDisabled(False)
                     elif active_axis=='y':
                         y_recalc = y
                         y_ration = y / (model.scale[1]*100.)
 
                         x_recalc = (model.scale[0]*100.) * y_ration
+                        self.edit_scale_x.setDisabled(True)
+                        self.edit_scale_x.setValue(x_recalc)
+                        self.edit_scale_x.setDisabled(False)
                         z_recalc = (model.scale[2]*100.) * y_ration
+                        self.edit_scale_z.setDisabled(True)
+                        self.edit_scale_z.setValue(z_recalc)
+                        self.edit_scale_z.setDisabled(False)
                     elif active_axis == 'z':
                         z_recalc = z
                         z_ration = z / (model.scale[2]*100.)
 
                         x_recalc = (model.scale[0]*100.) * z_ration
+                        self.edit_scale_x.setDisabled(True)
+                        self.edit_scale_x.setValue(x_recalc)
+                        self.edit_scale_x.setDisabled(False)
                         y_recalc = (model.scale[1]*100.) * z_ration
-
+                        self.edit_scale_y.setDisabled(True)
+                        self.edit_scale_y.setValue(y_recalc)
+                        self.edit_scale_y.setDisabled(False)
                 else:
                     x_recalc = x
                     y_recalc = y
@@ -747,36 +769,157 @@ class PrusaControlView(QtGui.QMainWindow):
             else:
                 #mm
                 if self.lock_scale_axis:
-                    x = (x/model.size_origin[0])*0.1
-                    y = (y/model.size_origin[1])*0.1
-                    z = (z/model.size_origin[2])*0.1
+                    #x = (x/model.size_origin[0])*0.1
+                    #y = (y/model.size_origin[1])*0.1
+                    #z = (z/model.size_origin[2])*0.1
+                    print("Vstupni parametry pro mm: %s %s %s" % (str(x), str(y), str(z)))
 
                     if active_axis == 'x':
                         x_recalc = x
                         x_ration = x / (model.scale[0] * 100.)
 
                         y_recalc = (model.scale[1] * 100.) * x_ration
+                        self.edit_scale_y.setDisabled(True)
+                        self.edit_scale_y.setValue(y_recalc)
+                        self.edit_scale_y.setDisabled(False)
                         z_recalc = (model.scale[2] * 100.) * x_ration
+                        self.edit_scale_z.setDisabled(True)
+                        self.edit_scale_z.setValue(z_recalc)
+                        self.edit_scale_z.setDisabled(False)
                     elif active_axis == 'y':
                         y_recalc = y
                         y_ration = y / (model.scale[1] * 100.)
 
                         x_recalc = (model.scale[0] * 100.) * y_ration
+                        self.edit_scale_x.setDisabled(True)
+                        self.edit_scale_x.setValue(x_recalc)
+                        self.edit_scale_x.setDisabled(False)
                         z_recalc = (model.scale[2] * 100.) * y_ration
+                        self.edit_scale_z.setDisabled(True)
+                        self.edit_scale_z.setValue(z_recalc)
+                        self.edit_scale_z.setDisabled(False)
                     elif active_axis == 'z':
                         z_recalc = z
                         z_ration = z / (model.scale[2] * 100.)
 
                         x_recalc = (model.scale[0] * 100.) * z_ration
+                        self.edit_scale_x.setDisabled(True)
+                        self.edit_scale_x.setValue(x_recalc)
+                        self.edit_scale_x.setDisabled(False)
                         y_recalc = (model.scale[1] * 100.) * z_ration
+                        self.edit_scale_y.setDisabled(True)
+                        self.edit_scale_y.setValue(y_recalc)
+                        self.edit_scale_y.setDisabled(False)
 
-                    model.set_scale_abs(x_recalc * .01, y_recalc * .01, z_recalc * .01)
+                    x_recalc *= .1
+                    y_recalc *= .1
+                    z_recalc *= .1
+
+                    print("Vystupni parametry pro mm: %s %s %s" % (str(x_recalc), str(y_recalc), str(z_recalc)))
+                    model.set_scale_abs(x_recalc, y_recalc, z_recalc)
                 else:
                     model.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
 
-            self.update_object_settings(self.object_id)
-            self.controller.view.update_scene()
+        #self.update_object_settings(self.object_id)
+        self.controller.view.update_scene()
 
+        '''
+        if widget.hasFocus():
+            model = self.controller.get_object_by_id(object_id)
+            if not model:
+                return
+            self.edit_scale_x.setDisabled(True)
+            self.edit_scale_y.setDisabled(True)
+            self.edit_scale_z.setDisabled(True)
+            if self.scale_units=='percent':
+                #units percent
+                if self.lock_scale_axis:
+                    print("Vstupni parametry pro procenta: %s %s %s" % (str(x), str(y), str(z)))
+                    #axis are locked
+                    if active_axis == 'x':
+                        x_recalc = x
+                        x_ration = x / (model.scale[0] * 100)
+
+                        y_recalc = (model.scale[1] * 100) * x_ration
+                        z_recalc = (model.scale[2] * 100) * x_ration
+
+                        self.edit_scale_y.setValue(int(y_recalc))
+                        self.edit_scale_z.setValue(int(z_recalc))
+                    elif active_axis == 'y':
+                        y_recalc = y
+                        y_ration = y / (model.scale[1] * 100)
+
+                        x_recalc = (model.scale[0] * 100) * y_ration
+                        z_recalc = (model.scale[2] * 100) * y_ration
+
+                        self.edit_scale_x.setValue(int(x_recalc))
+                        self.edit_scale_z.setValue(int(z_recalc))
+                    elif active_axis == 'z':
+                        z_recalc = z
+                        z_ration = z / (model.scale[2] * 100)
+
+                        x_recalc = (model.scale[0] * 100) * z_ration
+                        y_recalc = (model.scale[1] * 100) * z_ration
+
+                        self.edit_scale_x.setValue(int(x_recalc))
+                        self.edit_scale_y.setValue(int(y_recalc))
+                else:
+                    #without axis lock
+                    x_recalc = x*.01
+                    y_recalc = y*.01
+                    z_recalc = z*.01
+
+                x_recalc *=.01
+                y_recalc *=.01
+                z_recalc *=.01
+
+
+
+                print("Vystupni parametry pro procenta: %s %s %s" % (str(x_recalc), str(y_recalc), str(z_recalc)))
+            else:
+                #mm units
+                if self.lock_scale_axis:
+                    # axis are locked
+                    print("Vstupni parametry pro mm: %s %s %s" % (str(x), str(y), str(z)))
+
+                    if active_axis == 'x':
+                        x_recalc = x
+                        x_ration = x / (model.scale[0] * 100)
+
+                        y_recalc = (model.scale[1] * 100) * x_ration
+                        z_recalc = (model.scale[2] * 100) * x_ration
+                    elif active_axis == 'y':
+                        y_recalc = y
+                        y_ration = y / (model.scale[1] * 100)
+
+                        x_recalc = (model.scale[0] * 100) * y_ration
+                        z_recalc = (model.scale[2] * 100) * y_ration
+                    elif active_axis == 'z':
+                        z_recalc = z
+                        z_ration = z / (model.scale[2] * 100)
+
+                        x_recalc = (model.scale[0] * 100) * z_ration
+                        y_recalc = (model.scale[1] * 100) * z_ration
+
+
+                else:
+                    # without axis lock
+                    x_recalc = (x/model.size_origin[0])*.1
+                    y_recalc = (y/model.size_origin[1])*.1
+                    z_recalc = (z/model.size_origin[2])*.1
+                self.edit_scale_x.setValue(x_recalc * model.size_origin[0] * 10)
+                self.edit_scale_y.setValue(y_recalc * model.size_origin[1] * 10)
+                self.edit_scale_z.setValue(z_recalc * model.size_origin[2] * 10)
+
+            model.set_scale_abs(x_recalc, y_recalc, z_recalc)
+
+            self.edit_scale_x.setDisabled(False)
+            self.edit_scale_y.setDisabled(False)
+            self.edit_scale_z.setDisabled(False)
+
+            #self.update_object_settings(self.object_id)
+            self.controller.view.update_scene()
+        '''
     '''
     def set_x_scale(self, object_id, x):
         model = self.controller.get_object_by_id(object_id)
@@ -786,19 +929,22 @@ class PrusaControlView(QtGui.QMainWindow):
         if self.scale_units =="percent":
             x_recalc = x * 0.01
         else:
-
             x_recalc = (x/model.size_origin[0]) * 0.1
-            x_ration = x_recalc/model.scale[0]
 
+        x_ration = x_recalc / model.scale[0]
 
         if self.lock_scale_axis:
-            y =
-            z =
+            y = model.scale[1] * x_ration
+            z = model.scale[2] * x_ration
+        else:
+            y = model.scale[1]
+            z = model.scale[2]
 
+        model.set_scale_abs(x_recalc, y, z)
 
-
-        model.set_scale_abs(x, y, z)
+        print("Vystup nove funkce: %s %s %s" %(str(x_recalc), str(y), str(z)))
     '''
+
 
     def open_gcode_view(self):
         if self.is_setting_panel_opened:

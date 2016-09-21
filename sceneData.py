@@ -922,6 +922,9 @@ class ModelTypeAbstract(object):
         #logging.debug("This is abstract model type")
         return None
 
+class ModelTypeObj(ModelTypeAbstract):
+    pass
+
 
 class ModelTypeStl(ModelTypeAbstract):
     '''
