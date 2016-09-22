@@ -700,7 +700,8 @@ class Model(object):
 
         final_rotation = rotation_matrix
         final_scale = scale_matrix
-        final_matrix = np.dot(final_rotation, final_scale)
+        #final_matrix = np.dot(final_rotation, final_scale)
+        final_matrix = np.dot(final_scale, final_rotation)
 
         glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
 
@@ -931,7 +932,8 @@ class ModelTypeStl(ModelTypeAbstract):
     Concrete ModelType class for STL type file, it can load binary and char file
     '''
 
-    def load(self, filename):
+    @staticmethod
+    def load(filename):
         #logging.debug("this is STL file reader")
         mesh = Mesh.from_file(filename)
         return ModelTypeStl.load_from_mesh(mesh, filename, True)

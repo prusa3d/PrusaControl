@@ -3,6 +3,9 @@
 #import logging
 
 import OpenGL
+
+from sceneData import ModelTypeStl
+
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
 
@@ -292,7 +295,7 @@ class GLWidget(QGLWidget):
 
         self.bed = {}
         for i in self.parent.controller.printers:
-            self.bed[i['name']] = self.makePrintingBed(i['texture'], i['printing_space'])
+            self.bed[i['name']] = self.makePrintingBed(i)
 
 
         glClearDepth(1.0)
@@ -368,6 +371,8 @@ class GLWidget(QGLWidget):
     def paintGL(self, selection = 1):
         #print("Draw")
         t0 = time.time()
+        if not self.bed:
+            return
         heat_bed = self.bed[self.controller.settings['printer']]
         printer = None
         for p in self.controller.printers:
@@ -662,55 +667,75 @@ class GLWidget(QGLWidget):
 
 
 
-    def makePrintingBed(self, bed_texture, printing_space):
+    def makePrintingBed(self, printer_data):
+        Model = ModelTypeStl.load(printer_data['model'])
+        bed_texture = printer_data['texture']
+        printing_space = printer_data['printing_space']
         image_hotbed = self.texture_from_png(bed_texture)
 
         genList = glGenLists(1)
         glNewList(genList, GL_COMPILE)
 
         glLineWidth(2)
+        glPushMatrix()
+        glTranslatef(0., 1.1, -0.21)
+
+        glEnable(GL_BLEND)
+        glDisable(GL_DEPTH_TEST)
+
+        glColor4f(.4, .4, .4, .75)
+        glBegin(GL_TRIANGLES)
+        for i in Model.mesh.vectors:
+            glVertex3f(i[0][0], i[0][1], i[0][2])
+            glVertex3f(i[1][0], i[1][1], i[1][2])
+            glVertex3f(i[2][0], i[2][1], i[2][2])
+        glEnd()
+
+        glPopMatrix()
 
         glEnable(GL_TEXTURE_2D)
-        glDisable(GL_BLEND)
+        #glDisable(GL_BLEND)
         glBindTexture(GL_TEXTURE_2D, image_hotbed)
 
         glColor3f(1,1,1)
         glBegin(GL_QUADS)
         glNormal3f(.0,.0,1.)
-        glTexCoord2f(0, printing_space[1]*.5)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, -0.001)
+        glTexCoord2f(0, printing_space[1]*.5*.1)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, -0.001)
 
         glTexCoord2f(0, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, -0.001)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, -0.001)
 
-        glTexCoord2f(printing_space[0]*.5, 0)
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, -0.001)
+        glTexCoord2f(printing_space[0]*0.5*.1, 0)
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, -0.001)
 
-        glTexCoord2f(printing_space[0]*.5, printing_space[1]*.5)
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, -0.001)
+        glTexCoord2f(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1)
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, -0.001)
         glEnd()
         glDisable(GL_TEXTURE_2D)
+
+
         glEnable(GL_BLEND)
         glBegin(GL_LINES)
         glColor3f(1,1,1)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, printing_space[2])
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, 0)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
 
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, 0)
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, printing_space[2])
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, 0)
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
 
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, 0)
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, printing_space[2])
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, 0)
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
 
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, printing_space[2])
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
         glEnd()
 
         glBegin(GL_LINE_LOOP)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*0.5, printing_space[2])
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*0.5, printing_space[2])
-        glVertex3d(printing_space[0]*0.5, printing_space[1]*-0.5, printing_space[2])
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, printing_space[2])
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
+        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
         glEnd()
 
         #Axis
@@ -718,16 +743,16 @@ class GLWidget(QGLWidget):
         glDisable(GL_DEPTH_TEST)
         glBegin(GL_LINES)
         glColor3f(1, 0, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
-        glVertex3d((printing_space[0]*-0.5)-1, printing_space[1]*-0.5, 0)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
+        glVertex3d((printing_space[0]*-0.5*.1)-1, printing_space[1]*-0.5*.1, 0)
 
         glColor3f(0, 1, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
-        glVertex3d(printing_space[0]*-0.5, (printing_space[1]*-0.5)-1, 0)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
+        glVertex3d(printing_space[0]*-0.5*.1, (printing_space[1]*-0.5*.1)-1, 0)
 
         glColor3f(0, 0, 1)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 0)
-        glVertex3d(printing_space[0]*-0.5, printing_space[1]*-0.5, 1)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
+        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 1)
         glEnd()
         glEndList()
         glEnable(GL_DEPTH_TEST)

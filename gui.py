@@ -606,15 +606,15 @@ class PrusaControlView(QtGui.QMainWindow):
         self.object_id = object_id
 
         self.edit_pos_x.setDisabled(True)
-        self.edit_pos_x.setValue(mesh.pos[0])
+        self.edit_pos_x.setValue(mesh.pos[0]*10)
         self.edit_pos_x.setDisabled(False)
 
         self.edit_pos_y.setDisabled(True)
-        self.edit_pos_y.setValue(mesh.pos[1])
+        self.edit_pos_y.setValue(mesh.pos[1]*10)
         self.edit_pos_y.setDisabled(False)
 
         self.edit_pos_z.setDisabled(True)
-        self.edit_pos_z.setValue(mesh.pos[2])
+        self.edit_pos_z.setValue(mesh.pos[2]*10)
         self.edit_pos_z.setDisabled(False)
 
         self.edit_rot_x.setDisabled(True)
@@ -703,7 +703,7 @@ class PrusaControlView(QtGui.QMainWindow):
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
-            model.set_move(np.array([x, y, z]), False)
+            model.set_move(np.array([x*.1, y*.1, z*.1]), False)
             self.controller.view.update_scene()
 
     def set_rotation_on_object(self, widget, object_id, x, y, z):
