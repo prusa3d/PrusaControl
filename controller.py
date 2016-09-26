@@ -50,7 +50,7 @@ class Controller:
     def __init__(self, app):
         #logging.info('Controller instance created')
 
-        self.app_config = AppParameters()
+        self.app_config = AppParameters(self)
         self.analyzer = Analyzer(self)
         self.gcode = None
 
