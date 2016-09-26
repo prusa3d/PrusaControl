@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging
+
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from os.path import basename
@@ -76,6 +78,7 @@ class AppScene(object):
             old_instance.rot = np.copy(rot)
             old_instance.pos = np.copy(pos)
             old_instance.is_changed = True
+            old_instance.update_min_max()
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
     def make_do(self):
@@ -88,6 +91,7 @@ class AppScene(object):
             old_instance.rot = np.copy(rot)
             old_instance.pos = np.copy(pos)
             old_instance.is_changed = True
+            old_instance.update_min_max()
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
 
@@ -315,6 +319,10 @@ class Model(object):
         self.v1 = []
         self.v2 = []
 
+        self.t0 = []
+        self.t1 = []
+        self.t2 = []
+
         self.rotationAxis = []
         self.scaleAxis = []
 
@@ -394,8 +402,8 @@ class Model(object):
         min = self.min_scene
         max = self.max_scene
 
-        if max[0] <= (printer['printing_space'][0]*.5) and min[0] >= (printer['printing_space'][0]*-.5):
-                if max[1] <= (printer['printing_space'][1]*.5) and min[1] >= (printer['printing_space'][1]*-.5):
+        if max[0] <= (printer['printing_space'][0]*.05) and min[0] >= (printer['printing_space'][0]*-.05):
+                if max[1] <= (printer['printing_space'][1]*.05) and min[1] >= (printer['printing_space'][1]*-.05):
                     if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
                         self.parent.controller.set_printable(True)
                         return True
@@ -924,7 +932,79 @@ class ModelTypeAbstract(object):
         return None
 
 class ModelTypeObj(ModelTypeAbstract):
-    pass
+
+
+    @staticmethod
+    def load(filename):
+        logging.debug("this is OBJ file reader")
+        swapyz = False
+        vertices = []
+        normals = []
+        texcoords_array = []
+        faces = []
+
+        for line in open(filename, "r"):
+            if line.startswith('#'): continue
+            values = line.split()
+            if not values: continue
+            if values[0] == 'v':
+                v = map(float, values[1:4])
+                if swapyz:
+                    v = v[0], v[2], v[1]
+                vertices.append(v)
+            elif values[0] == 'vn':
+                v = map(float, values[1:4])
+                if swapyz:
+                    v = v[0], v[2], v[1]
+                normals.append(v)
+            elif values[0] == 'vt':
+                texcoords_array.append(map(float, values[1:3]))
+            #elif values[0] in ('usemtl', 'usemat'):
+            #    material = values[1]
+            #elif values[0] == 'mtllib':
+            #    mtl = MTL(values[1])
+            elif values[0] == 'f':
+                face = []
+                texcoords = []
+                norms = []
+                for v in values[1:]:
+                    w = v.split('/')
+                    face.append(int(w[0]))
+                    if len(w) >= 2 and len(w[1]) > 0:
+                        texcoords.append(int(w[1]))
+                    else:
+                        texcoords.append(0)
+                    if len(w) >= 3 and len(w[2]) > 0:
+                        norms.append(int(w[2]))
+                    else:
+                        norms.append(0)
+                faces.append((face, norms, texcoords))
+
+        model = Model()
+
+        if filename:
+            model.filename = basename(filename)
+        else:
+            model.filename = ""
+
+        print("Vertices: " + str(vertices))
+        print("Texcoords: " + str(texcoords_array))
+
+        for face in faces:
+            vert, norm, texcoord = face
+            #print("Vertex indexes: " + str(vert))
+            #print("Texcoord indexes: " + str(texcoord))
+            model.v0.append(vertices[vert[0]-1])
+            model.t0.append(texcoords_array[texcoord[0]-1])
+
+            model.v1.append(vertices[vert[1]-1])
+            model.t1.append(texcoords_array[texcoord[1]-1])
+
+            model.v2.append(vertices[vert[2]-1])
+            model.t2.append(texcoords_array[texcoord[2]-1])
+
+
+        return model
 
 
 class ModelTypeStl(ModelTypeAbstract):
