@@ -3,7 +3,11 @@
     {
       "name": "i3",
       "label": "Original Prusa i3 plus",
-      "model": "data/models/mk2_heatbed.stl",
+      "model": "data/models/I3_heatbed.stl",
+      "model_offset": [0.0, 0.0, -0.05],
+      "printer_variation": [
+        {"name": "0.4mm"}
+      ],
       "texture": "data/img/checker.png",
       "printing_space": [200, 200, 200]
     },
@@ -11,6 +15,11 @@
       "name": "i3_mk2",
       "label": "Original Prusa i3 MK2",
       "model": "data/models/mk2_heatbed.stl",
+      "model_offset": [0.0, 1.1, -0.21],
+      "printer_variation": [
+        {"name": "0.4mm"},
+        {"name": "0.25mm"}
+      ],
       "texture": "data/img/checker.png",
       "printing_space": [250, 210, 200]
     },
@@ -18,6 +27,10 @@
       "name": "default",
       "label": "",
       "model": "data/models/mk2_heatbed.stl",
+      "model_offset": [0.0, 1.1, -0.21],
+      "printer_variation": [
+        {"name": "0.4mm"}
+      ],
       "texture": "data/img/checker.png",
       "printing_space": [200, 200, 200]
     }
