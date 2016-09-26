@@ -18,7 +18,8 @@ class PrintingParameters(object):
 
 
 class AppParameters(object):
-    def __init__(self):
+    def __init__(self, controller):
+        self.controller = controller
         self.system_platform = platform.system()
 
         self.config = ConfigParser()

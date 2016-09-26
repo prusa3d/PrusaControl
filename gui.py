@@ -38,6 +38,12 @@ class SettingsDialog(QDialog):
         self.printer_combo.addItems(self.controller.enumeration['printer'].values())
         self.printer_combo.setCurrentIndex(self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
 
+        self.printer_variation_label = QtGui.QLabel(self.tr("Printer variation"))
+        self.printer_variation_combo = QtGui.QComboBox()
+        self.printer_variation_combo.addItems(self.controller.enumeration['printer'].values())
+        self.printer_variation_combo.setCurrentIndex(
+        self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
+
         self.debug_checkbox = QtGui.QCheckBox(self.tr("Debug"))
         self.debug_checkbox.setChecked(self.controller.settings['debug'])
 
@@ -52,6 +58,9 @@ class SettingsDialog(QDialog):
 
         layout.addWidget(self.printer_label)
         layout.addWidget(self.printer_combo)
+
+        layout.addWidget(self.printer_variation_label)
+        layout.addWidget(self.printer_variation_combo)
 
         layout.addWidget(self.debug_checkbox)
         layout.addWidget(self.automatic_placing_checkbox)
