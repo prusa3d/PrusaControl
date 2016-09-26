@@ -4,7 +4,7 @@
 
 import OpenGL
 
-from sceneData import ModelTypeStl
+from sceneData import ModelTypeStl, ModelTypeObj
 
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
@@ -474,7 +474,7 @@ class GLWidget(QGLWidget):
         glBegin(GL_LINES)
         for p in layer_data:
             if p[2] == 'E':
-                glColor3f(1.0, 0.0, 0.0)
+                glColor3f(.0, 1., .0)
             else:
                 glColor3f(0.0, 0.0, 1.0)
             glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
@@ -678,7 +678,7 @@ class GLWidget(QGLWidget):
 
         glLineWidth(2)
         glPushMatrix()
-        glTranslatef(0., 1.1, -0.21)
+        glTranslatef(printer_data['model_offset'][0], printer_data['model_offset'][1], printer_data['model_offset'][2])
 
         glEnable(GL_BLEND)
         glDisable(GL_DEPTH_TEST)
@@ -689,6 +689,19 @@ class GLWidget(QGLWidget):
             glVertex3f(i[0][0], i[0][1], i[0][2])
             glVertex3f(i[1][0], i[1][1], i[1][2])
             glVertex3f(i[2][0], i[2][1], i[2][2])
+
+        '''
+        for i in xrange(0, len(Model.v0)):
+            #print(str(Model.v0[i]))
+            glTexCoord2f(Model.t0[0], Model.t0[1])
+            glVertex3f(Model.v0[i][0]*.1, Model.v0[i][1]*.1, Model.v0[i][2]*.1)
+
+            glTexCoord2f(Model.t1[0], Model.t1[1])
+            glVertex3f(Model.v1[i][0]*.1, Model.v1[i][1]*.1, Model.v1[i][2]*.1)
+
+            glTexCoord2f(Model.t2[0], Model.t2[1])
+            glVertex3f(Model.v2[i][0]*.1, Model.v2[i][1]*.1, Model.v2[i][2]*.1)
+        '''
         glEnd()
 
         glPopMatrix()
