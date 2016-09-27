@@ -8,6 +8,7 @@ from sceneRender import *
 from sceneData import *
 import logging
 import cProfile
+import os
 
 
 __author__ = 'Tibor Vavra'
@@ -18,8 +19,9 @@ DEBUG = False
 def main():
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
+    local_path = os.path.realpath(__file__)
 
-    controller = Controller(app)
+    controller = Controller(app, local_path)
     window = controller.get_view()
     #app.installEventFilter(window)
     app.exec_()
