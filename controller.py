@@ -47,10 +47,10 @@ def timing(f):
     return wrap
 
 class Controller:
-    def __init__(self, app):
-        #logging.info('Controller instance created')
+    def __init__(self, app, local_path=''):
+        logging.info('Local path: ' + local_path)
 
-        self.app_config = AppParameters(self)
+        self.app_config = AppParameters(self, local_path)
         self.analyzer = Analyzer(self)
         self.gcode = None
 
