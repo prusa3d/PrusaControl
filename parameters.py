@@ -13,12 +13,23 @@ __author__ = 'Tibor Vavra'
 
 
 class PrintingParameters(object):
-    def __init__(self):
-        pass
+    def __init__(self, controller):
+        self.controller = controller
+
+
+    def get_printers(self):
+        return []
+
+    def get_materials_for_printer(self, printer):
+        return []
+
+    def get_actual_settings(self):
+        return []
 
 
 class AppParameters(object):
-    def __init__(self, controller):
+    def __init__(self, controller, local_path=''):
+        self.local_path = local_path
         self.controller = controller
         self.system_platform = platform.system()
 
