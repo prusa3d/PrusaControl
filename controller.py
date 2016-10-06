@@ -21,7 +21,7 @@ import sceneData
 from analyzer import Analyzer
 from gcode import GCode
 from gui import PrusaControlView
-from parameters import AppParameters
+from parameters import AppParameters, PrintingParameters
 from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
 from sceneRender import GLWidget
@@ -51,6 +51,8 @@ class Controller:
         logging.info('Local path: ' + local_path)
 
         self.app_config = AppParameters(self, local_path)
+        self.printing_parameters = PrintingParameters(self.app_config)
+
         self.analyzer = Analyzer(self)
         self.gcode = None
 
@@ -71,12 +73,12 @@ class Controller:
         }
 
 
-        with open(self.app_config.printing_parameters_file, 'rb') as json_file:
-            self.printing_settings = json.load(json_file)
+        #with open(self.app_config.printing_parameters_file, 'rb') as json_file:
+        #    self.printing_settings = json.load(json_file)
 
-        with open(self.app_config.printers_parameters_file, 'rb') as json_file:
-            self.printers = json.load(json_file)
-            self.printers = self.printers['printers']
+        #with open(self.app_config.printers_parameters_file, 'rb') as json_file:
+        #    self.printers = json.load(json_file)
+        #    self.printers = self.printers['printers']
 
         self.set_printer(self.settings['printer'])
 
