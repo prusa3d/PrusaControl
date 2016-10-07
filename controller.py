@@ -241,20 +241,46 @@ class Controller:
         #TODO:Add code for download firmware version
         return '1.0.1'
 
-    def get_printing_materials(self):
+    def get_printers_labels_ls(self):
+        return [printer["label"] for printer in self.printing_parameters.get_printers_parameters()]
+
+    def get_printers_name_ls(self):
+        return self.printing_parameters.get_printers_names()
+
+    def get_printer_variations_labels_ls(self, printer_name):
+        return [printer_type["label"] for printer_type in self.printing_parameters[printer_name]["printer_type"]]
+
+    def get_printer_variations_names_ls(self, printer_name):
+        return self.printing_parameters[printer_name]["printer_type"].keys()
+
+    def get_printer_materials_names_ls(self, printer_name):
         #return self.printing_settings['materials']
-        return [i['label'] for i in self.printing_settings['materials'] if i['name'] not in ['default']]
+        #return [i['label'] for i in self.printing_settings['materials'] if i['name'] not in ['default']]
+        return self.printing_parameters.get_materials_for_printer(printer_name).keys()
 
-    def get_printing_material_quality(self, index):
-        return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
+    def get_printer_materials_labels_ls(self, printer_name):
+        # return self.printing_settings['materials']
+        # return [i['label'] for i in self.printing_settings['materials'] if i['name'] not in ['default']]
+        return [material['label'] for material in self.printing_parameters.get_materials_for_printer(printer_name)]
 
-    def get_printing_settings_for_material(self, material_index):
-        material = self.printing_settings['materials'][material_index]
+    def get_printer_material_quality(self, material):
+        #return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
+        return [i['label'] for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)]
+
+
+    def get_printing_settings_for_material(self, material_name):
+        #material = self.printing_settings['materials'][material_index]
+        printing_settings_tmp = []
+        for material in self.printing_parameters.get_materials_for_printer(self.actual_printer):
+            if self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]["label"] == material_name:
+                printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]
+                break
+
 
         #default
-        printing_settings_tmp = deepcopy(self.printing_settings['materials'][-1])
+        #printing_settings_tmp = deepcopy(self.printing_settings['materials'][-1])
 
-        printing_settings_tmp.update(material)
+        #printing_settings_tmp.update(material)
 
         return printing_settings_tmp
 
@@ -326,9 +352,8 @@ class Controller:
         webbrowser.open(url, 1)
 
     def set_printer(self, name):
-        index = [i for i, data in enumerate(self.printers) if data['name']== name]
-        #print(str(index))
-        self.actual_printer = self.printers[index[0]]
+        #index = [i for i, data in enumerate(self.printers) if data['name']== name]
+        self.actual_printer = name
 
     def send_feedback(self):
         if self.settings['language'] == 'cs_CZ':
@@ -644,7 +669,6 @@ class Controller:
         self.view.update_scene()
 
     def prepare_tool(self, event):
-        print("prepare tool")
         if self.tool == 'rotate':
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             self.origin_rotation_point = sceneData.intersection_ray_plane(newRayStart, newRayEnd)

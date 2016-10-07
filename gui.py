@@ -35,14 +35,13 @@ class SettingsDialog(QDialog):
 
         self.printer_label = QtGui.QLabel(self.tr("Printer model"))
         self.printer_combo = QtGui.QComboBox()
-        self.printer_combo.addItems(self.controller.enumeration['printer'].values())
-        self.printer_combo.setCurrentIndex(self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
+        self.printer_combo.addItems(self.controller.get_printers_name_ls())
+        self.printer_combo.setCurrentIndex(self.controller.get_printers_name_ls().index(self.controller.settings['printer']))
 
         self.printer_variation_label = QtGui.QLabel(self.tr("Printer variation"))
         self.printer_variation_combo = QtGui.QComboBox()
-        self.printer_variation_combo.addItems(self.controller.enumeration['printer'].values())
-        self.printer_variation_combo.setCurrentIndex(
-        self.controller.enumeration['printer'].keys().index(self.controller.settings['printer']))
+        self.printer_variation_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
+        self.printer_variation_combo.setCurrentIndex(0)
 
         self.debug_checkbox = QtGui.QCheckBox(self.tr("Debug"))
         self.debug_checkbox.setChecked(self.controller.settings['debug'])
@@ -278,8 +277,7 @@ class PrusaControlView(QtGui.QMainWindow):
         # print tab
         self.materialLabel = QtGui.QLabel(self.tr("Material"))
         self.materialCombo = QtGui.QComboBox()
-        printing_materials_ls = self.controller.get_printing_materials()
-        self.materialCombo.addItems(printing_materials_ls)
+        self.materialCombo.addItems(self.controller.get_printer_materials_labels_ls(self.controller.actual_printer))
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
         self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
@@ -1062,12 +1060,10 @@ class PrusaControlView(QtGui.QMainWindow):
     def update_gui_for_material(self, set_materials=0):
         if set_materials:
             self.materialCombo.clear()
-            printing_materials_ls = [self.controller.get_enumeration('materials', i) for i in
-                                     self.controller.get_printing_materials()]
-            self.materialCombo.addItems(printing_materials_ls)
+            self.materialCombo.addItems(self.controller.get_printer_materials_labels_ls(self.controller.actual_printer))
 
         # material_label = self.materialCombo.currentText()
-        material_index = self.materialCombo.currentIndex()
+        material_label = self.materialCombo.currentText()
 
         material_printing_settings = self.controller.get_printing_settings_for_material(material_index)
 

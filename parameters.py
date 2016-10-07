@@ -67,6 +67,12 @@ class PrintingParameters(object):
         else:
             return []
 
+    def get_materials_quality_for_printer(self, printer_name, material):
+        if printer_name in self.printers_parameters and material in self.printers_parameters[printer_name]["materials"]:
+            return self.printers_parameters[printer_name]["materials"][material]
+        else:
+            return []
+
     def apply_default_parameters(self, dict_with_default):
         return_dict = {}
         for i in dict_with_default.keys():
