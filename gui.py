@@ -1065,12 +1065,13 @@ class PrusaControlView(QtGui.QMainWindow):
         # material_label = self.materialCombo.currentText()
         material_label = self.materialCombo.currentText()
 
-        material_printing_settings = self.controller.get_printing_settings_for_material(material_index)
+        material_printing_settings = self.controller.get_printing_settings_for_material_by_label(material_label)
+        #print(str(material_printing_settings))
 
         # update print quality widget
         self.qualityCombo.clear()
-        material_printing_settings_quality_ls = self.controller.get_printing_material_quality(material_index)
-        print("ktery material: " + str(material_index))
+        material_printing_settings_quality_ls = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
+        #print("Quality list: " + str(material_printing_settings_quality_ls))
         self.qualityCombo.addItems(material_printing_settings_quality_ls)
 
         # infill slider

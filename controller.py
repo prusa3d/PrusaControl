@@ -261,26 +261,41 @@ class Controller:
     def get_printer_materials_labels_ls(self, printer_name):
         # return self.printing_settings['materials']
         # return [i['label'] for i in self.printing_settings['materials'] if i['name'] not in ['default']]
-        return [material['label'] for material in self.printing_parameters.get_materials_for_printer(printer_name)]
+        return [self.printing_parameters.get_materials_for_printer(printer_name)[material]['label'] for material in self.printing_parameters.get_materials_for_printer(printer_name)]
 
-    def get_printer_material_quality(self, material):
-        #return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
-        return [i['label'] for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)]
+    def get_printer_material_quality_labels_ls_by_material_name(self, material_name):
+        return [self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality'][i]['label']
+                for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']]
 
+    def get_printer_material_quality_labels_ls_by_material_label(self, material_label):
+        materials_ls = self.printing_parameters.get_materials_for_printer(self.actual_printer)
+        material_name = ""
+        for material in materials_ls:
+            if materials_ls[material]['label'] == material_label:
+                material_name = material
+                break
 
-    def get_printing_settings_for_material(self, material_name):
+        return self.get_printer_material_quality_labels_ls_by_material_name(material_name)
+
+    def get_printer_material_quality_names_ls(self, material):
+        # return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
+        return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)]
+
+    def get_printing_settings_for_material_by_name(self, material_name):
+        # material = self.printing_settings['materials'][material_index]
+        printing_settings_tmp = []
+        printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.actual_printer)
+        material_printing_setting = printing_settings_tmp[material_name]
+
+        return material_printing_setting
+
+    def get_printing_settings_for_material_by_label(self, material_label):
         #material = self.printing_settings['materials'][material_index]
         printing_settings_tmp = []
         for material in self.printing_parameters.get_materials_for_printer(self.actual_printer):
-            if self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]["label"] == material_name:
+            if self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]["label"] == material_label:
                 printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]
                 break
-
-
-        #default
-        #printing_settings_tmp = deepcopy(self.printing_settings['materials'][-1])
-
-        #printing_settings_tmp.update(material)
 
         return printing_settings_tmp
 

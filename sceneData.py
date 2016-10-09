@@ -445,9 +445,10 @@ class Model(object):
 
 
         if transform and generate_gcode:
-            vectors += self.pos + (np.array([self.parent.controller.actual_printer['printing_space'][0]*0.5,
-                                             self.parent.controller.actual_printer['printing_space'][1]*0.5,
-                                             self.parent.controller.actual_printer['printing_space'][2]*0.5]))
+            printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
+            vectors += self.pos + (np.array([printer['printing_space'][0]*0.5,
+                                             printer['printing_space'][1]*0.5,
+                                             printer['printing_space'][2]*0.5]))
         elif transform and not generate_gcode:
             vectors += self.pos
 
@@ -734,7 +735,7 @@ class Model(object):
             if blending:
                 glColor4f(.4, .4, .4, .75)
             else:
-                if self.is_in_printing_space(self.parent.controller.actual_printer):
+                if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
                     if self.selected:
                         glColor3f(.75, .75, 0.)
                     else:
