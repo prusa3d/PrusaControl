@@ -294,8 +294,8 @@ class GLWidget(QGLWidget):
         #self.tools = []
 
         self.bed = {}
-        for i in self.parent.controller.printers:
-            self.bed[i['name']] = self.makePrintingBed(i)
+        for i in self.parent.controller.printing_parameters.get_printers_names():
+            self.bed[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.makePrintingBed(self.parent.controller.printing_parameters.get_printer_parameters(i))
 
 
         glClearDepth(1.0)
@@ -375,9 +375,11 @@ class GLWidget(QGLWidget):
             return
         heat_bed = self.bed[self.controller.settings['printer']]
         printer = None
-        for p in self.controller.printers:
-            if p['name'] == self.controller.settings['printer']:
-                printer = p['printing_space']
+
+        #for p in self.controller.printers:
+        #    if p['name'] == self.controller.settings['printer']:
+        #        printer = p['printing_space']
+        printer = self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)
 
         model_view = self.controller.render_status in ['model_view']
 
@@ -456,7 +458,8 @@ class GLWidget(QGLWidget):
             self.fps_count+=1
             self.fps_time+=t1-t0
 
-    def draw_layer(self, layer, printing_space):
+    def draw_layer(self, layer, printer):
+        printing_space = printer['printing_space']
         layer_data = self.controller.gcode.data[self.controller.gcode_layer]
 
         glPushMatrix()
@@ -668,6 +671,7 @@ class GLWidget(QGLWidget):
 
 
     def makePrintingBed(self, printer_data):
+        print("Printer data: " + str(printer_data))
         Model = ModelTypeStl.load(printer_data['model'])
         bed_texture = printer_data['texture']
         printing_space = printer_data['printing_space']
