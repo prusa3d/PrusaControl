@@ -65,7 +65,9 @@ class Slic3rEngineRunner(QObject):
         translation_table = [
             ['fill_density', 'infill', self.percent_transform],
             ['brim_width', 'brim', self.boolean_transform],
-            ['support_material', 'support', self.boolean_transform]
+            #['support_material', 'support', self.boolean_transform]
+            ['support_material', 'support_on_off', self.support1_transform],
+            ['support_material_buildplate_only', 'support_build_plate', self.support2_transform]
         ]
         for i in translation_table:
             old[i[0]] = i[2](update[i[1]])
@@ -76,6 +78,29 @@ class Slic3rEngineRunner(QObject):
 
     def boolean_transform(self, in_value):
         return "%s" % str(int(in_value))
+
+    def support1_transform(self, in_value):
+        if in_value == "None":
+            return "0"
+        elif in_value == "Build plate only":
+            return "1"
+        elif in_value == "Everywhere":
+            return "1"
+        else:
+            return "0"
+        return "0"
+
+    def support2_transform(self, in_value):
+        if in_value == "None":
+            return "no"
+        elif in_value == "Build plate only":
+            return "yes"
+        elif in_value == "Everywhere":
+            return "no"
+        else:
+            return "no"
+        return "no"
+
 
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
