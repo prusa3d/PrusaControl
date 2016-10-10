@@ -35,13 +35,13 @@ class SettingsDialog(QDialog):
 
         self.printer_label = QtGui.QLabel(self.tr("Printer model"))
         self.printer_combo = QtGui.QComboBox()
-        self.printer_combo.addItems(self.controller.get_printers_name_ls())
-        self.printer_combo.setCurrentIndex(self.controller.get_printers_name_ls().index(self.controller.settings['printer']))
+        self.printer_combo.addItems(self.controller.get_printers_labels_ls())
+        self.printer_combo.setCurrentIndex(self.controller.get_printers_names_ls().index(self.controller.settings['printer']))
 
-        self.printer_variation_label = QtGui.QLabel(self.tr("Printer variation"))
-        self.printer_variation_combo = QtGui.QComboBox()
-        self.printer_variation_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
-        self.printer_variation_combo.setCurrentIndex(0)
+        self.printer_type_label = QtGui.QLabel(self.tr("Printer variation"))
+        self.printer_type_combo = QtGui.QComboBox()
+        self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
+        self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
 
         self.debug_checkbox = QtGui.QCheckBox(self.tr("Debug"))
         self.debug_checkbox.setChecked(self.controller.settings['debug'])
@@ -58,8 +58,8 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.printer_label)
         layout.addWidget(self.printer_combo)
 
-        layout.addWidget(self.printer_variation_label)
-        layout.addWidget(self.printer_variation_combo)
+        layout.addWidget(self.printer_type_label)
+        layout.addWidget(self.printer_type_combo)
 
         layout.addWidget(self.debug_checkbox)
         layout.addWidget(self.automatic_placing_checkbox)
@@ -80,7 +80,8 @@ class SettingsDialog(QDialog):
         dialog.setWindowTitle("Settings")
         result = dialog.exec_()
         data['language'] = controller.enumeration['language'].keys()[dialog.language_combo.currentIndex()]
-        data['printer'] = controller.enumeration['printer'].keys()[dialog.printer_combo.currentIndex()]
+        data['printer'] = controller.get_printers_names_ls()[dialog.printer_combo.currentIndex()]
+        data['printer_type'] = controller.get_printer_variations_names_ls(data['printer'])[dialog.printer_type_combo.currentIndex()]
         controller.set_printer(data['printer'])
         data['debug'] = dialog.debug_checkbox.isChecked()
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
@@ -1081,13 +1082,17 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def get_actual_printing_data(self):
         material_index = self.materialCombo.currentIndex()
+        material_name = self.controller.get_printer_materials_names_ls(self.controller.actual_printer)[material_index]
         quality_index = self.qualityCombo.currentIndex()
+        print("Material: " + str(self.controller.get_printer_material_quality_names_ls(material_name)))
+        quality_name = self.controller.get_printer_material_quality_names_ls(material_name)[quality_index]
+
         infill_value = self.infillSlider.value()
         brim = self.brimCheckBox.isChecked()
         support = self.supportCheckBox.isChecked()
 
-        data = {'material': material_index,
-                'quality': quality_index,
+        data = {'material': material_name,
+                'quality': quality_name,
                 'infill': infill_value,
                 'brim': brim,
                 'support': support}

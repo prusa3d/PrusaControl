@@ -83,7 +83,9 @@ class Slic3rEngineRunner(QObject):
             if i in ['brim', 'support'] and actual_printing_data[i]==True:
                 self.step_max+=1
 
-        material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
+        #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
+        material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'])
+        print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = ConfigParser()
         new_config.add_section('settings')
