@@ -287,7 +287,11 @@ class PrusaControlView(QtGui.QMainWindow):
         self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
         self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
 
-        self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
+        #self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
+        self.supportLabel = QtGui.QLabel(self.tr("Support"))
+        self.supportCombo = QtGui.QComboBox()
+        self.supportCombo.addItems(["None", "Build plate only", "Everywhere"])
+
         self.brimCheckBox = QtGui.QCheckBox(self.tr("Brim"))
 
         self.progressBar = QtGui.QProgressBar()
@@ -316,7 +320,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.printTabVLayout.addWidget(self.qualityCombo)
         self.printTabVLayout.addWidget(self.infillLabel)
         self.printTabVLayout.addWidget(self.infillSlider)
-        self.printTabVLayout.addWidget(self.supportCheckBox)
+        #self.printTabVLayout.addWidget(self.supportCheckBox)
+        self.printTabVLayout.addWidget(self.supportLabel)
+        self.printTabVLayout.addWidget(self.supportCombo)
         self.printTabVLayout.addWidget(self.brimCheckBox)
         self.printTabVLayout.addWidget(self.progressBar)
         self.printTabVLayout.addWidget(self.generateButton)
@@ -553,11 +559,14 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.update_gui()
 
         self.changable_widgets['brimCheckBox'] = self.brimCheckBox
-        self.changable_widgets['supportCheckBox'] = self.supportCheckBox
+        #self.changable_widgets['supportCheckBox'] = self.supportCheckBox
+        self.changable_widgets['supportCombo'] = self.supportCombo
+
 
         self.qualityCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
         self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
-        self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
+        #self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
+        self.supportCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
@@ -1089,13 +1098,15 @@ class PrusaControlView(QtGui.QMainWindow):
 
         infill_value = self.infillSlider.value()
         brim = self.brimCheckBox.isChecked()
-        support = self.supportCheckBox.isChecked()
+        #support = self.supportCheckBox.isChecked()
+        support = self.supportCombo.currentText()
 
         data = {'material': material_name,
                 'quality': quality_name,
                 'infill': infill_value,
                 'brim': brim,
-                'support': support}
+                'support_on_off': support,
+                'support_build_plate': support,}
         return data
 
 
