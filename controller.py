@@ -63,6 +63,7 @@ class Controller:
             self.settings['automatic_placing'] = self.app_config.config.getboolean('settings', 'automatic_placing')
             self.settings['language'] = self.app_config.config.get('settings', 'language')
             self.settings['printer'] = self.app_config.config.get('settings', 'printer')
+            self.settings['printer_type'] = self.app_config.config.get('settings', 'printer_type')
             self.settings['analyze'] = self.app_config.config.getboolean('settings', 'analyze')
 
             self.settings['toolButtons'] = {
@@ -71,14 +72,6 @@ class Controller:
                 'rotateButton': False,
                 'scaleButton': False
         }
-
-
-        #with open(self.app_config.printing_parameters_file, 'rb') as json_file:
-        #    self.printing_settings = json.load(json_file)
-
-        #with open(self.app_config.printers_parameters_file, 'rb') as json_file:
-        #    self.printers = json.load(json_file)
-        #    self.printers = self.printers['printers']
 
         self.set_printer(self.settings['printer'])
 
@@ -158,6 +151,7 @@ class Controller:
         config = RawConfigParser()
         config.add_section('settings')
         config.set('settings', 'printer', self.settings['printer'])
+        config.set('settings', 'printer_type', self.settings['printer_type'])
         config.set('settings', 'debug', str(self.settings['debug']))
         config.set('settings', 'automatic_placing', str(self.settings['automatic_placing']))
         config.set('settings', 'language', self.settings['language'])
@@ -242,16 +236,18 @@ class Controller:
         return '1.0.1'
 
     def get_printers_labels_ls(self):
-        return [printer["label"] for printer in self.printing_parameters.get_printers_parameters()]
+        return [self.printing_parameters.get_printers_parameters()[printer]["label"] for printer in self.printing_parameters.get_printers_parameters()]
 
-    def get_printers_name_ls(self):
+    def get_printers_names_ls(self):
         return self.printing_parameters.get_printers_names()
 
     def get_printer_variations_labels_ls(self, printer_name):
-        return [printer_type["label"] for printer_type in self.printing_parameters[printer_name]["printer_type"]]
+        printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
+        return [printer_settings["printer_type"][printer_type]["label"] for printer_type in printer_settings["printer_type"]]
 
     def get_printer_variations_names_ls(self, printer_name):
-        return self.printing_parameters[printer_name]["printer_type"].keys()
+        printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
+        return printer_settings["printer_type"].keys()
 
     def get_printer_materials_names_ls(self, printer_name):
         #return self.printing_settings['materials']
@@ -279,7 +275,7 @@ class Controller:
 
     def get_printer_material_quality_names_ls(self, material):
         # return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
-        return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)]
+        return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)['quality']]
 
     def get_printing_settings_for_material_by_name(self, material_name):
         # material = self.printing_settings['materials'][material_index]
@@ -290,7 +286,6 @@ class Controller:
         return material_printing_setting
 
     def get_printing_settings_for_material_by_label(self, material_label):
-        #material = self.printing_settings['materials'][material_index]
         printing_settings_tmp = []
         for material in self.printing_parameters.get_materials_for_printer(self.actual_printer):
             if self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]["label"] == material_label:
