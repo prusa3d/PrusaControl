@@ -1,20 +1,4 @@
 {
-  "new":{
-    "name": "new",
-    "label": "Prusa NEW",
-    "quality": {
-      "draft": {
-        "name": "draft",
-        "label": "Draft",
-        "parameters": {}
-      },
-      "default": {
-        "name": "default",
-        "label": "",
-        "parameters": {}
-      }
-    }
-  },
   "abs":
   {
     "name": "abs",
