@@ -446,9 +446,10 @@ class Model(object):
 
         if transform and generate_gcode:
             printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
-            vectors += self.pos + (np.array([printer['printing_space'][0]*0.5,
-                                             printer['printing_space'][1]*0.5,
-                                             printer['printing_space'][2]*0.5]))
+            print("Printer: " + str(printer))
+            vectors += self.pos + (np.array([printer['printing_space'][0]*0.5*.1,
+                                             printer['printing_space'][1]*0.5*.1,
+                                             printer['printing_space'][2]*0.5*.1]))
         elif transform and not generate_gcode:
             vectors += self.pos
 
