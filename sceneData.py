@@ -64,7 +64,7 @@ class AppScene(object):
         if self.actual_list_position < len(self.transformation_list)-1:
             self.transformation_list = self.transformation_list[:self.actual_list_position+1]
 
-        self.transformation_list.append([old_instance, old_instance.isVisible, np.copy(old_instance.scale), np.copy(old_instance.rot), np.copy(old_instance.pos)])
+        self.transformation_list.append([old_instance, deepcopy(old_instance.isVisible), np.copy(old_instance.scale), np.copy(old_instance.rot), np.copy(old_instance.pos)])
         self.actual_list_position = len(self.transformation_list)-1
         #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
@@ -216,17 +216,12 @@ class AppScene(object):
             return False
 
     def delete_selected_models(self):
-        for i in self.models:
-            print(i.filename + ' ' + str(i.selected))
-
         for m in self.models:
             if m.selected and m.isVisible:
-                print("Mazu model: " + m.filename + " a jeho visible je " + str(m.isVisible))
                 m.isVisible = False
-            else:
-                print("Model nebude smazan: " + m.filename + " a jeho visible je " + str(m.isVisible))
 
         #TODO: Add state to history
+        self.clear_selected_models()
         self.controller.view.update_scene()
 
 
@@ -236,8 +231,8 @@ class AppScene(object):
         self.actual_list_position = 0
 
     def clear_selected_models(self):
-        for model in self.models:
-            model.selected = False
+        for m in self.models:
+            m.selected = False
 
     def automatic_models_position(self):
         #sort objects over size of bounding sphere
@@ -278,7 +273,7 @@ class AppScene(object):
                 position_vector[1] += model.boundingSphereSize*.1
 
     def get_whole_scene_in_one_mesh(self, gcode_generate=False):
-        return Mesh(np.concatenate([i.get_mesh(True, gcode_generate).data for i in self.models]))
+        return Mesh(np.concatenate([i.get_mesh(True, gcode_generate).data for i in self.models if i.isVisible]))
 
     def save_whole_scene_to_one_stl_file(self, filename):
         whole_scene = self.get_whole_scene_in_one_mesh(True)
@@ -1078,6 +1073,7 @@ class ModelTypeStl(ModelTypeAbstract):
 
         model.temp_mesh = deepcopy(model.mesh)
         model.make_normals()
+        model.isVisible = True
 
         #model.displayList = model.make_display_list()
         #model.make_vao()
