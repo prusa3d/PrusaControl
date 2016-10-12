@@ -67,7 +67,7 @@
   "pla": {
     "name": "pla",
     "label": "Prusa PLA",
-    "infill": 15,
+    "infill": 10,
     "infillRange": [
       0,
       90
