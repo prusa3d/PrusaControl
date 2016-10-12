@@ -351,11 +351,10 @@ class GLWidget(QGLWidget):
 
 
         for model in self.parent.controller.scene.models:
-            if not model.isVisible:
-                break
-            model.render(picking=True, blending=True)
-            if model.selected:
-                self.draw_tools_helper(model, self.controller.settings, True)
+            if model.isVisible:
+                model.render(picking=True, blending=True)
+                if model.selected:
+                    self.draw_tools_helper(model, self.controller.settings, True)
 
         self.draw_tools(picking=True)
 
@@ -412,9 +411,8 @@ class GLWidget(QGLWidget):
 
         glEnable ( GL_LIGHTING )
         for model in self.parent.controller.scene.models:
-            if not model.isVisible:
-                break
-            model.render(picking=False, blending=not model_view)
+            if model.isVisible:
+               model.render(picking=False, blending=not model_view)
         glDisable( GL_LIGHTING )
 
         if not model_view:
@@ -423,10 +421,9 @@ class GLWidget(QGLWidget):
 
 
         for model in self.parent.controller.scene.models:
-            if not model.isVisible:
-                break
-            if model.selected and model_view:
-                self.draw_tools_helper(model, self.parent.controller.settings)
+            if model.isVisible:
+                if model.selected and model_view:
+                    self.draw_tools_helper(model, self.parent.controller.settings)
 
 
         if self.controller.render_status in ['model_view']:
