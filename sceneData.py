@@ -620,7 +620,6 @@ class Model(object):
 
     @timing
     def update_min_max(self):
-        print("recalculate")
         self.temp_mesh = deepcopy(self.mesh)
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
@@ -824,9 +823,9 @@ class Model(object):
     '''
     def intersection_model_list_model_(self, list):
         for m in list:
-            #if self.intersection_model_model_by_BS(m):
-            if self.intersection_model_model_by_BB(m):
-                return True
+            if m.isVisible:
+                if self.intersection_model_model_by_BB(m):
+                    return True
         return False
 
 
@@ -1050,7 +1049,7 @@ class ModelTypeStl(ModelTypeAbstract):
         model.zeroPoint = deepcopy(model.boundingSphereCenter)
         model.zeroPoint[2] = model.min[2]
 
-        print(str(model.zeroPoint))
+        #print(str(model.zeroPoint))
 
         model.mesh = mesh
 

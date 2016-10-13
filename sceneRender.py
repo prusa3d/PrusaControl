@@ -332,7 +332,6 @@ class GLWidget(QGLWidget):
 
 
     #@timing
-
     def picking_render(self):
         glClearColor(0., 0., 0., 0.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
