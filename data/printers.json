@@ -45,7 +45,8 @@
       "use_volumetric_e" : 0,
       "vibration_limit" : 0,
       "wipe" : 1,
-      "z_offset" : 0
+      "z_offset" : 0,
+      "threads" : 4
     },
     "material_parameters_file": "",
     "printer_type": {

@@ -27,7 +27,11 @@ class PrintingParameters(object):
         self.all_printers_parameters = self.read_printers_parameters(self.application_parameters.printers_parameters_file)
 
         #apply default printer type settings
-        self.all_printers_parameters['default']['printer_type'] = self.apply_default_parameters(self.all_printers_parameters['default']['printer_type'])
+        print("Printer type before: " + str(self.all_printers_parameters['default']['printer_type']))
+        out = dict(self.apply_default_parameters(self.all_printers_parameters['default']['printer_type']))
+        print("Out: " + str(out))
+        self.all_printers_parameters['default']['printer_type'] = out
+        print("Printer type after:" + str(self.all_printers_parameters['default']['printer_type']))
         #apply default printer settings
         self.printers_parameters = self.apply_default_parameters(self.all_printers_parameters)
 
@@ -75,18 +79,19 @@ class PrintingParameters(object):
 
     def apply_default_parameters(self, dict_with_default):
         return_dict = {}
-        for i in dict_with_default.keys():
+        for i in dict_with_default:
+            updating_dict = {}
             if i == u'default':
                 continue
-            if 'parameters' in dict_with_default[i].keys():
-                return_dict[i] = dict(dict_with_default[u'default'])
-                updating_dict = dict(dict_with_default[i])
+            if 'parameters' in dict_with_default[i]:
+                return_dict[i] = deepcopy(dict_with_default[u'default'])
+                updating_dict = deepcopy(dict_with_default[i])
                 del updating_dict['parameters']
                 return_dict[i].update(updating_dict)
-                return_dict[i]['parameters'].update(dict_with_default[i]['parameters'])
+                return_dict[i]['parameters'].update(deepcopy(dict_with_default[i]['parameters']))
             else:
-                return_dict[i] = dict(dict_with_default[u'default'])
-                return_dict[i].update(dict_with_default[i])
+                return_dict[i] = deepcopy(dict_with_default[u'default'])
+                return_dict[i].update(deepcopy(dict_with_default[i]))
 
         return return_dict
 
@@ -100,9 +105,9 @@ class PrintingParameters(object):
                 if printer_variation in self.printers_parameters[printer_name]["printer_type"]:
                     if material_name in self.printers_parameters[printer_name]["materials"]:
                         if quality_seting in self.printers_parameters[printer_name]["materials"][material_name]['quality']:
-                            material_quality_pl = dict(self.printers_parameters[printer_name]["materials"][material_name]['quality'][quality_seting]["parameters"])
-                            final_pl = dict(self.printers_parameters[printer_name]["parameters"])
-                            printer_variation_pl = dict(self.printers_parameters[printer_name]["printer_type"][printer_variation]['parameters'])
+                            material_quality_pl = deepcopy(self.printers_parameters[printer_name]["materials"][material_name]['quality'][quality_seting]["parameters"])
+                            final_pl = deepcopy(self.printers_parameters[printer_name]["parameters"])
+                            printer_variation_pl = deepcopy(self.printers_parameters[printer_name]["printer_type"][printer_variation]['parameters'])
                             final_pl.update(material_quality_pl)
                             final_pl.update(printer_variation_pl)
                             return final_pl
