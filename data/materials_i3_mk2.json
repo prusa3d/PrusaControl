@@ -1,5 +1,6 @@
 {
   "abs": {
+    "sort":1,
     "name": "abs",
     "label": "Prusa ABS",
     "infill": 22,
@@ -9,6 +10,7 @@
     ],
     "quality": {
       "draft": {
+        "sort":1,
         "name": "draft",
         "label": "Draft",
         "parameters": {
@@ -38,12 +40,14 @@
         }
       },
       "detail": {
+        "sort":2,
         "name": "detail",
         "label": "Detail",
         "parameters": {
         }
       },
       "default": {
+        "sort":99,
         "name": "default",
         "label": "",
         "parameters": {
@@ -64,7 +68,21 @@
       }
     }
   },
+  "flex": {
+    "sort":2,
+    "name": "flex",
+    "label": "Prusa Flex",
+    "quality":{}
+  },
+  "pet": {
+    "sort":3,
+    "name": "pet",
+    "label": "Prusa PET",
+    "quality":{}
+
+  },
   "pla": {
+    "sort":4,
     "name": "pla",
     "label": "Prusa PLA",
     "infill": 10,
@@ -74,6 +92,7 @@
     ],
     "quality": {
       "ultradetail": {
+        "sort":1,
         "name": "ultradetail",
         "label": "Ultra detail",
         "parameters": {
@@ -111,6 +130,7 @@
         }
       },
       "detail": {
+        "sort":2,
         "name": "detail",
         "label": "Detail",
         "parameters": {
@@ -130,10 +150,12 @@
         }
       },
       "normal": {
+        "sort":3,
         "name": "normal",
         "label": "Normal"
       },
       "draft": {
+        "sort":4,
         "name": "draft",
         "label": "Draft",
         "parameters": {
@@ -154,6 +176,7 @@
         }
       },
       "default": {
+        "sort":99,
         "name": "default",
         "label": "",
         "parameters": {
@@ -257,6 +280,7 @@
     }
   },
   "default": {
+    "sort":99,
     "name": "default",
     "label": "",
     "infill": 20,
@@ -265,6 +289,10 @@
       100
     ],
     "quality": {
+      "draft": {
+        "name": "draft",
+        "label": "Draft"
+      },
       "default": {
         "name": "default",
         "label": "Draft",
