@@ -113,6 +113,7 @@ class Controller:
         self.canceled = False
 
         self.gcode_layer = '0.0'
+        self.gcode_draw_from_button = True
 
         self.over_object = False
         self.models_selected = False
@@ -188,6 +189,9 @@ class Controller:
         self.gcode_layer = self.gcode.data_keys[value]
         self.view.update_scene()
 
+    def set_gcode_draw_from_button(self, val):
+        self.gcode_draw_from_button = val
+
 
     def scene_was_sliced(self):
         self.set_save_gcode_button()
@@ -255,13 +259,34 @@ class Controller:
         return self.printing_parameters.get_materials_for_printer(printer_name).keys()
 
     def get_printer_materials_labels_ls(self, printer_name):
-        # return self.printing_settings['materials']
-        # return [i['label'] for i in self.printing_settings['materials'] if i['name'] not in ['default']]
-        return [self.printing_parameters.get_materials_for_printer(printer_name)[material]['label'] for material in self.printing_parameters.get_materials_for_printer(printer_name)]
+        data = self.printing_parameters.get_materials_for_printer(printer_name)
+        list = [[data[material]['label'], data[material]["sort"]] for material in data]
+        list = sorted(list, key=lambda a: a[1])
+        return [a[0] for a in list]
 
     def get_printer_material_quality_labels_ls_by_material_name(self, material_name):
-        return [self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality'][i]['label']
-                for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']]
+        #return [self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality'][i]['label']
+        #        for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']]
+        data = self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']
+        list = [[data[quality]['label'], data[quality]["sort"]] for quality in data]
+        list = sorted(list, key=lambda a: a[1])
+        return [a[0] for a in list]
+
+    def get_material_name_by_material_label(self, material_label):
+        data = self.printing_parameters.get_materials_for_printer(self.actual_printer)
+        for i in data:
+            if data[i]['label']==material_label:
+                return i
+        return None
+
+    def get_material_quality_name_by_quality_label(self, material_name, quality_label):
+        data = self.printing_parameters.get_materials_for_printer(self.actual_printer)[material_name]
+        for i in data["quality"]:
+            if data["quality"][i]['label'] == quality_label:
+                return i
+        return None
+
+
 
     def get_printer_material_quality_labels_ls_by_material_label(self, material_label):
         materials_ls = self.printing_parameters.get_materials_for_printer(self.actual_printer)
@@ -275,7 +300,12 @@ class Controller:
 
     def get_printer_material_quality_names_ls(self, material):
         # return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
-        return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)['quality']]
+        data = self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)['quality']
+        list = [[quality, data[quality]["sort"]] for quality in data]
+        list = sorted(list, key=lambda a: a[1])
+        return [a[0] for a in list]
+        #return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)['quality']]
+
 
     def get_printing_settings_for_material_by_name(self, material_name):
         # material = self.printing_settings['materials'][material_index]
@@ -294,6 +324,7 @@ class Controller:
 
         return printing_settings_tmp
 
+    '''
     def get_printing_parameters_for_material_quality(self, material_index, quality_index):
         material_default = self.printing_settings['materials'][material_index]['quality'][-1]['parameters']
         material_quality = self.printing_settings['materials'][material_index]['quality'][quality_index]['parameters']
@@ -302,6 +333,7 @@ class Controller:
         data.update(material_default)
         data.update(material_quality)
         return data
+    '''
 
     def get_actual_printing_data(self):
         return self.view.get_actual_printing_data()
@@ -456,6 +488,9 @@ class Controller:
         self.scene.check_models_name()
         project_file = ProjectFile(self.scene)
         project_file.save(path)
+
+    def update_scene(self):
+        self.view.update_scene()
 
     def update_firmware(self):
         #TODO:Add code for update of firmware

@@ -517,6 +517,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_label.setAlignment(Qt.AlignCenter)
 
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
+        self.gcode_from_button_checkbox = QtGui.QCheckBox(self.tr("From button"))
+        self.gcode_from_button_checkbox.setChecked(True)
+        self.gcode_from_button_checkbox.clicked.connect(self.set_gcode_draw_layers_from_button)
 
         '''
         self.gcode_slider = QtGui.QSlider(QtCore.Qt.Vertical)
@@ -533,6 +536,7 @@ class PrusaControlView(QtGui.QMainWindow):
         gcode_panel_layout.setSpacing(0)
         gcode_panel_layout.addWidget(self.gcode_label)
         gcode_panel_layout.addWidget(self.gcode_slider)
+        gcode_panel_layout.addWidget(self.gcode_from_button_checkbox)
         gcode_panel_layout.addWidget(self.gcode_cancel_button)
         self.gcode_panel.setLayout(gcode_panel_layout)
         self.gcode_panel.setVisible(False)
@@ -1090,11 +1094,10 @@ class PrusaControlView(QtGui.QMainWindow):
         self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
 
     def get_actual_printing_data(self):
-        material_index = self.materialCombo.currentIndex()
-        material_name = self.controller.get_printer_materials_names_ls(self.controller.actual_printer)[material_index]
-        quality_index = self.qualityCombo.currentIndex()
-        print("Material: " + str(self.controller.get_printer_material_quality_names_ls(material_name)))
-        quality_name = self.controller.get_printer_material_quality_names_ls(material_name)[quality_index]
+        material_label = self.materialCombo.currentText()
+        material_name = self.controller.get_material_name_by_material_label(material_label)
+        quality_label = self.qualityCombo.currentText()
+        quality_name = self.controller.get_material_quality_name_by_quality_label(material_name, quality_label)
 
         infill_value = self.infillSlider.value()
         brim = self.brimCheckBox.isChecked()
@@ -1149,6 +1152,10 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_gcode_slider(self, val):
         self.controller.set_gcode_layer(val)
         self.gcode_label.setText(self.controller.gcode.data_keys[val])
+
+    def set_gcode_draw_layers_from_button(self, val):
+        self.controller.set_gcode_draw_from_button(val)
+        self.controller.update_scene()
 
     def set_infill(self, val):
         self.infillValue = val

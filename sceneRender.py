@@ -456,7 +456,11 @@ class GLWidget(QGLWidget):
 
     def draw_layer(self, layer, printer):
         printing_space = printer['printing_space']
-        layer_data = self.controller.gcode.data[self.controller.gcode_layer]
+        if self.controller.gcode_draw_from_button:
+            keys = [i for i in self.controller.gcode.data_keys if i <= self.controller.gcode_layer]
+            layer_datas = [self.controller.gcode.data[i] for i in keys]
+        else:
+            layer_datas = [self.controller.gcode.data[self.controller.gcode_layer]]
 
         glPushMatrix()
         #TODO: Better solution
@@ -471,13 +475,14 @@ class GLWidget(QGLWidget):
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
         glBegin(GL_LINES)
-        for p in layer_data:
-            if p[2] == 'E':
-                glColor3f(.0, 1., .0)
-            else:
-                glColor3f(0.0, 0.0, 1.0)
-            glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
-            glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
+        for layer_data in layer_datas:
+            for p in layer_data:
+                if p[2] == 'E':
+                    glColor3f(.0, 1., .0)
+                else:
+                    glColor3f(0.0, 0.0, 1.0)
+                glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
+                glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
         glEnd()
 
         glEnable(GL_DEPTH_TEST)
