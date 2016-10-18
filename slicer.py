@@ -105,7 +105,7 @@ class Slic3rEngineRunner(QObject):
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
         for i in actual_printing_data:
-            if i in ['brim', 'support'] and actual_printing_data[i]==True:
+            if i in ['brim', 'support_on_off', 'support_build_plate'] and actual_printing_data[i]==True:
                 self.step_max+=1
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
@@ -127,15 +127,18 @@ class Slic3rEngineRunner(QObject):
     def slice(self):
         self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
 
-        process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
+        self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
                                     self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
                                     self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
                                    stdout=subprocess.PIPE)
-        self.check_progress(process)
+        self.check_progress()
 
-    def check_progress(self, process):
+    def kill(self):
+        self.process.kill()
+
+    def check_progress(self):
         while self.step <= self.step_max and self.is_running is True:
-            line = process.stdout.readline()
+            line = self.process.stdout.readline()
             self.step += 1
             if not line:
                 break
@@ -198,6 +201,7 @@ class SlicerEngineManager(object):
         logging.debug("Thread canceling")
         if self.slice_engine and self.slice_thread:
             self.slice_engine.is_running = False
+            self.slice_engine.kill()
             self.slice_thread.quit()
             self.slice_thread.wait()
             self.controller.status = 'canceled'

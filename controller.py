@@ -146,6 +146,10 @@ class Controller:
         '''
 
 
+    def clear_gcode(self):
+        self.gcode = None
+        self.gcode_layer = '0.0'
+        self.gcode_draw_from_button = False
 
 
     def write_config(self):
@@ -343,6 +347,7 @@ class Controller:
         if self.status in ['edit', 'canceled']:
             #prepared to be g-code generated
             self.canceled = False
+            self.close_object_settings()
             if self.settings['analyze']:
                 self.analyze_result = self.analyzer.make_analyze(whole_scene)
                 self.make_reaction_on_analyzation_result(self.analyze_result)
@@ -759,6 +764,9 @@ class Controller:
     def open_object_settings(self, object_id):
         self.view.create_object_settings_menu(object_id)
 
+    def close_object_settings(self):
+        self.view.close_object_settings_panel()
+
     def mouse_move_event(self, event):
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
@@ -1075,8 +1083,21 @@ class Controller:
                 return True
 
     def reset_scene(self):
-        self.scene.clearScene()
+        self.scene.clear_scene()
         self.view.update_scene(True)
+
+    def clear_gui(self):
+        self.view.reinit()
+
+    def reset(self):
+        #reset render mode
+        self.scene_was_changed()
+        self.set_model_edit_view()
+        #reset gcode data
+        self.clear_gcode()
+        #reset gui
+        self.clear_gui()
+        self.reset_scene()
 
     def import_image(self, path):
         #TODO:Add importing of image(just plane with texture?)

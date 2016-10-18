@@ -236,12 +236,12 @@ class PrusaControlView(QtGui.QMainWindow):
         self.menubar = self.menuBar()
         # file menu definition
         self.file_menu = self.menubar.addMenu(self.tr('&File'))
+        self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
+        self.file_menu.addSeparator()
         self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
         self.file_menu.addAction(self.tr('Save project'), self.controller.save_project_file)
         self.file_menu.addSeparator()
-        self.file_menu.addAction(self.tr('Import stl file'), self.controller.open_model_file)
-        self.file_menu.addSeparator()
-        self.file_menu.addAction(self.tr('Reset'), self.controller.reset_scene)
+        self.file_menu.addAction(self.tr('Reset'), self.controller.reset)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.tr('Close'), self.controller.close)
         # file menu definition
@@ -517,9 +517,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_label.setAlignment(Qt.AlignCenter)
 
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
-        self.gcode_from_button_checkbox = QtGui.QCheckBox(self.tr("From button"))
-        self.gcode_from_button_checkbox.setChecked(True)
-        self.gcode_from_button_checkbox.clicked.connect(self.set_gcode_draw_layers_from_button)
+        #self.gcode_from_button_checkbox = QtGui.QCheckBox(self.tr("From button"))
+        #self.gcode_from_button_checkbox.setChecked(True)
+        #self.gcode_from_button_checkbox.clicked.connect(self.set_gcode_draw_layers_from_button)
 
         '''
         self.gcode_slider = QtGui.QSlider(QtCore.Qt.Vertical)
@@ -536,7 +536,7 @@ class PrusaControlView(QtGui.QMainWindow):
         gcode_panel_layout.setSpacing(0)
         gcode_panel_layout.addWidget(self.gcode_label)
         gcode_panel_layout.addWidget(self.gcode_slider)
-        gcode_panel_layout.addWidget(self.gcode_from_button_checkbox)
+        #gcode_panel_layout.addWidget(self.gcode_from_button_checkbox)
         gcode_panel_layout.addWidget(self.gcode_cancel_button)
         self.gcode_panel.setLayout(gcode_panel_layout)
         self.gcode_panel.setVisible(False)
@@ -576,6 +576,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
         self.show()
+
+    def reinit(self):
+        self.update_gui_for_material()
 
     def set_progress_bar(self, value):
         self.progressBar.setValue(value)
@@ -721,6 +724,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def set_position_on_object(self, widget, object_id, x, y, z):
         if widget.hasFocus():
+            self.controller.scene_was_changed()
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
@@ -729,6 +733,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def set_rotation_on_object(self, widget, object_id, x, y, z):
         if widget.hasFocus():
+            self.controller.scene_was_changed()
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
@@ -738,6 +743,7 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_scale_on_object(self, widget, active_axis, object_id, x, y, z):
 
         if widget.hasFocus():
+            self.controller.scene_was_changed()
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
@@ -1012,7 +1018,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def open_model_file_dialog(self):
         filters = "STL (*.stl *.STL)"
-        title = "Import stl file"
+        title = "Import model file"
         open_at = "/home"
         data = QtGui.QFileDialog.getOpenFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
@@ -1153,9 +1159,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.controller.set_gcode_layer(val)
         self.gcode_label.setText(self.controller.gcode.data_keys[val])
 
-    def set_gcode_draw_layers_from_button(self, val):
-        self.controller.set_gcode_draw_from_button(val)
-        self.controller.update_scene()
+    #def set_gcode_draw_layers_from_button(self, val):
+    #    self.controller.set_gcode_draw_from_button(val)
+    #    self.controller.update_scene()
 
     def set_infill(self, val):
         self.infillValue = val

@@ -225,7 +225,7 @@ class AppScene(object):
         self.controller.view.update_scene()
 
 
-    def clearScene(self):
+    def clear_scene(self):
         self.models = []
         self.transformation_list = []
         self.actual_list_position = 0
@@ -551,7 +551,7 @@ class Model(object):
         self.pos = deepcopy(self.pos_hist)
         self.scale = deepcopy(self.scale_hist)
         self.rot = deepcopy(self.rot_hist)
-        self.apply_all_transformation()
+        #self.apply_all_transformation()
         self.is_changed = False
 
     def set_scale(self, value):
