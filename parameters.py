@@ -4,6 +4,7 @@ import json
 import os
 import platform
 import tempfile
+import sys
 
 from ConfigParser import ConfigParser, RawConfigParser
 from copy import deepcopy
@@ -153,25 +154,26 @@ class AppParameters(object):
         if self.system_platform in ['Linux']:
             self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
-            self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
+            #self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
             self.printers_parameters_file = os.path.expanduser("data/printers.json")
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Darwin']:
             self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
-            self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
+            #self.printing_parameters_file = os.path.expanduser("data/printing_parameters.json")
             self.printers_parameters_file = os.path.expanduser("data/printers.json")
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Windows']:
             self.tmp_place = tempfile.gettempdir() + '\\'
             self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
-            self.printing_parameters_file = os.path.expanduser("data\\printing_parameters.json")
+            #self.printing_parameters_file = os.path.expanduser("data\\printing_parameters.json")
             self.printers_parameters_file = os.path.expanduser("data\\printers.json")
             self.config.readfp(open('data\\defaults.cfg'))
+            print("Executable: " + sys.executable)
         else:
             self.tmp_place = './'
             self.config_path = 'prusacontrol.cfg'
-            self.printing_parameters_file = "data/printing_parameters.json"
+            #self.printing_parameters_file = "data/printing_parameters.json"
             self.printers_parameters_file = os.path.expanduser("data/printers.json")
             self.config.readfp(open('data/defaults.cfg'))
 

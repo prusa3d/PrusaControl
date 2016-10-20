@@ -160,6 +160,7 @@ class Controller:
         config.set('settings', 'debug', str(self.settings['debug']))
         config.set('settings', 'automatic_placing', str(self.settings['automatic_placing']))
         config.set('settings', 'language', self.settings['language'])
+        config.set('settings', 'analyze', self.settings['analyze'])
 
         with open(self.app_config.config_path, 'wb') as configfile:
             config.write(configfile)
@@ -207,6 +208,7 @@ class Controller:
     def set_gcode_view(self):
         self.unselect_objects()
         self.render_status = 'gcode_view'
+        #self.view.set_gcode_slider()
         self.open_gcode_gui()
 
     def set_model_edit_view(self):
@@ -526,6 +528,8 @@ class Controller:
         self.view.set_print_info_text(string)
 
     def scene_was_changed(self):
+        if self.status == 'generating':
+            self.cancel_generation()
         self.status = 'edit'
         self.scene.analyze_result_data_tmp = []
         self.set_generate_button()

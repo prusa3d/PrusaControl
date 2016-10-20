@@ -978,9 +978,13 @@ class PrusaControlView(QtGui.QMainWindow):
             self.cancel_object_settings()
         self.right_panel.setMaximumWidth(350)
         self.gcode_panel.setVisible(True)
+        self.gcode_slider.setTickInterval(1)
+        self.gcode_slider.setSingleStep(1)
         self.line.setVisible(True)
         self.controller.view.update_scene()
 
+    #def set_gcode_slider(self, number_of_layers=0, maximal_value=0):
+    #    self.gcode_slider.setTickInterval(0)
 
     def close_gcode_view(self):
         self.gcode_panel.setVisible(False)
