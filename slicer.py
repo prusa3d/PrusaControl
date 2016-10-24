@@ -92,14 +92,14 @@ class Slic3rEngineRunner(QObject):
 
     def support2_transform(self, in_value):
         if in_value == "None":
-            return "no"
+            return "0"
         elif in_value == "Build plate only":
-            return "yes"
+            return "1"
         elif in_value == "Everywhere":
-            return "no"
+            return "0"
         else:
-            return "no"
-        return "no"
+            return "0"
+        return "0"
 
 
     def save_configuration(self, filename):

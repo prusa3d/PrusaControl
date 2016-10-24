@@ -78,7 +78,7 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 0
         self.zoom = 0
-        self.camera_position = numpy.array([0., 4. ,0.])
+        self.camera_position = numpy.array([0., 0. ,0.])
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -189,7 +189,7 @@ class GLWidget(QGLWidget):
     #TODO:All this function will be changed to control camera instance
     def set_zoom(self, diff):
         #self.camera.add_zoom(diff)
-        if (self.zoom + diff >= -60.0) and (self.zoom + diff <= -10.0):
+        if (self.zoom + diff >= -60.0) and (self.zoom + diff <= -5.0):
             self.zoom += diff
 
 
