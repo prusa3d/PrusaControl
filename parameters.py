@@ -180,8 +180,11 @@ class AppParameters(object):
         elif self.system_platform in ['Windows']:
             self.data_folder = "data\\"
             self.tmp_place = tempfile.gettempdir() + '\\'
+
             self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
-            self.user_folder = os.path.expanduser("~\\.prusacontrol\\")
+            #self.user_folder = os.path.expanduser("~\\.prusacontrol\\")
+            self.user_folder = self.tmp_place.split("\\appdata")[0] + "\\.prusacontrol\\"
+
             self.printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
             self.config.readfp(open('data\\defaults.cfg'))
             print("Executable: " + sys.executable)
@@ -299,7 +302,7 @@ class AppParameters(object):
 
         for i in new_material_list:
             new_material_version = self.get_materials_info(self.tmp_place + i)
-            old_material_version = self.get_materials_info(self.user_folder + i)
+            old_material_version = self.get_materials_info(self.user_folder+i)
             if new_material_version:
                 if old_material_version:
                     if new_material_version > old_material_version:
