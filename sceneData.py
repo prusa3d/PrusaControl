@@ -48,6 +48,7 @@ class AppScene(object):
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
+        self.copied_models = []
         self.printable = True
         self.camera_vector = np.array([0.,0.,0.])
 
@@ -93,7 +94,6 @@ class AppScene(object):
             old_instance.is_changed = True
             old_instance.update_min_max()
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
-
 
 
     def check_models_name(self):
@@ -225,6 +225,20 @@ class AppScene(object):
         self.controller.view.update_scene()
 
 
+    def copy_selected_objects(self):
+        self.copied_models = []
+        for m in self.models:
+            if m.selected and m.isVisible:
+                self.copied_models.append(m)
+
+    def paste_selected_objects(self):
+        for i in self.copied_models:
+            self.models.append(deepcopy(i))
+
+        #self.automatic_models_position()
+
+
+
     def clear_scene(self):
         self.models = []
         self.transformation_list = []
@@ -248,6 +262,7 @@ class AppScene(object):
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
+            print("index 0")
             self.models[0 ].pos[0] = position_vector[0]
             self.models[0].pos[1] = position_vector[1]
 
@@ -256,6 +271,7 @@ class AppScene(object):
             return
         scene_tmp = self.models[:index]
         if index > 0:
+            print("index >0")
             while model.intersection_model_list_model_(scene_tmp):
                 #for angle in xrange(0, 360, 20):
                 for angle in xrange(0, 360, 5):
@@ -386,6 +402,33 @@ class Model(object):
         #example car.stl
         self.filename = ""
         self.normalization_flag = False
+
+    def __deepcopy__(self, memodict={}):
+        m = Model()
+
+        m.filename = deepcopy(self.filename)
+        m.mesh = deepcopy(self.mesh)
+        m.normal = deepcopy(self.normal)
+
+        m.pos = deepcopy(self.pos)
+        m.scale = deepcopy(self.scale)
+        m.rot = deepcopy(self.rot)
+
+        m.tiled_normals = deepcopy(self.tiled_normals)
+        m.parent = self.parent
+
+        m.min = deepcopy(self.min)
+        m.max = deepcopy(self.max)
+
+        m.min_scene = deepcopy(self.min_scene)
+        m.max_scene = deepcopy(self.max_scene)
+
+        m.size = deepcopy(self.size)
+        m.size_origin = deepcopy(self.size_origin)
+
+        m.temp_mesh = deepcopy(self.mesh)
+        print("Udelana kopie")
+        return m
 
     def clear_state(self):
         self.is_changed = False
@@ -810,6 +853,7 @@ class Model(object):
         model_min = model.min_scene
         model_max = model.max_scene
         d = self.parent.model_position_offset
+        print("intersection model model: " + str(d))
         return not(max[0]+d<model_min[0] or model_max[0]<min[0]-d or max[1]+d<model_min[1] or model_max[1]<min[1]-d)
     '''
     def intersection_model_model_by_BS(self, model):

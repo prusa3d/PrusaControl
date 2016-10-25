@@ -647,6 +647,12 @@ class Controller:
         key = event.key()
         if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view':
             self.scene.delete_selected_models()
+        elif key in [Qt.Key_C] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+            print("Copy models")
+            self.scene.copy_selected_objects()
+        elif key in [Qt.Key_V] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+            print("Paste models")
+            self.scene.paste_selected_objects()
 
 
 

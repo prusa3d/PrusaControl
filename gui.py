@@ -351,6 +351,7 @@ class PrusaControlView(QtGui.QMainWindow):
         layout.setAlignment(Qt.AlignLeft)
 
         menu_label = QtGui.QLabel(self.tr("Object settings"))
+        self.filename_label = QtGui.QLabel("")
         position = QtGui.QLabel(self.tr("Position"))
         self.edit_pos_x = QtGui.QSpinBox()
         self.edit_pos_x.setMaximum(200)
@@ -462,6 +463,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
         layout.addWidget(menu_label)
+        layout.addWidget(self.filename_label)
         layout.addWidget(position)
         layout.addRow(QtGui.QLabel('X'), self.edit_pos_x)
         layout.addRow(QtGui.QLabel('Y'), self.edit_pos_y)
@@ -629,6 +631,7 @@ class PrusaControlView(QtGui.QMainWindow):
         mesh.start_edit()
         self.object_id = object_id
 
+        self.filename_label.setText(mesh.filename)
         self.edit_pos_x.setDisabled(True)
         self.edit_pos_x.setValue(mesh.pos[0]*10)
         self.edit_pos_x.setDisabled(False)
