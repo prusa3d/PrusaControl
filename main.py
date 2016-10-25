@@ -21,6 +21,7 @@ def main():
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
     local_path = os.path.realpath(__file__)
     print("Local_path: " + local_path)
+    print("Executable: " + str(sys.executable))
 
     controller = Controller(app, local_path)
     window = controller.get_view()
