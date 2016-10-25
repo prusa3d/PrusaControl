@@ -15,8 +15,6 @@ from pprint import pprint
 import errno
 from shutil import copyfile, Error
 
-import shutil
-import urllib3
 
 __author__ = 'Tibor Vavra'
 
@@ -259,8 +257,6 @@ class AppParameters(object):
 
     def download_new_settings_files(self):
         printers_data = {}
-        #http = urllib3.PoolManager()
-        #r = http.request('GET', self.json_settings_url+self.printers_filename)
         r = urllib2.urlopen(self.json_settings_url + self.printers_filename)
         with open(self.tmp_place+self.printers_filename, 'wb') as out_file:
             #shutil.copyfileobj(r, out_file)
