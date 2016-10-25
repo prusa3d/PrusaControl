@@ -10,6 +10,7 @@ from sceneData import *
 import logging
 import cProfile
 import os
+import shutil
 
 
 __author__ = 'Tibor Vavra'
@@ -25,11 +26,21 @@ def log_exception(excType, excValue, traceback):
 
 def main():
     sys.excepthook = log_exception
+
+    try:
+        if sys.frozen or sys.importers:
+            SCRIPT_ROOT = os.path.dirname(sys.executable)
+    except AttributeError:
+        SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
     local_path = os.path.realpath(__file__)
-    print("Local_path: " + local_path)
-    print("Executable: " + str(sys.executable))
+    logging.info("01: " + local_path)
+    logging.info("02: " + str(os.__file__))
+    logging.info("03: " + str(SCRIPT_ROOT))
+    logging.info("04: " + str(sys.argv))
+
 
     controller = Controller(app, local_path)
     window = controller.get_view()
