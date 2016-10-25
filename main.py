@@ -52,7 +52,8 @@ def main():
 
 if __name__ == '__main__':
     FORMAT = "[%(levelname)s][%(filename)s:%(lineno)s:%(funcName)s()]-%(message)s"
-    logging.basicConfig(filename='prusacontrol.log', format=FORMAT, filemode='w', level=logging.DEBUG)
+    #logging.basicConfig(filename='prusacontrol.log', format=FORMAT, filemode='w', level=logging.DEBUG)
+    logging.basicConfig(filename=os.path.expanduser("~\\prusacontrol.log"), format=FORMAT, filemode='w', level=logging.DEBUG)
 
     if DEBUG:
         cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
