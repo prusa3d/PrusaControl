@@ -737,6 +737,18 @@ class Controller:
                         self.view.glWidget.v1 = face[1]
                         self.view.glWidget.v2 = face[2]
                         print("Nalezen objekt " + str(model))
+        elif self.tool == 'scale':
+            ray_start, ray_end = self.view.get_cursor_position(event)
+            camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+
+            for model in self.scene.models:
+                if model.selected:
+                    pos = deepcopy(model.pos)
+                    pos[2] = 0.
+                    self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, pos, direction))
+                    self.original_scale = numpy.linalg.norm(self.original_scale_point - pos)
+                    self.last_l = 0.0
+
 
 
     def mouse_move_event(self, event):
@@ -819,12 +831,18 @@ class Controller:
 
             for model in self.scene.models:
                 if model.selected:
-                    pos = model.pos
+                    pos = deepcopy(model.pos)
                     pos[2] = 0.
                     new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, pos, direction))
-                    new_scale_vec = new_scale_point - pos
-                    l = numpy.linalg.norm(new_scale_vec)
+                    new_scale_vect = new_scale_point - pos
+                    #new_scale_vec = new_scale_point - pos
+                    #l = numpy.linalg.norm(new_scale_vect)/self.original_scale
+                    l = numpy.linalg.norm(new_scale_vect)
+
+                    print("original scale is: " + str(self.original_scale))
+                    print("new scale is: " + str(l))
                     model.set_scale_abs(l, l, l)
+                    #self.last_l = l
                     self.view.update_object_settings(model.id)
                     self.scene_was_changed()
 

@@ -295,9 +295,10 @@ class GLWidget(QGLWidget):
         #self.tools = []
 
         self.bed = {}
+        self.printing_space = {}
         for i in self.parent.controller.printing_parameters.get_printers_names():
             self.bed[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.makePrintingBed(self.parent.controller.printing_parameters.get_printer_parameters(i))
-
+            self.printing_space[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.make_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(i))
 
         glClearDepth(1.0)
         glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
@@ -370,9 +371,10 @@ class GLWidget(QGLWidget):
     def paintGL(self, selection = 1):
         #print("Draw")
         t0 = time.time()
-        if not self.bed:
+        if not self.bed and self.printing_space:
             return
         heat_bed = self.bed[self.controller.settings['printer']]
+        printing_space = self.printing_space[self.controller.settings['printer']]
         printer = None
 
         #for p in self.controller.printers:
@@ -439,6 +441,7 @@ class GLWidget(QGLWidget):
 
             self.draw_tools()
 
+        glCallList(printing_space)
 
         #self.picking_render()
         glFlush()
@@ -735,7 +738,7 @@ class GLWidget(QGLWidget):
         glEnd()
         glDisable(GL_TEXTURE_2D)
 
-
+        '''
         glEnable(GL_BLEND)
         glBegin(GL_LINES)
         glColor3f(1,1,1)
@@ -774,6 +777,59 @@ class GLWidget(QGLWidget):
         glColor3f(0, 0, 1)
         glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
         glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 1)
+        glEnd()
+        glEndList()
+        glEnable(GL_DEPTH_TEST)
+        '''
+
+        glEndList()
+        return genList
+
+    def make_printing_space(self, printer_data):
+        printing_space = printer_data['printing_space']
+
+        genList = glGenLists(1)
+        glNewList(genList, GL_COMPILE)
+
+        glLineWidth(2)
+        glEnable(GL_BLEND)
+        glBegin(GL_LINES)
+        glColor3f(1, 1, 1)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * 0.5 * .1, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * 0.5 * .1, printing_space[2] * .1)
+
+        glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * 0.5 * .1, 0)
+        glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * 0.5 * .1, printing_space[2] * .1)
+
+        glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * -0.5 * .1, 0)
+        glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * -0.5 * .1, printing_space[2] * .1)
+
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, printing_space[2] * .1)
+        glEnd()
+
+        glBegin(GL_LINE_LOOP)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * 0.5 * .1, printing_space[2] * .1)
+        glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * 0.5 * .1, printing_space[2] * .1)
+        glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * -0.5 * .1, printing_space[2] * .1)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, printing_space[2] * .1)
+        glEnd()
+
+        # Axis
+        glLineWidth(5)
+        glDisable(GL_DEPTH_TEST)
+        glBegin(GL_LINES)
+        glColor3f(1, 0, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
+        glVertex3d((printing_space[0] * -0.5 * .1) - 1, printing_space[1] * -0.5 * .1, 0)
+
+        glColor3f(0, 1, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, (printing_space[1] * -0.5 * .1) - 1, 0)
+
+        glColor3f(0, 0, 1)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 1)
         glEnd()
         glEndList()
         glEnable(GL_DEPTH_TEST)

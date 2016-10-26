@@ -645,13 +645,17 @@ class Model(object):
         self.place_on_zero()
 
     def set_scale_abs(self, x, y, z):
-        self.scale[0] = x
-        self.scale[1] = y
-        self.scale[2] = z
+        printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
+        if (x * self.size_origin[0] > .5) and (y * self.size_origin[1] > .5) and (z * self.size_origin[2] > .5)\
+            and (x * self.size_origin[0] < printer['printing_space'][0]*.1) and\
+                (y * self.size_origin[1] < printer['printing_space'][1]*.1) and\
+                (z * self.size_origin[2] < printer['printing_space'][2]*.1):
+            self.scale[0] = x
+            self.scale[1] = y
+            self.scale[2] = z
 
-
-        self.update_min_max()
-        self.place_on_zero()
+            self.update_min_max()
+            self.place_on_zero()
 
 
     def update_position(self):
