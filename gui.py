@@ -1122,7 +1122,9 @@ class PrusaControlView(QtGui.QMainWindow):
                 'infill': infill_value,
                 'brim': brim,
                 'support_on_off': support,
-                'support_build_plate': support,}
+                'support_build_plate': support,
+                'overhang': support
+                }
         return data
 
 

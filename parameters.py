@@ -104,7 +104,7 @@ class PrintingParameters(object):
 
 
     def get_actual_settings(self, printer_name, printer_variation, material_name, quality_seting):
-        print("Option: " + str(printer_name) + ' ' + str(printer_variation) + ' ' + str(material_name) + ' ' + str(quality_seting))
+        #print("Option: " + str(printer_name) + ' ' + str(printer_variation) + ' ' + str(material_name) + ' ' + str(quality_seting))
         if not printer_name or not printer_variation or not material_name or not quality_seting:
             return None
         else:

@@ -67,7 +67,8 @@ class Slic3rEngineRunner(QObject):
             ['brim_width', 'brim', self.boolean_transform],
             #['support_material', 'support', self.boolean_transform]
             ['support_material', 'support_on_off', self.support1_transform],
-            ['support_material_buildplate_only', 'support_build_plate', self.support2_transform]
+            ['support_material_buildplate_only', 'support_build_plate', self.support2_transform],
+            ['overhang', 'overhang', self.support3_transform]
         ]
         for i in translation_table:
             old[i[0]] = i[2](update[i[1]])
@@ -101,6 +102,17 @@ class Slic3rEngineRunner(QObject):
             return "0"
         return "0"
 
+    def support3_transform(self, in_value):
+        if in_value == "None":
+            return "0"
+        elif in_value == "Build plate only":
+            return "1"
+        elif in_value == "Everywhere":
+            return "1"
+        else:
+            return "1"
+        return "0"
+
 
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
@@ -110,7 +122,7 @@ class Slic3rEngineRunner(QObject):
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
         material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'])
-        print("All settings: " + str(material_printing_data))
+        #print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = ConfigParser()
         new_config.add_section('settings')

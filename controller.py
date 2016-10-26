@@ -739,34 +739,6 @@ class Controller:
                         print("Nalezen objekt " + str(model))
 
 
-
-
-    def get_active_tool(self):
-        for tool in self.tools:
-            if tool.pressed:
-                return tool.tool_name
-        return 'move'
-
-    def mouse_release_event(self, event):
-        print("mouse release event")
-        self.set_camera_function_false()
-        print("Hodnota v tool je: " + self.tool)
-        if self.tool in ['move', 'rotate', 'scale', 'placeonface']:
-            print("Ukladame nastaveni")
-            for model in self.scene.models:
-                if model.selected:
-                    model.update_min_max()
-                    model.recalc_bounding_sphere()
-                    self.scene.save_change(model)
-        self.tool = ''
-        self.res_old = numpy.array([0.,0.,0.])
-
-    def open_object_settings(self, object_id):
-        self.view.create_object_settings_menu(object_id)
-
-    def close_object_settings(self):
-        self.view.close_object_settings_panel()
-
     def mouse_move_event(self, event):
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
@@ -859,6 +831,33 @@ class Controller:
 
         self.last_pos = QtCore.QPoint(event.pos())
         self.view.update_scene()
+
+
+    def get_active_tool(self):
+        for tool in self.tools:
+            if tool.pressed:
+                return tool.tool_name
+        return 'move'
+
+    def mouse_release_event(self, event):
+        print("mouse release event")
+        self.set_camera_function_false()
+        print("Hodnota v tool je: " + self.tool)
+        if self.tool in ['move', 'rotate', 'scale', 'placeonface']:
+            print("Ukladame nastaveni")
+            for model in self.scene.models:
+                if model.selected:
+                    model.update_min_max()
+                    model.recalc_bounding_sphere()
+                    self.scene.save_change(model)
+        self.tool = ''
+        self.res_old = numpy.array([0.,0.,0.])
+
+    def open_object_settings(self, object_id):
+        self.view.create_object_settings_menu(object_id)
+
+    def close_object_settings(self):
+        self.view.close_object_settings_panel()
 
 
     '''
