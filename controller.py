@@ -112,6 +112,14 @@ class Controller:
         self.status = 'edit'
         self.canceled = False
 
+        self.mouse_double_click_event_flag = False
+        self.mouse_press_event_flag = False
+        self.mouse_move_event_flag = False
+        self.mouse_release_event_flag = False
+        self.tool_press_event_flag = False
+        self.object_select_event_flag = False
+        #TODO:Add clear event flags function
+
         self.gcode_layer = '0.0'
         self.gcode_draw_from_button = True
 
@@ -145,6 +153,13 @@ class Controller:
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
         '''
 
+    def clear_event_flag_status(self):
+        self.mouse_double_click_event_flag = False
+        self.mouse_press_event_flag = False
+        self.mouse_move_event_flag = False
+        self.mouse_release_event_flag = False
+        self.tool_press_event_flag = False
+        self.object_select_event_flag = False
 
     def clear_gcode(self):
         self.gcode = None
@@ -563,8 +578,8 @@ class Controller:
         return None
 
 
-    def get_active_tool(self):
-        return None
+    #def get_active_tool(self):
+    #    return None
 
     def is_some_tool_helper_under_cursor(self, object_id):
         if object_id == 0:
@@ -614,6 +629,21 @@ class Controller:
         #No object with id in scene.models
         return None
 
+    def unselect_objects_and_select_this_one(self, object_id):
+        self.unselect_objects()
+        one_selected = False
+        for model in self.scene.models:
+            #object founded
+            if model.id == object_id:
+                model.selected = True
+                one_selected = True
+                self.object_select_event_flag = True
+
+        if one_selected:
+            return True
+        else:
+            return False
+
 
     def unselect_object(self, object_id):
         for model in self.scene.models:
@@ -628,10 +658,12 @@ class Controller:
             # object founded
             if model.id == object_id:
                 model.selected = True
+                self.object_select_event_flag = True
                 return True
         return False
 
     def unselect_objects(self):
+        print("Unselect objects")
         for model in self.scene.models:
             model.selected = False
 
@@ -657,7 +689,8 @@ class Controller:
 
 
     def mouse_double_click(self, event):
-        if self.render_status == 'model_view':
+        self.mouse_double_click_event_flag = True
+        if self.render_status == 'model_view' and event.button() & QtCore.Qt.LeftButton:
             object_id = self.get_id_under_cursor(event)
             if object_id == 0 or self.is_some_tool_under_cursor(object_id):
                 return
@@ -666,7 +699,10 @@ class Controller:
 
 
     def mouse_press_event(self, event):
-        print("mouse press event")
+        print("Mouse press event")
+        self.clear_event_flag_status()
+        self.mouse_press_event_flag = True
+
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
         self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
         #Je stisknuto prave tlacitko?
@@ -682,6 +718,7 @@ class Controller:
                 else:
                     #Je pod kurzorem nejaky tool?
                     if self.is_some_tool_under_cursor(object_id):
+                        self.tool_press_event_flag = True
                         tool = self.get_tool_by_id(object_id)
                         for t in self.tools:
                             if not t == tool:
@@ -691,15 +728,32 @@ class Controller:
                         #tool.activate_tool()
                     #Je pod kurzorem nejaky tool helper?
                     elif self.is_some_tool_helper_under_cursor(object_id):
-                        print("Nasel tool_helper")
+                        self.tool_press_event_flag = True
                         self.set_active_tool_helper_by_id(object_id)
+                    elif self.is_ctrl_pressed():
+                        self.select_object(object_id)
+                    elif self.is_object_already_selected(object_id):
+                        pass
+                    else:
+                        self.unselect_objects()
+                        self.select_object(object_id)
+
+                    self.tool = self.get_active_tool()
+                    self.prepare_tool(event)
                     #Je objekt oznaceny?
+                    '''
                     elif self.is_ctrl_pressed():
                         if self.is_object_already_selected(object_id):
                             self.unselect_object(object_id)
                         else:
                             self.select_object(object_id)
-                    elif self.is_object_already_selected(object_id):
+                    '''
+                    #elif self.is_object_already_selected(object_id):
+
+
+                    '''
+                    elif self.unselect_objects_and_select_this_one(object_id):
+                        print("Klikani na objekt")
                         #nastav funkci na provedeni toolu
 
                         self.tool = self.get_active_tool()
@@ -711,9 +765,14 @@ class Controller:
                         self.prepare_tool(event)
                     else:
                         #select object
+                        print("Else:")
                         self.unselect_objects()
                         self.select_object(object_id)
+                    '''
+
+
             else:
+                print("Jiny status nez model_view")
                 self.unselect_objects()
                 self.set_camera_rotation_function()
         self.view.update_scene()
@@ -752,6 +811,8 @@ class Controller:
 
 
     def mouse_move_event(self, event):
+        print("Mouse move event")
+        self.mouse_move_event_flag = True
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
@@ -790,7 +851,7 @@ class Controller:
                 res_new = res - self.res_old
                 for model in self.scene.models:
                     if model.selected:
-                        pos = model.pos
+                        pos = deepcopy(model.pos)
                         pos[2] = 0.
 
                         #New
@@ -813,12 +874,12 @@ class Controller:
                         alpha = numpy.arctan2(sin_ang, cos_ang)
 
                         if new_vect_leng >= model.boundingSphereSize:
-                            model.set_rot(model.rot[0], model.rot[1], alpha)
+                            model.set_rot(model.rot[0], model.rot[1], alpha, False, False)
                             print("New angle: " + str(numpy.degrees(alpha)))
                         else:
                             alpha_new = numpy.degrees(alpha) // 45
                             print("New round angle: " + str(alpha_new*45.))
-                            model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25))
+                            model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False)
 
                         self.view.update_object_settings(model.id)
                         self.scene_was_changed()
@@ -837,6 +898,8 @@ class Controller:
                     new_scale_vect = new_scale_point - pos
                     #new_scale_vec = new_scale_point - pos
                     #l = numpy.linalg.norm(new_scale_vect)/self.original_scale
+                    #l = numpy.linalg.norm(new_scale_vect)/numpy.linalg.norm(model.size_origin)
+                    #l = numpy.linalg.norm(new_scale_vect)/numpy.linalg.norm(model.size_origin)
                     l = numpy.linalg.norm(new_scale_vect)
 
                     print("original scale is: " + str(self.original_scale))
@@ -858,11 +921,10 @@ class Controller:
         return 'move'
 
     def mouse_release_event(self, event):
-        print("mouse release event")
+        print("Mouse releas event")
+        self.mouse_release_event_flag = True
         self.set_camera_function_false()
-        print("Hodnota v tool je: " + self.tool)
         if self.tool in ['move', 'rotate', 'scale', 'placeonface']:
-            print("Ukladame nastaveni")
             for model in self.scene.models:
                 if model.selected:
                     model.update_min_max()
@@ -870,6 +932,14 @@ class Controller:
                     self.scene.save_change(model)
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])
+
+        if event.button() & QtCore.Qt.LeftButton and self.mouse_press_event_flag and\
+                self.mouse_release_event_flag and self.mouse_move_event_flag == False and\
+                self.object_select_event_flag==False:
+            print("Podminky splneny")
+            self.clear_event_flag_status()
+            self.unselect_objects()
+        self.update_scene()
 
     def open_object_settings(self, object_id):
         self.view.create_object_settings_menu(object_id)

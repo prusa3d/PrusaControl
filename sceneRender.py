@@ -312,10 +312,10 @@ class GLWidget(QGLWidget):
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
         #new light settings
-        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(50, 50, 100, 0))
+        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(500, 500, 1000, 0))
         glLightfv(GL_LIGHT0, GL_SPECULAR, _gl_vector(.5, .5, 1, 1))
         glLightfv(GL_LIGHT0, GL_DIFFUSE, _gl_vector(1, 1, 1, 1))
-        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(100, 0, 50, 0))
+        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(1000, 0, 500, 0))
         glLightfv(GL_LIGHT1, GL_DIFFUSE, _gl_vector(.5, .5, .5, 1))
         glLightfv(GL_LIGHT1, GL_SPECULAR, _gl_vector(1, 1, 1, 1))
         #new light settings
@@ -439,9 +439,10 @@ class GLWidget(QGLWidget):
                 glDisableClientState(GL_VERTEX_ARRAY)
                 glDisableClientState(GL_NORMAL_ARRAY)
 
+            glCallList(printing_space)
             self.draw_tools()
-
-        glCallList(printing_space)
+        else:
+            glCallList(printing_space)
 
         #self.picking_render()
         glFlush()
@@ -821,11 +822,11 @@ class GLWidget(QGLWidget):
         glBegin(GL_LINES)
         glColor3f(1, 0, 0)
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
-        glVertex3d((printing_space[0] * -0.5 * .1) - 1, printing_space[1] * -0.5 * .1, 0)
+        glVertex3d((printing_space[0] * -0.5 * .1) + 1, printing_space[1] * -0.5 * .1, 0)
 
         glColor3f(0, 1, 0)
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
-        glVertex3d(printing_space[0] * -0.5 * .1, (printing_space[1] * -0.5 * .1) - 1, 0)
+        glVertex3d(printing_space[0] * -0.5 * .1, (printing_space[1] * -0.5 * .1) + 1, 0)
 
         glColor3f(0, 0, 1)
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)

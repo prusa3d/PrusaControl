@@ -631,7 +631,7 @@ class Model(object):
         self.min_scene = self.min + pos
         self.max_scene = self.max + pos
 
-    def set_rot(self, x, y, z, add=False):
+    def set_rot(self, x, y, z, add=False, place_on_zero=True):
         if add:
             self.rot[0] += x
             self.rot[1] += y
@@ -641,8 +641,10 @@ class Model(object):
             self.rot[1] = y
             self.rot[2] = z
 
-        self.update_min_max()
-        self.place_on_zero()
+
+        #self.update_min_max()
+        if place_on_zero:
+            self.place_on_zero()
 
     def set_scale_abs(self, x, y, z):
         printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
@@ -692,6 +694,8 @@ class Model(object):
         self.temp_mesh.update_max()
         self.min = self.temp_mesh.min_
         self.max = self.temp_mesh.max_
+
+        self.size = self.max - self.min
 
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
