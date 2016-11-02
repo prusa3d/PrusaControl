@@ -679,7 +679,7 @@ class GLWidget(QGLWidget):
 
 
     def makePrintingBed(self, printer_data):
-        print("Printer data: " + str(printer_data))
+        #print("Printer data: " + str(printer_data))
         Model = ModelTypeStl.load(printer_data['model'])
         bed_texture = printer_data['texture']
         printing_space = printer_data['printing_space']

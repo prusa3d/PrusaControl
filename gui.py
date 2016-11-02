@@ -52,6 +52,9 @@ class SettingsDialog(QDialog):
         self.analyze_checkbox = QtGui.QCheckBox(self.tr("Analyzer"))
         self.analyze_checkbox .setChecked(self.controller.settings['analyze'])
 
+        self.update_parameters_checkbox = QtGui.QCheckBox(self.tr("Auto update parameters"))
+        self.update_parameters_checkbox.setChecked(self.controller.settings['automatic_update_parameters'])
+
         layout.addWidget(self.language_label)
         layout.addWidget(self.language_combo)
 
@@ -64,6 +67,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.debug_checkbox)
         layout.addWidget(self.automatic_placing_checkbox)
         layout.addWidget(self.analyze_checkbox)
+        layout.addWidget(self.update_parameters_checkbox)
 
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -86,6 +90,7 @@ class SettingsDialog(QDialog):
         data['debug'] = dialog.debug_checkbox.isChecked()
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
         data['analyze'] = dialog.analyze_checkbox.isChecked()
+        data['automatic_update_parameters'] = dialog.update_parameters_checkbox.isChecked()
         return (data, result == QDialog.Accepted)
 
 
@@ -221,6 +226,14 @@ class PrusaControlView(QtGui.QMainWindow):
         self.setAcceptDrops(True)
 
         self.is_setting_panel_opened = False
+        #self.setStyleSheet()
+
+        self.setObjectName('PrusaControlView')
+        css = QtCore.QFile('data/my_stylesheet.css')
+        css.open(QtCore.QIODevice.ReadOnly)
+        if css.isOpen():
+            self.setStyleSheet(QtCore.QVariant(css.readAll()).toString())
+            css.close()
 
         self.infillValue = 20
         self.changable_widgets = {}
@@ -263,57 +276,80 @@ class PrusaControlView(QtGui.QMainWindow):
         self.help_menu.addAction('Help', self.controller.open_help)
         self.help_menu.addAction(self.tr('Prusa Online'), self.controller.open_shop)
         self.help_menu.addSeparator()
+        self.help_menu.addAction(self.tr("Send feedback"), self.controller.send_feedback)
+        self.help_menu.addSeparator()
         self.help_menu.addAction(self.tr('About'), self.controller.open_about)
         # Help menu
 
         #self.prusa_control_widget = PrusaControlWidget(self)
 
         self.glWidget = sceneRender.GLWidget(self)
+        self.glWidget.setObjectName('glWidget')
 
         self.right_panel = QtGui.QWidget()
+        self.right_panel.setObjectName('right_panel')
         self.right_panel_layout = QtGui.QHBoxLayout()
+        self.right_panel_layout.setObjectName('right_panel_layout')
 
 
         self.printTab = QtGui.QWidget()
         # print tab
         self.materialLabel = QtGui.QLabel(self.tr("Material"))
+        self.materialLabel.setObjectName('materialLabel')
         self.materialCombo = QtGui.QComboBox()
-        self.materialCombo.addItems(self.controller.get_printer_materials_labels_ls(self.controller.actual_printer))
+        self.materialCombo.setObjectName('materialCombo')
+        material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+        self.materialCombo.addItems(material_label_ls)
+        self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
         self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
+        self.qualityLabel.setObjectName('qualityLabel')
         self.qualityCombo = QtGui.QComboBox()
+        self.qualityCombo.setObjectName('qualityCombo')
 
         self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
+        self.infillLabel.setObjectName('infillLabel')
         self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
+        self.infillSlider.setObjectName('infillSlider')
 
         #self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
         self.supportLabel = QtGui.QLabel(self.tr("Support"))
+        self.supportLabel.setObjectName('supportLabel')
         self.supportCombo = QtGui.QComboBox()
         self.supportCombo.addItems(["None", "Build plate only", "Everywhere"])
+        self.supportCombo.setObjectName('supportCombo')
 
         self.brimCheckBox = QtGui.QCheckBox(self.tr("Brim"))
+        self.brimCheckBox.setObjectName('brimCheckBox')
 
         self.progressBar = QtGui.QProgressBar()
+        self.progressBar.setObjectName('progressBar')
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
 
         self.generateButton = QtGui.QPushButton(self.tr("Generate"))
+        self.generateButton.setObjectName('generateButton')
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
         self.generateButton.setEnabled(False)
 
         # printing info place
         self.printingInfoLabel = QtGui.QLabel(self.tr("Print info:"))
+        self.printingInfoLabel.setObjectName('printingInfoLabel')
 
         self.printing_filament_label = QtGui.QLabel(self.tr("Filament required:"))
+        self.printing_filament_label.setObjectName('printing_filament_label')
         self.printing_filament_data = QtGui.QLabel('')
+        self.printing_filament_data.setObjectName('printing_filament_data')
 
         # send feedback button
-        self.send_feedback_button = QtGui.QPushButton(self.tr("Send feedback"))
-        self.send_feedback_button.clicked.connect(self.controller.send_feedback)
+        #self.send_feedback_button = QtGui.QPushButton(self.tr("Send feedback"))
+        #self.send_feedback_button.clicked.connect(self.controller.send_feedback)
 
         self.printTabVLayout = QtGui.QVBoxLayout()
+        self.printTabVLayout.setObjectName('printTabVLayout')
+
         self.printTabVLayout.addWidget(self.materialLabel)
         self.printTabVLayout.addWidget(self.materialCombo)
         self.printTabVLayout.addWidget(self.qualityLabel)
@@ -330,7 +366,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.printTabVLayout.addWidget(self.printing_filament_label)
         self.printTabVLayout.addWidget(self.printing_filament_data)
         self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-        self.printTabVLayout.addWidget(self.send_feedback_button)
+        #self.printTabVLayout.addWidget(self.send_feedback_button)
 
 
         self.printTab.setLayout(self.printTabVLayout)
@@ -1087,7 +1123,11 @@ class PrusaControlView(QtGui.QMainWindow):
     def update_gui_for_material(self, set_materials=0):
         if set_materials:
             self.materialCombo.clear()
-            self.materialCombo.addItems(self.controller.get_printer_materials_labels_ls(self.controller.actual_printer))
+            labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+            self.materialCombo.addItems(labels)
+            self.materialCombo.setCurrentIndex(first)
+
+
 
         # material_label = self.materialCombo.currentText()
         material_label = self.materialCombo.currentText()
@@ -1097,9 +1137,10 @@ class PrusaControlView(QtGui.QMainWindow):
 
         # update print quality widget
         self.qualityCombo.clear()
-        material_printing_settings_quality_ls = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
+        material_printing_settings_quality_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
         #print("Quality list: " + str(material_printing_settings_quality_ls))
         self.qualityCombo.addItems(material_printing_settings_quality_ls)
+        self.qualityCombo.setCurrentIndex(first)
 
         # infill slider
         self.infillSlider.setValue(material_printing_settings['infill'])

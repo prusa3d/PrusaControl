@@ -65,6 +65,7 @@ class Controller:
             self.settings['printer'] = self.app_config.config.get('settings', 'printer')
             self.settings['printer_type'] = self.app_config.config.get('settings', 'printer_type')
             self.settings['analyze'] = self.app_config.config.getboolean('settings', 'analyze')
+            self.settings['automatic_update_parameters'] = self.app_config.config.getboolean('settings', 'automatic_update_parameters')
 
             self.settings['toolButtons'] = {
                 'selectButton': False,
@@ -176,6 +177,8 @@ class Controller:
         config.set('settings', 'automatic_placing', str(self.settings['automatic_placing']))
         config.set('settings', 'language', self.settings['language'])
         config.set('settings', 'analyze', self.settings['analyze'])
+        config.set('settings', 'automatic_update_parameters', self.settings['automatic_update_parameters'])
+
 
         with open(self.app_config.config_path, 'wb') as configfile:
             config.write(configfile)
@@ -280,18 +283,28 @@ class Controller:
         return self.printing_parameters.get_materials_for_printer(printer_name).keys()
 
     def get_printer_materials_labels_ls(self, printer_name):
+        first_index = 0
         data = self.printing_parameters.get_materials_for_printer(printer_name)
-        list = [[data[material]['label'], data[material]["sort"]] for material in data]
+        list = [[data[material]['label'], data[material]["sort"], data[material]["first"]] for material in data]
         list = sorted(list, key=lambda a: a[1])
-        return [a[0] for a in list]
+        for i, data in enumerate(list):
+            if data[2] == 1:
+                first_index = i
+                break
+        return [a[0] for a in list], first_index
 
     def get_printer_material_quality_labels_ls_by_material_name(self, material_name):
         #return [self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality'][i]['label']
         #        for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']]
+        first_index = 0
         data = self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']
-        list = [[data[quality]['label'], data[quality]["sort"]] for quality in data]
+        list = [[data[quality]['label'], data[quality]["sort"], data[quality]["first"]] for quality in data]
         list = sorted(list, key=lambda a: a[1])
-        return [a[0] for a in list]
+        for i, data in enumerate(list):
+            if data[2] == 1:
+                first_index = i
+                break
+        return [a[0] for a in list], first_index
 
     def get_material_name_by_material_label(self, material_label):
         data = self.printing_parameters.get_materials_for_printer(self.actual_printer)
@@ -663,7 +676,7 @@ class Controller:
         return False
 
     def unselect_objects(self):
-        print("Unselect objects")
+        #print("Unselect objects")
         for model in self.scene.models:
             model.selected = False
 
@@ -680,10 +693,10 @@ class Controller:
         if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view':
             self.scene.delete_selected_models()
         elif key in [Qt.Key_C] and self.is_ctrl_pressed() and self.render_status == 'model_view':
-            print("Copy models")
+            #print("Copy models")
             self.scene.copy_selected_objects()
         elif key in [Qt.Key_V] and self.is_ctrl_pressed() and self.render_status == 'model_view':
-            print("Paste models")
+            #print("Paste models")
             self.scene.paste_selected_objects()
 
 
@@ -699,7 +712,7 @@ class Controller:
 
 
     def mouse_press_event(self, event):
-        print("Mouse press event")
+        #print("Mouse press event")
         self.clear_event_flag_status()
         self.mouse_press_event_flag = True
 
@@ -772,7 +785,7 @@ class Controller:
 
 
             else:
-                print("Jiny status nez model_view")
+                #print("Jiny status nez model_view")
                 self.unselect_objects()
                 self.set_camera_rotation_function()
         self.view.update_scene()
@@ -795,7 +808,7 @@ class Controller:
                         self.view.glWidget.v0 = face[0]
                         self.view.glWidget.v1 = face[1]
                         self.view.glWidget.v2 = face[2]
-                        print("Nalezen objekt " + str(model))
+                        #print("Nalezen objekt " + str(model))
         elif self.tool == 'scale':
             ray_start, ray_end = self.view.get_cursor_position(event)
             camera_pos, direction, _, _ = self.view.get_camera_direction(event)
@@ -811,7 +824,7 @@ class Controller:
 
 
     def mouse_move_event(self, event):
-        print("Mouse move event")
+        #print("Mouse move event")
         self.mouse_move_event_flag = True
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
@@ -875,10 +888,10 @@ class Controller:
 
                         if new_vect_leng >= model.boundingSphereSize:
                             model.set_rot(model.rot[0], model.rot[1], alpha, False, False)
-                            print("New angle: " + str(numpy.degrees(alpha)))
+                            #print("New angle: " + str(numpy.degrees(alpha)))
                         else:
                             alpha_new = numpy.degrees(alpha) // 45
-                            print("New round angle: " + str(alpha_new*45.))
+                            #print("New round angle: " + str(alpha_new*45.))
                             model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False)
 
                         self.view.update_object_settings(model.id)
@@ -921,7 +934,7 @@ class Controller:
         return 'move'
 
     def mouse_release_event(self, event):
-        print("Mouse releas event")
+        #print("Mouse releas event")
         self.mouse_release_event_flag = True
         self.set_camera_function_false()
         if self.tool in ['move', 'rotate', 'scale', 'placeonface']:
@@ -936,7 +949,7 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton and self.mouse_press_event_flag and\
                 self.mouse_release_event_flag and self.mouse_move_event_flag == False and\
                 self.object_select_event_flag==False:
-            print("Podminky splneny")
+            #print("Podminky splneny")
             self.clear_event_flag_status()
             self.unselect_objects()
         self.update_scene()

@@ -34,11 +34,9 @@ class PrintingParameters(object):
         self.all_printers_parameters = self.read_printers_parameters(self.application_parameters.printers_parameters_file)['printers']
 
         #apply default printer type settings
-        print("Printer type before: " + str(self.all_printers_parameters['default']['printer_type']))
+        #print("Printer type before: " + str(self.all_printers_parameters['default']['printer_type']))
         out = dict(self.apply_default_parameters(self.all_printers_parameters['default']['printer_type']))
-        print("Out: " + str(out))
         self.all_printers_parameters['default']['printer_type'] = out
-        print("Printer type after:" + str(self.all_printers_parameters['default']['printer_type']))
         #apply default printer settings
         self.printers_parameters = self.apply_default_parameters(self.all_printers_parameters)
 
@@ -48,16 +46,22 @@ class PrintingParameters(object):
                                                         self.application_parameters.user_folder + self.printers_parameters[printer]['material_parameters_file'])['materials']
         #apply default materials and default quality
         for printer in self.all_materials_quality_parameters:
-            self.materials_quality_parameters[printer] = self.apply_default_parameters(
+            self.materials_quality_parameters[printer] = self.apply_default_material_parameters(
                                                         self.all_materials_quality_parameters[printer])
 
+            #apply default material quality on other quality
             for material in self.materials_quality_parameters[printer]:
-                self.materials_quality_parameters[printer][material]["quality"] = self.apply_default_parameters(
-                                                    self.all_materials_quality_parameters[printer][material]["quality"])
+                self.materials_quality_parameters[printer][material]["quality"] = self.apply_default_quality_parameters(
+                                                    self.materials_quality_parameters[printer][material]["quality"])
+
+            print("Material list without defaults quality: ")
+            pprint(self.materials_quality_parameters[printer])
 
             #merge printers dict with materials dict to one super list with all parameters
             self.printers_parameters[printer]['materials'] = self.materials_quality_parameters[printer]
 
+            #print("Material list without default: ")
+            #pprint(self.materials_quality_parameters[printer])
 
 
     def get_printers_names(self):
@@ -83,6 +87,38 @@ class PrintingParameters(object):
             return self.printers_parameters[printer_name]["materials"][material]
         else:
             return []
+
+    def apply_default_material_parameters(self, dict_with_default):
+        return_dict = {}
+        for i in dict_with_default:
+            if i == u'default':
+                continue
+            return_dict[i] = deepcopy(dict_with_default[u'default'])
+            return_dict[i].update(dict_with_default[i])
+
+            if u'quality' in dict_with_default[i]:
+                return_dict[i][u'quality'] = deepcopy(dict_with_default[u'default'][u'quality'])
+                return_dict[i][u'quality'].update(deepcopy(dict_with_default[i][u'quality']))
+                if u'parameters' in return_dict[i][u'quality'][u'default']:
+                    return_dict[i][u'quality'][u'default'][u'parameters'] = deepcopy(dict_with_default[u'default'][u'quality'][u'default'][u'parameters'])
+                    return_dict[i][u'quality'][u'default'][u'parameters'].update(deepcopy(dict_with_default[i][u'quality'][u'default'][u'parameters']))
+
+        return return_dict
+
+
+    def apply_default_quality_parameters(self, dict_with_default):
+        return_dict = {}
+        for i in dict_with_default:
+            if i == u'default':
+                continue
+            return_dict[i] = deepcopy(dict_with_default[u'default'])
+            return_dict[i].update(dict_with_default[i])
+
+            if u'parameters' in return_dict[i]:
+                return_dict[i][u'parameters'] = deepcopy(dict_with_default[u'default'][u'parameters'])
+                return_dict[i][u'parameters'].update(deepcopy(dict_with_default[i][u'parameters']))
+
+        return return_dict
 
     def apply_default_parameters(self, dict_with_default):
         return_dict = {}
@@ -137,7 +173,7 @@ class PrintingParameters(object):
 
 
     def read_material_quality_parameters_for_printer(self, printer_config_file):
-        print(printer_config_file)
+        #print(printer_config_file)
         if not printer_config_file:
             return None
 
@@ -187,7 +223,7 @@ class AppParameters(object):
 
             self.printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
             self.config.readfp(open('data\\defaults.cfg'))
-            print("Executable: " + sys.executable)
+            #print("Executable: " + sys.executable)
         else:
             self.data_folder = "data/"
             self.tmp_place = './'
@@ -200,8 +236,8 @@ class AppParameters(object):
 
         self.first_run()
 
-        #TODO:Check connections
-        if self.internet_on():
+        #Check connections and update flag
+        if self.internet_on() and self.config.getboolean('settings', 'automatic_update_parameters'):
             self.download_new_settings_files()
             self.check_versions()
 
@@ -297,7 +333,7 @@ class AppParameters(object):
             return
 
         if new_version > old_version:
-            print("nova verze printers-kopiruji")
+            #print("nova verze printers-kopiruji")
             copyfile(new, self.user_folder + self.printers_filename)
 
         for i in new_material_list:
