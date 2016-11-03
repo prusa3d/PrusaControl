@@ -78,7 +78,7 @@ class Slic3rEngineRunner(QObject):
         return "%s" % str(in_value) + '%'
 
     def boolean_transform(self, in_value):
-        return "%s" % str(int(in_value))
+        return "%s" % str(int(in_value)*10)
 
     def support1_transform(self, in_value):
         if in_value == "None":
