@@ -307,6 +307,10 @@ class Model(object):
         self.isVisible = True
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
+        self.select_color = [255, 97, 0]
+        self.color = [224, 224, 224]
+
+        self.face_color = []
 
         self.rotateXId = self.id * 1001
         self.rotateColorXId = [(self.rotateXId & 0x000000FF) >> 0, (self.rotateXId & 0x0000FF00) >> 8, (self.rotateXId & 0x00FF0000) >> 16]
@@ -393,7 +397,7 @@ class Model(object):
         self.size_origin = np.array([.0, .0, .0])
 
         #self.color = [75./255., 119./255., 190./255.]
-        self.color = [34./255., 167./255., 240./255.]
+        #self.color = [34./255., 167./255., 240./255.]
 
         #status of object
         self.is_changed = True
@@ -429,6 +433,10 @@ class Model(object):
         m.temp_mesh = deepcopy(self.mesh)
         print("Udelana kopie")
         return m
+
+    #def calculate_normal_groups(self):
+
+
 
     def clear_state(self):
         self.is_changed = False
@@ -519,7 +527,7 @@ class Model(object):
 
         self.normalization_flag = True
 
-    def set_move(self, vector, add=True):
+    def set_move(self, vector, add=True, place_on_zero=False):
         vector = np.array(vector)
         if add:
             self.pos += vector
@@ -528,6 +536,9 @@ class Model(object):
         #self.parent.controller.show_message_on_status_bar("Place on %s %s" % ('{:.2}'.format(self.pos[0]), '{:.2}'.format(self.pos[1])))
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
+
+        if place_on_zero:
+            self.place_on_zero()
 
     def make_normals(self):
         self.tiled_normals = np.tile(self.mesh.normals, 3)
@@ -631,7 +642,7 @@ class Model(object):
         self.min_scene = self.min + pos
         self.max_scene = self.max + pos
 
-    def set_rot(self, x, y, z, add=False, place_on_zero=True):
+    def set_rot(self, x, y, z, add=False, update_min_max=True, place_on_zero=True):
         if add:
             self.rot[0] += x
             self.rot[1] += y
@@ -642,7 +653,8 @@ class Model(object):
             self.rot[2] = z
 
 
-        #self.update_min_max()
+        if update_min_max:
+            self.update_min_max()
         if place_on_zero:
             self.place_on_zero()
 
@@ -783,9 +795,9 @@ class Model(object):
             else:
                 if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
                     if self.selected:
-                        glColor3f(.75, .75, 0.)
+                        glColor3ubv(self.select_color)
                     else:
-                        glColor3fv(self.color)
+                        glColor3ubv(self.color)
                 else:
                     glColor3f(0.75, .0, .0)
 
@@ -1063,6 +1075,7 @@ class ModelTypeStl(ModelTypeAbstract):
     @staticmethod
     def load(filename):
         #logging.debug("this is STL file reader")
+        print(filename)
         mesh = Mesh.from_file(filename)
         return ModelTypeStl.load_from_mesh(mesh, filename, True)
 

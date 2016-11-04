@@ -1257,13 +1257,16 @@ class Controller:
         function for resolve which file type will be loaded
         '''
         #self.view.statusBar().showMessage('Load file name: ')
-        print("Soubor: %s " % url)
-        if url[0] == '/' and self.app_config.system_platform in ['Windows']:
-            url = url[1:]
+
+        #TODO:Why?
+        #if url[0] == '/' and self.app_config.system_platform in ['Windows']:
+        #    url = url[1:]
 
         urlSplited = url.split('.')
-        if len(urlSplited)>1:
+        if len(urlSplited)==2:
             fileEnd = urlSplited[1]
+        elif len(urlSplited)>2:
+            fileEnd = urlSplited[-1]
         else:
             fileEnd=''
 

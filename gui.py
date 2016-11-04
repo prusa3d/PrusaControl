@@ -397,7 +397,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
                                                                                  self.edit_pos_y.value(),
-                                                                                 self.edit_pos_z.value()))
+                                                                                 self.edit_pos_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
 
         self.edit_pos_y = QtGui.QSpinBox()
         self.edit_pos_y.setMaximum(200)
@@ -407,7 +408,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_pos_x.value(),
                                                                                 self.edit_pos_y.value(),
-                                                                                self.edit_pos_z.value()))
+                                                                                self.edit_pos_z.value(),
+                                                                                self.place_on_zero.isChecked()))
 
         self.edit_pos_z = QtGui.QSpinBox()
         self.edit_pos_z.setMaximum(300)
@@ -417,7 +419,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_pos_x.value(),
                                                                                 self.edit_pos_y.value(),
-                                                                                self.edit_pos_z.value()))
+                                                                                self.edit_pos_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
 
 
         rotation = QtGui.QLabel(self.tr("Rotation"))
@@ -429,7 +432,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_rot_x.value(),
                                                                                 self.edit_rot_y.value(),
-                                                                                self.edit_rot_z.value()))
+                                                                                self.edit_rot_z.value(),
+                                                                                self.place_on_zero.isChecked()))
 
         self.edit_rot_y = QtGui.QSpinBox()
         self.edit_rot_y.setMaximum(360)
@@ -439,7 +443,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_rot_x.value(),
                                                                                 self.edit_rot_y.value(),
-                                                                                self.edit_rot_z.value()))
+                                                                                self.edit_rot_z.value(),
+                                                                                self.place_on_zero.isChecked()))
 
         self.edit_rot_z = QtGui.QSpinBox()
         self.edit_rot_z.setMaximum(360)
@@ -449,7 +454,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_rot_x.value(),
                                                                                 self.edit_rot_y.value(),
-                                                                                self.edit_rot_z.value()))
+                                                                                self.edit_rot_z.value(),
+                                                                                self.place_on_zero.isChecked()))
 
 
         scale = QtGui.QLabel(self.tr("Scale"))
@@ -463,7 +469,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_scale_x.value(),
                                                                                 self.edit_scale_y.value(),
-                                                                                self.edit_scale_z.value()))
+                                                                                self.edit_scale_z.value(),
+                                                                                self.place_on_zero.isChecked()))
 
         self.edit_scale_y = QtGui.QDoubleSpinBox()
         self.edit_scale_y.setMaximum(9999)
@@ -475,7 +482,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_scale_x.value(),
                                                                                 self.edit_scale_y.value(),
-                                                                                self.edit_scale_z.value()))
+                                                                                self.edit_scale_z.value(),
+                                                                                self.place_on_zero.isChecked()))
 
         self.edit_scale_z = QtGui.QDoubleSpinBox()
         self.edit_scale_z.setMaximum(9999)
@@ -487,7 +495,8 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.get_object_id(),
                                                                                 self.edit_scale_x.value(),
                                                                                 self.edit_scale_y.value(),
-                                                                                self.edit_scale_z.value()))
+                                                                                self.edit_scale_z.value(),
+                                                                                self.place_on_zero.isChecked()))
         self.combobox_scale_units = QtGui.QComboBox()
         self.combobox_scale_units.addItems(["percent","mm"])
         self.combobox_scale_units.setCurrentIndex(0)
@@ -761,25 +770,25 @@ class PrusaControlView(QtGui.QMainWindow):
         self.close_object_settings_panel()
         self.controller.view.update_scene()
 
-    def set_position_on_object(self, widget, object_id, x, y, z):
+    def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
             self.controller.scene_was_changed()
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
-            model.set_move(np.array([x*.1, y*.1, z*.1]), False)
+            model.set_move(np.array([x*.1, y*.1, z*.1]), False, place_on_zero)
             self.controller.view.update_scene()
 
-    def set_rotation_on_object(self, widget, object_id, x, y, z):
+    def set_rotation_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
             self.controller.scene_was_changed()
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
-            model.set_rot(np.deg2rad(x), np.deg2rad(y), np.deg2rad(z))
+            model.set_rot(np.deg2rad(x), np.deg2rad(y), np.deg2rad(z), False, True, place_on_zero)
             self.controller.view.update_scene()
 
-    def set_scale_on_object(self, widget, active_axis, object_id, x, y, z):
+    def set_scale_on_object(self, widget, active_axis, object_id, x, y, z, place_on_zero):
 
         if widget.hasFocus():
             self.controller.scene_was_changed()
