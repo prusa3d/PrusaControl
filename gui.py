@@ -303,6 +303,13 @@ class PrusaControlView(QtGui.QMainWindow):
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
+        '''
+        self.materialCombo.style().unpolish(self.materialCombo)
+        self.materialCombo.style().polish(self.materialCombo)
+        self.materialCombo.update()
+        print("Style: " + str(self.materialCombo.styleSheet()))
+        '''
+
         self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
         self.qualityLabel.setObjectName('qualityLabel')
         self.qualityCombo = QtGui.QComboBox()
@@ -367,6 +374,8 @@ class PrusaControlView(QtGui.QMainWindow):
         self.printTabVLayout.addWidget(self.printing_filament_data)
         self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
         #self.printTabVLayout.addWidget(self.send_feedback_button)
+
+        #print("Style: " + str(self.materialCombo.styleSheet().toAscii()))
 
 
         self.printTab.setLayout(self.printTabVLayout)
