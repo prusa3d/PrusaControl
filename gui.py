@@ -223,6 +223,16 @@ class PrusaControlView(QtGui.QMainWindow):
     def __init__(self, c):
         self.controller = c
         super(PrusaControlView, self).__init__()
+
+
+
+        font_id = QFontDatabase.addApplicationFont("data/font/TitilliumWeb-Light.ttf")
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        print(str(font_family))
+        self.font = QFont(font_family)
+        self.setFont(self.font)
+
+
         self.setAcceptDrops(True)
 
         self.is_setting_panel_opened = False
@@ -242,7 +252,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.setVisible(False)
 
-        self.centralWidget = QtGui.QWidget()
+        self.centralWidget = QtGui.QWidget(self)
         self.object_settings_panel = None
 
 
@@ -286,13 +296,168 @@ class PrusaControlView(QtGui.QMainWindow):
         self.glWidget = sceneRender.GLWidget(self)
         self.glWidget.setObjectName('glWidget')
 
-        self.right_panel = QtGui.QWidget()
+        #Object settings layout
+        self.universal_groupbox_layout = QtGui.QFormLayout()
+        self.universal_groupbox_layout.setSpacing(0)
+        self.universal_groupbox_layout.setMargin(0)
+        self.universal_groupbox_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.filename_label = QtGui.QLabel("")
+        position = QtGui.QLabel(self.tr("Position"))
+        self.edit_pos_x = QtGui.QSpinBox()
+        self.edit_pos_x.setMaximum(200)
+        self.edit_pos_x.setMinimum(-200)
+        self.edit_pos_x.setSuffix("mm")
+        self.edit_pos_x.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_x,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_pos_x.value(),
+                                                                                 self.edit_pos_y.value(),
+                                                                                 self.edit_pos_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
+
+        self.edit_pos_y = QtGui.QSpinBox()
+        self.edit_pos_y.setMaximum(200)
+        self.edit_pos_y.setMinimum(-200)
+        self.edit_pos_y.setSuffix("mm")
+        self.edit_pos_y.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_y,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_pos_x.value(),
+                                                                                 self.edit_pos_y.value(),
+                                                                                 self.edit_pos_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
+
+        self.edit_pos_z = QtGui.QSpinBox()
+        self.edit_pos_z.setMaximum(300)
+        self.edit_pos_z.setMinimum(-50)
+        self.edit_pos_z.setSuffix("mm")
+        self.edit_pos_z.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_z,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_pos_x.value(),
+                                                                                 self.edit_pos_y.value(),
+                                                                                 self.edit_pos_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
+
+        rotation = QtGui.QLabel(self.tr("Rotation"))
+        self.edit_rot_x = QtGui.QSpinBox()
+        self.edit_rot_x.setMaximum(360)
+        self.edit_rot_x.setMinimum(-360)
+        self.edit_rot_x.setSuffix(u"°")
+        self.edit_rot_x.valueChanged.connect(lambda: self.set_rotation_on_object(self.edit_rot_x,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_rot_x.value(),
+                                                                                 self.edit_rot_y.value(),
+                                                                                 self.edit_rot_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
+
+        self.edit_rot_y = QtGui.QSpinBox()
+        self.edit_rot_y.setMaximum(360)
+        self.edit_rot_y.setMinimum(-360)
+        self.edit_rot_y.setSuffix(u"°")
+        self.edit_rot_y.valueChanged.connect(lambda: self.set_rotation_on_object(self.edit_rot_y,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_rot_x.value(),
+                                                                                 self.edit_rot_y.value(),
+                                                                                 self.edit_rot_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
+
+        self.edit_rot_z = QtGui.QSpinBox()
+        self.edit_rot_z.setMaximum(360)
+        self.edit_rot_z.setMinimum(-360)
+        self.edit_rot_z.setSuffix(u"°")
+        self.edit_rot_z.valueChanged.connect(lambda: self.set_rotation_on_object(self.edit_rot_z,
+                                                                                 self.get_object_id(),
+                                                                                 self.edit_rot_x.value(),
+                                                                                 self.edit_rot_y.value(),
+                                                                                 self.edit_rot_z.value(),
+                                                                                 self.place_on_zero.isChecked()))
+
+        scale = QtGui.QLabel(self.tr("Scale"))
+        self.edit_scale_x = QtGui.QDoubleSpinBox()
+        self.edit_scale_x.setMaximum(9999)
+        self.edit_scale_x.setMinimum(1)
+        self.edit_scale_x.setSuffix("%")
+        self.edit_scale_x.setDecimals(0)
+        self.edit_scale_x.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_x,
+                                                                                'x',
+                                                                                self.get_object_id(),
+                                                                                self.edit_scale_x.value(),
+                                                                                self.edit_scale_y.value(),
+                                                                                self.edit_scale_z.value(),
+                                                                                self.place_on_zero.isChecked()))
+
+        self.edit_scale_y = QtGui.QDoubleSpinBox()
+        self.edit_scale_y.setMaximum(9999)
+        self.edit_scale_y.setMinimum(1)
+        self.edit_scale_y.setSuffix("%")
+        self.edit_scale_y.setDecimals(0)
+        self.edit_scale_y.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_y,
+                                                                                'y',
+                                                                                self.get_object_id(),
+                                                                                self.edit_scale_x.value(),
+                                                                                self.edit_scale_y.value(),
+                                                                                self.edit_scale_z.value(),
+                                                                                self.place_on_zero.isChecked()))
+
+        self.edit_scale_z = QtGui.QDoubleSpinBox()
+        self.edit_scale_z.setMaximum(9999)
+        self.edit_scale_z.setMinimum(1)
+        self.edit_scale_z.setSuffix("%")
+        self.edit_scale_z.setDecimals(0)
+        self.edit_scale_z.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_z,
+                                                                                'z',
+                                                                                self.get_object_id(),
+                                                                                self.edit_scale_x.value(),
+                                                                                self.edit_scale_y.value(),
+                                                                                self.edit_scale_z.value(),
+                                                                                self.place_on_zero.isChecked()))
+        self.combobox_scale_units = QtGui.QComboBox()
+        self.combobox_scale_units.addItems(["percent", "mm"])
+        self.combobox_scale_units.setCurrentIndex(0)
+        self.scale_units = self.combobox_scale_units.currentText()
+        self.combobox_scale_units.currentIndexChanged.connect(self.change_scale_units)
+        self.lock_scale_axes_checkbox = QtGui.QCheckBox("")
+        self.lock_scale_axes_checkbox.stateChanged.connect(self.lock_scale_axes_change)
+        self.lock_scale_axes_checkbox.setChecked(True)
+        #self.lock_scale_axes_checkbox.setLayoutDirection(Qt.RightToLeft)
+        self.place_on_zero = QtGui.QCheckBox("")
+        self.place_on_zero.setChecked(True)
+        #self.place_on_zero.setLayoutDirection(Qt.RightToLeft)
+
+
+
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Name'), self.filename_label)
+        self.universal_groupbox_layout.addWidget(position)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('X'), self.edit_pos_x)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Y'), self.edit_pos_y)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Z'), self.edit_pos_z)
+
+        self.universal_groupbox_layout.addWidget(rotation)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('X'), self.edit_rot_x)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Y'), self.edit_rot_y)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Z'), self.edit_rot_z)
+
+        self.universal_groupbox_layout.addWidget(scale)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('X'), self.edit_scale_x)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Y'), self.edit_scale_y)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Z'), self.edit_scale_z)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel('Units'), self.combobox_scale_units)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel(self.tr("Lock axes")), self.lock_scale_axes_checkbox)
+        self.universal_groupbox_layout.addRow(QtGui.QLabel(self.tr("Place on pad")), self.place_on_zero)
+        # Object settings layout
+
+
+
+        self.right_panel = QtGui.QWidget(self)
         self.right_panel.setObjectName('right_panel')
-        self.right_panel_layout = QtGui.QHBoxLayout()
+        self.right_panel_layout = QtGui.QFormLayout()
         self.right_panel_layout.setObjectName('right_panel_layout')
+        self.right_panel_layout.setSpacing(0)
+        self.right_panel_layout.setMargin(0)
+        self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
 
 
-        self.printTab = QtGui.QWidget()
+        self.printer_settings_l = QtGui.QLabel(self.tr("Printer settings"))
+        self.printer_settings_l.setObjectName('printer_settings_l')
         # print tab
         self.materialLabel = QtGui.QLabel(self.tr("Material"))
         self.materialLabel.setObjectName('materialLabel')
@@ -303,12 +468,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
 
-        '''
-        self.materialCombo.style().unpolish(self.materialCombo)
-        self.materialCombo.style().polish(self.materialCombo)
-        self.materialCombo.update()
-        print("Style: " + str(self.materialCombo.styleSheet()))
-        '''
 
         self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
         self.qualityLabel.setObjectName('qualityLabel')
@@ -327,8 +486,16 @@ class PrusaControlView(QtGui.QMainWindow):
         self.supportCombo.addItems(["None", "Build plate only", "Everywhere"])
         self.supportCombo.setObjectName('supportCombo')
 
-        self.brimCheckBox = QtGui.QCheckBox(self.tr("Brim"))
+        self.brimCheckBox = QtGui.QCheckBox("")
         self.brimCheckBox.setObjectName('brimCheckBox')
+        #self.brimCheckBox.setLayoutDirection(Qt.RightToLeft)
+
+        #TODO:Label of this groupbox make more dynamic
+        self.universal_group_box = QtGui.QGroupBox(self.tr("Object settings"))
+        self.universal_group_box.setObjectName('universal_group_box')
+        self.universal_group_box.setLayout(self.universal_groupbox_layout)
+        self.universal_group_box.setHidden(True)
+
 
         self.progressBar = QtGui.QProgressBar()
         self.progressBar.setObjectName('progressBar')
@@ -354,39 +521,27 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.send_feedback_button = QtGui.QPushButton(self.tr("Send feedback"))
         #self.send_feedback_button.clicked.connect(self.controller.send_feedback)
 
-        self.printTabVLayout = QtGui.QVBoxLayout()
-        self.printTabVLayout.setObjectName('printTabVLayout')
-
-        self.printTabVLayout.addWidget(self.materialLabel)
-        self.printTabVLayout.addWidget(self.materialCombo)
-        self.printTabVLayout.addWidget(self.qualityLabel)
-        self.printTabVLayout.addWidget(self.qualityCombo)
-        self.printTabVLayout.addWidget(self.infillLabel)
-        self.printTabVLayout.addWidget(self.infillSlider)
-        #self.printTabVLayout.addWidget(self.supportCheckBox)
-        self.printTabVLayout.addWidget(self.supportLabel)
-        self.printTabVLayout.addWidget(self.supportCombo)
-        self.printTabVLayout.addWidget(self.brimCheckBox)
-        self.printTabVLayout.addWidget(self.progressBar)
-        self.printTabVLayout.addWidget(self.generateButton)
-        self.printTabVLayout.addWidget(self.printingInfoLabel)
-        self.printTabVLayout.addWidget(self.printing_filament_label)
-        self.printTabVLayout.addWidget(self.printing_filament_data)
-        self.printTabVLayout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
-        #self.printTabVLayout.addWidget(self.send_feedback_button)
-
-        #print("Style: " + str(self.materialCombo.styleSheet().toAscii()))
+        #self.right_panel_layout.setAlignment(Qt.AlignTop)
+        self.right_panel_layout.addRow(self.printer_settings_l)
+        self.right_panel_layout.addRow(self.materialLabel, self.materialCombo)
+        self.right_panel_layout.addRow(self.qualityLabel, self.qualityCombo)
+        self.right_panel_layout.addRow(self.infillLabel, self.infillSlider)
+        self.right_panel_layout.addRow(self.supportLabel, self.supportCombo)
+        self.right_panel_layout.addRow(QtGui.QLabel(self.tr("Brim")), self.brimCheckBox)
+        self.right_panel_layout.addRow(self.universal_group_box)
+        #self.right_panel_layout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
+        self.right_panel_layout.addRow(self.progressBar)
+        self.right_panel_layout.addRow(self.generateButton)
+        self.right_panel_layout.addRow(self.printingInfoLabel)
+        self.right_panel_layout.addRow(self.printing_filament_label)
+        self.right_panel_layout.addRow(self.printing_filament_data)
 
 
-        self.printTab.setLayout(self.printTabVLayout)
-        self.printTab.setMaximumWidth(250)
-
-
-        self.right_panel_layout.addWidget(self.printTab)
         self.right_panel.setLayout(self.right_panel_layout)
-        self.right_panel.setMaximumWidth(250)
+        self.right_panel.setFixedWidth(250)
+        #self.right_panel.setMaximumWidth(250)
 
-
+        '''
         layout = QFormLayout(self)
 
         # TODO: nice widget for editing position
@@ -394,6 +549,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.object_settings_panel.setVisible(False)
 
         layout.setAlignment(Qt.AlignLeft)
+
+        #TODO:add to groupbox
+        self.object_settings_gb = QtGui.QGroupBox(self.tr("Object settings"))
 
         menu_label = QtGui.QLabel(self.tr("Object settings"))
         self.filename_label = QtGui.QLabel("")
@@ -559,12 +717,11 @@ class PrusaControlView(QtGui.QMainWindow):
         layout.addWidget(apply_button)
         layout.addWidget(cancel_button)
 
-        self.object_settings_panel.setLayout(layout)
-        self.object_settings_panel.setMaximumWidth(150)
+        self.object_settings_gb.setLayout(layout)
 
-        self.line = QFrame()
-        self.line.setVisible(False)
-        self.line.setFrameShape(QFrame.VLine)
+        #self.object_settings_panel.setLayout(layout)
+        #self.object_settings_panel.setMaximumWidth(150)
+        '''
 
 
         self.gcode_panel = QWidget()
@@ -599,13 +756,14 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
 
-        self.right_panel_layout.insertWidget(0, self.object_settings_panel)
-        self.right_panel_layout.insertWidget(1, self.gcode_panel)
-        self.right_panel_layout.insertWidget(2, self.line)
+        #self.right_panel_layout.insertWidget(0, self.object_settings_panel)
+        #self.right_panel_layout.insertWidget(1, self.gcode_panel)
+        #self.right_panel_layout.insertWidget(2, self.line)
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.setSpacing(0)
         mainLayout.setMargin(0)
+        #mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.addWidget(self.glWidget)
         mainLayout.addWidget(self.right_panel)
 
@@ -670,13 +828,14 @@ class PrusaControlView(QtGui.QMainWindow):
             mesh = self.controller.get_object_by_id(object_id)
             if not mesh:
                 return
-            self.right_panel.setMaximumWidth(400)
-            self.object_settings_panel.setVisible(True)
-            self.line.setVisible(True)
+            self.universal_group_box.setHidden(False)
+            #self.right_panel.setMaximumWidth(400)
+            #self.object_settings_panel.setVisible(True)
+            #self.line.setVisible(True)
             self.set_gui_for_object(object_id)
             self.is_setting_panel_opened = True
         self.glWidget.setFocusPolicy(Qt.NoFocus)
-        self.object_settings_panel.setFocusPolicy(Qt.StrongFocus)
+        #self.object_settings_panel.setFocusPolicy(Qt.StrongFocus)
 
     def set_gui_for_object(self, object_id, scale_units_perc=True):
         mesh = self.controller.get_object_by_id(object_id)
@@ -752,12 +911,12 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
     def close_object_settings_panel(self):
-        self.object_settings_panel.setVisible(False)
-        self.line.setVisible(False)
-        self.right_panel.setMaximumWidth(250)
+        #self.object_settings_panel.setVisible(False)
+        #self.line.setVisible(False)
+        #self.right_panel.setMaximumWidth(250)
         self.is_setting_panel_opened = False
         self.object_id = 0
-        self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
+        #self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
     def apply_object_settings(self):
@@ -1029,24 +1188,25 @@ class PrusaControlView(QtGui.QMainWindow):
         print("Vystup nove funkce: %s %s %s" %(str(x_recalc), str(y), str(z)))
     '''
 
-
+    #TODO:Debug new design
     def open_gcode_view(self):
         if self.is_setting_panel_opened:
             self.cancel_object_settings()
-        self.right_panel.setMaximumWidth(350)
-        self.gcode_panel.setVisible(True)
-        self.gcode_slider.setTickInterval(1)
-        self.gcode_slider.setSingleStep(1)
-        self.line.setVisible(True)
+        #self.right_panel.setMaximumWidth(350)
+        #self.gcode_panel.setVisible(True)
+        #self.gcode_slider.setTickInterval(1)
+        #self.gcode_slider.setSingleStep(1)
+        #self.line.setVisible(True)
         self.controller.view.update_scene()
 
     #def set_gcode_slider(self, number_of_layers=0, maximal_value=0):
     #    self.gcode_slider.setTickInterval(0)
 
+    # TODO:Debug new design
     def close_gcode_view(self):
-        self.gcode_panel.setVisible(False)
-        self.line.setVisible(False)
-        self.right_panel.setMaximumWidth(250)
+        #self.gcode_panel.setVisible(False)
+        #self.line.setVisible(False)
+        #self.right_panel.setMaximumWidth(250)
         self.controller.view.update_scene()
 
 

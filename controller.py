@@ -927,6 +927,9 @@ class Controller:
         self.view.update_scene()
 
 
+    def organize_button_pressed(self):
+        pass
+
     def get_active_tool(self):
         for tool in self.tools:
             if tool.pressed:

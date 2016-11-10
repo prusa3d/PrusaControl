@@ -151,6 +151,8 @@ class Slic3rEngineRunner(QObject):
     def check_progress(self):
         while self.step <= self.step_max and self.is_running is True:
             line = self.process.stdout.readline()
+            if self.controller.settings['debug']:
+                print(line)
             self.step += 1
             if not line:
                 break

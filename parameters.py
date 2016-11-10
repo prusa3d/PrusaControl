@@ -54,8 +54,8 @@ class PrintingParameters(object):
                 self.materials_quality_parameters[printer][material]["quality"] = self.apply_default_quality_parameters(
                                                     self.materials_quality_parameters[printer][material]["quality"])
 
-            print("Material list without defaults quality: ")
-            pprint(self.materials_quality_parameters[printer])
+            #print("Material list without defaults quality: ")
+            #pprint(self.materials_quality_parameters[printer])
 
             #merge printers dict with materials dict to one super list with all parameters
             self.printers_parameters[printer]['materials'] = self.materials_quality_parameters[printer]

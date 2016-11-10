@@ -34,7 +34,7 @@ def main():
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
     app = QtGui.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
+    app.setWindowIcon(QtGui.QIcon("data/icon/dev.ico"))
     local_path = os.path.realpath(__file__)
     logging.info("01: " + local_path)
     logging.info("02: " + str(os.__file__))

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from collections import defaultdict
 
 import numpy as np
 from abc import ABCMeta, abstractmethod
@@ -262,7 +263,6 @@ class AppScene(object):
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
-            print("index 0")
             self.models[0 ].pos[0] = position_vector[0]
             self.models[0].pos[1] = position_vector[1]
 
@@ -271,10 +271,23 @@ class AppScene(object):
             return
         scene_tmp = self.models[:index]
         if index > 0:
-            print("index >0")
             while model.intersection_model_list_model_(scene_tmp):
                 #for angle in xrange(0, 360, 20):
+                for angle in xrange(0, 360, 45):
+                    model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
+                    model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
+
+                    model.max_scene = model.max + model.pos
+                    model.min_scene = model.min + model.pos
+
+                    #TODO:Add some test for checking if object is inside of printing space of printer
+                    if not model.intersection_model_list_model_(scene_tmp):
+                        return
+
                 for angle in xrange(0, 360, 5):
+                    #this angels are tried
+                    if angle in [0, 45, 90, 135, 180, 225, 270, 315, 360]:
+                        continue
                     model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
 
@@ -310,7 +323,8 @@ class Model(object):
         self.select_color = [255, 97, 0]
         self.color = [224, 224, 224]
 
-        self.face_color = []
+        self.face_colors = []
+        self.normal_groups = {}
 
         self.rotateXId = self.id * 1001
         self.rotateColorXId = [(self.rotateXId & 0x000000FF) >> 0, (self.rotateXId & 0x0000FF00) >> 8, (self.rotateXId & 0x00FF0000) >> 16]
@@ -431,10 +445,62 @@ class Model(object):
         m.size_origin = deepcopy(self.size_origin)
 
         m.temp_mesh = deepcopy(self.mesh)
-        print("Udelana kopie")
+        #print("Udelana kopie")
         return m
 
-    #def calculate_normal_groups(self):
+
+    def calculate_normal_groups(self):
+        actual_id = 0
+        id=0
+
+        d = defaultdict(int)
+
+        for normal in self.mesh.normals:
+            if str(normal) in d:
+                id = d[str(normal)]
+            else:
+                d[str(normal)] = actual_id
+                actual_id += 1
+
+        '''
+        self.face_colors = [[[(d[str(i)] & 0x000000FF) >> 0,
+                                       (d[str(i)] & 0x0000FF00) >> 8,
+                                       (d[str(i)] & 0x00FF0000) >> 16],
+                                      [(d[str(i)] & 0x000000FF) >> 0,
+                                       (d[str(i)] & 0x0000FF00) >> 8,
+                                       (d[str(i)] & 0x00FF0000) >> 16],
+                                      [(d[str(i)] & 0x000000FF) >> 0,
+                                       (d[str(i)] & 0x0000FF00) >> 8,
+                                       (d[str(i)] & 0x00FF0000) >> 16]] for i in self.mesh.normals]
+        '''
+
+        '''
+        for normal in self.mesh.normals:
+            if str(normal) in self.normal_groups:
+                id = self.normal_groups[str(normal)]
+            else:
+                self.normal_groups[str(normal)] = actual_id
+                actual_id+=1
+
+
+
+        self.face_colors = np.array([[[(self.normal_groups[str(i)] & 0x000000FF) >> 0,
+                              (self.normal_groups[str(i)] & 0x0000FF00) >> 8,
+                              (self.normal_groups[str(i)] & 0x00FF0000) >> 16],
+                             [(self.normal_groups[str(i)] & 0x000000FF) >> 0,
+                              (self.normal_groups[str(i)] & 0x0000FF00) >> 8,
+                              (self.normal_groups[str(i)] & 0x00FF0000) >> 16],
+                             [(self.normal_groups[str(i)] & 0x000000FF) >> 0,
+                              (self.normal_groups[str(i)] & 0x0000FF00) >> 8,
+                              (self.normal_groups[str(i)] & 0x00FF0000) >> 16]] for i in self.mesh.normals])
+        '''
+
+
+
+        #print("Face colors:")
+        #pprint(self.face_colors)
+
+
 
 
 
@@ -492,7 +558,7 @@ class Model(object):
 
         if transform and generate_gcode:
             printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
-            print("Printer: " + str(printer))
+            #print("Printer: " + str(printer))
             vectors += self.pos + (np.array([printer['printing_space'][0]*0.5*.1,
                                              printer['printing_space'][1]*0.5*.1,
                                              printer['printing_space'][2]*0.5*.1]))
@@ -591,7 +657,7 @@ class Model(object):
         self.is_changed = True
 
     def apply_changes(self):
-        print("Apply changes")
+        #print("Apply changes")
         self.pos_hist = np.array([.0, .0, .0])
         self.rot_hist = np.array([.0, .0, .0])
         self.scale_hist = np.array([1., 1., 1.])
@@ -601,7 +667,7 @@ class Model(object):
         self.is_changed = False
 
     def discard_changes(self):
-        print("Discard changes")
+        #print("Discard changes")
         self.pos = deepcopy(self.pos_hist)
         self.scale = deepcopy(self.scale_hist)
         self.rot = deepcopy(self.rot_hist)
@@ -722,6 +788,11 @@ class Model(object):
 
     def put_array_to_gl(self):
         glNormalPointerf(self.tiled_normals)
+        #print("Data normals:")
+        #pprint(self.face_colors)
+        #print("Data vectors:")
+        #pprint(self.mesh.vectors)
+        #glColorPointerf(self.face_colors)
         glVertexPointerf(self.mesh.vectors)
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
@@ -731,28 +802,27 @@ class Model(object):
         if not self.isVisible:
             return
         glPushMatrix()
-        '''
-        glPointSize(5.0)
-        glColor3f(1., .0, .0)
-        glBegin(GL_POINTS)
-        glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
-        glVertex3f(self.max_scene[0], self.min_scene[1], self.min_scene[2])
-        glVertex3f(self.min_scene[0], self.max_scene[1], self.min_scene[2])
-        glVertex3f(self.min_scene[0], self.min_scene[1], self.max_scene[2])
-        glVertex3f(self.max_scene[0], self.min_scene[1], self.max_scene[2])
-        glVertex3f(self.max_scene[0], self.max_scene[1], self.min_scene[2])
-        glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
-        glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
-        glEnd()
 
-        #glColor3f(.0, .0, 1.)
-        #glBegin(GL_POINTS)
-        #glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
-        #glEnd()
-        '''
+        if self.parent.controller.settings['debug']:
+            glPointSize(5.0)
+            glColor3f(1., .0, .0)
+            glBegin(GL_POINTS)
+            glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
+            glVertex3f(self.max_scene[0], self.min_scene[1], self.min_scene[2])
+            glVertex3f(self.min_scene[0], self.max_scene[1], self.min_scene[2])
+            glVertex3f(self.min_scene[0], self.min_scene[1], self.max_scene[2])
+            glVertex3f(self.max_scene[0], self.min_scene[1], self.max_scene[2])
+            glVertex3f(self.max_scene[0], self.max_scene[1], self.min_scene[2])
+            glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
+            glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
+            glEnd()
+
+            glColor3f(.0, .0, 1.)
+            glBegin(GL_POINTS)
+            glVertex3f(self.zeroPoint[0], self.zeroPoint[1], self.zeroPoint[2])
+            glEnd()
+
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-
-
 
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
@@ -775,23 +845,24 @@ class Model(object):
         self.put_array_to_gl()
 
         glEnableClientState(GL_VERTEX_ARRAY)
+        #glEnableClientState(GL_COLOR_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
-        if blending:
+        if picking:
+            glDisable(GL_LIGHTING)
+        elif blending:
             glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
         else:
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
 
-
-
-
         if picking:
             glColor3ubv(self.colorId)
         else:
             if blending:
-                glColor4f(.4, .4, .4, .75)
+                glColor4ub(175, 175, 175, 175)
+                #glColor4f(.4, .4, .4, .75)
             else:
                 if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
                     if self.selected:
@@ -801,10 +872,12 @@ class Model(object):
                 else:
                     glColor3f(0.75, .0, .0)
 
+
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
 
 
         glDisableClientState(GL_VERTEX_ARRAY)
+        #glDisableClientState(GL_COLOR_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
 
         glPopMatrix()
@@ -844,27 +917,6 @@ class Model(object):
         glDisableClientState(GL_NORMAL_ARRAY)
 
         return genList
-    '''
-    def closest_point(self, a, b, p):
-        ab = Vector([b.x-a.x, b.y-a.y, b.z-a.z])
-        abSquare = np.dot(ab.getRaw(), ab.getRaw())
-        ap = Vector([p.x-a.x, p.y-a.y, p.z-a.z])
-        apDotAB = np.dot(ap.getRaw(), ab.getRaw())
-        t = apDotAB / abSquare
-        q = Vector([a.x+ab.x*t, a.y+ab.y*t, a.z+ab.z*t])
-        return q
-
-    def intersection_ray_bounding_sphere(self, start, end):
-        v = Vector3(self.boundingSphereCenter)
-        matrix = matrix44.from_scale(Vector3(self.scale))
-        matrix = matrix * matrix44.from_translation(Vector3(self.pos))
-
-        v = matrix * v
-
-        pt = self.closest_point(Vector(start), Vector(end), Vector(v.tolist()))
-        lenght = pt.lenght(v.tolist())
-        return lenght < self.boundingSphereSize
-    '''
 
     def intersection_model_model_by_BB(self, model):
         #intersection by collision of BB
@@ -873,18 +925,9 @@ class Model(object):
         model_min = model.min_scene
         model_max = model.max_scene
         d = self.parent.model_position_offset
-        print("intersection model model: " + str(d))
+        #print("intersection model model: " + str(d))
         return not(max[0]+d<model_min[0] or model_max[0]<min[0]-d or max[1]+d<model_min[1] or model_max[1]<min[1]-d)
-    '''
-    def intersection_model_model_by_BS(self, model):
-        #intersection by collision of BS
-        vector_model_model = self.pos - model.pos
-        distance = np.linalg.norm(vector_model_model)
-        if distance >= (model.boundingSphereSize+self.boundingSphereSize):
-            return False
-        else:
-            return True
-    '''
+
     def intersection_model_list_model_(self, list):
         for m in list:
             if m.isVisible:
@@ -972,7 +1015,7 @@ class Model(object):
         beta = AppScene.calc_angle(up_vector, normal_face_vector_tmp2)
 
 
-        print("Nalezeny uhly alpha %s a beta %s" % (str(alpha), str(beta)))
+        #print("Nalezeny uhly alpha %s a beta %s" % (str(alpha), str(beta)))
         self.set_rot(np.deg2rad(alpha), 0., 0.)
         return deepcopy(hit_face)
 
@@ -1047,8 +1090,8 @@ class ModelTypeObj(ModelTypeAbstract):
         else:
             model.filename = ""
 
-        print("Vertices: " + str(vertices))
-        print("Texcoords: " + str(texcoords_array))
+        #print("Vertices: " + str(vertices))
+        #print("Texcoords: " + str(texcoords_array))
 
         for face in faces:
             vert, norm, texcoord = face
@@ -1075,7 +1118,7 @@ class ModelTypeStl(ModelTypeAbstract):
     @staticmethod
     def load(filename):
         #logging.debug("this is STL file reader")
-        print(filename)
+        #print(filename)
         mesh = Mesh.from_file(filename)
         return ModelTypeStl.load_from_mesh(mesh, filename, True)
 
@@ -1138,6 +1181,11 @@ class ModelTypeStl(ModelTypeAbstract):
         model.temp_mesh = deepcopy(model.mesh)
         model.make_normals()
         model.isVisible = True
+
+        #model.calculate_normal_groups()
+
+        #model.face_colors = np.array([[np.absolute(i), np.absolute(i), np.absolute(i)] for i in mesh.normals])
+
 
         #model.displayList = model.make_display_list()
         #model.make_vao()

@@ -210,7 +210,7 @@ class GLWidget(QGLWidget):
         return QtCore.QSize(50, 50)
 
     def sizeHint(self):
-        return QtCore.QSize(600, 480)
+        return QtCore.QSize(1024, 600)
 
     def set_x_rotation(self, angle):
         angle = self.normalize_angle_x(angle)
@@ -257,27 +257,33 @@ class GLWidget(QGLWidget):
         #tools
         #self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
         #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
-        self.rotateTool = GlButton(self.texture_from_png("data/img/new/Rotate_OFF.png"),
-                                   self.texture_from_png("data/img/new/Rotate_ON.png"),
-                                   self.texture_from_png("data/img/new/Rotate_Background.png"),
-                                   [30., 30.], [-40., 90.], False, 'rotate')
-        self.scaleTool = GlButton(self.texture_from_png("data/img/new/Scale_OFF.png"),
-                                  self.texture_from_png("data/img/new/Scale_ON.png"),
-                                  self.texture_from_png("data/img/new/Scale_Background.png"),
-                                  [30., 30.], [-40., 50], False, 'scale')
-        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/new/Place_on_Face_OFF.png"),
-                                        self.texture_from_png("data/img/new/Place_on_Face_ON.png"),
-                                        self.texture_from_png("data/img/new/Place_on_Face_Background.png"),
-                                        [30., 30.], [-40., 10.], False, 'placeonface')
+        self.scaleTool = GlButton(self.texture_from_png("data/img/gui/Scale_Off.png"),
+                                  self.texture_from_png("data/img/gui/Scale_On.png"),
+                                  self.texture_from_png("data/img/gui/tool_mask.png"),
+                                  [40., 40.], [10., -200.], False, 'scale')
+        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/gui/PlaceOnFace_Off.png"),
+                                        self.texture_from_png("data/img/gui/PlaceOnFace_On.png"),
+                                        self.texture_from_png("data/img/gui/tool_mask.png"),
+                                        [40., 40.], [10., -245.], False, 'placeonface')
+        self.rotateTool = GlButton(self.texture_from_png("data/img/gui/Rotate_Off.png"),
+                                   self.texture_from_png("data/img/gui/Rotate_On.png"),
+                                   self.texture_from_png("data/img/gui/tool_mask.png"),
+                                   [40., 40.], [10., -290.], False, 'rotate')
+        self.organize_tool = GlButton(self.texture_from_png("data/img/gui/Organize_Off.png"),
+                                        self.texture_from_png("data/img/gui/Organize_On.png"),
+                                        self.texture_from_png("data/img/gui/tool_mask.png"),
+                                        [40., 40.], [10., -335.], True, 'organize')
+
+
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/new/Back_Arrow_OFF.png"),
-                                    self.texture_from_png("data/img/new/Back_Arrow_ON.png"),
-                                    self.texture_from_png("data/img/new/Back_Arrow_Background.png"),
-                                    [30., 30.], [10, -40], True)
-        self.do_button = GlButton(self.texture_from_png("data/img/new/Front_Arrow_OFF.png"),
-                                  self.texture_from_png("data/img/new/Front_Arrow_ON.png"),
-                                  self.texture_from_png("data/img/new/Front_Arrow_Background.png"),
-                                  [30., 30.], [50, -40], True)
+        self.undo_button = GlButton(self.texture_from_png("data/img/gui/BackArrow_Off.png"),
+                                    self.texture_from_png("data/img/gui/BackArrow_On.png"),
+                                    self.texture_from_png("data/img/gui/tool_mask.png"),
+                                    [40., 40.], [10, -50], True)
+        self.do_button = GlButton(self.texture_from_png("data/img/gui/ForwardArrow_Off.png"),
+                                  self.texture_from_png("data/img/gui/ForwardArrow_On.png"),
+                                  self.texture_from_png("data/img/gui/tool_mask.png"),
+                                  [40., 40.], [60, -50], True)
 
 
         #self.selectTool.set_callback(self.parent.controller.select_button_pressed)
@@ -285,13 +291,14 @@ class GLWidget(QGLWidget):
         self.rotateTool.set_callback(self.controller.rotate_button_pressed)
         self.scaleTool.set_callback(self.controller.scale_button_pressed)
         self.placeOnFaceTool.set_callback(self.controller.place_on_face_button_pressed)
+        self.organize_tool.set_callback(self.controller.organize_button_pressed)
         self.undo_button.set_callback(self.controller.undo_button_pressed)
         self.do_button.set_callback(self.controller.do_button_pressed)
 
 
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
 
-        self.tools = [self.rotateTool, self.scaleTool, self.placeOnFaceTool, self.undo_button, self.do_button]
+        self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
         #self.tools = []
 
         self.bed = {}
@@ -332,6 +339,9 @@ class GLWidget(QGLWidget):
         glEnable( GL_LIGHT0 )
         glEnable( GL_LIGHT1 )
 
+        glEnable(GL_MULTISAMPLE)
+        glEnable(GL_LINE_SMOOTH)
+
 
     #@timing
     def picking_render(self):
@@ -353,7 +363,7 @@ class GLWidget(QGLWidget):
 
         for model in self.parent.controller.scene.models:
             if model.isVisible:
-                model.render(picking=True, blending=True)
+                model.render(picking=True, blending=False)
                 if model.selected:
                     self.draw_tools_helper(model, self.controller.settings, True)
 
@@ -449,15 +459,15 @@ class GLWidget(QGLWidget):
 
         t1 = time.time()
 
-
-        if self.fps_count==100:
-            self.last_fps = 1./(self.fps_time/self.fps_count)
-            self.fps_count = 0
-            self.fps_time = 0.
-            self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
-        else:
-            self.fps_count+=1
-            self.fps_time+=t1-t0
+        if self.controller.settings['debug']:
+            if self.fps_count==100:
+                self.last_fps = 1./(self.fps_time/self.fps_count)
+                self.fps_count = 0
+                self.fps_time = 0.
+                self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
+            else:
+                self.fps_count+=1
+                self.fps_time+=t1-t0
 
     def draw_layer(self, layer, printer):
         printing_space = printer['printing_space']
@@ -476,7 +486,7 @@ class GLWidget(QGLWidget):
         glDisable(GL_LIGHTING)
         glDisable(GL_DEPTH_TEST)
 
-        glLineWidth(0.75)
+        glLineWidth(1.5)
 
         glEnable(GL_LINE_SMOOTH)
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
@@ -485,19 +495,18 @@ class GLWidget(QGLWidget):
         #for layer_data in layer_datas:
         for p in layer_data:
             if p[2] == 'E':
-                glColor3f(.0, 1., .0)
-            else:
-                glColor3f(0.0, 0.0, 1.0)
-            glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
-            glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
+                glColor3ub(255, 97, 0)
+                glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
+                glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
+        '''
+        else:
+            glColor3f(0.0, 0.0, 1.0)
+        '''
         glEnd()
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_LIGHTING)
         glPopMatrix()
-        #print(str(self.controller.gcode.data[self.controller.gcode_layer]))
-
-
 
 
     def draw_tools_helper(self, model, settings, picking=False):
@@ -718,8 +727,50 @@ class GLWidget(QGLWidget):
 
         glPopMatrix()
 
-        glEnable(GL_TEXTURE_2D)
+        #glEnable(GL_TEXTURE_2D)
+        glDisable(GL_TEXTURE_2D)
         #glDisable(GL_BLEND)
+
+        glEnable(GL_BLEND)
+
+        glColor3f(1.0, 1.0, 1.0)
+        glLineWidth(.65)
+        glBegin(GL_LINES)
+        for i in xrange(0, 26, 1):
+            if i in [0,5,10,15,20,25]:
+                continue
+            glVertex3d(i + (printing_space[0]*-0.5*.1), 0. + (printing_space[1]*-0.5*.1), -0.001)
+            glVertex3d(i + (printing_space[0]*-0.5*.1), 21. + (printing_space[1]*-0.5*.1), -0.001)
+        for i in xrange(0, 21, 1):
+            if i in [0,5,10,15,20,25]:
+                continue
+            glVertex3d(0. + (printing_space[0]*-0.5*.1), i + (printing_space[1]*-0.5*.1) +.5, -0.001)
+            glVertex3d(25. + (printing_space[0]*-0.5*.1), i + (printing_space[1]*-0.5*.1) +.5, -0.001)
+        glEnd()
+
+        glColor3f(1.0, 1.0, 1.0)
+        glLineWidth(2)
+        glBegin(GL_LINES)
+        for i in xrange(0, 26, 1):
+            if i not in [0, 5, 10, 15, 20, 25]:
+                continue
+            glVertex3d(i + (printing_space[0] * -0.5 * .1), 0. + (printing_space[1] * -0.5 * .1), -0.001)
+            glVertex3d(i + (printing_space[0] * -0.5 * .1), 21. + (printing_space[1] * -0.5 * .1), -0.001)
+
+        glVertex3d(0. + (printing_space[0] * -0.5 * .1), 0. + (printing_space[1] * -0.5 * .1), -0.001)
+        glVertex3d(25. + (printing_space[0] * -0.5 * .1), 0. + (printing_space[1] * -0.5 * .1), -0.001)
+        glVertex3d(0. + (printing_space[0] * -0.5 * .1), 21. + (printing_space[1] * -0.5 * .1), -0.001)
+        glVertex3d(25. + (printing_space[0] * -0.5 * .1), 21. + (printing_space[1] * -0.5 * .1), -0.001)
+        for i in xrange(0, 21, 1):
+            if i not in [0, 5, 10, 15, 20, 25]:
+                continue
+            glVertex3d(0. + (printing_space[0] * -0.5 * .1), i + (printing_space[1] * -0.5 * .1) +.5, -0.001)
+            glVertex3d(25. + (printing_space[0] * -0.5 * .1), i + (printing_space[1] * -0.5 * .1) +.5, -0.001)
+        glEnd()
+
+
+
+        '''
         glBindTexture(GL_TEXTURE_2D, image_hotbed)
 
         glColor3f(1,1,1)
@@ -738,7 +789,7 @@ class GLWidget(QGLWidget):
         glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, -0.001)
         glEnd()
         glDisable(GL_TEXTURE_2D)
-
+        '''
         '''
         glEnable(GL_BLEND)
         glBegin(GL_LINES)
@@ -792,7 +843,7 @@ class GLWidget(QGLWidget):
         genList = glGenLists(1)
         glNewList(genList, GL_COMPILE)
 
-        glLineWidth(2)
+        glLineWidth(.75)
         glEnable(GL_BLEND)
         glBegin(GL_LINES)
         glColor3f(1, 1, 1)
