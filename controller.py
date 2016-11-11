@@ -672,8 +672,11 @@ class Controller:
             if model.id == object_id:
                 model.selected = True
                 self.object_select_event_flag = True
+                self.open_object_settings(object_id)
                 return True
         return False
+
+
 
     def unselect_objects(self):
         #print("Unselect objects")
@@ -700,7 +703,7 @@ class Controller:
             self.scene.paste_selected_objects()
 
 
-
+    '''
     def mouse_double_click(self, event):
         self.mouse_double_click_event_flag = True
         if self.render_status == 'model_view' and event.button() & QtCore.Qt.LeftButton:
@@ -709,6 +712,7 @@ class Controller:
                 return
             else:
                 self.open_object_settings(object_id)
+    '''
 
 
     def mouse_press_event(self, event):

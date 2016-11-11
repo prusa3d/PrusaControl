@@ -5,10 +5,10 @@
     font-size: 12px;
 
 }
-
+/*
 QWidget {
     border: 1px solid black;
-}
+}*/
 
 
 .QLabel {
@@ -22,34 +22,40 @@ QLabel#printer_settings_l {
     margin: 13px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
     font-size: 16px;
+    font-weight: bold;
 }
 
-QLabel#materialLabel {
+QLabel#infillLabel, QLabel#supportLabel, QLabel#qualityLabel, QLabel#materialLabel, QLabel#brim_label {
     margin: 0px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
     font-size: 12px;
 }
 
-QLabel#qualityLabel {
-    margin: 0px 0px 0px 26px;
-    padding: 0px 0px 0px 0px;
-    font-size: 12px;
-}
-
-
-QComboBox{
-    margin: 0px 1px 0px 0px;
+QComboBox {
+    margin: 0px 10px 0px 0px;
     padding: 0px 0px 1px 3px;
     font-size: 12px;
     height: 22px;
-
-
     background-color:rgb(77, 77, 77);
     border-radius: 5px;
     color:rgb(255, 255, 255);
-
-
 }
+/*
+QComboBox#materialCombo, QComboBox#qualityCombo, QComboBox#supportCombo, QComboBox#combobox_scale_units {
+    margin: 0px 10px 0px 0px;
+    padding: 0px 0px 1px 3px;
+    font-size: 12px;
+    height: 22px;
+    background-color:rgb(77, 77, 77);
+    border-radius: 5px;
+    color:rgb(255, 255, 255);
+}*/
+
+QComboBox#combobox_scale_units {
+    background-color:rgb(132, 132, 132);
+    color:rgb(255, 255, 255);
+}
+
 
 QComboBox:hover, QPushButton:hover {
     border: 1px solid rgb(255, 97, 0);
@@ -65,17 +71,14 @@ QComboBox::drop-down {
     border-radius: 5px;
 }
 
-
 QComboBox::down-arrow {
     image: url(data/Arrow_DropDownMenu.png);
     width: 13px;
     height: 13px;
-    selection-background-color: rgb(255, 97, 0);
 }
 
-
-QComboBox QAbstractItemView {
-    margin: 0px 1px 0px 0px;
+QComboBox#materialCombo QAbstractItemView, QComboBox#qualityCombo QAbstractItemView, QComboBox#supportCombo QAbstractItemView {
+    margin: 0px 10px 0px 0px;
     padding: 0px 0px 1px 0px;
     background-color:rgb(181, 181, 181);
     selection-background-color: rgb(255, 97, 0);
@@ -86,7 +89,49 @@ QComboBox QAbstractItemView {
     outline: 0px;
 }
 
+QGroupBox#object_group_box, QGroupBox#gcode_group_box {
+    color: rgb(255, 255, 255);
+    margin: 8px 0px 0px 29px;
+    padding: 20px 0px 0px 0px;
+    width: 221px;
+    border-radius: 5px;
+    background-color:rgb(77, 77, 77);
+    font-family: 'Titillium Web';
+    font-size: 16px;
+    font-weight: bold;
+}
 
+QGroupBox::title{
+    background-color: transparent;
+    padding: 3px 0 0 8px;
+}
+
+QLabel#x_pos_l, QLabel#y_pos_l, QLabel#z_pos_l, QLabel#x_rot_l, QLabel#y_rot_l, QLabel#z_rot_l,
+QLabel#x_scale_l, QLabel#y_scale_l, QLabel#z_scale_l, QLabel#units_l, QLabel#lock_scale_axes_l,
+QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#filename_label, QLabel#name_l
+{
+    background-color:rgb(77, 77, 77);
+}
+
+
+QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l{
+    margin: 2px 0 0 0;
+    background-color:rgb(77, 77, 77);
+}
+
+QSpinBox#edit_pos_x, QSpinBox#edit_rot_x, QSpinBox#edit_scale_x{
+    margin: 10px 0 0 0;
+}
+
+QCheckBox#place_on_zero{
+    margin: 2px 0 0 0;
+}
+
+
+
+QSlider#infillSlider{
+    margin: 0px 10px 0px 0px;
+}
 
 QSlider::groove:horizontal {
     border: 1px solid #999999;
@@ -123,43 +168,37 @@ QSlider::sub-page:vertical {
     background: pink;
 }
 
-
-
-
-
-QPushButton#generateButton {
-    background-color:rgb(132, 132, 132);
-    color:rgb(255, 255, 255);
-    border-radius: 5px;
-}
-
-QLabel#printer_settings_l{
-    font-size: 16px;
-}
-
-QLabel#materialLabel{
+QPushButton#generateButton, QPushButton#gcode_back_b {
+    font-family: 'Titillium Web';
     font-size: 12px;
-}
-
-
-/*
-QProgressBar#progressBar {
-    background-color:rgb(132, 132, 132);
+    font-weight: bold;
+    height: 27px;
+    background-color:rgb(255, 97, 0);
+    padding-left: 0px;
+    margin: 0px 10px 0px 30px;
     color:rgb(255, 255, 255);
     border-radius: 5px;
+    text-align:center;
 }
-*/
 
 QProgressBar {
-    border: 2px solid grey;
+    font-family: 'Titillium Web';
+    font-size: 12px;
+    height: 27px;
+    margin: 0px 10px 0px 30px;
     border-radius: 5px;
+    background-color: rgb(132, 132, 132);
+    color:rgb(255, 255, 255);
     text-align: center;
 }
 
 QProgressBar::chunk {
-    background-color: #05B8CC;
+    background-color: rgb(255, 97, 0);
     width: 20px;
 }
+
+
+
 
 
 QSpinBox {
