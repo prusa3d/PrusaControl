@@ -932,7 +932,7 @@ class Controller:
 
 
     def organize_button_pressed(self):
-        pass
+        self.scene.automatic_models_position()
 
     def get_active_tool(self):
         for tool in self.tools:

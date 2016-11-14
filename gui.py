@@ -309,7 +309,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_x.setObjectName("edit_pos_x")
         self.edit_pos_x.setMaximum(200)
         self.edit_pos_x.setMinimum(-200)
-        self.edit_pos_x.setSuffix("mm")
+        self.edit_pos_x.setSuffix(" mm")
         self.edit_pos_x.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_x,
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
@@ -321,7 +321,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_y.setObjectName("edit_pos_y")
         self.edit_pos_y.setMaximum(200)
         self.edit_pos_y.setMinimum(-200)
-        self.edit_pos_y.setSuffix("mm")
+        self.edit_pos_y.setSuffix(" mm")
         self.edit_pos_y.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_y,
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
@@ -333,7 +333,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_z.setObjectName("edit_pos_z")
         self.edit_pos_z.setMaximum(300)
         self.edit_pos_z.setMinimum(-50)
-        self.edit_pos_z.setSuffix("mm")
+        self.edit_pos_z.setSuffix(" mm")
         self.edit_pos_z.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_z,
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
@@ -424,7 +424,7 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.place_on_zero.isChecked()))
         self.combobox_scale_units = QtGui.QComboBox()
         self.combobox_scale_units.setObjectName("combobox_scale_units")
-        self.combobox_scale_units.addItems(["percent", "mm"])
+        self.combobox_scale_units.addItems(["percent", " mm"])
         self.combobox_scale_units.setCurrentIndex(0)
         self.scale_units = self.combobox_scale_units.currentText()
         self.combobox_scale_units.currentIndexChanged.connect(self.change_scale_units)
@@ -751,11 +751,11 @@ class PrusaControlView(QtGui.QMainWindow):
             self.edit_scale_z.setSuffix("%")
             self.edit_scale_z.setValue(mesh.scale[2] * 100)
         else:
-            self.edit_scale_x.setSuffix("mm")
+            self.edit_scale_x.setSuffix(" mm")
             self.edit_scale_x.setValue(mesh.scale[0] * mesh.size_origin[0] * 10)
-            self.edit_scale_y.setSuffix("mm")
+            self.edit_scale_y.setSuffix(" mm")
             self.edit_scale_y.setValue(mesh.scale[1] * mesh.size_origin[1] * 10)
-            self.edit_scale_z.setSuffix("mm")
+            self.edit_scale_z.setSuffix(" mm")
             self.edit_scale_z.setValue(mesh.scale[2] * mesh.size_origin[2] * 10)
 
         self.edit_scale_x.setDisabled(False)
@@ -935,40 +935,74 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def create_object_settings_layout(self):
         object_settings_layout = QtGui.QGridLayout()
+        object_settings_layout.setRowMinimumHeight(4, 10)
+        object_settings_layout.setRowMinimumHeight(8, 10)
+        object_settings_layout.setRowMinimumHeight(14, 10)
+        object_settings_layout.setVerticalSpacing(2)
+
 
         object_settings_layout.addWidget(self.name_l, 0, 0)
+        self.name_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.filename_label, 0, 1, 1, 2)
+        self.filename_label.setFixedHeight(22)
 
         object_settings_layout.addWidget(self.position_l, 1, 0)
+        self.position_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.x_pos_l, 1, 1)
+        self.x_pos_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.edit_pos_x, 1, 2)
+        self.edit_pos_x.setFixedHeight(22)
         object_settings_layout.addWidget(self.y_pos_l, 2, 1)
+        self.y_pos_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.edit_pos_y, 2, 2)
+        self.edit_pos_y.setFixedHeight(22)
         object_settings_layout.addWidget(self.z_pos_l, 3, 1)
+        self.z_pos_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.edit_pos_z, 3, 2)
+        self.edit_pos_z.setFixedHeight(22)
 
-        object_settings_layout.addWidget(self.rotation_l, 4, 0)
-        object_settings_layout.addWidget(self.x_rot_l, 4, 1)
-        object_settings_layout.addWidget(self.edit_rot_x, 4, 2)
-        object_settings_layout.addWidget(self.y_rot_l, 5, 1)
-        object_settings_layout.addWidget(self.edit_rot_y, 5, 2)
-        object_settings_layout.addWidget(self.z_rot_l, 6, 1)
-        object_settings_layout.addWidget(self.edit_rot_z, 6, 2)
+        object_settings_layout.addWidget(self.rotation_l, 5, 0)
+        self.rotation_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.x_rot_l, 5, 1)
+        self.x_rot_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.edit_rot_x, 5, 2)
+        self.edit_rot_x.setFixedHeight(22)
+        object_settings_layout.addWidget(self.y_rot_l, 6, 1)
+        self.y_rot_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.edit_rot_y, 6, 2)
+        self.edit_rot_y.setFixedHeight(22)
+        object_settings_layout.addWidget(self.z_rot_l, 7, 1)
+        self.z_rot_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.edit_rot_z, 7, 2)
+        self.edit_rot_z.setFixedHeight(22)
 
-        object_settings_layout.addWidget(self.scale_l, 7, 0)
-        object_settings_layout.addWidget(self.x_scale_l, 7, 1)
-        object_settings_layout.addWidget(self.edit_scale_x, 7, 2)
-        object_settings_layout.addWidget(self.y_scale_l, 8, 1)
-        object_settings_layout.addWidget(self.edit_scale_y, 8, 2)
-        object_settings_layout.addWidget(self.z_scale_l, 9, 1)
-        object_settings_layout.addWidget(self.edit_scale_z, 9, 2)
+        object_settings_layout.addWidget(self.scale_l, 9, 0)
+        self.scale_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.x_scale_l, 9, 1)
+        self.x_scale_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.edit_scale_x, 9, 2)
+        self.edit_scale_x.setFixedHeight(22)
+        object_settings_layout.addWidget(self.y_scale_l, 10, 1)
+        self.y_scale_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.edit_scale_y, 10, 2)
+        self.edit_scale_y.setFixedHeight(22)
+        object_settings_layout.addWidget(self.z_scale_l, 11, 1)
+        self.z_scale_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.edit_scale_z, 11, 2)
+        self.edit_scale_z.setFixedHeight(22)
+        object_settings_layout.addWidget(self.units_l, 12, 1)
+        self.units_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.combobox_scale_units, 12, 2)
+        self.combobox_scale_units.setFixedHeight(22)
+        object_settings_layout.addWidget(self.lock_scale_axes_l, 13, 1)
+        self.lock_scale_axes_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.lock_scale_axes_checkbox, 13, 2)
+        self.lock_scale_axes_checkbox.setFixedHeight(22)
 
-        object_settings_layout.addWidget(self.units_l, 10, 1)
-        object_settings_layout.addWidget(self.combobox_scale_units, 10, 2)
-        object_settings_layout.addWidget(self.lock_scale_axes_l, 11, 1)
-        object_settings_layout.addWidget(self.lock_scale_axes_checkbox, 11, 2)
-        object_settings_layout.addWidget(self.place_on_zero_l, 12, 0)
-        object_settings_layout.addWidget(self.place_on_zero, 12, 2)
+        object_settings_layout.addWidget(self.place_on_zero_l, 15, 0)
+        self.place_on_zero_l.setFixedHeight(22)
+        object_settings_layout.addWidget(self.place_on_zero, 15, 2)
+        self.place_on_zero.setFixedHeight(22)
 
         return object_settings_layout
 
@@ -991,6 +1025,12 @@ class PrusaControlView(QtGui.QMainWindow):
         '''
 
         return qcode_view_layout
+
+    def create_information_window(self, text):
+
+        pass
+
+
 
     #TODO:Debug new design
     def open_gcode_view(self):

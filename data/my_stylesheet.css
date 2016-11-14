@@ -5,6 +5,7 @@
     font-size: 12px;
 
 }
+
 /*
 QWidget {
     border: 1px solid black;
@@ -37,7 +38,20 @@ QComboBox {
     font-size: 12px;
     height: 22px;
     background-color:rgb(77, 77, 77);
+    border: 1px solid rgb(77, 77, 77);
     border-radius: 5px;
+    color:rgb(255, 255, 255);
+}
+
+QComboBox#combobox_scale_units {
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 1px 3px;
+    font-size: 12px;
+    height: 22px;
+    border: 1px solid rgb(77, 77, 77);
+    border-radius: 5px;
+
+    background-color:rgb(132, 132, 132);
     color:rgb(255, 255, 255);
 }
 /*
@@ -51,6 +65,7 @@ QComboBox#materialCombo, QComboBox#qualityCombo, QComboBox#supportCombo, QComboB
     color:rgb(255, 255, 255);
 }*/
 
+
 QComboBox#combobox_scale_units {
     background-color:rgb(132, 132, 132);
     color:rgb(255, 255, 255);
@@ -58,8 +73,8 @@ QComboBox#combobox_scale_units {
 
 
 QComboBox:hover, QPushButton:hover {
-    border: 1px solid rgb(255, 97, 0);
-    color: rgb(255, 97, 0);
+    border: 1px solid rgb(255, 255, 255);
+    color: rgb(255, 255, 255);
 }
 
 QComboBox:on {
@@ -72,18 +87,23 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(data/Arrow_DropDownMenu.png);
+    image: url(data/img/gui/Arrow_DropDownMenu.png);
     width: 13px;
     height: 13px;
 }
 
-QComboBox#materialCombo QAbstractItemView, QComboBox#qualityCombo QAbstractItemView, QComboBox#supportCombo QAbstractItemView {
+QComboBox#materialCombo QAbstractItemView, QComboBox#qualityCombo QAbstractItemView,
+QComboBox#supportCombo QAbstractItemView, QComboBox#combobox_scale_units QAbstractItemView {
     margin: 0px 10px 0px 0px;
-    padding: 0px 0px 1px 0px;
+    padding: 0px 0px 0px 0px;
     background-color:rgb(181, 181, 181);
     selection-background-color: rgb(255, 97, 0);
     selection-color: rgb(25, 25, 25);
     color:rgb(0, 0, 0);
+    outline-style: none;
+    /*
+    border: 1px solid rgb(181, 181, 181);
+    */
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     outline: 0px;
@@ -118,10 +138,10 @@ QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l{
     margin: 2px 0 0 0;
     background-color:rgb(77, 77, 77);
 }
-
+/*
 QSpinBox#edit_pos_x, QSpinBox#edit_rot_x, QSpinBox#edit_scale_x{
     margin: 10px 0 0 0;
-}
+}*/
 
 QCheckBox#place_on_zero{
     margin: 2px 0 0 0;
@@ -201,67 +221,106 @@ QProgressBar::chunk {
 
 
 
-QSpinBox {
+QSpinBox, QDoubleSpinBox {
+    font-family: 'Titillium Web';
+    font-size: 12px;
+    height: 22px;
+    color: rgb(255, 255, 255);
+
+    border-radius: 5px;
+    background-color:rgb(181, 181, 181);
     padding-right: 15px; /* make room for the arrows */
+
+    /*
     border-image: url(:/images/frame.png) 4;
     border-width: 3px;
+    */
 }
 
+QSpinBox::up-button, QDoubleSpinBox::up-button{
+    image: url(data/img/gui/Arrow_Up_ObjectAdjust_OFF.png);
+}
+
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover{
+    image: url(data/img/gui/Arrow_Up_ObjectAdjust_Hover.png);
+}
+
+QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed{
+    image: url(data/img/gui/Arrow_Up_ObjectAdjust_ON.png);
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button{
+    image: url(data/img/gui/Arrow_Down_ObjectAdjust_OFF.png);
+}
+
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover{
+    image: url(data/img/gui/Arrow_Down_ObjectAdjust_Hover.png);
+}
+
+QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed{
+    image: url(data/img/gui/Arrow_Down_ObjectAdjust_ON.png);
+}
+
+
+
+
+
+/*
 QSpinBox::up-button {
     subcontrol-origin: border;
-    subcontrol-position: top right; /* position at the top right corner */
+    subcontrol-position: top right;
 
-    width: 16px; /* 16 + 2*1px border-width = 15px padding + 3px parent border */
-    border-image: url(:/images/spinup.png) 1;
+    width: 16px;
+    border-image: url(data/img/gui/Arrow_DropDownMenu.png);
     border-width: 1px;
 }
 
 QSpinBox::up-button:hover {
-    border-image: url(:/images/spinup_hover.png) 1;
+    border-image: url(data/img/gui/Arrow_DropDownMenu.png);
 }
 
 QSpinBox::up-button:pressed {
-    border-image: url(:/images/spinup_pressed.png) 1;
+    border-image: url(data/img/gui/Arrow_DropDownMenu.png);
 }
 
 QSpinBox::up-arrow {
-    image: url(:/images/up_arrow.png);
+    image: url(data/img/gui/Arrow_DropDownMenu.png);
     width: 7px;
     height: 7px;
 }
 
-QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off { /* off state when value is max */
-   image: url(:/images/up_arrow_disabled.png);
+QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off {
+   image: url(data/img/gui/Arrow_DropDownMenu.png);
 }
 
 QSpinBox::down-button {
     subcontrol-origin: border;
-    subcontrol-position: bottom right; /* position at bottom right corner */
+    subcontrol-position: bottom right;
 
     width: 16px;
-    border-image: url(:/images/spindown.png) 1;
+    border-image: url(data/img/gui/Arrow_DropDownMenu.png);
     border-width: 1px;
     border-top-width: 0;
 }
 
 QSpinBox::down-button:hover {
-    border-image: url(:/images/spindown_hover.png) 1;
+    border-image: url(data/img/gui/Arrow_DropDownMenu.png);
 }
 
 QSpinBox::down-button:pressed {
-    border-image: url(:/images/spindown_pressed.png) 1;
+    border-image: url(data/img/gui/Arrow_DropDownMenu.png);
 }
 
 QSpinBox::down-arrow {
-    image: url(:/images/down_arrow.png);
+    image: url(data/img/gui/Arrow_DropDownMenu.png);
     width: 7px;
     height: 7px;
 }
 
 QSpinBox::down-arrow:disabled,
-QSpinBox::down-arrow:off { /* off state when value in min */
-   image: url(:/images/down_arrow_disabled.png);
-}
+QSpinBox::down-arrow:off {
+   image: url(data/img/gui/Arrow_DropDownMenu.png);
+}*/
 
 
 QCheckBox {
@@ -285,6 +344,19 @@ QCheckBox::indicator:unchecked:hover {
 QCheckBox::indicator:unchecked:pressed {
     image: url(data/img/gui/checkbox_Off.png);
 }
+
+QCheckBox#brimCheckBox::indicator:unchecked {
+    image: url(data/img/gui/checkbox_dark_Off.png);
+}
+
+QCheckBox#brimCheckBox::indicator:unchecked:hover {
+    image: url(data/img/gui/checkbox_dark_Off.png);
+}
+
+QCheckBox#brimCheckBox::indicator:unchecked:pressed {
+    image: url(data/img/gui/checkbox_dark_Off.png);
+}
+
 
 QCheckBox::indicator:checked {
     image: url(data/img/gui/checkbox_On.png);
