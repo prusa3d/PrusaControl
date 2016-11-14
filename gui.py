@@ -10,6 +10,7 @@ from PyQt4 import *
 from PyQt4 import QtGui
 
 from PyQt4.QtCore import QDateTime, Qt
+from PyQt4.QtCore import QRect
 from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
@@ -217,6 +218,16 @@ class PrinterInfoDialog(QDialog):
         result = dialog.exec_()
         data = {'msg': 'Update is complete. New version is ....'}
         return (data, result == QDialog.Accepted)
+
+class Popup(QWidget):
+    def __init__(self, parent):
+        QWidget.__init__(self, parent)
+
+    def paintEvent(self, e):
+        dc = QPainter(self)
+        dc.drawLine(0, 0, 100, 100)
+        dc.drawLine(100, 0, 0, 100)
+
 
 
 class PrusaControlView(QtGui.QMainWindow):
@@ -498,7 +509,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.gcode_back_b = QtGui.QPushButton(self.tr("Edit scene"))
         self.gcode_s.setObjectName("gcode_back_b")
-        self.gcode_back_b.clicked.connect(self.controller.close_gcode_gui)
+        self.gcode_back_b.clicked.connect(self.controller.set_model_edit_view)
 
         # Gcode view layout
 
@@ -657,6 +668,17 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
+        #self.show_warning_popup()
+
+    def show_warning_popup(self):
+        print "Opening a new popup window..."
+        self.w = Popup(self)
+        self.w.setGeometry(QRect(100, 100, 400, 200))
+        self.w.show()
+
+    def show_information_popup(self):
+        pass
+
     def reinit(self):
         self.update_gui_for_material()
 
@@ -777,13 +799,18 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
     def close_object_settings_panel(self):
+        '''
+        This function is for
+        '''
         #self.object_settings_panel.setVisible(False)
         #self.line.setVisible(False)
         #self.right_panel.setMaximumWidth(250)
         self.is_setting_panel_opened = False
+        self.object_group_box.setDisabled(True)
         self.object_id = 0
         #self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
+
 
     def apply_object_settings(self):
         object_id = self.get_object_id()
@@ -1046,10 +1073,13 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_group_box.setVisible(False)
         self.object_group_box.setVisible(True)
 
+
         #self.gcode_panel.setVisible(False)
         #self.line.setVisible(False)
         #self.right_panel.setMaximumWidth(250)
         self.controller.view.update_scene()
+
+
 
 
     def open_settings_dialog(self):

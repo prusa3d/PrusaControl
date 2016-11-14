@@ -683,6 +683,8 @@ class Controller:
         for model in self.scene.models:
             model.selected = False
 
+        self.close_object_settings()
+
     def add_camera_position(self, vec):
         self.view.add_camera_position(vec)
 
@@ -747,6 +749,8 @@ class Controller:
                     elif self.is_some_tool_helper_under_cursor(object_id):
                         self.tool_press_event_flag = True
                         self.set_active_tool_helper_by_id(object_id)
+                    elif self.is_object_already_selected(object_id) and self.is_ctrl_pressed():
+                        self.unselect_object(object_id)
                     elif self.is_ctrl_pressed():
                         self.select_object(object_id)
                     elif self.is_object_already_selected(object_id):

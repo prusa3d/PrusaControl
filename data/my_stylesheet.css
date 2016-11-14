@@ -51,24 +51,56 @@ QComboBox#combobox_scale_units {
     border: 1px solid rgb(77, 77, 77);
     border-radius: 5px;
 
-    background-color:rgb(132, 132, 132);
+    background-color:rgb(181, 181, 181);
     color:rgb(255, 255, 255);
 }
-/*
-QComboBox#materialCombo, QComboBox#qualityCombo, QComboBox#supportCombo, QComboBox#combobox_scale_units {
-    margin: 0px 10px 0px 0px;
-    padding: 0px 0px 1px 3px;
-    font-size: 12px;
-    height: 22px;
-    background-color:rgb(77, 77, 77);
+
+
+
+QComboBox#combobox_scale_units::down-arrow {
+    background-color:rgb(181, 181, 181);
+    color:rgb(255, 255, 255);
+    image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
+    width: 13px;
+    height: 13px;
+}
+
+QComboBox#combobox_scale_units::down-arrow:disabled {
+   color: rgb(112, 112, 112);
+    background-color:rgb(96, 96, 96);
+    image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
+    width: 13px;
+    height: 13px;
+}
+
+QComboBox#combobox_scale_units::drop-down {
+    background-color:rgb(181, 181, 181);
+    color:rgb(255, 255, 255);
     border-radius: 5px;
-    color:rgb(255, 255, 255);
-}*/
+}
 
+QComboBox#combobox_scale_units QAbstractItemView {
+    margin: 0px 10px 0px 0px;
+    padding: 0px 0px 0px 0px;
+    background-color:rgb(181, 181, 181);
+    selection-background-color: rgb(255, 97, 0);
+    selection-color: rgb(25, 25, 25);
+    color:rgb(0, 0, 0);
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    outline: 0px;
+}
 
-QComboBox#combobox_scale_units {
-    background-color:rgb(132, 132, 132);
-    color:rgb(255, 255, 255);
+QComboBox#combobox_scale_units::drop-down:disabled {
+    color: rgb(112, 112, 112);
+    background-color:rgb(96, 96, 96);
+    border-radius: 5px;
+}
+
+QComboBox#combobox_scale_units:disabled{
+    color: rgb(112, 112, 112);
+    background-color:rgb(96, 96, 96);
+    border: 1px solid rgb(96, 96, 96);
 }
 
 
@@ -100,10 +132,6 @@ QComboBox#supportCombo QAbstractItemView, QComboBox#combobox_scale_units QAbstra
     selection-background-color: rgb(255, 97, 0);
     selection-color: rgb(25, 25, 25);
     color:rgb(0, 0, 0);
-    outline-style: none;
-    /*
-    border: 1px solid rgb(181, 181, 181);
-    */
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     outline: 0px;
@@ -121,6 +149,20 @@ QGroupBox#object_group_box, QGroupBox#gcode_group_box {
     font-weight: bold;
 }
 
+QGroupBox#object_group_box:disabled, QGroupBox#gcode_group_box:disabled {
+    color: rgb(112, 112, 112);
+    background-color:rgb(89, 89, 89);
+}
+
+QLabel#x_pos_l:disabled, QLabel#y_pos_l:disabled, QLabel#z_pos_l:disabled, QLabel#x_rot_l:disabled,
+QLabel#y_rot_l:disabled, QLabel#z_rot_l:disabled, QLabel#x_scale_l:disabled, QLabel#y_scale_l:disabled,
+QLabel#z_scale_l:disabled, QLabel#units_l:disabled, QLabel#lock_scale_axes_l:disabled, QLabel#position_l:disabled,
+QLabel#rotation_l:disabled, QLabel#scale_l:disabled, QLabel#filename_label:disabled, QLabel#name_l:disabled,
+QLabel#place_on_zero_l:disabled{
+    color: rgb(112, 112, 112);
+    background-color:rgb(89, 89, 89);
+}
+
 QGroupBox::title{
     background-color: transparent;
     padding: 3px 0 0 8px;
@@ -128,24 +170,26 @@ QGroupBox::title{
 
 QLabel#x_pos_l, QLabel#y_pos_l, QLabel#z_pos_l, QLabel#x_rot_l, QLabel#y_rot_l, QLabel#z_rot_l,
 QLabel#x_scale_l, QLabel#y_scale_l, QLabel#z_scale_l, QLabel#units_l, QLabel#lock_scale_axes_l,
-QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#filename_label, QLabel#name_l
+QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#filename_label, QLabel#name_l,
+QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l
 {
     background-color:rgb(77, 77, 77);
 }
 
-
+/*
 QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l{
-    margin: 2px 0 0 0;
+    margin: 0px 0 0 0;
     background-color:rgb(77, 77, 77);
-}
+}*/
 /*
 QSpinBox#edit_pos_x, QSpinBox#edit_rot_x, QSpinBox#edit_scale_x{
     margin: 10px 0 0 0;
 }*/
 
+/*
 QCheckBox#place_on_zero{
     margin: 2px 0 0 0;
-}
+}*/
 
 
 
@@ -201,6 +245,12 @@ QPushButton#generateButton, QPushButton#gcode_back_b {
     text-align:center;
 }
 
+QPushButton#generateButton:disabled{
+    background-color: rgb(132, 132, 132);
+    color: rgb(112, 112, 112);
+}
+
+
 QProgressBar {
     font-family: 'Titillium Web';
     font-size: 12px;
@@ -217,24 +267,19 @@ QProgressBar::chunk {
     width: 20px;
 }
 
-
-
-
-
 QSpinBox, QDoubleSpinBox {
     font-family: 'Titillium Web';
     font-size: 12px;
     height: 22px;
     color: rgb(255, 255, 255);
-
     border-radius: 5px;
     background-color:rgb(181, 181, 181);
-    padding-right: 15px; /* make room for the arrows */
+    padding-right: 15px;
+}
 
-    /*
-    border-image: url(:/images/frame.png) 4;
-    border-width: 3px;
-    */
+QSpinBox:disabled, QDoubleSpinBox:disabled {
+    color: rgb(112, 112, 112);
+    background-color:rgb(96, 96, 96);
 }
 
 QSpinBox::up-button, QDoubleSpinBox::up-button{
@@ -333,6 +378,33 @@ QCheckBox::indicator {
     height: 17px;
 }
 
+QCheckBox#brimCheckBox::indicator:unchecked {
+    image: url(data/img/gui/checkbox_dark_Off.png);
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(data/img/gui/checkbox_Off.png);
+    color: rgb(0,0,0);
+}
+
+QCheckBox::indicator:checked {
+    image: url(data/img/gui/checkbox_On.png);
+}
+
+QCheckBox::indicator:checked:disabled {
+    image: url(data/img/gui/Disable_checkbox_On.png);
+    color: rgb(0,0,0);
+}
+
+QCheckBox::indicator:unchecked:disabled {
+    image: url(data/img/gui/Disable_checkbox_Off.png);
+    color: rgb(0,0,0);
+}
+
+
+
+
+/*
 QCheckBox::indicator:unchecked {
     image: url(data/img/gui/checkbox_Off.png);
 }
@@ -343,25 +415,23 @@ QCheckBox::indicator:unchecked:hover {
 
 QCheckBox::indicator:unchecked:pressed {
     image: url(data/img/gui/checkbox_Off.png);
-}
+}*/
 
-QCheckBox#brimCheckBox::indicator:unchecked {
-    image: url(data/img/gui/checkbox_dark_Off.png);
-}
 
+
+/*
 QCheckBox#brimCheckBox::indicator:unchecked:hover {
     image: url(data/img/gui/checkbox_dark_Off.png);
-}
-
+}*/
+/*
 QCheckBox#brimCheckBox::indicator:unchecked:pressed {
     image: url(data/img/gui/checkbox_dark_Off.png);
-}
+}*/
 
 
-QCheckBox::indicator:checked {
-    image: url(data/img/gui/checkbox_On.png);
-}
 
+
+/*
 QCheckBox::indicator:checked:hover {
     image: url(data/img/gui/checkbox_On.png);
 }
@@ -376,4 +446,4 @@ QCheckBox::indicator:indeterminate:hover {
 
 QCheckBox::indicator:indeterminate:pressed {
     image: url(data/img/gui/checkbox_On.png);
-}
+}*/
