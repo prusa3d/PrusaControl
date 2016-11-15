@@ -799,6 +799,8 @@ class Model(object):
         #glVertexPointerf(self.draw_mesh['vectors'])
 
     def render(self, picking=False, blending=False):
+        is_in_printing_space = True
+
         if not self.isVisible:
             return
         glPushMatrix()
@@ -823,7 +825,6 @@ class Model(object):
             glEnd()
 
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
         ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
@@ -865,12 +866,14 @@ class Model(object):
                 #glColor4f(.4, .4, .4, .75)
             else:
                 if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
+                    is_in_printing_space = True
                     if self.selected:
                         glColor3ubv(self.select_color)
                     else:
                         glColor3ubv(self.color)
                 else:
-                    glColor3f(0.75, .0, .0)
+                    is_in_printing_space = False
+                    glColor3f(0.35, 0.35, 0.35)
 
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
@@ -879,6 +882,14 @@ class Model(object):
         glDisableClientState(GL_VERTEX_ARRAY)
         #glDisableClientState(GL_COLOR_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
+
+        if is_in_printing_space == False:
+            font = self.parent.controller.view.font
+            font.setPointSize(35)
+            glDisable(GL_DEPTH_TEST)
+            glColor3ub(255, 97, 0)
+            self.parent.controller.view.glWidget.renderText(0., 0., 0., "!", font)
+            glEnable(GL_DEPTH_TEST)
 
         glPopMatrix()
 

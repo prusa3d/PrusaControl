@@ -98,6 +98,10 @@ class Controller:
             }
         }
 
+        self.warning_message_buffer = [u"•  Nemáme tu ještě novou podložku!",
+                                       u"•  A ještě se musí opravit PlaceOnFace!",
+                                       u"•  Object stl.stl is out of printable area!"]
+
 
         #variables for help
         self.last_pos = QtCore.QPoint()
@@ -183,6 +187,13 @@ class Controller:
         with open(self.app_config.config_path, 'wb') as configfile:
             config.write(configfile)
 
+    def set_gcode_slider(self, min, max, min_l, max_l):
+        self.view.gcode_slider.setMinimum(min)
+        self.view.gcode_slider.setMaximum(max)
+
+        self.view.gcode_slider_min_l.setText(str(min_l))
+        self.view.gcode_slider_max_l.setText(str(max_l))
+
 
     def read_gcode(self, filename = ''):
         if filename:
@@ -193,11 +204,10 @@ class Controller:
         min = 0
         max = len(self.gcode.data_keys)-1
 
-        self.view.gcode_slider.setMinimum(min)
-        self.view.gcode_slider.setMaximum(max)
-
         min_l = float(self.gcode.data_keys[0])
         max_l = float(self.gcode.data_keys[-1])
+
+        self.set_gcode_slider(min, max, min_l, max_l)
 
         self.gcode_layer = self.gcode.data_keys[0]
 

@@ -43,7 +43,7 @@ QComboBox {
     color:rgb(255, 255, 255);
 }
 
-QComboBox#combobox_scale_units {
+QComboBox#combobox_scale_units, QComboBox#gcode_display_units_cb {
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 1px 3px;
     font-size: 12px;
@@ -57,7 +57,7 @@ QComboBox#combobox_scale_units {
 
 
 
-QComboBox#combobox_scale_units::down-arrow {
+QComboBox#combobox_scale_units::down-arrow, QComboBox#gcode_display_units_cb::down-arrow{
     background-color:rgb(181, 181, 181);
     color:rgb(255, 255, 255);
     image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
@@ -73,13 +73,13 @@ QComboBox#combobox_scale_units::down-arrow:disabled {
     height: 13px;
 }
 
-QComboBox#combobox_scale_units::drop-down {
+QComboBox#combobox_scale_units::drop-down, QComboBox#gcode_display_units_cb::drop-down {
     background-color:rgb(181, 181, 181);
     color:rgb(255, 255, 255);
     border-radius: 5px;
 }
 
-QComboBox#combobox_scale_units QAbstractItemView {
+QComboBox#combobox_scale_units QAbstractItemView, QComboBox#gcode_display_units_cb QAbstractItemView{
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 0px 0px;
     background-color:rgb(181, 181, 181);
@@ -125,7 +125,7 @@ QComboBox::down-arrow {
 }
 
 QComboBox#materialCombo QAbstractItemView, QComboBox#qualityCombo QAbstractItemView,
-QComboBox#supportCombo QAbstractItemView, QComboBox#combobox_scale_units QAbstractItemView {
+QComboBox#supportCombo QAbstractItemView {
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 0px 0px;
     background-color:rgb(181, 181, 181);
@@ -158,7 +158,8 @@ QLabel#x_pos_l:disabled, QLabel#y_pos_l:disabled, QLabel#z_pos_l:disabled, QLabe
 QLabel#y_rot_l:disabled, QLabel#z_rot_l:disabled, QLabel#x_scale_l:disabled, QLabel#y_scale_l:disabled,
 QLabel#z_scale_l:disabled, QLabel#units_l:disabled, QLabel#lock_scale_axes_l:disabled, QLabel#position_l:disabled,
 QLabel#rotation_l:disabled, QLabel#scale_l:disabled, QLabel#filename_label:disabled, QLabel#name_l:disabled,
-QLabel#place_on_zero_l:disabled{
+QLabel#place_on_zero_l:disabled, QLabel#gcode_display_units_l:disabled, QLabel#gcode_slider_min_l:disabled,
+QLabel#gcode_slider_max_l:disabled {
     color: rgb(112, 112, 112);
     background-color:rgb(89, 89, 89);
 }
@@ -171,7 +172,8 @@ QGroupBox::title{
 QLabel#x_pos_l, QLabel#y_pos_l, QLabel#z_pos_l, QLabel#x_rot_l, QLabel#y_rot_l, QLabel#z_rot_l,
 QLabel#x_scale_l, QLabel#y_scale_l, QLabel#z_scale_l, QLabel#units_l, QLabel#lock_scale_axes_l,
 QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#filename_label, QLabel#name_l,
-QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l
+QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#gcode_display_units_l,
+QLabel#gcode_slider_min_l, QLabel#gcode_slider_max_l
 {
     background-color:rgb(77, 77, 77);
 }
@@ -191,6 +193,12 @@ QCheckBox#place_on_zero{
     margin: 2px 0 0 0;
 }*/
 
+QGLWidget{
+    font-family: 'Titillium Web';
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+}
 
 
 QSlider#infillSlider{
@@ -198,30 +206,38 @@ QSlider#infillSlider{
 }
 
 QSlider::groove:horizontal {
-    border: 1px solid #999999;
-    height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);
-    margin: 2px 0;
-}
-
-QSlider::handle:horizontal {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
-    border: 1px solid #5c5c5c;
-    width: 18px;
-    margin: -2px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
-    border-radius: 3px;
+    border-image: url(data/img/gui/slider_path.png) 0 0 0 0 stretch stretch;
+    background-color: transparent;
+    height: 17px;
+    width: 145px;
 }
 
 QSlider::groove:vertical {
+    border-image: url(data/img/gui/slider_path_vert.png) 0 0 0 0 stretch stretch;
+    background-color: transparent;
+    /*
+    height: 500px;
+    */
+    width: 17px;
+}
+
+QSlider::handle {
+    image: url(data/img/gui/slider_knob.png);
+    background-color: transparent;
+    width: 17px;
+    height: 17px;
+}
+
+/*
+QSlider::groove:vertical {
     background: red;
-    position: absolute; /* absolutely position 4px from the left and right of the widget. setting margins on the widget should work too... */
     left: 4px; right: 4px;
 }
 
 QSlider::handle:vertical {
     height: 10px;
     background: green;
-    margin: 0 -4px; /* expand outside the groove */
+    margin: 0 -4px;
 }
 
 QSlider::add-page:vertical {
@@ -230,7 +246,7 @@ QSlider::add-page:vertical {
 
 QSlider::sub-page:vertical {
     background: pink;
-}
+}*/
 
 QPushButton#generateButton, QPushButton#gcode_back_b {
     font-family: 'Titillium Web';

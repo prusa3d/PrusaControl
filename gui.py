@@ -435,7 +435,7 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.place_on_zero.isChecked()))
         self.combobox_scale_units = QtGui.QComboBox()
         self.combobox_scale_units.setObjectName("combobox_scale_units")
-        self.combobox_scale_units.addItems(["percent", " mm"])
+        self.combobox_scale_units.addItems(["%", " mm"])
         self.combobox_scale_units.setCurrentIndex(0)
         self.scale_units = self.combobox_scale_units.currentText()
         self.combobox_scale_units.currentIndexChanged.connect(self.change_scale_units)
@@ -504,11 +504,18 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_display_units_cb.setCurrentIndex(0)
         self.gcode_display_units_cb.setObjectName("gcode_display_units_cb")
 
-        self.gcode_s = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
-        self.gcode_s.setObjectName("gcode_s")
+        self.gcode_slider_min_l = QtGui.QLabel("0.00")
+        self.gcode_slider_min_l.setObjectName("gcode_slider_min_l")
+        self.gcode_slider_min_l.setAlignment(Qt.AlignRight)
+        self.gcode_slider_max_l = QtGui.QLabel("0.00")
+        self.gcode_slider_max_l.setObjectName("gcode_slider_max_l")
+        self.gcode_slider_max_l.setAlignment(Qt.AlignRight)
+
+        self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
+        self.gcode_slider.setObjectName("gcode_slider")
 
         self.gcode_back_b = QtGui.QPushButton(self.tr("Edit scene"))
-        self.gcode_s.setObjectName("gcode_back_b")
+        self.gcode_back_b.setObjectName("gcode_back_b")
         self.gcode_back_b.clicked.connect(self.controller.set_model_edit_view)
 
         # Gcode view layout
@@ -603,9 +610,11 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.right_panel_layout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
         self.right_panel_layout.addRow(self.generateButton)
         self.right_panel_layout.addRow(self.progressBar)
-        self.right_panel_layout.addRow(self.printingInfoLabel)
-        self.right_panel_layout.addRow(self.printing_filament_label)
-        self.right_panel_layout.addRow(self.printing_filament_data)
+
+        #TODO:Where to put this information? Info box?
+        #self.right_panel_layout.addRow(self.printingInfoLabel)
+        #self.right_panel_layout.addRow(self.printing_filament_label)
+        #self.right_panel_layout.addRow(self.printing_filament_data)
 
 
         self.right_panel.setLayout(self.right_panel_layout)
@@ -617,12 +626,13 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_label.setMaximumWidth(40)
         self.gcode_label.setAlignment(Qt.AlignCenter)
 
-        self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
+        #self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
         #self.gcode_from_button_checkbox = QtGui.QCheckBox(self.tr("From button"))
         #self.gcode_from_button_checkbox.setChecked(True)
         #self.gcode_from_button_checkbox.clicked.connect(self.set_gcode_draw_layers_from_button)
 
 
+        '''
         self.gcode_cancel_button = QPushButton('X')
         self.gcode_cancel_button.setMaximumWidth(40)
         self.gcode_cancel_button.clicked.connect(self.controller.set_model_edit_view)
@@ -635,6 +645,7 @@ class PrusaControlView(QtGui.QMainWindow):
         gcode_panel_layout.addWidget(self.gcode_cancel_button)
         self.gcode_panel.setLayout(gcode_panel_layout)
         self.gcode_panel.setVisible(False)
+        '''
 
 
         mainLayout = QtGui.QHBoxLayout()
@@ -765,7 +776,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_scale_y.setDisabled(True)
         self.edit_scale_z.setDisabled(True)
 
-        if self.scale_units == 'percent':
+        if self.scale_units == '%':
             self.edit_scale_x.setSuffix("%")
             self.edit_scale_x.setValue(mesh.scale[0] * 100)
             self.edit_scale_y.setSuffix("%")
@@ -850,13 +861,12 @@ class PrusaControlView(QtGui.QMainWindow):
             self.controller.view.update_scene()
 
     def set_scale_on_object(self, widget, active_axis, object_id, x, y, z, place_on_zero):
-
         if widget.hasFocus():
             self.controller.scene_was_changed()
             model = self.controller.get_object_by_id(object_id)
             if not model:
                 return
-            if self.scale_units == 'percent':
+            if self.scale_units == '%':
                 if self.lock_scale_axis:
 
                     if active_axis=='x':
@@ -1036,12 +1046,16 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def create_gcode_view_layout(self):
 
-        qcode_view_layout = QtGui.QGridLayout()
+        gcode_view_layout = QtGui.QGridLayout()
+        gcode_view_layout.setRowMinimumHeight(2, 350)
 
-        qcode_view_layout.addWidget(self.gcode_display_units_l, 0, 0)
-        qcode_view_layout.addWidget(self.gcode_display_units_cb, 0, 1)
-        qcode_view_layout.addWidget(self.gcode_s, 1, 1, 25, 1)
-        qcode_view_layout.addWidget(self.gcode_back_b, 27, 0, 1, 3)
+
+        gcode_view_layout.addWidget(self.gcode_display_units_l, 0, 0)
+        gcode_view_layout.addWidget(self.gcode_display_units_cb, 0, 1)
+        gcode_view_layout.addWidget(self.gcode_slider_max_l, 1, 0)
+        gcode_view_layout.addWidget(self.gcode_slider, 1, 1, 3, 1)
+        gcode_view_layout.addWidget(self.gcode_slider_min_l, 3, 0)
+        gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
 
         '''
         qcode_view_layout = QtGui.QVBoxLayout()
@@ -1051,7 +1065,7 @@ class PrusaControlView(QtGui.QMainWindow):
         qcode_view_layout.addWidget(self.gcode_back_b)
         '''
 
-        return qcode_view_layout
+        return gcode_view_layout
 
     def create_information_window(self, text):
 

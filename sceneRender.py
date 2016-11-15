@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #import inspect
 #import logging
+from pprint import pprint
 
 import OpenGL
 
@@ -297,12 +298,15 @@ class GLWidget(QGLWidget):
 
 
         self.tool_background = self.texture_from_png("data/img/tool_background.png")
+        self.popup_widget = self.texture_from_png("data/img/gui/popup_window.png")
+
 
         self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
         #self.tools = []
 
         self.bed = {}
         self.printing_space = {}
+
         for i in self.parent.controller.printing_parameters.get_printers_names():
             self.bed[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.makePrintingBed(self.parent.controller.printing_parameters.get_printer_parameters(i))
             self.printing_space[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.make_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(i))
@@ -381,6 +385,7 @@ class GLWidget(QGLWidget):
     def paintGL(self, selection = 1):
         #print("Draw")
         t0 = time.time()
+
         if not self.bed and self.printing_space:
             return
         heat_bed = self.bed[self.controller.settings['printer']]
@@ -396,8 +401,7 @@ class GLWidget(QGLWidget):
 
         #glDepthMask(GL_TRUE)
         glEnable( GL_LIGHTING )
-        #glClearColor(0.0, 0.47, 0.62, 1.0)
-        #glClearColor((176./255.),(236/255.) ,(255./255.), 1.0)
+
         glClearColor(0., 0., 0., 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -411,22 +415,49 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-
-        #glLightfv(GL_LIGHT0, GL_POSITION, [0., 50., 100., 0.])
-        #glLightfv(GL_LIGHT1, GL_POSITION, [50., 10., 50., 0.])
-
         glCallList(heat_bed)
 
         glEnable(GL_DEPTH_TEST)
 
-        #self.draw_debug()
 
+        '''
         glEnable ( GL_LIGHTING )
         for model in self.parent.controller.scene.models:
             if model.isVisible:
                model.render(picking=False, blending=not model_view)
         glDisable( GL_LIGHTING )
+        '''
 
+
+        if model_view:
+            #render solid objects, possible to edit transformation, select objects
+            for model in self.parent.controller.scene.models:
+                if model.isVisible:
+                    model.render(picking=False, blending=not model_view)
+
+            glCallList(printing_space)
+            #self.draw_axis(printing_space_info)
+
+            self.draw_tools()
+
+        elif not model_view:
+            #render blended objects and layers of gcode to inspect it
+            for model in self.parent.controller.scene.models:
+                if model.isVisible:
+                    model.render(picking=False, blending=not model_view)
+
+            self.draw_layer(self.controller.gcode_layer, printer)
+            glCallList(printing_space)
+
+        self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
+        self.draw_warning_window()
+        self.draw_information_window()
+
+
+        #self.renderText(-10., -10., -10., u"Testovací text, strášně dlouhý... :-)))", self.controller.view.font)
+
+
+        '''
         if not model_view:
             self.draw_layer(self.controller.gcode_layer, printer)
 
@@ -449,12 +480,15 @@ class GLWidget(QGLWidget):
                 glDisableClientState(GL_VERTEX_ARRAY)
                 glDisableClientState(GL_NORMAL_ARRAY)
 
-            glCallList(printing_space)
+            glCallList(printing_space_id)
             self.draw_tools()
         else:
-            glCallList(printing_space)
+            glCallList(printing_space_id)
+        '''
 
         #self.picking_render()
+
+
         glFlush()
 
         t1 = time.time()
@@ -464,10 +498,78 @@ class GLWidget(QGLWidget):
                 self.last_fps = 1./(self.fps_time/self.fps_count)
                 self.fps_count = 0
                 self.fps_time = 0.
-                self.parent.controller.show_message_on_status_bar("FPS: %s" % str(self.last_fps))
+                self.renderText(100, 100, 'FPS: %3.1f' % self.last_fps)
             else:
                 self.fps_count+=1
                 self.fps_time+=t1-t0
+                self.renderText(100, 100, 'FPS: %3.1f' % self.last_fps)
+
+
+    def draw_warning_window(self):
+        #set camera view
+        glMatrixMode(GL_PROJECTION)
+        glPushMatrix()
+        glLoadIdentity()
+        viewport = glGetIntegerv(GL_VIEWPORT)
+        glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix()
+
+        sW = viewport[2] * 1.0
+        sH = viewport[3] * 1.0
+
+
+        glLoadIdentity()
+        glDisable(GL_LIGHTING)
+        glDisable(GL_DEPTH_TEST)
+        glEnable(GL_TEXTURE_2D)
+
+        #draw frame for warning messages
+        position_x = 25
+        position_y = 25
+        size_w = 371
+        size_h = 180
+
+        coef_sH = size_h
+        coef_sW = size_w
+
+        glBindTexture(GL_TEXTURE_2D, self.popup_widget)
+        glColor4f(0.1, 0.1, 0.1, .75)
+        glBegin(GL_QUADS)
+        glTexCoord2f(0, 0)
+        glVertex3f(position_x, position_y, 0)
+        glTexCoord2f(0, 1)
+        glVertex3f(position_x, (position_y + coef_sH), 0)
+        glTexCoord2f(1, 1)
+        glVertex3f((position_x + coef_sW), (position_y + coef_sH), 0)
+        glTexCoord2f(1, 0)
+        glVertex3f((position_x + coef_sW), position_y, 0)
+        glEnd()
+
+        glDisable(GL_TEXTURE_2D)
+
+        glColor4f(1.,1.,1.,1.)
+        font = self.controller.view.font
+        font.setPointSize(28)
+        self.renderText(115, sH - 153, u"WARNING", font)
+
+        font.setPointSize(10)
+        for n, message in enumerate(self.controller.warning_message_buffer):
+            self.renderText(57, sH-122+15*n,  message, font)
+
+
+        glEnable(GL_DEPTH_TEST)
+
+        glPopMatrix()
+
+        glMatrixMode(GL_PROJECTION)
+        glPopMatrix()
+
+        glMatrixMode(GL_MODELVIEW)
+
+
+    def draw_information_window(self):
+        pass
 
     def draw_layer(self, layer, printer):
         printing_space = printer['printing_space']
@@ -598,6 +700,8 @@ class GLWidget(QGLWidget):
             glVertex3f(self.oldHitPoint[0], self.oldHitPoint[1], self.oldHitPoint[2])
             glEnd()
         '''
+
+
 
 
         glEnable(GL_DEPTH_TEST)
@@ -866,10 +970,15 @@ class GLWidget(QGLWidget):
         glVertex3d(printing_space[0] * 0.5 * .1, printing_space[1] * -0.5 * .1, printing_space[2] * .1)
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, printing_space[2] * .1)
         glEnd()
+        glEndList()
 
-        # Axis
+        glEnable(GL_DEPTH_TEST)
+
+        return genList
+
+    def draw_axis(self, printing_space):
         glLineWidth(5)
-        glDisable(GL_DEPTH_TEST)
+        #glDisable(GL_DEPTH_TEST)
         glBegin(GL_LINES)
         glColor3f(1, 0, 0)
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
@@ -883,35 +992,16 @@ class GLWidget(QGLWidget):
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 0)
         glVertex3d(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 1)
         glEnd()
-        glEndList()
-        glEnable(GL_DEPTH_TEST)
-
-        return genList
-
-    def make_axis(self):
-        genList = glGenLists(1)
-        glNewList(genList, GL_COMPILE)
-
-        glLineWidth(5)
-
-        glBegin(GL_LINES)
 
         glColor3f(1, 0, 0)
-        glVertex3d(-10, -10, 0)
-        glVertex3d(-9, -10, 0)
-
+        self.renderText((printing_space[0] * -0.5 * .1) + 1.1, printing_space[1] * -0.5 * .1, 0, "X")
         glColor3f(0, 1, 0)
-        glVertex3d(-10, -10, 0)
-        glVertex3d(-10, -9, 0)
-
+        self.renderText(printing_space[0] * -0.5 * .1, (printing_space[1] * -0.5 * .1) + 1.1, 0, "Y")
         glColor3f(0, 0, 1)
-        glVertex3d(-10, -10, 0)
-        glVertex3d(-10, -10, 1)
+        self.renderText(printing_space[0] * -0.5 * .1, printing_space[1] * -0.5 * .1, 1.1, "Z")
 
-        glEnd()
-        glEndList()
+        #glEnable(GL_DEPTH_TEST)
 
-        return genList
 
     def draw_background_texture(self):
         glMatrixMode(GL_PROJECTION)
