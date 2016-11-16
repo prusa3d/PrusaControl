@@ -98,9 +98,7 @@ class Controller:
             }
         }
 
-        self.warning_message_buffer = [u"•  Nemáme tu ještě novou podložku!",
-                                       u"•  A ještě se musí opravit PlaceOnFace!",
-                                       u"•  Object stl.stl is out of printable area!"]
+        self.warning_message_buffer = []
 
 
         #variables for help
@@ -151,11 +149,22 @@ class Controller:
 
         logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
 
-
         if len(self.app_parameters) >= 3:
             for file in self.app_parameters[2:]:
                 logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
+
+
+    #TODO:Better,
+    def add_warning_message(self, object, problem):
+        if problem == "out_of_printing_space":
+            text = u"•  Object %s is out of printable area!" % object.filename
+            if not text in self.warning_message_buffer:
+                self.warning_message_buffer.append(text)
+        elif problem == "something_else":
+            pass
+        else:
+            self.warning_message_buffer.append(u"•  Object %s has some other problem!" % object.filename)
 
 
     def clear_event_flag_status(self):
@@ -1087,8 +1096,10 @@ class Controller:
     def set_printable(self, is_printable):
         self.scene.printable = is_printable
         if is_printable == False:
+            print("Disable genrate button")
             self.disable_generate_button()
         else:
+            print("Enable genrate button")
             self.enable_generate_button()
 
     def disable_generate_button(self):

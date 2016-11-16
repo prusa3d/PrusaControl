@@ -308,6 +308,13 @@ class AppScene(object):
         whole_scene = self.get_whole_scene_in_one_mesh(True)
         whole_scene.save(filename)
 
+    #TODO:Connect it in enable/disable generate button logic
+    def is_scene_printable(self):
+        for model in self.models:
+            if not model.is_in_printing_space(self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)):
+                return False
+        return True
+
 class Model(object):
     '''
     this is reprezentation of model data
@@ -351,6 +358,10 @@ class Model(object):
         self.t0 = []
         self.t1 = []
         self.t2 = []
+
+        self.n0 = []
+        self.n1 = []
+        self.n2 = []
 
         self.rotationAxis = []
         self.scaleAxis = []
@@ -517,18 +528,20 @@ class Model(object):
         if max[0] <= (printer['printing_space'][0]*.05) and min[0] >= (printer['printing_space'][0]*-.05):
                 if max[1] <= (printer['printing_space'][1]*.05) and min[1] >= (printer['printing_space'][1]*-.05):
                     if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
-                        self.parent.controller.set_printable(True)
+                        #self.parent.controller.set_printable(True)
+
                         return True
                     else:
                         #print("naruseni v Z")
-                        self.parent.controller.set_printable(False)
+                        #self.parent.controller.set_printable(False)
                         return False
                 else:
                     #print("naruseni v Y")
-                    self.parent.controller.set_printable(False)
+                    #self.parent.controller.set_printable(False)
+
                     return False
         else:
-            #print("naruseni v X")
+            print("naruseni v X")
             self.parent.controller.set_printable(False)
             return False
 
@@ -872,6 +885,7 @@ class Model(object):
                     else:
                         glColor3ubv(self.color)
                 else:
+                    self.parent.controller.add_warning_message(self, "out_of_printing_space")
                     is_in_printing_space = False
                     glColor3f(0.35, 0.35, 0.35)
 
@@ -1101,21 +1115,28 @@ class ModelTypeObj(ModelTypeAbstract):
         else:
             model.filename = ""
 
-        #print("Vertices: " + str(vertices))
-        #print("Texcoords: " + str(texcoords_array))
+
+        print("Vertices N: " + str(len(vertices)))
+        print("Texcoords N: " + str(len(texcoords_array)))
+        print("Normals N: " + str(len(normals)))
+        print("Faces N: " + str(len(faces)))
+
 
         for face in faces:
             vert, norm, texcoord = face
             #print("Vertex indexes: " + str(vert))
             #print("Texcoord indexes: " + str(texcoord))
-            model.v0.append(vertices[vert[0]-1])
-            model.t0.append(texcoords_array[texcoord[0]-1])
+            model.v0.append(vertices[vert[0] - 1])
+            model.n0.append(normals[norm[0] - 1])
+            model.t0.append(texcoords_array[texcoord[0] - 1])
 
-            model.v1.append(vertices[vert[1]-1])
-            model.t1.append(texcoords_array[texcoord[1]-1])
+            model.v1.append(vertices[vert[1] - 1])
+            model.n1.append(normals[norm[1] - 1])
+            model.t1.append(texcoords_array[texcoord[1] - 1])
 
-            model.v2.append(vertices[vert[2]-1])
-            model.t2.append(texcoords_array[texcoord[2]-1])
+            model.v2.append(vertices[vert[2] - 1])
+            model.n2.append(normals[norm[2] - 1])
+            model.t2.append(texcoords_array[texcoord[2] - 1])
 
 
         return model
@@ -1210,7 +1231,7 @@ def intersection_ray_plane(start, end, pos=np.array([.0, .0, .0]), n=np.array([.
     return res
 
 def intersection_ray_plane2(O, D, P=np.array([0., 0., 0.]), N=np.array([.0, .0, 1.])):
-    # Return the distance from O to the intersection of the ray (O, D) with the 
+    # Return the distance from O to the intersection of the ray (O, D) with the
     # plane (P, N), or +inf if there is no intersection.
     # O and P are 3D points, D and N (normal) are normalized vectors.
     denom = np.dot(D, N)

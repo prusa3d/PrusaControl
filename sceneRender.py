@@ -243,12 +243,13 @@ class GLWidget(QGLWidget):
         texture = glGenTextures(1)
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         glBindTexture(GL_TEXTURE_2D, texture)
-
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexImage2D(GL_TEXTURE_2D, 0, type, img.size[0], img.size[1], 0, type, GL_UNSIGNED_BYTE, img_data)
+        glGenerateMipmap(GL_TEXTURE_2D)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
         return texture
 
     def initializeGL(self):
@@ -308,7 +309,7 @@ class GLWidget(QGLWidget):
         self.printing_space = {}
 
         for i in self.parent.controller.printing_parameters.get_printers_names():
-            self.bed[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.makePrintingBed(self.parent.controller.printing_parameters.get_printer_parameters(i))
+            self.bed[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.make_printing_bed(self.parent.controller.printing_parameters.get_printer_parameters(i))
             self.printing_space[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.make_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(i))
 
         glClearDepth(1.0)
@@ -507,65 +508,66 @@ class GLWidget(QGLWidget):
 
     def draw_warning_window(self):
         #set camera view
-        glMatrixMode(GL_PROJECTION)
-        glPushMatrix()
-        glLoadIdentity()
-        viewport = glGetIntegerv(GL_VIEWPORT)
-        glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
-        glMatrixMode(GL_MODELVIEW)
-        glPushMatrix()
+        if len(self.controller.warning_message_buffer) > 0:
+            glMatrixMode(GL_PROJECTION)
+            glPushMatrix()
+            glLoadIdentity()
+            viewport = glGetIntegerv(GL_VIEWPORT)
+            glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
+            glMatrixMode(GL_MODELVIEW)
+            glPushMatrix()
 
-        sW = viewport[2] * 1.0
-        sH = viewport[3] * 1.0
-
-
-        glLoadIdentity()
-        glDisable(GL_LIGHTING)
-        glDisable(GL_DEPTH_TEST)
-        glEnable(GL_TEXTURE_2D)
-
-        #draw frame for warning messages
-        position_x = 25
-        position_y = 25
-        size_w = 371
-        size_h = 180
-
-        coef_sH = size_h
-        coef_sW = size_w
-
-        glBindTexture(GL_TEXTURE_2D, self.popup_widget)
-        glColor4f(0.1, 0.1, 0.1, .75)
-        glBegin(GL_QUADS)
-        glTexCoord2f(0, 0)
-        glVertex3f(position_x, position_y, 0)
-        glTexCoord2f(0, 1)
-        glVertex3f(position_x, (position_y + coef_sH), 0)
-        glTexCoord2f(1, 1)
-        glVertex3f((position_x + coef_sW), (position_y + coef_sH), 0)
-        glTexCoord2f(1, 0)
-        glVertex3f((position_x + coef_sW), position_y, 0)
-        glEnd()
-
-        glDisable(GL_TEXTURE_2D)
-
-        glColor4f(1.,1.,1.,1.)
-        font = self.controller.view.font
-        font.setPointSize(28)
-        self.renderText(115, sH - 153, u"WARNING", font)
-
-        font.setPointSize(10)
-        for n, message in enumerate(self.controller.warning_message_buffer):
-            self.renderText(57, sH-122+15*n,  message, font)
+            sW = viewport[2] * 1.0
+            sH = viewport[3] * 1.0
 
 
-        glEnable(GL_DEPTH_TEST)
+            glLoadIdentity()
+            glDisable(GL_LIGHTING)
+            glDisable(GL_DEPTH_TEST)
+            glEnable(GL_TEXTURE_2D)
 
-        glPopMatrix()
+            #draw frame for warning messages
+            position_x = 25
+            position_y = 25
+            size_w = 325
+            size_h = 180
 
-        glMatrixMode(GL_PROJECTION)
-        glPopMatrix()
+            coef_sH = size_h
+            coef_sW = size_w
 
-        glMatrixMode(GL_MODELVIEW)
+            glBindTexture(GL_TEXTURE_2D, self.popup_widget)
+            glColor4f(0.1, 0.1, 0.1, .75)
+            glBegin(GL_QUADS)
+            glTexCoord2f(0, 0)
+            glVertex3f(position_x, position_y, 0)
+            glTexCoord2f(0, 1)
+            glVertex3f(position_x, (position_y + coef_sH), 0)
+            glTexCoord2f(1, 1)
+            glVertex3f((position_x + coef_sW), (position_y + coef_sH), 0)
+            glTexCoord2f(1, 0)
+            glVertex3f((position_x + coef_sW), position_y, 0)
+            glEnd()
+
+            glDisable(GL_TEXTURE_2D)
+
+            glColor4f(1.,1.,1.,1.)
+            font = self.controller.view.font
+            font.setPointSize(28)
+            self.renderText(115, sH - 153, u"WARNING", font)
+
+            font.setPointSize(10)
+            for n, message in enumerate(self.controller.warning_message_buffer):
+                self.renderText(57, sH-122+15*n,  message, font)
+
+            glEnable(GL_DEPTH_TEST)
+
+            glPopMatrix()
+
+            glMatrixMode(GL_PROJECTION)
+            glPopMatrix()
+
+            glMatrixMode(GL_MODELVIEW)
+
 
 
     def draw_information_window(self):
@@ -791,11 +793,13 @@ class GLWidget(QGLWidget):
 
 
 
-    def makePrintingBed(self, printer_data):
+    def make_printing_bed(self, printer_data):
         #print("Printer data: " + str(printer_data))
-        Model = ModelTypeStl.load(printer_data['model'])
+        #Model = ModelTypeStl.load(printer_data['model'])
+        Model = ModelTypeObj.load(printer_data['model'])
         bed_texture = printer_data['texture']
         printing_space = printer_data['printing_space']
+
         image_hotbed = self.texture_from_png(bed_texture)
 
         genList = glGenLists(1)
@@ -805,36 +809,54 @@ class GLWidget(QGLWidget):
         glPushMatrix()
         glTranslatef(printer_data['model_offset'][0], printer_data['model_offset'][1], printer_data['model_offset'][2])
 
-        glEnable(GL_BLEND)
-        glDisable(GL_DEPTH_TEST)
-
+        #glEnable(GL_BLEND)
+        #glDisable(GL_DEPTH_TEST)
+        '''
+        #STL version
         glColor4f(.4, .4, .4, .75)
         glBegin(GL_TRIANGLES)
         for i in Model.mesh.vectors:
             glVertex3f(i[0][0], i[0][1], i[0][2])
             glVertex3f(i[1][0], i[1][1], i[1][2])
             glVertex3f(i[2][0], i[2][1], i[2][2])
-
+        glEnd()
         '''
+
+        glDisable(GL_BLEND)
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, image_hotbed)
+
+        glEnable(GL_LIGHTING)
+
+        #glShadeModel(GL_SMOOTH)
+        glCullFace(GL_FRONT_AND_BACK)
+
+        #Obj version
+        #glColor4f(.4, .4, .4, .75)
+        glColor4f(1., 1., 1., 1.)
+        glBegin(GL_TRIANGLES)
         for i in xrange(0, len(Model.v0)):
             #print(str(Model.v0[i]))
-            glTexCoord2f(Model.t0[0], Model.t0[1])
+            glTexCoord2f(Model.t0[i][0], Model.t0[i][1])
+            glNormal3f(Model.n0[i][0], Model.n0[i][1], Model.n0[i][2])
             glVertex3f(Model.v0[i][0]*.1, Model.v0[i][1]*.1, Model.v0[i][2]*.1)
 
-            glTexCoord2f(Model.t1[0], Model.t1[1])
+            glTexCoord2f(Model.t1[i][0], Model.t1[i][1])
+            glNormal3f(Model.n1[i][0], Model.n1[i][1], Model.n1[i][2])
             glVertex3f(Model.v1[i][0]*.1, Model.v1[i][1]*.1, Model.v1[i][2]*.1)
 
-            glTexCoord2f(Model.t2[0], Model.t2[1])
+            glTexCoord2f(Model.t2[i][0], Model.t2[i][1])
+            glNormal3f(Model.n2[i][0], Model.n2[i][1], Model.n2[i][2])
             glVertex3f(Model.v2[i][0]*.1, Model.v2[i][1]*.1, Model.v2[i][2]*.1)
-        '''
         glEnd()
 
         glPopMatrix()
 
         #glEnable(GL_TEXTURE_2D)
         glDisable(GL_TEXTURE_2D)
+        glDisable(GL_LIGHTING)
         #glDisable(GL_BLEND)
-
+        '''
         glEnable(GL_BLEND)
 
         glColor3f(1.0, 1.0, 1.0)
@@ -871,6 +893,7 @@ class GLWidget(QGLWidget):
             glVertex3d(0. + (printing_space[0] * -0.5 * .1), i + (printing_space[1] * -0.5 * .1) +.5, -0.001)
             glVertex3d(25. + (printing_space[0] * -0.5 * .1), i + (printing_space[1] * -0.5 * .1) +.5, -0.001)
         glEnd()
+        '''
 
 
 
