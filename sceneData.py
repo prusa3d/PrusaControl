@@ -254,6 +254,16 @@ class AppScene(object):
 
         #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
         self.models = sorted(self.models, key=lambda k: np.linalg.norm(k.size), reverse=True)
+
+        #null position of all objects
+        zer = np.array([.0, .0, .0])
+        for m in self.models:
+            m.pos[0] = zer[0]
+            m.pos[1] = zer[1]
+
+            m.max_scene = m.max + m.pos
+            m.min_scene = m.min + m.pos
+
         #place biggest object(first one) on center
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
         for i, m in enumerate(self.models):
@@ -308,7 +318,6 @@ class AppScene(object):
         whole_scene = self.get_whole_scene_in_one_mesh(True)
         whole_scene.save(filename)
 
-    #TODO:Connect it in enable/disable generate button logic
     def is_scene_printable(self):
         for model in self.models:
             if not model.is_in_printing_space(self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)):
@@ -456,7 +465,8 @@ class Model(object):
         m.size_origin = deepcopy(self.size_origin)
 
         m.temp_mesh = deepcopy(self.mesh)
-        #print("Udelana kopie")
+        print("Udelana kopie")
+        print("Stary model ma id %s a ten novy ma %s" % (str(self.id), str(m.id)))
         return m
 
 
@@ -511,10 +521,6 @@ class Model(object):
         #print("Face colors:")
         #pprint(self.face_colors)
 
-
-
-
-
     def clear_state(self):
         self.is_changed = False
 
@@ -528,21 +534,15 @@ class Model(object):
         if max[0] <= (printer['printing_space'][0]*.05) and min[0] >= (printer['printing_space'][0]*-.05):
                 if max[1] <= (printer['printing_space'][1]*.05) and min[1] >= (printer['printing_space'][1]*-.05):
                     if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
-                        #self.parent.controller.set_printable(True)
-
                         return True
                     else:
                         #print("naruseni v Z")
-                        #self.parent.controller.set_printable(False)
                         return False
                 else:
                     #print("naruseni v Y")
-                    #self.parent.controller.set_printable(False)
-
                     return False
         else:
-            print("naruseni v X")
-            self.parent.controller.set_printable(False)
+            #print("naruseni v X")
             return False
 
     def get_mesh(self, transform=True, generate_gcode=False, default_scale=True):

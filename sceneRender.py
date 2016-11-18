@@ -187,6 +187,7 @@ class GLWidget(QGLWidget):
         self.update()
 
 
+
     #TODO:All this function will be changed to control camera instance
     def set_zoom(self, diff):
         #self.camera.add_zoom(diff)
@@ -369,8 +370,10 @@ class GLWidget(QGLWidget):
         for model in self.parent.controller.scene.models:
             if model.isVisible:
                 model.render(picking=True, blending=False)
-                if model.selected:
-                    self.draw_tools_helper(model, self.controller.settings, True)
+
+        for model in self.parent.controller.scene.models:
+            if model.isVisible and model.selected:
+                self.draw_tools_helper(model, self.controller.settings, True)
 
         self.draw_tools(picking=True)
 
@@ -436,6 +439,10 @@ class GLWidget(QGLWidget):
                 if model.isVisible:
                     model.render(picking=False, blending=not model_view)
 
+            for model in self.parent.controller.scene.models:
+                if model.isVisible and model.selected:
+                    self.draw_tools_helper(model, self.parent.controller.settings)
+
             glCallList(printing_space)
             #self.draw_axis(printing_space_info)
 
@@ -451,11 +458,10 @@ class GLWidget(QGLWidget):
             glCallList(printing_space)
 
         self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
-        self.draw_warning_window()
+
+        #self.draw_warning_window()
         self.draw_information_window()
 
-
-        #self.renderText(-10., -10., -10., u"Testovací text, strášně dlouhý... :-)))", self.controller.view.font)
 
 
         '''
@@ -623,91 +629,119 @@ class GLWidget(QGLWidget):
             self.draw_rotation_circles(model, rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
 
     def draw_rotation_circles(self, model, colors, position, radius, picking=False):
-        if not picking:
-                colors[2] = [255, 255, 0]
 
-        segments = 32
+        actual_angle = numpy.rad2deg(model.rot[2])
+
+        if not picking:
+                colors[2] = [255, 255, 255]
+
+        segments = 64
         if picking:
             width = 0.45
         else:
             width = 0.15
 
-        #calculete points
-        circle0 = [[math.cos(math.radians(i)) * (radius-width*.5), math.sin(math.radians(i)) * (radius-width*.5)] for i in xrange(0, 360 + (360 / segments), 360 / segments)]
-        circle1 = [[math.cos(math.radians(i)) * (radius+width*.5), math.sin(math.radians(i)) * (radius+width*.5)] for i in xrange(0, 360 + (360 / segments), 360 / segments)]
+        if radius < 2.5:
+            radius = 2.5
+
+        r0 = radius-0.4
+        r1 = radius-0.05
+        r2 = radius
+        r3 = radius+0.05
+        r4 = radius+0.15
+        r5 = radius+0.25
+        r6 = radius+0.4
+        r7 = radius+0.5
+
+        if picking:
+            list_of_segnments_6 = numpy.arange(0., 360., 1.)
+            circle7 = [[numpy.cos(numpy.radians(i)) * r7, numpy.sin(numpy.radians(i)) * r7] for i in list_of_segnments_6]
+        else:
+            #calculete points for circle 0 and 1
+            list_of_segnments_0_1 = numpy.arange(0, 360., 360./16.)
+            circle0 = [[numpy.cos(numpy.radians(i)) * r0, numpy.sin(numpy.radians(i)) * r0] for i in list_of_segnments_0_1]
+            circle1 = [[numpy.cos(numpy.radians(i)) * r1, numpy.sin(numpy.radians(i)) * r1] for i in list_of_segnments_0_1]
+
+            # calculete points for circle 2
+            list_of_segnments_2 = numpy.arange(0, 360., 360. / segments)
+            circle2 = [[numpy.cos(numpy.radians(i)) * r2, numpy.sin(numpy.radians(i)) * r2] for i in list_of_segnments_2]
+
+            # calculete points for circle 3, 4 and 5
+            list_of_segnments_3_4_5 = numpy.arange(0, 360., 360. / 72.)
+            circle3 = [[numpy.cos(numpy.radians(i)) * r3, numpy.sin(numpy.radians(i)) * r3] for i in list_of_segnments_3_4_5]
+            circle4 = [[numpy.cos(numpy.radians(i)) * r4, numpy.sin(numpy.radians(i)) * r4] for i in list_of_segnments_3_4_5]
+            circle5 = [[numpy.cos(numpy.radians(i)) * r5, numpy.sin(numpy.radians(i)) * r5] for i in list_of_segnments_3_4_5]
+
+            # calculete points for circle 6
+            list_of_segnments_6 = numpy.arange(0., 360., 1.)
+            circle6 = [[numpy.cos(numpy.radians(i)) * r6, numpy.sin(numpy.radians(i)) * r6] for i in list_of_segnments_6]
+            circle7 = [[numpy.cos(numpy.radians(i)) * r7, numpy.sin(numpy.radians(i)) * r7] for i in list_of_segnments_6]
 
         glPushMatrix()
         glTranslatef(position[0], position[1], 0.0)
         glDisable( GL_LIGHTING )
         glDisable(GL_DEPTH_TEST)
 
-        index = list(xrange(0, len(circle0)-1))
-        index.append(0)
 
-        glColor3ubv(colors[2])
-        glBegin(GL_TRIANGLES)
-        for i in index:
-            glVertex3f(circle1[i][0], circle1[i][1], 0.)
-            glVertex3f(circle0[i][0], circle0[i][1], 0.)
-            glVertex3f(circle1[i+1][0], circle1[i+1][1], 0.)
-
-            glVertex3f(circle0[i][0], circle0[i][1], 0.)
-            glVertex3f(circle1[i+1][0], circle1[i+1][1], 0.)
-            glVertex3f(circle0[i+1][0], circle0[i+1][1], 0.)
-        glEnd()
-
-        glColor3f(1., 0., 0.)
-        glBegin(GL_LINES)
-        glVertex3f(0., 0., 0.)
-        glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
-
-        glVertex3f(0., 0., 0.)
-        glVertex3f(self.oldHitPoint[0], self.oldHitPoint[1], self.oldHitPoint[2])
-        glEnd()
-
-
-        '''
         if picking:
-            glLineWidth(6.0)
             glColor3ubv(colors[2])
-            glBegin(GL_LINE_LOOP)
-            for i in xrange(0, 360, 360 / segments):
-                glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
+            if picking:
+                glLineWidth(5)
+            else:
+                glLineWidth(2.5)
+            glBegin(GL_LINES)
+            glVertex3f(0., 0., 0.)
+            glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1] * -1., 0.)
             glEnd()
+
         else:
-            glLineWidth(2.0)
             glColor3ubv(colors[2])
-            glBegin(GL_LINE_LOOP)
-            for i in xrange(0, 360, 360/segments):
-                glVertex3f(math.cos(math.radians(i)) * radius, math.sin(math.radians(i)) * radius, 0.0)
-            glEnd()
-
-            glBegin(GL_LINE_LOOP)
-            for i in xrange(0, 360, 360 / segments):
-                glVertex3f(math.cos(math.radians(i)) * (radius+.25), math.sin(math.radians(i)) * (radius+.25), 0.0)
-            glEnd()
-
+            #inner lines
             glBegin(GL_LINES)
-            for i in xrange(0, 360, 360 / 8):
-                glVertex3f(math.cos(math.radians(i)) * (radius), math.sin(math.radians(i)) * (radius), 0.0)
-                glVertex3f(math.cos(math.radians(i)) * (radius + .25), math.sin(math.radians(i)) * (radius + .25), 0.0)
+            for i0, i1 in zip(circle0, circle1):
+                glVertex3f(i0[0], i0[1], 0.)
+                glVertex3f(i1[0], i1[1], 0.)
             glEnd()
 
-            glColor3f(1., 0., 0.)
+            #outer lines
+            bigger_index = list(xrange(0,72,3))
+            glBegin(GL_LINES)
+            for n, (i0, i1, i2) in enumerate(zip(circle3, circle4, circle5)):
+                glVertex3f(i0[0], i0[1], 0.)
+                if n in bigger_index:
+                    glVertex3f(i2[0], i2[1], 0.)
+                else:
+                    glVertex3f(i1[0], i1[1], 0.)
+            glEnd()
+
+            #main circle
+            glBegin(GL_LINE_LOOP)
+            for i in circle2:
+                glVertex3f(i[0], i[1], 0.)
+            glEnd()
+
+
+            glLineWidth(2.5)
             glBegin(GL_LINES)
             glVertex3f(0., 0., 0.)
-            glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
-
-            glVertex3f(0., 0., 0.)
-            glVertex3f(self.oldHitPoint[0], self.oldHitPoint[1], self.oldHitPoint[2])
+            glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0.)
             glEnd()
-        '''
 
+            glLineWidth(1.0)
+            glBegin(GL_LINE_LOOP)
+            glVertex3f(0., 0., 0.)
+            glVertex3f(circle6[0][0], circle6[0][1], 0.)
+            for i in circle6[1:int(actual_angle)]:
+                glVertex3f(i[0], i[1]*-1., 0.)
+                #glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
+            glVertex3f(0., 0., 0.)
+            glEnd()
 
+            self.renderText(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0., "%.1f" % actual_angle )
 
 
         glEnable(GL_DEPTH_TEST)
-        glEnable( GL_LIGHTING )
+        glEnable(GL_LIGHTING)
         glPopMatrix()
 
 
@@ -855,113 +889,9 @@ class GLWidget(QGLWidget):
         #glEnable(GL_TEXTURE_2D)
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_LIGHTING)
-        #glDisable(GL_BLEND)
-        '''
-        glEnable(GL_BLEND)
-
-        glColor3f(1.0, 1.0, 1.0)
-        glLineWidth(.65)
-        glBegin(GL_LINES)
-        for i in xrange(0, 26, 1):
-            if i in [0,5,10,15,20,25]:
-                continue
-            glVertex3d(i + (printing_space[0]*-0.5*.1), 0. + (printing_space[1]*-0.5*.1), -0.001)
-            glVertex3d(i + (printing_space[0]*-0.5*.1), 21. + (printing_space[1]*-0.5*.1), -0.001)
-        for i in xrange(0, 21, 1):
-            if i in [0,5,10,15,20,25]:
-                continue
-            glVertex3d(0. + (printing_space[0]*-0.5*.1), i + (printing_space[1]*-0.5*.1) +.5, -0.001)
-            glVertex3d(25. + (printing_space[0]*-0.5*.1), i + (printing_space[1]*-0.5*.1) +.5, -0.001)
-        glEnd()
-
-        glColor3f(1.0, 1.0, 1.0)
-        glLineWidth(2)
-        glBegin(GL_LINES)
-        for i in xrange(0, 26, 1):
-            if i not in [0, 5, 10, 15, 20, 25]:
-                continue
-            glVertex3d(i + (printing_space[0] * -0.5 * .1), 0. + (printing_space[1] * -0.5 * .1), -0.001)
-            glVertex3d(i + (printing_space[0] * -0.5 * .1), 21. + (printing_space[1] * -0.5 * .1), -0.001)
-
-        glVertex3d(0. + (printing_space[0] * -0.5 * .1), 0. + (printing_space[1] * -0.5 * .1), -0.001)
-        glVertex3d(25. + (printing_space[0] * -0.5 * .1), 0. + (printing_space[1] * -0.5 * .1), -0.001)
-        glVertex3d(0. + (printing_space[0] * -0.5 * .1), 21. + (printing_space[1] * -0.5 * .1), -0.001)
-        glVertex3d(25. + (printing_space[0] * -0.5 * .1), 21. + (printing_space[1] * -0.5 * .1), -0.001)
-        for i in xrange(0, 21, 1):
-            if i not in [0, 5, 10, 15, 20, 25]:
-                continue
-            glVertex3d(0. + (printing_space[0] * -0.5 * .1), i + (printing_space[1] * -0.5 * .1) +.5, -0.001)
-            glVertex3d(25. + (printing_space[0] * -0.5 * .1), i + (printing_space[1] * -0.5 * .1) +.5, -0.001)
-        glEnd()
-        '''
-
-
-
-        '''
-        glBindTexture(GL_TEXTURE_2D, image_hotbed)
-
-        glColor3f(1,1,1)
-        glBegin(GL_QUADS)
-        glNormal3f(.0,.0,1.)
-        glTexCoord2f(0, printing_space[1]*.5*.1)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, -0.001)
-
-        glTexCoord2f(0, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, -0.001)
-
-        glTexCoord2f(printing_space[0]*0.5*.1, 0)
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, -0.001)
-
-        glTexCoord2f(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1)
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, -0.001)
-        glEnd()
-        glDisable(GL_TEXTURE_2D)
-        '''
-        '''
-        glEnable(GL_BLEND)
-        glBegin(GL_LINES)
-        glColor3f(1,1,1)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
-
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, 0)
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
-
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, 0)
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
-
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
-        glEnd()
-
-        glBegin(GL_LINE_LOOP)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*0.5*.1, printing_space[2]*.1)
-        glVertex3d(printing_space[0]*0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, printing_space[2]*.1)
-        glEnd()
-
-        #Axis
-        glLineWidth(5)
-        glDisable(GL_DEPTH_TEST)
-        glBegin(GL_LINES)
-        glColor3f(1, 0, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
-        glVertex3d((printing_space[0]*-0.5*.1)-1, printing_space[1]*-0.5*.1, 0)
-
-        glColor3f(0, 1, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, (printing_space[1]*-0.5*.1)-1, 0)
-
-        glColor3f(0, 0, 1)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 0)
-        glVertex3d(printing_space[0]*-0.5*.1, printing_space[1]*-0.5*.1, 1)
-        glEnd()
         glEndList()
-        glEnable(GL_DEPTH_TEST)
-        '''
 
-        glEndList()
+
         return genList
 
     def make_printing_space(self, printer_data):

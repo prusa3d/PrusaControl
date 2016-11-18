@@ -393,8 +393,16 @@ QCheckBox::indicator {
     height: 17px;
 }
 
+QCheckBox::indicator:checked:hover {
+    image: url(data/img/gui/checkbox_On_hover.png);
+}
+
 QCheckBox#brimCheckBox::indicator:unchecked {
     image: url(data/img/gui/checkbox_dark_Off.png);
+}
+
+QCheckBox#brimCheckBox::indicator:unchecked:hover {
+    image: url(data/img/gui/checkbox_dark_Off_hover.png);
 }
 
 QCheckBox::indicator:unchecked {
@@ -415,6 +423,11 @@ QCheckBox::indicator:unchecked:disabled {
     image: url(data/img/gui/Disable_checkbox_Off.png);
     color: rgb(0,0,0);
 }
+
+QCheckBox::indicator:unchecked:hover {
+    image: url(data/img/gui/checkbox_Off_hover.png);
+}
+
 
 
 

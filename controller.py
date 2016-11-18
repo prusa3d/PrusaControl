@@ -229,7 +229,8 @@ class Controller:
 
     def set_gcode_layer(self, value):
         self.gcode_layer = self.gcode.data_keys[value]
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def set_gcode_draw_from_button(self, val):
         self.gcode_draw_from_button = val
@@ -522,11 +523,13 @@ class Controller:
         self.scene.clear_history()
         for m in self.scene.models:
             self.scene.save_change(m)
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def import_project(self, path):
         project_file = ProjectFile(self.scene, path)
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def save_project(self, path):
         self.scene.check_models_name()
@@ -535,6 +538,10 @@ class Controller:
 
     def update_scene(self):
         self.view.update_scene()
+        if self.scene.is_scene_printable():
+            self.enable_generate_button()
+        else:
+            self.disable_generate_button()
 
     def update_firmware(self):
         #TODO:Add code for update of firmware
@@ -575,7 +582,8 @@ class Controller:
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
         self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
 
     def set_camera_move_function(self):
@@ -710,7 +718,8 @@ class Controller:
     def check_rotation_axis(self, event):
         if self.settings['toolButtons']['rotateButton']:
             if self.find_object_and_rotation_axis_by_color(event):
-                self.view.update_scene()
+                self.update_scene()
+                #self.view.update_scene()
 
     def key_press_event(self, event):
         key = event.key()
@@ -815,7 +824,8 @@ class Controller:
                 #print("Jiny status nez model_view")
                 self.unselect_objects()
                 self.set_camera_rotation_function()
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def prepare_tool(self, event):
         if self.tool == 'rotate':
@@ -951,7 +961,8 @@ class Controller:
 
 
         self.last_pos = QtCore.QPoint(event.pos())
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
 
     def organize_button_pressed(self):
@@ -1216,7 +1227,8 @@ class Controller:
 
     def reset_scene(self):
         self.scene.clear_scene()
-        self.view.update_scene(True)
+        self.update_scene()
+        #self.view.update_scene(True)
 
     def clear_gui(self):
         self.view.reinit()
@@ -1248,7 +1260,8 @@ class Controller:
     def select_button_pressed(self):
         self.clear_tool_button_states()
         self.settings['toolButtons']['selectButton'] = True
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def move_button_pressed(self):
         if self.settings['toolButtons']['moveButton']:
@@ -1256,7 +1269,8 @@ class Controller:
         else:
             self.clear_tool_button_states()
             self.settings['toolButtons']['moveButton'] = True
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def rotate_button_pressed(self):
         if self.settings['toolButtons']['rotateButton']:
@@ -1264,7 +1278,8 @@ class Controller:
         else:
             self.clear_tool_button_states()
             self.settings['toolButtons']['rotateButton'] = True
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def scale_button_pressed(self):
         if self.settings['toolButtons']['scaleButton']:
@@ -1272,7 +1287,8 @@ class Controller:
         else:
             self.clear_tool_button_states()
             self.settings['toolButtons']['scaleButton'] = True
-        self.view.update_scene()
+        self.update_scene()
+        #self.view.update_scene()
 
     def place_on_face_button_pressed(self):
         #TODO:Add new tool
