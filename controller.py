@@ -155,7 +155,7 @@ class Controller:
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
 
 
-    #TODO:Better,
+    #TODO:Better construction
     def add_warning_message(self, object, problem):
         if problem == "out_of_printing_space":
             text = u"•  Object %s is out of printable area!" % object.filename
@@ -551,7 +551,10 @@ class Controller:
         object_settings = self.view.open_object_settings_dialog(object_id)
 
     def open_settings(self):
-        self.settings = self.view.open_settings_dialog()
+        temp_settings = self.view.open_settings_dialog()
+        if not temp_settings['language'] == self.settings['language']:
+            self.set_language(temp_settings['language'])
+        self.settings = temp_settings
 
     def open_about(self):
         self.view.open_about_dialog()
@@ -599,7 +602,7 @@ class Controller:
         self.camera_rotate = False
 
     def is_some_tool_under_cursor(self, object_id):
-        print("Is some tool under cursor")
+        #print("Is some tool under cursor")
         for tool in self.tools:
             if tool.id == object_id:
                 return True
@@ -649,7 +652,7 @@ class Controller:
 
     @staticmethod
     def is_ctrl_pressed():
-        print("is_ctrl_pressed")
+        #print("is_ctrl_pressed")
         modifiers = QtGui.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
             return True
@@ -923,7 +926,12 @@ class Controller:
 
                         alpha = numpy.arctan2(sin_ang, cos_ang)
 
-                        if new_vect_leng >= model.boundingSphereSize:
+                        radius = model.boundingSphereSize
+
+                        if radius < 2.5:
+                            radius = 2.5
+
+                        if new_vect_leng >= radius:
                             model.set_rot(model.rot[0], model.rot[1], alpha, False, False)
                             #print("New angle: " + str(numpy.degrees(alpha)))
                         else:
@@ -952,12 +960,28 @@ class Controller:
                     #l = numpy.linalg.norm(new_scale_vect)/numpy.linalg.norm(model.size_origin)
                     l = numpy.linalg.norm(new_scale_vect)
 
-                    print("original scale is: " + str(self.original_scale))
-                    print("new scale is: " + str(l))
+                    #print("original scale is: " + str(self.original_scale))
+                    #print("new scale is: " + str(l))
                     model.set_scale_abs(l, l, l)
                     #self.last_l = l
                     self.view.update_object_settings(model.id)
                     self.scene_was_changed()
+
+        else:
+            if self.render_status == 'model_view':
+                object_id = self.get_id_under_cursor(event)
+                if object_id > 0:
+                    #Je pod kurzorem nejaky tool?
+                    for tool in self.tools:
+                        if tool.id == object_id:
+                            tool.mouse_is_over(True)
+                        else:
+                            tool.mouse_is_over(False)
+                else:
+                    for tool in self.tools:
+                        tool.mouse_is_over(False)
+
+
 
 
         self.last_pos = QtCore.QPoint(event.pos())
@@ -1107,10 +1131,10 @@ class Controller:
     def set_printable(self, is_printable):
         self.scene.printable = is_printable
         if is_printable == False:
-            print("Disable genrate button")
+            #print("Disable genrate button")
             self.disable_generate_button()
         else:
-            print("Enable genrate button")
+            #print("Enable genrate button")
             self.enable_generate_button()
 
     def disable_generate_button(self):
@@ -1248,12 +1272,12 @@ class Controller:
         pass
 
     def undo_button_pressed(self):
-        print("Undo")
+        #print("Undo")
         self.clear_tool_button_states()
         self.scene.make_undo()
 
     def do_button_pressed(self):
-        print("Do")
+        #print("Do")
         self.clear_tool_button_states()
         self.scene.make_do()
 

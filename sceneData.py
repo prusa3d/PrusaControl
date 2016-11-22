@@ -234,10 +234,17 @@ class AppScene(object):
 
     def paste_selected_objects(self):
         for i in self.copied_models:
-            self.models.append(deepcopy(i))
+            m = deepcopy(i)
+            m.set_move([1.0,1.0,0.0], True, False)
+            self.models.append(m)
 
         #self.automatic_models_position()
 
+
+    def get_warnings(self):
+        #return all warnings for scene, objects out of scene, brim and support need etc...
+        #pass
+        return []
 
 
     def clear_scene(self):
@@ -256,8 +263,8 @@ class AppScene(object):
         self.models = sorted(self.models, key=lambda k: np.linalg.norm(k.size), reverse=True)
 
         #null position of all objects
-        zer = np.array([.0, .0, .0])
         for m in self.models:
+            zer = np.array([.0, .0, .0])
             m.pos[0] = zer[0]
             m.pos[1] = zer[1]
 
@@ -465,8 +472,8 @@ class Model(object):
         m.size_origin = deepcopy(self.size_origin)
 
         m.temp_mesh = deepcopy(self.mesh)
-        print("Udelana kopie")
-        print("Stary model ma id %s a ten novy ma %s" % (str(self.id), str(m.id)))
+        #print("Udelana kopie")
+        #print("Stary model ma id %s a ten novy ma %s" % (str(self.id), str(m.id)))
         return m
 
 
@@ -1116,10 +1123,10 @@ class ModelTypeObj(ModelTypeAbstract):
             model.filename = ""
 
 
-        print("Vertices N: " + str(len(vertices)))
-        print("Texcoords N: " + str(len(texcoords_array)))
-        print("Normals N: " + str(len(normals)))
-        print("Faces N: " + str(len(faces)))
+        #print("Vertices N: " + str(len(vertices)))
+        #print("Texcoords N: " + str(len(texcoords_array)))
+        #print("Normals N: " + str(len(normals)))
+        #print("Faces N: " + str(len(faces)))
 
 
         for face in faces:
