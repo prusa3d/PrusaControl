@@ -326,7 +326,10 @@ class AppScene(object):
         whole_scene.save(filename)
 
     def is_scene_printable(self):
-        for model in self.models:
+        scene_models = [m for m in self.models if m.isVisible]
+        if len(scene_models) == 0:
+            return False
+        for model in scene_models:
             if not model.is_in_printing_space(self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)):
                 return False
         return True
@@ -870,11 +873,18 @@ class Model(object):
         glEnableClientState(GL_NORMAL_ARRAY)
 
         if picking:
+            glDisable(GL_BLEND)
             glDisable(GL_LIGHTING)
         elif blending:
-            glDisable(GL_LIGHTING)
+            glCullFace(GL_FRONT_AND_BACK)
+            glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE)
+            glEnable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
+            glEnable(GL_BLEND)
         else:
+            glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
+            glCullFace(GL_FRONT)
+            glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
 

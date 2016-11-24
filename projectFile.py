@@ -114,13 +114,14 @@ class Version_1_0(VersionAbstract):
             models_tag = ET.SubElement(root, "models")
 
             for model in scene.models:
-                model_element = ET.SubElement(models_tag, "model", name=model.filename)
-                ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
-                ET.SubElement(model_element, "position").text=str(model.pos.tolist())
-                ET.SubElement(model_element, "rotation").text=str(model.rotation_matrix.tolist())
-                ET.SubElement(model_element, "scale").text=str(model.scale_matrix.tolist())
-                #ET.SubElement(model_element, "rotation").text=str([.0, .0, .0])
-                #ET.SubElement(model_element, "scale").text=str([1., 1., 1.])
+                if model.isVisible:
+                    model_element = ET.SubElement(models_tag, "model", name=model.filename)
+                    ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
+                    ET.SubElement(model_element, "position").text=str(model.pos.tolist())
+                    ET.SubElement(model_element, "rotation").text=str(model.rotation_matrix.tolist())
+                    ET.SubElement(model_element, "scale").text=str(model.scale_matrix.tolist())
+                    #ET.SubElement(model_element, "rotation").text=str([.0, .0, .0])
+                    #ET.SubElement(model_element, "scale").text=str([1., 1., 1.])
 
 
             #save xml file to new created zip file
@@ -129,16 +130,17 @@ class Version_1_0(VersionAbstract):
 
             #write stl files to zip file
             for model in scene.models:
-                #transform data to stl file
-                #mesh = self._create_mesh_from_model(model)
-                mesh = model.get_mesh(False, False)
+                if model.isVisible:
+                    #transform data to stl file
+                    #mesh = self._create_mesh_from_model(model)
+                    mesh = model.get_mesh(False, False)
 
-                #generate ascii format of stl(bug in numpy-stl)
-                #fileHandler = opened_zipfile.write(model.filename)
-                fileLike = StringIO()
-                mesh._write_ascii(fh=fileLike, name=model.filename)
-                openedZipfile.writestr(model.filename, fileLike.getvalue())
-                fileLike.close()
+                    #generate ascii format of stl(bug in numpy-stl)
+                    #fileHandler = opened_zipfile.write(model.filename)
+                    fileLike = StringIO()
+                    mesh._write_ascii(fh=fileLike, name=model.filename)
+                    openedZipfile.writestr(model.filename, fileLike.getvalue())
+                    fileLike.close()
 
         return True
 

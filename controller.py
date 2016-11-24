@@ -197,11 +197,21 @@ class Controller:
             config.write(configfile)
 
     def set_gcode_slider(self, min, max, min_l, max_l):
+        '''
         self.view.gcode_slider.setMinimum(min)
         self.view.gcode_slider.setMaximum(max)
 
         self.view.gcode_slider_min_l.setText(str(min_l))
         self.view.gcode_slider_max_l.setText(str(max_l))
+        '''
+
+        self.view.gcode_slider.setMinimum(min)
+        self.view.gcode_slider.setMaximum(max)
+
+        self.view.gcode_slider.min_label.setText(str(min_l))
+        self.view.gcode_slider.max_label.setText(str(max_l))
+
+
 
 
     def read_gcode(self, filename = ''):
@@ -239,6 +249,7 @@ class Controller:
     def scene_was_sliced(self):
         self.set_save_gcode_button()
         self.read_gcode()
+        self.view.gcode_slider.init_points()
         self.set_gcode_view()
         self.status = 'generated'
 
@@ -892,7 +903,8 @@ class Controller:
                 for model in self.scene.models:
                     if model.selected:
                         model.set_move(res_new)
-                        self.view.update_object_settings(model.id)
+                        #self.view.update_object_settings(model.id)
+                        self.view.update_position_widgets(model.id)
                         self.scene_was_changed()
                 self.res_old = res
 
@@ -939,7 +951,8 @@ class Controller:
                             #print("New round angle: " + str(alpha_new*45.))
                             model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False)
 
-                        self.view.update_object_settings(model.id)
+                        #self.view.update_object_settings(model.id)
+                        self.view.update_rotate_widgets(model.id)
                         self.scene_was_changed()
                 #self.res_old = res
 
@@ -964,7 +977,8 @@ class Controller:
                     #print("new scale is: " + str(l))
                     model.set_scale_abs(l, l, l)
                     #self.last_l = l
-                    self.view.update_object_settings(model.id)
+                    #self.view.update_object_settings(model.id)
+                    self.view.update_scale_widgets(model.id)
                     self.scene_was_changed()
 
         else:

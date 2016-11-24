@@ -446,11 +446,20 @@ class GLWidget(QGLWidget):
 
         elif not model_view:
             #render blended objects and layers of gcode to inspect it
+            #glEnable(GL_LIGHTING)
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
                     model.render(picking=False, blending=not model_view)
+            #glDisable(GL_LIGHTING)
 
-            self.draw_layer(self.controller.gcode_layer, printer)
+            color_change_list = [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
+
+            color = [255, 255, 255]
+            for color_change in color_change_list:
+                self.draw_layer(color_change, color, printer)
+
+            color = [255, 97, 0]
+            self.draw_layer(self.controller.gcode_layer, color, printer)
             glCallList(printing_space)
 
         self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
@@ -542,14 +551,14 @@ class GLWidget(QGLWidget):
     def draw_information_window(self):
         pass
 
-    def draw_layer(self, layer, printer):
+    def draw_layer(self, layer, color, printer):
         printing_space = printer['printing_space']
         #if self.controller.gcode_draw_from_button:
         #    keys = [i for i in self.controller.gcode.data_keys if i <= self.controller.gcode_layer]
         #    layer_datas = [self.controller.gcode.data[i] for i in keys]
         #else:
         #    layer_datas = [self.controller.gcode.data[self.controller.gcode_layer]]
-        layer_data = self.controller.gcode.data[self.controller.gcode_layer]
+        layer_data = self.controller.gcode.data[layer]
 
 
         glPushMatrix()
@@ -568,7 +577,7 @@ class GLWidget(QGLWidget):
         #for layer_data in layer_datas:
         for p in layer_data:
             if p[2] == 'E':
-                glColor3ub(255, 97, 0)
+                glColor3ub(color[0], color[1], color[2])
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
                 glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
         '''

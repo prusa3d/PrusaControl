@@ -20,11 +20,34 @@ import projectFile
 import sceneRender
 
 class Gcode_slider(QtGui.QWidget):
-    def __init__(self, other):
+    def __init__(self, other, controller):
         super(Gcode_slider, self).__init__()
+        self.controller = controller
         self.initUI()
 
     def initUI(self):
+        self.points = []
+        self.init_points()
+
+        '''
+        for i in xrange(0, 20):
+            self.points = []
+
+            label = QtGui.QLabel(self)
+            label.setObjectName("gcode_slider_point_label")
+            label.setVisible(False)
+            label.setFixedWidth(50)
+            button = QtGui.QPushButton('', self)
+            button.setObjectName("gcode_slider_point_button")
+            button.setVisible(False)
+            button.setFixedWidth(20)
+
+            self.points.append({'value' : -1,
+                'label': label,
+                'button': button
+            })
+        '''
+
 
         self.max_label = QtGui.QLabel(self)
         self.max_label.setObjectName("gcode_slider_max_label")
@@ -36,7 +59,7 @@ class Gcode_slider(QtGui.QWidget):
         self.min_label.setText("Min")
         self.min_label.setAlignment(Qt.AlignCenter)
 
-        main_layout = QtGui.QVBoxLayout()
+        main_layout = QtGui.QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
 
         self.slider = QtGui.QSlider()
@@ -44,15 +67,29 @@ class Gcode_slider(QtGui.QWidget):
         #self.slider.setFixedWidth(144)
         self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
 
+        '''
+        self.style = QtGui.QApplication.style()
+        self.opt = QtGui.QStyleOptionSlider()
+        self.slider.initStyleOption(self.opt)
+
+        rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
+        myPoint = rectHandle.topRight() + self.slider.pos()
+        '''
+
         self.value_label = QtGui.QLabel(self)
         self.value_label.setObjectName("gcode_slider_value_label")
-        self.value_label.setText("-  0.00")
+        self.value_label.setVisible(False)
+        self.value_label.setText(u"─  0.00")
         self.value_label.setFixedWidth(50)
-        self.add_button = QtGui.QPushButton("+", self)
+
+        self.add_button = QtGui.QPushButton("", self)
+        self.add_button.setObjectName("gcode_slider_add_button")
+        self.add_button.setVisible(False)
         self.add_button.setFixedWidth(20)
+
         self.add_button.clicked.connect(self.add_point)
 
-        self.point_label = QtGui.QLabel(self)
+        #self.point_label = QtGui.QLabel(self)
 
 
 
@@ -64,6 +101,7 @@ class Gcode_slider(QtGui.QWidget):
 
         self.setLayout(main_layout)
 
+
         self.style = QtGui.QApplication.style()
         self.opt = QtGui.QStyleOptionSlider()
         self.slider.initStyleOption(self.opt)
@@ -71,51 +109,83 @@ class Gcode_slider(QtGui.QWidget):
         self.set_value_label(0.00)
 
 
+    def init_points(self):
+        self.points = []
+
+        for i in xrange(0, 20):
+            label = QtGui.QLabel(self)
+            label.setObjectName("gcode_slider_point_label")
+            label.setVisible(False)
+            label.setFixedWidth(50)
+            button = QtGui.QPushButton('', self)
+            button.setObjectName("gcode_slider_point_button")
+            button.setVisible(False)
+            button.setFixedWidth(20)
+
+            self.points.append({'value': -1,
+                                'label': label,
+                                'button': button
+                                })
+
     def add_point(self):
-        print("Add point")
         self.slider.initStyleOption(self.opt)
 
         rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
         myPoint = rectHandle.topRight() + self.slider.pos()
 
         value = self.slider.value()
+        layer_value = self.controller.gcode.data_keys[value]
 
         #delete_button = QtGui.QPushButton("X", self)
         #delete_button.setFixedWidth(20)
         #self.point_label = QtGui.QLabel(self)
-        self.point_label.setText("%3.2f  -" % value)
-        self.point_label.setFixedWidth(50)
-
-        self.point_label.move(self.slider.width(), myPoint.y() - 15)
-        #delete_button.move(self.slider.width(), myPoint.y() - 15)
-
-        print("podle vseho se podarilo ten objekt vytvorit")
-
-        #delete_button.repaint()
-        #point_label.repaint()
+        number = 0
 
 
-    #TODO:Find a way!!!!
+        for p in self.points:
+            if p['value'] == layer_value:
+                return
+
+        for i, p in enumerate(self.points):
+            number = i
+            if p['value'] == -1:
+                break
+
+        self.points[number]['value'] = layer_value
+
+        self.points[number]['button'].setVisible(True)
+        self.points[number]['button'].move(10, myPoint.y() - 9)
+        self.points[number]['button'].clicked.connect(lambda: self.delete_point(number))
+
+        self.points[number]['label'].setText(u"%s  ─" % layer_value)
+        self.points[number]['label'].setVisible(True)
+        self.points[number]['label'].move(35, myPoint.y() - 9)
+
+
+
+    def delete_point(self, number):
+        self.points[number]['value'] = -1
+        self.points[number]['button'].setVisible(False)
+        self.points[number]['label'].setVisible(False)
+
+
     def set_value_label(self, value):
-        '''
-        style = QtGui.QApplication.style()
-        opt = QtGui.QStyleOptionSlider()
-        self.slider.initStyleOption(self.opt)
-        '''
         self.slider.initStyleOption(self.opt)
 
         #rectHandle = style.subControlRect(QtGui.QStyle.CC_Slider, opt, QtGui.QStyle.SC_SliderHandle, self)
         rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
-
-
         myPoint = rectHandle.topRight() + self.slider.pos()
 
-        self.value_label.setText("-  %3.2f" % value)
-        self.value_label.move(self.slider.width() + 85, myPoint.y() - 9)
-        self.add_button.move(self.slider.width() + 135, myPoint.y() - 9)
+        if self.controller.gcode:
+            layer_value = self.controller.gcode.data_keys[value]
+        else:
+            layer_value = "0.00"
+        self.value_label.setText(u"─  %s" % layer_value)
+        self.value_label.move(self.slider.width() + 90, myPoint.y() - 9)
+        self.add_button.move(self.slider.width() + 145, myPoint.y() - 9)
 
-        #self.value_label.repaint()
-        #self.add_button.repaint()
+        self.add_button.setVisible(True)
+        self.value_label.setVisible(True)
 
 
     def setRange(self, rangeMin, rangeMax):
@@ -134,7 +204,7 @@ class Gcode_slider(QtGui.QWidget):
         self.slider.setTickInterval(tick)
 
     def setValue(self, value):
-        self.value_label.setText("%3.2f" % value)
+        self.value_label.setText(u"─  %3.2f" % value)
         self.slider.setValue(value)
 
     def setTickPosition(self, position):
@@ -142,10 +212,12 @@ class Gcode_slider(QtGui.QWidget):
 
     def setMinimum(self, minimum):
         #self.min_label.setText("%.2f" % minimum)
+        print(str(minimum))
         self.slider.setMinimum(minimum)
 
     def setMaximum(self, maximum):
         #self.max_label.setText("%.2f" % maximum)
+        print(str(maximum))
         self.slider.setMaximum(maximum)
 
 
@@ -636,12 +708,12 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_display_units_cb.setCurrentIndex(0)
         self.gcode_display_units_cb.setObjectName("gcode_display_units_cb")
 
-        self.gcode_slider_min_l = QtGui.QLabel("0.00")
-        self.gcode_slider_min_l.setObjectName("gcode_slider_min_l")
-        self.gcode_slider_min_l.setAlignment(Qt.AlignRight)
-        self.gcode_slider_max_l = QtGui.QLabel("0.00")
-        self.gcode_slider_max_l.setObjectName("gcode_slider_max_l")
-        self.gcode_slider_max_l.setAlignment(Qt.AlignRight)
+        #self.gcode_slider_min_l = QtGui.QLabel("0.00")
+        #self.gcode_slider_min_l.setObjectName("gcode_slider_min_l")
+        #self.gcode_slider_min_l.setAlignment(Qt.AlignRight)
+        #self.gcode_slider_max_l = QtGui.QLabel("0.00")
+        #self.gcode_slider_max_l.setObjectName("gcode_slider_max_l")
+        #self.gcode_slider_max_l.setAlignment(Qt.AlignRight)
 
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
@@ -849,6 +921,54 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def get_object_id(self):
         return self.object_id
+
+
+    def update_position_widgets(self, object_id):
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        self.object_id = object_id
+
+        self.edit_pos_x.setDisabled(True)
+        self.edit_pos_x.setValue(mesh.pos[0] * 10)
+        self.edit_pos_x.setDisabled(False)
+
+        self.edit_pos_y.setDisabled(True)
+        self.edit_pos_y.setValue(mesh.pos[1] * 10)
+        self.edit_pos_y.setDisabled(False)
+
+        self.edit_pos_z.setDisabled(True)
+        self.edit_pos_z.setValue(mesh.pos[2] * 10)
+        self.edit_pos_z.setDisabled(False)
+
+
+    def update_rotate_widgets(self, object_id):
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        self.object_id = object_id
+        self.edit_rot_x.setDisabled(True)
+        self.edit_rot_x.setValue(np.rad2deg(mesh.rot[0]))
+        self.edit_rot_x.setDisabled(False)
+
+        self.edit_rot_y.setDisabled(True)
+        self.edit_rot_y.setValue(np.rad2deg(mesh.rot[1]))
+        self.edit_rot_y.setDisabled(False)
+
+        self.edit_rot_z.setDisabled(True)
+        self.edit_rot_z.setValue(np.rad2deg(mesh.rot[2]))
+        self.edit_rot_z.setDisabled(False)
+
+
+    #TODO:Dodelat!!!
+    def update_scale_widgets(self, object_id):
+        mesh = self.controller.get_object_by_id(object_id)
+        if not mesh:
+            return
+        self.object_id = object_id
+        self.set_scale_widgets(mesh)
+
+
 
     def update_object_settings(self, object_id):
         if self.is_setting_panel_opened:
@@ -1417,7 +1537,10 @@ class PrusaControlView(QtGui.QMainWindow):
         self.infillLabel.setText(self.tr("Infill") + " " + str(val) + "%")
 
     def create_slider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100, orientation=QtCore.Qt.Horizontal, base_class=QtGui.QSlider):
-        slider = base_class(orientation)
+        if base_class == Gcode_slider:
+            slider = base_class(orientation, self.controller)
+        else:
+            slider = base_class(orientation)
 
         slider.setRange(rangeMin, rangeMax)
         slider.setSingleStep(10)
