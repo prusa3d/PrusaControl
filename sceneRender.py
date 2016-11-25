@@ -280,6 +280,12 @@ class GLWidget(QGLWidget):
                                         self.texture_from_png("data/img/gui/Organize_Hover.png"),
                                         self.texture_from_png("data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -335.], True, 'organize')
+        self.multiply_tool = GlButton(self.texture_from_png("data/img/gui/Multi_Off.png"),
+                                      self.texture_from_png("data/img/gui/Multi_On.png"),
+                                      self.texture_from_png("data/img/gui/Multi_Hover.png"),
+                                      self.texture_from_png("data/img/gui/tool_mask.png"),
+                                      [40., 40.], [10., -380.], False, 'multi')
+
 
 
         #back, forward buttons
@@ -290,7 +296,7 @@ class GLWidget(QGLWidget):
                                     [40., 40.], [10, -50], True)
         self.do_button = GlButton(self.texture_from_png("data/img/gui/ForwardArrow_Off.png"),
                                   self.texture_from_png("data/img/gui/ForwardArrow_On.png"),
-                                  self.texture_from_png("data/img/gui/BackArrow_Hover.png"),
+                                  self.texture_from_png("data/img/gui/ForwardArrow_Hover.png"),
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
                                   [40., 40.], [60, -50], True)
 
@@ -309,7 +315,7 @@ class GLWidget(QGLWidget):
         self.popup_widget = self.texture_from_png("data/img/gui/popup_window.png")
 
 
-        self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
+        self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.undo_button, self.do_button]
         #self.tools = []
 
         self.bed = {}
@@ -578,6 +584,10 @@ class GLWidget(QGLWidget):
         for p in layer_data:
             if p[2] == 'E':
                 glColor3ub(color[0], color[1], color[2])
+                glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
+                glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
+            elif p[2] == 'M':
+                glColor3f(0.0, 0.0, 1.0)
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
                 glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
         '''

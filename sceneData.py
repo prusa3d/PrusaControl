@@ -876,14 +876,12 @@ class Model(object):
             glDisable(GL_BLEND)
             glDisable(GL_LIGHTING)
         elif blending:
-            glCullFace(GL_FRONT_AND_BACK)
-            glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE)
+            glCullFace(GL_BACK)
+            glEnable(GL_CULL_FACE)
             glEnable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
             glEnable(GL_BLEND)
         else:
-            glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
-            glCullFace(GL_FRONT)
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
@@ -892,7 +890,7 @@ class Model(object):
             glColor3ubv(self.colorId)
         else:
             if blending:
-                glColor4ub(175, 175, 175, 175)
+                glColor4ub(175, 175, 175, 150)
                 #glColor4f(.4, .4, .4, .75)
             else:
                 if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
@@ -920,6 +918,20 @@ class Model(object):
             glDisable(GL_DEPTH_TEST)
             glColor3ub(255, 97, 0)
             self.parent.controller.view.glWidget.renderText(0., 0., 0., "!", font)
+            glEnable(GL_DEPTH_TEST)
+
+        if blending:
+            glCullFace(GL_BACK)
+            glDisable(GL_CULL_FACE)
+            glDisable(GL_BLEND)
+            glEnable(GL_LIGHTING)
+            glEnable(GL_DEPTH_TEST)
+        else:
+            #glDisable(GL_CULL_FACE)
+            #glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
+            #glCullFace(GL_FRONT)
+            glDisable(GL_BLEND)
+            glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
 
         glPopMatrix()

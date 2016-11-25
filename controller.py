@@ -595,7 +595,7 @@ class Controller:
 
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
-        self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
+        #self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
         self.update_scene()
         #self.view.update_scene()
 

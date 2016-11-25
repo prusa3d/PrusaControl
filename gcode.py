@@ -1,6 +1,7 @@
 import time
 #from fastnumbers import fast_float
 from copy import deepcopy
+from pprint import pprint
 
 
 def timing(f):
@@ -28,7 +29,8 @@ class GCode(object):
         self.all_data = []
         self.data_keys = []
         self.actual_z = '0.0'
-        self.last_point = []
+        self.last_point = [0.0, 0.0, 0.0]
+        self.actual_point = [0.0, 0.0, 0.0]
 
 
 
@@ -41,12 +43,16 @@ class GCode(object):
                 if bits[0] == '':
                     continue
                 if 'G1' in bits[0]:
-                    self.parse_line(bits[0])
+                    self.parse_g1_line(bits[0])
                 else:
                     continue
 
-    def parse_line(self, text):
+        pprint(self.all_data[0])
+
+    #only G1 lines
+    def parse_g1_line(self, text):
         line = text.split(' ')
+        line = filter(None, line)
         if 'Z' in line[1]:
             #Set of Z axis
             self.actual_z = line[1][1:]
@@ -55,22 +61,44 @@ class GCode(object):
 
         if len(line)<4:
             return
+
         elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]):
             #Move point
-            actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
+            self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
-                self.add_line(self.last_point, actual_point, self.actual_z, 'M')
-                self.last_point = deepcopy(actual_point)
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'M')
+                self.last_point = deepcopy(self.actual_point)
             else:
-                self.last_point = deepcopy(actual_point)
+                self.last_point = deepcopy(self.actual_point)
         elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
             #Extrusion point
-            actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
+            self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
-                self.add_line(self.last_point, actual_point, self.actual_z, 'E')
-                self.last_point = deepcopy(actual_point)
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E')
+                self.last_point = deepcopy(self.actual_point)
             else:
-                self.last_point = deepcopy(actual_point)
+                self.last_point = deepcopy(self.actual_point)
+        elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
+            print("nasel samostatne X")
+            #Extrusion point
+            self.actual_point[0] = float(line[1][1:])
+
+            if self.last_point:
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E')
+                self.last_point = deepcopy(self.actual_point)
+            else:
+                self.last_point = deepcopy(self.actual_point)
+        elif 'Y' in line[1] and 'F' in line[2]:
+            print("nasel samostatne Y")
+            #Move point
+            self.actual_point[1] = float(line[1][1:])
+
+            if self.last_point:
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'M')
+                self.last_point = deepcopy(self.actual_point)
+            else:
+                self.last_point = deepcopy(self.actual_point)
+
         return
 
     def add_line(self, first_point, second_point, actual_z, type):

@@ -43,7 +43,7 @@ QComboBox {
     color:rgb(255, 255, 255);
 }
 
-QComboBox#combobox_scale_units, QComboBox#gcode_display_units_cb {
+QComboBox#combobox_scale_units {
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 1px 3px;
     font-size: 12px;
@@ -158,7 +158,7 @@ QLabel#x_pos_l:disabled, QLabel#y_pos_l:disabled, QLabel#z_pos_l:disabled, QLabe
 QLabel#y_rot_l:disabled, QLabel#z_rot_l:disabled, QLabel#x_scale_l:disabled, QLabel#y_scale_l:disabled,
 QLabel#z_scale_l:disabled, QLabel#units_l:disabled, QLabel#lock_scale_axes_l:disabled, QLabel#position_l:disabled,
 QLabel#rotation_l:disabled, QLabel#scale_l:disabled, QLabel#filename_label:disabled, QLabel#name_l:disabled,
-QLabel#place_on_zero_l:disabled, QLabel#gcode_display_units_l:disabled, QLabel#gcode_slider_min_l:disabled,
+QLabel#place_on_zero_l:disabled, QLabel#gcode_slider_min_l:disabled,
 QLabel#gcode_slider_max_l:disabled {
     color: rgb(112, 112, 112);
     background-color:rgb(89, 89, 89);
@@ -172,11 +172,17 @@ QGroupBox::title{
 QLabel#x_pos_l, QLabel#y_pos_l, QLabel#z_pos_l, QLabel#x_rot_l, QLabel#y_rot_l, QLabel#z_rot_l,
 QLabel#x_scale_l, QLabel#y_scale_l, QLabel#z_scale_l, QLabel#units_l, QLabel#lock_scale_axes_l,
 QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#filename_label, QLabel#name_l,
-QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l, QLabel#gcode_display_units_l,
-QLabel#gcode_slider_min_l, QLabel#gcode_slider_max_l
+QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l,
+QLabel#gcode_slider_min_l, QLabel#gcode_slider_max_l, QLabel#gcode_slider_min_label, QLabel#gcode_slider_max_label,
+QLabel#gcode_slider_value_label, QLabel#gcode_slider_point_label
 {
     background-color:rgb(77, 77, 77);
 }
+
+QLabel#gcode_slider_point_label{
+    background-color: transparent;
+}
+
 
 /*
 QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l{
@@ -258,6 +264,31 @@ QPushButton#generateButton, QPushButton#gcode_back_b {
     color:rgb(255, 255, 255);
     border-radius: 5px;
     text-align:center;
+}
+
+
+QPushButton#gcode_slider_add_button,
+QPushButton#gcode_slider_add_button:pressed,
+QPushButton#gcode_slider_add_button:flat,
+QPushButton#gcode_slider_add_button:hover
+{
+    image: url(data/img/gui/plusButton.png);
+    background-color: transparent;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
+QPushButton#gcode_slider_point_button,
+QPushButton#gcode_slider_point_button:pressed,
+QPushButton#gcode_slider_point_button:flat,
+QPushButton#gcode_slider_point_button:hover
+{
+    image: url(data/img/gui/deleteButton.png);
+    background-color: transparent;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
 }
 
 QPushButton#generateButton:disabled{

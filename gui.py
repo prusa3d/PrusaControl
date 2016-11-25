@@ -110,22 +110,31 @@ class Gcode_slider(QtGui.QWidget):
 
 
     def init_points(self):
-        self.points = []
+        if self.points:
+            for point in self.points:
+                point['value'] = -1
 
-        for i in xrange(0, 20):
-            label = QtGui.QLabel(self)
-            label.setObjectName("gcode_slider_point_label")
-            label.setVisible(False)
-            label.setFixedWidth(50)
-            button = QtGui.QPushButton('', self)
-            button.setObjectName("gcode_slider_point_button")
-            button.setVisible(False)
-            button.setFixedWidth(20)
+                point['label'].setText('')
+                point['label'].move(0,0)
+                point['label'].setVisible(False)
+                point['button'].move(0,0)
+                point['button'].setVisible(False)
 
-            self.points.append({'value': -1,
-                                'label': label,
-                                'button': button
-                                })
+        else:
+            for i in xrange(0, 20):
+                label = QtGui.QLabel(self)
+                label.setObjectName("gcode_slider_point_label")
+                label.setVisible(False)
+                label.setFixedWidth(50)
+                button = QtGui.QPushButton('', self)
+                button.setObjectName("gcode_slider_point_button")
+                button.setVisible(False)
+                button.setFixedWidth(20)
+
+                self.points.append({'value': -1,
+                                    'label': label,
+                                    'button': button
+                                    })
 
     def add_point(self):
         self.slider.initStyleOption(self.opt)
@@ -691,29 +700,10 @@ class PrusaControlView(QtGui.QMainWindow):
         self.place_on_zero_l = QtGui.QLabel(self.tr("Place on pad"))
         self.place_on_zero_l.setObjectName("place_on_zero_l")
 
-
-
-
-
         # Object settings layout
 
         # Gcode view layout
-        self.gcode_view_layout = QtGui.QVBoxLayout()
-
-        self.gcode_display_units_l = QtGui.QLabel(self.tr("Units"))
-        self.gcode_display_units_l.setObjectName("gcode_display_units_l")
-
-        self.gcode_display_units_cb = QtGui.QComboBox()
-        self.gcode_display_units_cb.addItems(["mm", "%"])
-        self.gcode_display_units_cb.setCurrentIndex(0)
-        self.gcode_display_units_cb.setObjectName("gcode_display_units_cb")
-
-        #self.gcode_slider_min_l = QtGui.QLabel("0.00")
-        #self.gcode_slider_min_l.setObjectName("gcode_slider_min_l")
-        #self.gcode_slider_min_l.setAlignment(Qt.AlignRight)
-        #self.gcode_slider_max_l = QtGui.QLabel("0.00")
-        #self.gcode_slider_max_l.setObjectName("gcode_slider_max_l")
-        #self.gcode_slider_max_l.setAlignment(Qt.AlignRight)
+        #self.gcode_view_layout = QtGui.QVBoxLayout()
 
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
@@ -1305,8 +1295,8 @@ class PrusaControlView(QtGui.QMainWindow):
         gcode_view_layout.setRowMinimumHeight(2, 350)
 
 
-        gcode_view_layout.addWidget(self.gcode_display_units_l, 0, 0)
-        gcode_view_layout.addWidget(self.gcode_display_units_cb, 0, 1)
+        #gcode_view_layout.addWidget(self.gcode_display_units_l, 0, 0)
+        #gcode_view_layout.addWidget(self.gcode_display_units_cb, 0, 1)
         #gcode_view_layout.addWidget(self.gcode_slider_max_l, 1, 0)
         gcode_view_layout.addWidget(self.gcode_slider, 1, 0, 3, 3)
         #gcode_view_layout.addWidget(self.gcode_slider_min_l, 3, 0)
