@@ -586,10 +586,10 @@ class GLWidget(QGLWidget):
                 glColor3ub(color[0], color[1], color[2])
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
                 glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
-            elif p[2] == 'M':
-                glColor3f(0.0, 0.0, 1.0)
-                glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
-                glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
+            #elif p[2] == 'M':
+            #    glColor3f(0.0, 0.0, 1.0)
+            #    glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
+            #    glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
         '''
         else:
             glColor3f(0.0, 0.0, 1.0)
@@ -604,11 +604,74 @@ class GLWidget(QGLWidget):
     def draw_tools_helper(self, model, settings, picking=False):
         if picking:
             rotateColors = [model.rotateColorXId, model.rotateColorYId, model.rotateColorZId]
+            scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
         else:
             rotateColors = [[180,180,180],[180,180,180],[180,180,180]]
+            scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
 
         if settings['toolButtons']['rotateButton']:
-            self.draw_rotation_circles(model, rotateColors, [i+o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
+            self.draw_rotation_circles(model, rotateColors, [i + o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
+        elif settings['toolButtons']['scaleButton']:
+            self.draw_scale_rect(model, scaleColors, [i + o for i, o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
+
+
+    def draw_scale_rect(self, model, colors, position, radius, picking=False):
+        actual_angle = numpy.rad2deg(model.rot[2])
+
+        if not picking:
+                colors[3] = [255, 255, 255]
+
+
+        glPushMatrix()
+        glTranslatef(position[0], position[1], 0.0)
+        glDisable( GL_LIGHTING )
+        glDisable(GL_DEPTH_TEST)
+
+
+        if picking:
+            glColor3ubv(colors[3])
+            if picking:
+                glLineWidth(5)
+            else:
+                glLineWidth(2.5)
+
+            '''
+            glBegin(GL_LINES)
+            glVertex3f(0., 0., 0.)
+            glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1] * -1., 0.)
+            glEnd()
+            '''
+
+        else:
+            glColor3ubv(colors[3])
+            #inner lines
+
+            glBegin(GL_LINE_LOOP)
+            glVertex3f(model.min[0], model.min[1], 0.)
+            glVertex3f(model.min[0], model.max[1], 0.)
+            glVertex3f(model.max[0], model.max[1], 0.)
+            glVertex3f(model.max[0], model.min[1], 0.)
+            glEnd()
+
+            glLineStipple(4, 0xAAAA)
+            glEnable(GL_LINE_STIPPLE)
+
+            glLineWidth(2.5)
+
+            glBegin(GL_LINES)
+            glVertex3f(model.max[0], model.max[1], 0.)
+            glVertex3f(model.min[0], model.min[1], 0.)
+            glEnd()
+
+            glDisable(GL_LINE_STIPPLE)
+
+            #self.renderText(0., 0., 0., "%s" % str(model.size_origin))
+
+
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_LIGHTING)
+        glPopMatrix()
+
 
     def draw_rotation_circles(self, model, colors, position, radius, picking=False):
 

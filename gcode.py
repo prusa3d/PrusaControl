@@ -3,6 +3,8 @@ import time
 from copy import deepcopy
 from pprint import pprint
 
+import numpy as np
+
 
 def timing(f):
     def wrap(*args):
@@ -29,6 +31,7 @@ class GCode(object):
         self.all_data = []
         self.data_keys = []
         self.actual_z = '0.0'
+        self.speed = 0.0
         self.last_point = [0.0, 0.0, 0.0]
         self.actual_point = [0.0, 0.0, 0.0]
 
@@ -47,7 +50,21 @@ class GCode(object):
                 else:
                     continue
 
-        pprint(self.all_data[0])
+        time_of_print = self.calculate_time_of_print()
+        print("Doba tisku by mela byt [m]: %.2f" % time_of_print)
+
+    def calculate_time_of_print(self):
+        time_of_print = 0.0
+        for line in self.all_data:
+            a = np.array(line[0])
+            b = np.array(line[1])
+            speed = line[3] #mm/min
+            vect = b-a
+            leng = np.linalg.norm(vect)
+            time = leng / speed
+            time_of_print += time
+
+        return time_of_print
 
     #only G1 lines
     def parse_g1_line(self, text):
@@ -55,18 +72,20 @@ class GCode(object):
         line = filter(None, line)
         if 'Z' in line[1]:
             #Set of Z axis
-            self.actual_z = line[1][1:]
+            self.actual_z = "%.2f" % float(line[1][1:])
+
             self.last_point =[]
             return
 
-        if len(line)<4:
+        if 'F' in line[1]:
+            self.speed = float(line[1][1:])
+        elif len(line)<4:
             return
-
-        elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]):
+        elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]) and 'F' in line[3]:
             #Move point
             self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'M')
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]))
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
@@ -74,7 +93,11 @@ class GCode(object):
             #Extrusion point
             self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E')
+                if float(line[3][1:])>0.:
+                    type = 'E'
+                else:
+                    type = 'M'
+                self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed)
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
@@ -84,7 +107,11 @@ class GCode(object):
             self.actual_point[0] = float(line[1][1:])
 
             if self.last_point:
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E')
+                if float(line[2][1:])>0.:
+                    type = 'E'
+                else:
+                    type = 'M'
+                self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]))
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
@@ -94,23 +121,23 @@ class GCode(object):
             self.actual_point[1] = float(line[1][1:])
 
             if self.last_point:
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'M')
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]))
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
 
         return
 
-    def add_line(self, first_point, second_point, actual_z, type):
+    def add_line(self, first_point, second_point, actual_z, type, speed=0.):
         key = actual_z
         if key in self.data_keys:
-            self.data[key].append([first_point, second_point, type])
-            self.all_data.append([first_point, second_point, type])
+            self.data[key].append([first_point, second_point, type, speed])
+            self.all_data.append([first_point, second_point, type, speed])
         else:
             self.data_keys.append(key)
             self.data[key] = []
-            self.data[key].append([first_point, second_point, type])
-            self.all_data.append([first_point, second_point, type])
+            self.data[key].append([first_point, second_point, type, speed])
+            self.all_data.append([first_point, second_point, type, speed])
 
 
 
