@@ -156,6 +156,7 @@ class Controller:
 
 
     #TODO:Better construction
+    '''
     def add_warning_message(self, object, problem):
         if problem == "out_of_printing_space":
             text = u"•  Object %s is out of printable area!" % object.filename
@@ -165,6 +166,28 @@ class Controller:
             pass
         else:
             self.warning_message_buffer.append(u"•  Object %s has some other problem!" % object.filename)
+    '''
+
+    def get_informations(self):
+        if not self.gcode:
+            return
+
+        printing_time = self.gcode.printing_time
+        filament_length = self.gcode.filament_length
+
+        printing_time_str = self.convert_printing_time_from_seconds(printing_time)
+        filament_length_str = "%.2d m" % (filament_length)
+
+        data = {'info_text': 'info total:',
+                'printing_time': printing_time_str,
+                'filament_lenght': filament_length_str}
+
+        return data
+
+    def convert_printing_time_from_seconds(self, seconds):
+        m, s = divmod(seconds, 60)
+        h, m = divmod(m, 60)
+        return "%02d:%02d:%02d" % (h, m, s)
 
 
     def clear_event_flag_status(self):
@@ -583,7 +606,8 @@ class Controller:
         exit()
 
     def set_print_info_text(self, string):
-        self.view.set_print_info_text(string)
+
+        self.gcode.set_print_info_text(string)
 
     def scene_was_changed(self):
         if self.status == 'generating':
@@ -779,6 +803,7 @@ class Controller:
                 else:
                     #Je pod kurzorem nejaky tool?
                     if self.is_some_tool_under_cursor(object_id):
+                        self.unselect_objects()
                         self.tool_press_event_flag = True
                         tool = self.get_tool_by_id(object_id)
                         for t in self.tools:

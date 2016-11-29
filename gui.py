@@ -11,6 +11,7 @@ from PyQt4 import QtGui
 
 from PyQt4.QtCore import QDateTime, Qt
 from PyQt4.QtCore import QRect
+from PyQt4.QtCore import QSettings
 from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
@@ -66,6 +67,7 @@ class Gcode_slider(QtGui.QWidget):
         self.slider.setOrientation(QtCore.Qt.Vertical)
         #self.slider.setFixedWidth(144)
         self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
+        self.slider.setTickInterval(1)
 
         '''
         self.style = QtGui.QApplication.style()
@@ -448,11 +450,12 @@ class PrusaControlView(QtGui.QMainWindow):
         self.controller = c
         super(PrusaControlView, self).__init__()
 
-
+        self.settings = QSettings("Prusa Research", "PrusaControl")
+        self.restoreGeometry(self.settings.value("geometry", "").toByteArray())
+        self.restoreState(self.settings.value("windowState", "").toByteArray())
 
         font_id = QFontDatabase.addApplicationFont("data/font/TitilliumWeb-Light.ttf")
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
-        print(str(font_family))
         self.font = QFont(font_family)
         self.setFont(self.font)
 
@@ -716,7 +719,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.right_panel = QtGui.QWidget(self)
         self.right_panel.setObjectName('right_panel')
-        self.right_panel_layout = QtGui.QFormLayout()
+        #self.right_panel_layout = QtGui.QFormLayout()
+        self.right_panel_layout = QtGui.QVBoxLayout()
         self.right_panel_layout.setObjectName('right_panel_layout')
         self.right_panel_layout.setSpacing(5)
         self.right_panel_layout.setMargin(0)
@@ -793,20 +797,41 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.send_feedback_button.clicked.connect(self.controller.send_feedback)
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
-        self.right_panel_layout.addRow(self.printer_settings_l)
-        self.right_panel_layout.addRow(self.materialLabel, self.materialCombo)
-        self.right_panel_layout.addRow(self.qualityLabel, self.qualityCombo)
-        self.right_panel_layout.addRow(self.infillLabel, self.infillSlider)
-        self.right_panel_layout.addRow(self.supportLabel, self.supportCombo)
-        self.right_panel_layout.addRow(self.brim_label, self.brimCheckBox)
+        printing_parameters_layout = QtGui.QGridLayout()
+        #TODO:How???
+        printing_parameters_layout.setRowMinimumHeight(0, 65)
 
-        self.right_panel_layout.addRow(self.object_group_box)
-        self.right_panel_layout.addRow(self.gcode_group_box)
+        printing_parameters_layout.addWidget(self.printer_settings_l, 0, 0, 1, 3)
+        printing_parameters_layout.addWidget(self.materialLabel, 1,0)
+        printing_parameters_layout.addWidget(self.materialCombo, 1, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.qualityLabel, 2, 0)
+        printing_parameters_layout.addWidget(self.qualityCombo, 2, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.infillLabel, 3, 0)
+        printing_parameters_layout.addWidget(self.infillSlider, 3, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.supportLabel, 4, 0)
+        printing_parameters_layout.addWidget(self.supportCombo, 4, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.brim_label, 5, 0)
+        printing_parameters_layout.addWidget(self.brimCheckBox, 5, 1, 1, 3)
+
+        '''
+        printing_parameters_layout.addRow(self.printer_settings_l)
+        printing_parameters_layout.addRow(self.materialLabel, self.materialCombo)
+        printing_parameters_layout.addRow(self.qualityLabel, self.qualityCombo)
+        printing_parameters_layout.addRow(self.infillLabel, self.infillSlider)
+        printing_parameters_layout.addRow(self.supportLabel, self.supportCombo)
+        printing_parameters_layout.addRow(self.brim_label, self.brimCheckBox)
+        '''
+
+        self.right_panel_layout.addLayout(printing_parameters_layout)
+
+        self.right_panel_layout.addWidget(self.object_group_box)
+        self.right_panel_layout.addWidget(self.gcode_group_box)
+        self.right_panel_layout.addStretch()
         #self.right_panel_layout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
 
-        self.right_panel_layout.addRow(self.generateButton)
-        self.right_panel_layout.addRow(self.progressBar)
+        self.right_panel_layout.addWidget(self.generateButton)
+        self.right_panel_layout.addWidget(self.progressBar)
 
         #TODO:Where to put this information? Info box?
         #self.right_panel_layout.addRow(self.printingInfoLabel)
@@ -822,27 +847,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_label = QLabel("0")
         self.gcode_label.setMaximumWidth(40)
         self.gcode_label.setAlignment(Qt.AlignCenter)
-
-        #self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical)
-        #self.gcode_from_button_checkbox = QtGui.QCheckBox(self.tr("From button"))
-        #self.gcode_from_button_checkbox.setChecked(True)
-        #self.gcode_from_button_checkbox.clicked.connect(self.set_gcode_draw_layers_from_button)
-
-
-        '''
-        self.gcode_cancel_button = QPushButton('X')
-        self.gcode_cancel_button.setMaximumWidth(40)
-        self.gcode_cancel_button.clicked.connect(self.controller.set_model_edit_view)
-        gcode_panel_layout = QVBoxLayout()
-        gcode_panel_layout.setMargin(0)
-        gcode_panel_layout.setSpacing(0)
-        gcode_panel_layout.addWidget(self.gcode_label)
-        gcode_panel_layout.addWidget(self.gcode_slider)
-        #gcode_panel_layout.addWidget(self.gcode_from_button_checkbox)
-        gcode_panel_layout.addWidget(self.gcode_cancel_button)
-        self.gcode_panel.setLayout(gcode_panel_layout)
-        self.gcode_panel.setVisible(False)
-        '''
 
 
         mainLayout = QtGui.QHBoxLayout()
@@ -876,16 +880,20 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
-        #self.show_warning_popup()
+    '''
+    def eventFilter(self, source, event):
+        if event.type() == QtCore.QEvent.MouseMove:
+            if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
+                # source.set_mouse_event(event)
+                if self.controller.settings['toolButtons']['rotateButton']:
+                    self.controller.check_rotation_axis(event)
+        return QtGui.QMainWindow.eventFilter(self, source, event)
+    '''
 
-    def show_warning_popup(self):
-        print "Opening a new popup window..."
-        self.w = Popup(self)
-        self.w.setGeometry(QRect(100, 100, 400, 200))
-        self.w.show()
-
-    def show_information_popup(self):
-        pass
+    def closeEvent(self, event):
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("windowState", self.saveState())
+        QMainWindow.closeEvent(self, event)
 
     def reinit(self):
         self.update_gui_for_material()
@@ -1323,6 +1331,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.object_group_box.setVisible(False)
         self.gcode_group_box.setVisible(True)
         self.controller.view.update_scene()
+        self.gcode_slider.setTickInterval(0)
 
     #def set_gcode_slider(self, number_of_layers=0, maximal_value=0):
     #    self.gcode_slider.setTickInterval(0)
@@ -1524,7 +1533,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def set_infill(self, val):
         self.infillValue = val
-        self.infillLabel.setText(self.tr("Infill") + " " + str(val) + "%")
+        infill_value_str = "%2d" % val
+        self.infillLabel.setText(self.tr("Infill") + " " + infill_value_str + "%")
 
     def create_slider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100, orientation=QtCore.Qt.Horizontal, base_class=QtGui.QSlider):
         if base_class == Gcode_slider:
@@ -1533,9 +1543,9 @@ class PrusaControlView(QtGui.QMainWindow):
             slider = base_class(orientation)
 
         slider.setRange(rangeMin, rangeMax)
-        slider.setSingleStep(10)
-        slider.setPageStep(20)
-        slider.setTickInterval(10)
+        slider.setSingleStep(1)
+        slider.setPageStep(1)
+        slider.setTickInterval(1)
         slider.setValue(defaultValue)
         slider.setTickPosition(QtGui.QSlider.TicksRight)
 

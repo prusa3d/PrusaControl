@@ -240,11 +240,14 @@ class AppScene(object):
 
         #self.automatic_models_position()
 
-
+    #TODO:Add brim and support message
     def get_warnings(self):
-        #return all warnings for scene, objects out of scene, brim and support need etc...
-        #pass
-        return []
+        messages = []
+        text00 = u"• Object %s... is out of printable area!"
+        for model in self.models:
+            if not model.is_in_printing_area:
+                messages.append(text00 % model.filename[:7])
+        return messages
 
 
     def clear_scene(self):
@@ -344,6 +347,7 @@ class Model(object):
         self.id = Model.newid()+1
 
         self.isVisible = True
+        self.is_in_printing_area = True
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
         self.select_color = [255, 97, 0]
@@ -544,15 +548,19 @@ class Model(object):
         if max[0] <= (printer['printing_space'][0]*.05) and min[0] >= (printer['printing_space'][0]*-.05):
                 if max[1] <= (printer['printing_space'][1]*.05) and min[1] >= (printer['printing_space'][1]*-.05):
                     if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
+                        self.is_in_printing_area = True
                         return True
                     else:
                         #print("naruseni v Z")
+                        self.is_in_printing_area = False
                         return False
                 else:
                     #print("naruseni v Y")
+                    self.is_in_printing_area = False
                     return False
         else:
             #print("naruseni v X")
+            self.is_in_printing_area = False
             return False
 
     def get_mesh(self, transform=True, generate_gcode=False, default_scale=True):
@@ -894,14 +902,11 @@ class Model(object):
                 #glColor4f(.4, .4, .4, .75)
             else:
                 if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
-                    is_in_printing_space = True
                     if self.selected:
                         glColor3ubv(self.select_color)
                     else:
                         glColor3ubv(self.color)
                 else:
-                    self.parent.controller.add_warning_message(self, "out_of_printing_space")
-                    is_in_printing_space = False
                     glColor3f(0.35, 0.35, 0.35)
 
 
@@ -912,7 +917,7 @@ class Model(object):
         #glDisableClientState(GL_COLOR_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
 
-        if is_in_printing_space == False:
+        if self.is_in_printing_area == False:
             font = self.parent.controller.view.font
             font.setPointSize(35)
             glDisable(GL_DEPTH_TEST)

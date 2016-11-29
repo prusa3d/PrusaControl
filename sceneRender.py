@@ -471,8 +471,9 @@ class GLWidget(QGLWidget):
         self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
 
         self.draw_warning_window()
-        self.draw_information_window()
 
+        if self.controller.status == 'generated':
+            self.draw_information_window()
 
         #self.picking_render()
 
@@ -494,7 +495,8 @@ class GLWidget(QGLWidget):
 
     def draw_warning_window(self):
         #set camera view
-        if len(self.controller.warning_message_buffer) > 0:
+        messages = self.controller.scene.get_warnings()
+        if len(messages) > 0:
             glMatrixMode(GL_PROJECTION)
             glPushMatrix()
             glLoadIdentity()
@@ -541,7 +543,10 @@ class GLWidget(QGLWidget):
             self.renderText(115, sH - 153, u"WARNING", font)
 
             font.setPointSize(10)
-            for n, message in enumerate(self.controller.warning_message_buffer):
+            for n, message in enumerate(messages):
+                #Maximum of massages in warning box
+                if n > 5:
+                    break
                 self.renderText(57, sH-122+15*n,  message, font)
 
             glEnable(GL_DEPTH_TEST)
@@ -555,7 +560,81 @@ class GLWidget(QGLWidget):
 
 
     def draw_information_window(self):
-        pass
+        # set camera view
+        messages = self.controller.get_informations()
+
+        if len(messages) > 0:
+            glMatrixMode(GL_PROJECTION)
+            glPushMatrix()
+            glLoadIdentity()
+            viewport = glGetIntegerv(GL_VIEWPORT)
+            glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
+            glMatrixMode(GL_MODELVIEW)
+            glPushMatrix()
+
+            sW = viewport[2] * 1.0
+            sH = viewport[3] * 1.0
+
+            glLoadIdentity()
+            glDisable(GL_LIGHTING)
+            glDisable(GL_DEPTH_TEST)
+            glEnable(GL_TEXTURE_2D)
+
+            # draw frame for information messages
+            position = [-325, 25]
+
+            position_x = sW - abs(position[0]) if position[0] < 0 else position[0]
+            position_y = sH - abs(position[1]) if position[1] < 0 else position[1]
+
+            #position_x = 25
+            #position_y = 25
+
+            size_w = 300
+            size_h = 100
+
+            coef_sH = size_h
+            coef_sW = size_w
+
+            glBindTexture(GL_TEXTURE_2D, self.popup_widget)
+            glColor4f(0.1, 0.1, 0.1, .75)
+            glBegin(GL_QUADS)
+            glTexCoord2f(0, 0)
+            glVertex3f(position_x, position_y, 0)
+            glTexCoord2f(0, 1)
+            glVertex3f(position_x, (position_y + coef_sH), 0)
+            glTexCoord2f(1, 1)
+            glVertex3f((position_x + coef_sW), (position_y + coef_sH), 0)
+            glTexCoord2f(1, 0)
+            glVertex3f((position_x + coef_sW), position_y, 0)
+            glEnd()
+
+            glDisable(GL_TEXTURE_2D)
+
+            glColor4f(1., 1., 1., 1.)
+            font = self.controller.view.font
+            font.setPointSize(17)
+            self.renderText(position_x + 8, sH - position_y - size_h + 25, u"PRINT INFO", font)
+
+            font.setPointSize(10)
+
+            header = '{:>27}{:>21}{:>14}'.format(' ', 'time:', 'filament:')
+            #print(header)
+            text = '{:20}{:>20}{:>12}'.format(messages['info_text'], messages['printing_time'], messages['filament_lenght'])
+            #print(text)
+            glColor3f(.5,.5,.5)
+            self.renderText(position_x + 8, sH - position_y - size_h + 63, header, font)
+            glColor3f(1., 1., 1.)
+            self.renderText(position_x + 8, sH - position_y - size_h + 65 + 15, text, font)
+
+
+            glEnable(GL_DEPTH_TEST)
+
+            glPopMatrix()
+
+            glMatrixMode(GL_PROJECTION)
+            glPopMatrix()
+
+            glMatrixMode(GL_MODELVIEW)
 
     def draw_layer(self, layer, color, printer):
         printing_space = printer['printing_space']

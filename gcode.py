@@ -35,6 +35,9 @@ class GCode(object):
         self.last_point = [0.0, 0.0, 0.0]
         self.actual_point = [0.0, 0.0, 0.0]
 
+        self.printing_time = 0.0
+        self.filament_length = 0.0
+
 
 
         #buffering=(2 << 16) + 8
@@ -50,8 +53,9 @@ class GCode(object):
                 else:
                     continue
 
-        time_of_print = self.calculate_time_of_print()
-        print("Doba tisku by mela byt [m]: %.2f" % time_of_print)
+        self.printing_time = self.calculate_time_of_print()
+        self.filament_length = 0.0#self.calculate_length_of_filament()
+
 
     def calculate_time_of_print(self):
         time_of_print = 0.0
@@ -64,7 +68,26 @@ class GCode(object):
             time = leng / speed
             time_of_print += time
 
-        return time_of_print
+        #Magic constant :-)
+        time_of_print *=1.1
+
+        return time_of_print*60
+
+    def calculate_length_of_filament(self):
+        length = 0.0
+        for line in self.all_data:
+            if line[2]=='M':
+                continue
+            a = np.array(line[0])
+            b = np.array(line[1])
+            vect = b-a
+            leng = np.linalg.norm(vect)
+            length+=leng
+
+        return length
+
+    def set_print_info_text(self, string):
+        print("Info: " + string)
 
     #only G1 lines
     def parse_g1_line(self, text):
