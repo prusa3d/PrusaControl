@@ -245,8 +245,9 @@ class AppScene(object):
         messages = []
         text00 = u"• Object %s... is out of printable area!"
         for model in self.models:
-            if not model.is_in_printing_area:
-                messages.append(text00 % model.filename[:7])
+            if model.isVisible:
+                if not model.is_in_printing_area:
+                    messages.append(text00 % model.filename[:7])
         return messages
 
 
@@ -681,6 +682,7 @@ class Model(object):
         self.is_changed = False
     '''
 
+    '''
     def start_edit(self):
         self.rot_hist = deepcopy(self.rot)
         self.scale_hist = deepcopy(self.scale)
@@ -704,6 +706,8 @@ class Model(object):
         self.rot = deepcopy(self.rot_hist)
         #self.apply_all_transformation()
         self.is_changed = False
+
+    '''
 
     def set_scale(self, value):
         printing_space = self.parent.controller.actual_printer['printing_space']
@@ -1051,7 +1055,7 @@ class Model(object):
         return False
 
 
-
+    #TODO:Better!!!
     def place_on_face(self, ray_start, ray_end):
         value = self.intersectionRayModel(np.array(ray_start), np.array(ray_end))
         if type(value) == bool:

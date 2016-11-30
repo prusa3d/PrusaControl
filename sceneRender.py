@@ -446,7 +446,6 @@ class GLWidget(QGLWidget):
                     self.draw_tools_helper(model, self.parent.controller.settings)
 
             glCallList(printing_space)
-            #self.draw_axis(printing_space_info)
 
             self.draw_tools()
 
@@ -475,7 +474,8 @@ class GLWidget(QGLWidget):
         if self.controller.status == 'generated':
             self.draw_information_window()
 
-        #self.picking_render()
+        if self.controller.settings['debug']:
+            self.picking_render()
 
         glFlush()
 
@@ -695,11 +695,8 @@ class GLWidget(QGLWidget):
 
 
     def draw_scale_rect(self, model, colors, position, radius, picking=False):
-        actual_angle = numpy.rad2deg(model.rot[2])
-
         if not picking:
                 colors[3] = [255, 255, 255]
-
 
         glPushMatrix()
         glTranslatef(position[0], position[1], 0.0)
@@ -709,21 +706,31 @@ class GLWidget(QGLWidget):
 
         if picking:
             glColor3ubv(colors[3])
-            if picking:
-                glLineWidth(5)
-            else:
-                glLineWidth(2.5)
 
-            '''
-            glBegin(GL_LINES)
-            glVertex3f(0., 0., 0.)
-            glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1] * -1., 0.)
+            glBegin(GL_TRIANGLES)
+            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
+            glVertex3f(model.max[0] - .1, model.max[1] + .1, 0.)
+            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
+
+            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
+            glVertex3f(model.max[0] + .1, model.max[1] - .1, 0.)
+            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
             glEnd()
-            '''
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
+            glVertex3f(model.min[0] - .1, model.min[1] + .1, 0.)
+            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
+
+            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
+            glVertex3f(model.min[0] + .1, model.min[1] - .1, 0.)
+            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
+            glEnd()
+
 
         else:
             glColor3ubv(colors[3])
-            #inner lines
+            #Outer lines
 
             glBegin(GL_LINE_LOOP)
             glVertex3f(model.min[0], model.min[1], 0.)
@@ -743,6 +750,32 @@ class GLWidget(QGLWidget):
             glEnd()
 
             glDisable(GL_LINE_STIPPLE)
+
+            if model.scaleAxis == 'XYZ':
+                glColor3f(1.,0.,0.)
+            else:
+                glColor3f(1.,1.,1.)
+            glBegin(GL_TRIANGLES)
+            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
+            glVertex3f(model.max[0] - .1, model.max[1] + .1, 0.)
+            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
+
+            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
+            glVertex3f(model.max[0] + .1, model.max[1] - .1, 0.)
+            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
+            glEnd()
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
+            glVertex3f(model.min[0] - .1, model.min[1] + .1, 0.)
+            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
+
+            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
+            glVertex3f(model.min[0] + .1, model.min[1] - .1, 0.)
+            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
+            glEnd()
+
+
 
             #self.renderText(0., 0., 0., "%s" % str(model.size_origin))
 
@@ -775,7 +808,7 @@ class GLWidget(QGLWidget):
         r4 = radius+0.15
         r5 = radius+0.25
         r6 = radius+0.4
-        r7 = radius+0.5
+        r7 = radius+1.0
 
         if picking:
             list_of_segnments_6 = numpy.arange(0., 360., 1.)
@@ -844,20 +877,24 @@ class GLWidget(QGLWidget):
                 glVertex3f(i[0], i[1], 0.)
             glEnd()
 
-
-            glLineWidth(2.5)
+            if model.rotationAxis == "Z":
+                glLineWidth(5)
+            else:
+                glLineWidth(2.5)
             glBegin(GL_LINES)
             glVertex3f(0., 0., 0.)
             glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0.)
             glEnd()
 
-            glLineWidth(1.0)
+            glLineWidth(2.5)
             glBegin(GL_LINE_LOOP)
             glVertex3f(0., 0., 0.)
             glVertex3f(circle6[0][0], circle6[0][1], 0.)
-            for i in circle6[1:int(actual_angle)]:
+            glColor3ub(255, 97, 0)
+            for i in circle6[1:int(actual_angle)+1]:
                 glVertex3f(i[0], i[1]*-1., 0.)
                 #glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
+            glColor3ub(255, 255, 255)
             glVertex3f(0., 0., 0.)
             glEnd()
 

@@ -197,6 +197,7 @@ class Controller:
         self.mouse_release_event_flag = False
         self.tool_press_event_flag = False
         self.object_select_event_flag = False
+        self.tool_helper_press_event_flag = False
 
     def clear_gcode(self):
         self.gcode = None
@@ -276,6 +277,12 @@ class Controller:
         self.set_gcode_view()
         self.status = 'generated'
 
+    def check_rotation_helper(self, event):
+        print("check rotation")
+        id = self.get_id_under_cursor(event)
+        if self.is_some_tool_under_cursor(id):
+            self.view.update_scene()
+
 
     def set_gcode_view(self):
         self.unselect_objects()
@@ -290,10 +297,8 @@ class Controller:
     def open_gcode_gui(self):
         self.view.open_gcode_view()
 
-
     def close_gcode_gui(self):
         self.view.close_gcode_view()
-
 
     def set_language(self, language):
         full_name = 'translation/' + language + '.qm'
@@ -664,22 +669,52 @@ class Controller:
             return False
         for model in self.scene.models:
             if model.rotateXId == object_id:
+                model.scalenAxis = []
                 model.selected = True
                 model.rotationAxis = 'x'
                 self.tool = 'rotate'
                 return True
             elif model.rotateYId == object_id:
+                model.scalenAxis = []
                 model.selected = True
                 model.rotationAxis = 'y'
                 self.tool = 'rotate'
                 return True
             elif model.rotateZId == object_id:
+                model.scalenAxis = []
                 model.selected = True
                 model.rotationAxis = 'z'
                 self.tool = 'rotate'
                 return True
+            elif model.scaleXId == object_id:
+                model.rotationAxis = []
+                model.selected = True
+                model.scaleAxis = 'x'
+                self.tool = 'scale'
+                return True
+            elif model.scaleYId == object_id:
+                model.rotationAxis = []
+                model.selected = True
+                model.scaleAxis = 'y'
+                self.tool = 'scale'
+                return True
+            elif model.scaleZId == object_id:
+                model.rotationAxis = []
+                model.selected = True
+                model.scaleAxis = 'z'
+                self.tool = 'scale'
+                return True
+            elif model.scaleXYZId == object_id:
+                model.rotationAxis = []
+                model.selected = True
+                model.scaleAxis = 'XYZ'
+                self.tool = 'scale'
+                return True
             else:
                 model.rotationAxis = []
+                model.scalenAxis = []
+                model.selected = False
+
 
     def set_active_tool_helper_by_id(self, object_id):
         pass
@@ -771,6 +806,9 @@ class Controller:
             self.scene.paste_selected_objects()
 
 
+    def mouse_double_click(self, event):
+        pass
+
     '''
     def mouse_double_click(self, event):
         self.mouse_double_click_event_flag = True
@@ -784,7 +822,7 @@ class Controller:
 
 
     def mouse_press_event(self, event):
-        #print("Mouse press event")
+        print("Mouse press event")
         self.clear_event_flag_status()
         self.mouse_press_event_flag = True
 
@@ -812,22 +850,30 @@ class Controller:
                             else:
                                 tool.press_button()
                         #tool.activate_tool()
+
                     #Je pod kurzorem nejaky tool helper?
                     elif self.is_some_tool_helper_under_cursor(object_id):
-                        self.tool_press_event_flag = True
-                        self.set_active_tool_helper_by_id(object_id)
+                        print("tool helper under cursor")
+                        self.tool_helper_press_event_flag = True
+                        #self.set_active_tool_helper_by_id(object_id)
+                        self.prepare_tool(event)
+
                     elif self.is_object_already_selected(object_id) and self.is_ctrl_pressed():
+                        print("object already selected and ctrl pressed")
                         self.unselect_object(object_id)
                     elif self.is_ctrl_pressed():
+                        print("ctrl pressed")
                         self.select_object(object_id)
                     elif self.is_object_already_selected(object_id):
+                        print("object already selected")
                         pass
                     else:
+                        print("else")
                         self.unselect_objects()
                         self.select_object(object_id)
 
+
                     self.tool = self.get_active_tool()
-                    self.prepare_tool(event)
                     #Je objekt oznaceny?
                     '''
                     elif self.is_ctrl_pressed():
@@ -867,12 +913,15 @@ class Controller:
         #self.view.update_scene()
 
     def prepare_tool(self, event):
+        print("prepare tool")
         if self.tool == 'rotate':
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             self.origin_rotation_point = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             self.res_old = self.origin_rotation_point
             self.view.glWidget.oldHitPoint = numpy.array([0., 0., 0.])
             self.view.glWidget.hitPoint = numpy.array([0., 0., 0.])
+
+
         elif self.tool == 'placeonface':
             ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
@@ -887,26 +936,26 @@ class Controller:
                         #print("Nalezen objekt " + str(model))
         elif self.tool == 'scale':
             ray_start, ray_end = self.view.get_cursor_position(event)
-            camera_pos, direction, _, _ = self.view.get_camera_direction(event)
 
             for model in self.scene.models:
                 if model.selected:
                     pos = deepcopy(model.pos)
                     pos[2] = 0.
-                    self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, pos, direction))
+                    self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
                     self.original_scale = numpy.linalg.norm(self.original_scale_point - pos)
                     self.last_l = 0.0
 
 
 
     def mouse_move_event(self, event):
-        #print("Mouse move event")
+        print("Mouse move event")
         self.mouse_move_event_flag = True
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
 
         if self.camera_move:
+            print("camera move")
             camStart, camDir, camUp, camRight = self.view.get_camera_direction(event)
             right_move = -0.025*dx * camRight
             up_move = 0.025*dy * camUp
@@ -915,12 +964,14 @@ class Controller:
             self.add_camera_position(move_vector)
 
         elif self.camera_rotate:
+            print("camera rotate")
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
             #self.scene.camera_vector = direction - camera_pos
         #Move function
         elif self.tool== 'move':
+            print("move function")
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
@@ -935,6 +986,7 @@ class Controller:
 
         #Rotate function
         elif self.tool == 'rotate':
+            print("rotate function")
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
@@ -983,32 +1035,31 @@ class Controller:
 
         #Scale function
         elif self.tool == 'scale':
+            print("scale function")
             ray_start, ray_end = self.view.get_cursor_position(event)
-            camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+            #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
 
             for model in self.scene.models:
                 if model.selected:
                     pos = deepcopy(model.pos)
                     pos[2] = 0.
-                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, pos, direction))
+                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
                     new_scale_vect = new_scale_point - pos
-                    #new_scale_vec = new_scale_point - pos
-                    #l = numpy.linalg.norm(new_scale_vect)/self.original_scale
-                    #l = numpy.linalg.norm(new_scale_vect)/numpy.linalg.norm(model.size_origin)
-                    #l = numpy.linalg.norm(new_scale_vect)/numpy.linalg.norm(model.size_origin)
+
+
                     l = numpy.linalg.norm(new_scale_vect)
 
-                    #print("original scale is: " + str(self.original_scale))
-                    #print("new scale is: " + str(l))
-                    model.set_scale_abs(l, l, l)
-                    #self.last_l = l
-                    #self.view.update_object_settings(model.id)
+                    new_scale = l/self.original_scale
+                    print("Nova velikost scalu: " + str(new_scale))
+
+                    model.set_scale_abs(new_scale, new_scale, new_scale)
                     self.view.update_scale_widgets(model.id)
                     self.scene_was_changed()
 
         else:
             if self.render_status == 'model_view':
                 object_id = self.get_id_under_cursor(event)
+                #TOOLs hover effect
                 if object_id > 0:
                     #Je pod kurzorem nejaky tool?
                     for tool in self.tools:
@@ -1016,16 +1067,38 @@ class Controller:
                             tool.mouse_is_over(True)
                         else:
                             tool.mouse_is_over(False)
+
+                    #if self.settings['toolButtons']['rotateButton']:
+                    #    self.select_tool_helper_by_id(object_id)
+                        #for tool_helper in self.get_tools_helpers_id(1,0):
+                        #    if tool_helper == object_id:
+
                 else:
                     for tool in self.tools:
                         tool.mouse_is_over(False)
 
 
-
-
         self.last_pos = QtCore.QPoint(event.pos())
         self.update_scene()
         #self.view.update_scene()
+
+    def select_tool_helper(self, event):
+        object_id = self.get_id_under_cursor(event)
+        if object_id > 0:
+            self.select_tool_helper_by_id(object_id)
+
+    def select_tool_helper_by_id(self, object_id):
+        for m in self.scene.models:
+            if m.isVisible:
+                if object_id == m.rotateZId:
+                    m.rotationAxis = "Z"
+                    m.scaleAxis = ""
+                elif object_id == m.scaleXYZId:
+                    m.scaleAxis = "XYZ"
+                    m.rotationAxis = ""
+                else:
+                    m.rotationAxis = ""
+                    m.scaleAxis = ""
 
 
     def organize_button_pressed(self):
@@ -1255,6 +1328,7 @@ class Controller:
                 model.selected = not model.selected
                 return True
 
+    '''
     def find_object_and_rotation_axis_by_color(self, event):
         #color = self.view.get_cursor_pixel_color(event)
         #color to id
@@ -1287,6 +1361,8 @@ class Controller:
                 model.selected = True
                 model.scaleAxis = 'xyz'
                 return True
+    '''
+
 
     def reset_scene(self):
         self.scene.clear_scene()

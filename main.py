@@ -35,13 +35,14 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
+
     local_path = os.path.realpath(__file__)
 
 
 
     controller = Controller(app, local_path)
     window = controller.get_view()
-    #app.installEventFilter(window)
+    app.installEventFilter(window)
     app.exec_()
     atexit.register(controller.write_config)
 

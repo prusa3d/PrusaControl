@@ -747,6 +747,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
         self.infillLabel.setObjectName('infillLabel')
+        self.infillLabel.setFixedWidth(75)
         self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
         self.infillSlider.setObjectName('infillSlider')
 
@@ -799,7 +800,7 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
         printing_parameters_layout = QtGui.QGridLayout()
         #TODO:How???
-        printing_parameters_layout.setRowMinimumHeight(0, 65)
+        #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
         printing_parameters_layout.addWidget(self.printer_settings_l, 0, 0, 1, 3)
         printing_parameters_layout.addWidget(self.materialLabel, 1,0)
@@ -812,15 +813,6 @@ class PrusaControlView(QtGui.QMainWindow):
         printing_parameters_layout.addWidget(self.supportCombo, 4, 1, 1, 3)
         printing_parameters_layout.addWidget(self.brim_label, 5, 0)
         printing_parameters_layout.addWidget(self.brimCheckBox, 5, 1, 1, 3)
-
-        '''
-        printing_parameters_layout.addRow(self.printer_settings_l)
-        printing_parameters_layout.addRow(self.materialLabel, self.materialCombo)
-        printing_parameters_layout.addRow(self.qualityLabel, self.qualityCombo)
-        printing_parameters_layout.addRow(self.infillLabel, self.infillSlider)
-        printing_parameters_layout.addRow(self.supportLabel, self.supportCombo)
-        printing_parameters_layout.addRow(self.brim_label, self.brimCheckBox)
-        '''
 
         self.right_panel_layout.addLayout(printing_parameters_layout)
 
@@ -880,15 +872,17 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
-    '''
+
+    #TODO:
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:
             if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
-                # source.set_mouse_event(event)
-                if self.controller.settings['toolButtons']['rotateButton']:
-                    self.controller.check_rotation_axis(event)
+                if self.controller.settings['toolButtons']['rotateButton'] or\
+                        self.controller.settings['toolButtons']['scaleButton']:
+                    self.controller.select_tool_helper(event)
+                    #self.update_scene()
         return QtGui.QMainWindow.eventFilter(self, source, event)
-    '''
+
 
     def closeEvent(self, event):
         self.settings.setValue("geometry", self.saveGeometry())
@@ -993,7 +987,7 @@ class PrusaControlView(QtGui.QMainWindow):
         if not mesh:
             return
         self.object_group_box.setEnabled(True)
-        mesh.start_edit()
+        #mesh.start_edit()
         self.object_id = object_id
 
         self.filename_label.setText(mesh.filename)
@@ -1063,25 +1057,18 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
     def close_object_settings_panel(self):
-        '''
-        This function is for
-        '''
-        #self.object_settings_panel.setVisible(False)
-        #self.line.setVisible(False)
-        #self.right_panel.setMaximumWidth(250)
         self.is_setting_panel_opened = False
         self.object_group_box.setDisabled(True)
         self.object_id = 0
-        #self.object_settings_panel.setFocusPolicy(Qt.NoFocus)
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
-
+    '''
     def apply_object_settings(self):
         object_id = self.get_object_id()
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
             return
-        mesh.apply_changes()
+        #mesh.apply_changes()
         #self.controller.scene.save_change(mesh)
         self.close_object_settings_panel()
         self.controller.view.update_scene()
@@ -1091,9 +1078,10 @@ class PrusaControlView(QtGui.QMainWindow):
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
             return
-        mesh.discard_changes()
+        #mesh.discard_changes()
         self.close_object_settings_panel()
         self.controller.view.update_scene()
+    '''
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
@@ -1526,10 +1514,6 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_gcode_slider(self, val):
         self.controller.set_gcode_layer(val)
         self.gcode_label.setText(self.controller.gcode.data_keys[val])
-
-    #def set_gcode_draw_layers_from_button(self, val):
-    #    self.controller.set_gcode_draw_from_button(val)
-    #    self.controller.update_scene()
 
     def set_infill(self, val):
         self.infillValue = val
