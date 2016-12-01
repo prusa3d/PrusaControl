@@ -406,6 +406,7 @@ class Model(object):
         self.rot = np.array([.0, .0, .0])
         self.rot_scene = np.array([.0, .0, .0])
         self.scale = np.array([1., 1., 1.])
+        self.old_scale = np.array([1., 1., 1.])
         self.scaleDefault = [.1, .1, .1]
 
         self.min_scene = [.0, .0, .0]
@@ -744,6 +745,16 @@ class Model(object):
         self.max_scene = self.max + pos
 
     def set_rot(self, x, y, z, add=False, update_min_max=True, place_on_zero=True):
+        '''
+        if x > (2*np.pi):
+            x = divmod(x,2*np.pi)
+        if y > (2*np.pi):
+            y = divmod(y,2*np.pi)
+        if z > (2*np.pi):
+            z = divmod(z,2*np.pi)
+        '''
+        print("uhel v set_rot: " + str(z))
+
         if add:
             self.rot[0] += x
             self.rot[1] += y
@@ -765,11 +776,15 @@ class Model(object):
             and (x * self.size_origin[0] < printer['printing_space'][0]*.1) and\
                 (y * self.size_origin[1] < printer['printing_space'][1]*.1) and\
                 (z * self.size_origin[2] < printer['printing_space'][2]*.1):
+
+            self.old_scale = deepcopy(self.scale)
+
             self.scale[0] = x
             self.scale[1] = y
             self.scale[2] = z
 
-            self.update_min_max()
+            #self.update_min_max()
+            self.update_min_max_quick_change_of_scale()
             self.place_on_zero()
 
 
@@ -780,7 +795,7 @@ class Model(object):
             self.pos[2]+=len
             self.update_min_max()
 
-    @timing
+    #@timing
     def update_min_max(self):
         self.temp_mesh = deepcopy(self.mesh)
 
@@ -812,6 +827,24 @@ class Model(object):
 
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
+
+
+    def update_min_max_quick_change_of_scale(self):
+        diff_scale = np.array([self.scale[0] / self.old_scale[0],
+                                self.scale[1] / self.old_scale[1],
+                                self.scale[2] / self.old_scale[2]])
+
+        self.max *= diff_scale
+        self.min *= diff_scale
+
+        self.size = self.max - self.min
+
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
+
+
+
+
 
     def recalc_bounding_sphere(self):
         max_l = np.linalg.norm(self.max)

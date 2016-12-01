@@ -915,11 +915,18 @@ class Controller:
     def prepare_tool(self, event):
         print("prepare tool")
         if self.tool == 'rotate':
-            newRayStart, newRayEnd = self.view.get_cursor_position(event)
-            self.origin_rotation_point = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
-            self.res_old = self.origin_rotation_point
-            self.view.glWidget.oldHitPoint = numpy.array([0., 0., 0.])
-            self.view.glWidget.hitPoint = numpy.array([0., 0., 0.])
+            for model in self.scene.models:
+                if model.selected:
+                    #newRayStart, newRayEnd = self.view.get_cursor_position(event)
+                    #self.origin_rotation_point = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+                    #self.res_old = self.origin_rotation_point
+                    self.origin_rotation_point = numpy.array([1.,0.,0.])
+                    self.origin_rotation_point += model.pos
+                    self.origin_rotation_point[2] = 0.
+                    self.res_old = self.origin_rotation_point
+                    self.old_angle = model.rot[2]
+            #self.view.glWidget.oldHitPoint = numpy.array([0., 0., 0.])
+            #self.view.glWidget.hitPoint = numpy.array([0., 0., 0.])
 
 
         elif self.tool == 'placeonface':
@@ -929,10 +936,10 @@ class Controller:
                     self.view.glWidget.rayStart = ray_start
                     self.view.glWidget.rayDir = numpy.array(ray_end) - numpy.array(ray_start)
                     face = model.place_on_face(ray_start, ray_end)
-                    if not face == []:
-                        self.view.glWidget.v0 = face[0]
-                        self.view.glWidget.v1 = face[1]
-                        self.view.glWidget.v2 = face[2]
+                    #if not face == []:
+                    #    self.view.glWidget.v0 = face[0]
+                    #    self.view.glWidget.v1 = face[1]
+                    #    self.view.glWidget.v2 = face[2]
                         #print("Nalezen objekt " + str(model))
         elif self.tool == 'scale':
             ray_start, ray_end = self.view.get_cursor_position(event)
@@ -998,14 +1005,13 @@ class Controller:
 
                         #New
                         new_vec = res - pos
-                        self.view.glWidget.hitPoint = deepcopy(new_vec)
+                        #self.view.glWidget.hitPoint = deepcopy(new_vec)
                         new_vect_leng = numpy.linalg.norm(new_vec)
                         new_vec /= new_vect_leng
 
                         old_vec = self.res_old - pos
-                        self.view.glWidget.oldHitPoint = deepcopy(old_vec)
+                        #self.view.glWidget.oldHitPoint = deepcopy(old_vec)
                         old_vec /= numpy.linalg.norm(old_vec)
-
 
                         cos_ang = numpy.dot(old_vec, new_vec)
                         cross = numpy.cross(old_vec, new_vec)
@@ -1014,6 +1020,14 @@ class Controller:
                         sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) * -1.
 
                         alpha = numpy.arctan2(sin_ang, cos_ang)
+                        '''
+                        if alpha < 0.:
+                            alpha = 2*numpy.pi
+                        elif alpha >= 2*numpy.pi:
+                            alpha = 0.
+                        '''
+                        print("angle: " + str(alpha))
+                        #alpha+= self.old_angle
 
                         radius = model.boundingSphereSize
 
@@ -1021,12 +1035,12 @@ class Controller:
                             radius = 2.5
 
                         if new_vect_leng >= radius:
-                            model.set_rot(model.rot[0], model.rot[1], alpha, False, False)
-                            #print("New angle: " + str(numpy.degrees(alpha)))
+                            model.set_rot(model.rot[0], model.rot[1], alpha, False, False, False)
+                            print("New angle: " + str(numpy.degrees(alpha)))
                         else:
                             alpha_new = numpy.degrees(alpha) // 45
-                            #print("New round angle: " + str(alpha_new*45.))
-                            model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False)
+                            print("New round angle: " + str(alpha_new*45.))
+                            model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
 
                         #self.view.update_object_settings(model.id)
                         self.view.update_rotate_widgets(model.id)
@@ -1046,14 +1060,21 @@ class Controller:
                     new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
                     new_scale_vect = new_scale_point - pos
 
-
                     l = numpy.linalg.norm(new_scale_vect)
+                    l-=.5
 
-                    new_scale = l/self.original_scale
+                    origin_size = deepcopy(model.size_origin)
+                    origin_size[2] = 0.
+                    origin_size*=.5
+
+                    new_scale = l/numpy.linalg.norm(origin_size)
                     print("Nova velikost scalu: " + str(new_scale))
 
                     model.set_scale_abs(new_scale, new_scale, new_scale)
-                    self.view.update_scale_widgets(model.id)
+                    #model.set_scale(new_scale)
+                    self.last_l=new_scale
+
+                    #self.view.update_scale_widgets(model.id)
                     self.scene_was_changed()
 
         else:
@@ -1115,10 +1136,12 @@ class Controller:
         self.mouse_release_event_flag = True
         self.set_camera_function_false()
         if self.tool in ['move', 'rotate', 'scale', 'placeonface']:
+            self.old_angle = 0.0
             for model in self.scene.models:
                 if model.selected:
                     model.update_min_max()
-                    model.recalc_bounding_sphere()
+                    if not self.tool == 'scale':
+                        model.recalc_bounding_sphere()
                     self.scene.save_change(model)
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])

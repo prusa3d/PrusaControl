@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #import inspect
 #import logging
+from copy import deepcopy
 from pprint import pprint
 
 import OpenGL
@@ -337,17 +338,17 @@ class GLWidget(QGLWidget):
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
         #new light settings
-        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(500, 500, 1000, 0))
-        glLightfv(GL_LIGHT0, GL_SPECULAR, _gl_vector(.5, .5, 1, 1))
+        glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(50, 50, 100, 0))
+        glLightfv(GL_LIGHT0, GL_SPECULAR, _gl_vector(.5, .5, 1., 1.))
         glLightfv(GL_LIGHT0, GL_DIFFUSE, _gl_vector(1, 1, 1, 1))
-        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(1000, 0, 500, 0))
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, _gl_vector(.5, .5, .5, 1))
-        glLightfv(GL_LIGHT1, GL_SPECULAR, _gl_vector(1, 1, 1, 1))
+        glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(100, 0, 50, 0))
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, _gl_vector(.5, .5, .5, 1.))
+        glLightfv(GL_LIGHT1, GL_SPECULAR, _gl_vector(1., 1., 1., 1.))
         #new light settings
 
         #material
-        glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
-        glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
+        #glMaterialfv(GL_FRONT, GL_SPECULAR, self.materialSpecular)
+        #glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
 
         glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
@@ -378,6 +379,7 @@ class GLWidget(QGLWidget):
         glDisable(GL_LIGHTING)
         glDisable(GL_BLEND)
 
+        glDisable(GL_MULTISAMPLE)
 
         for model in self.parent.controller.scene.models:
             if model.isVisible:
@@ -388,6 +390,8 @@ class GLWidget(QGLWidget):
                 self.draw_tools_helper(model, self.controller.settings, True)
 
         self.draw_tools(picking=True)
+
+        glEnable(GL_MULTISAMPLE)
 
 
     def get_id_under_cursor(self, x, y):
@@ -689,14 +693,24 @@ class GLWidget(QGLWidget):
             scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
 
         if settings['toolButtons']['rotateButton']:
-            self.draw_rotation_circles(model, rotateColors, [i + o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
+            #self.draw_rotation_circle(model, rotateColors, [i + o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
+            self.draw_rotation_circle(model, rotateColors, model.pos, model.boundingSphereSize, picking)
         elif settings['toolButtons']['scaleButton']:
-            self.draw_scale_rect(model, scaleColors, [i + o for i, o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
+            self.draw_scale_rect(model, scaleColors, model.pos, model.boundingSphereSize, picking)
 
 
     def draw_scale_rect(self, model, colors, position, radius, picking=False):
         if not picking:
                 colors[3] = [255, 255, 255]
+
+        offset=0.5
+        size_of_selector = 0.2
+
+        min = deepcopy(model.min)
+        max = deepcopy(model.max)
+
+        min -= offset
+        max += offset
 
         glPushMatrix()
         glTranslatef(position[0], position[1], 0.0)
@@ -708,23 +722,43 @@ class GLWidget(QGLWidget):
             glColor3ubv(colors[3])
 
             glBegin(GL_TRIANGLES)
-            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
-            glVertex3f(model.max[0] - .1, model.max[1] + .1, 0.)
-            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
+            glVertex3f(max[0] - size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, max[1] + size_of_selector, 0.)
 
-            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
-            glVertex3f(model.max[0] + .1, model.max[1] - .1, 0.)
-            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
+            glVertex3f(max[0] + size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, max[1] - size_of_selector, 0.)
             glEnd()
 
             glBegin(GL_TRIANGLES)
-            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
-            glVertex3f(model.min[0] - .1, model.min[1] + .1, 0.)
-            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
+            glVertex3f(min[0] - size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, min[1] + size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, min[1] + size_of_selector, 0.)
 
-            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
-            glVertex3f(model.min[0] + .1, model.min[1] - .1, 0.)
-            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
+            glVertex3f(min[0] + size_of_selector, min[1] + size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, min[1] - size_of_selector, 0.)
+            glEnd()
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(max[0] - size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, min[1] + size_of_selector, 0.)
+
+            glVertex3f(max[0] + size_of_selector, min[1] + size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, min[1] + size_of_selector, 0.)
+            glEnd()
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(min[0] - size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, max[1] + size_of_selector, 0.)
+
+            glVertex3f(min[0] + size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, max[1] - size_of_selector, 0.)
             glEnd()
 
 
@@ -733,46 +767,54 @@ class GLWidget(QGLWidget):
             #Outer lines
 
             glBegin(GL_LINE_LOOP)
-            glVertex3f(model.min[0], model.min[1], 0.)
-            glVertex3f(model.min[0], model.max[1], 0.)
-            glVertex3f(model.max[0], model.max[1], 0.)
-            glVertex3f(model.max[0], model.min[1], 0.)
+            glVertex3f(min[0], min[1], 0.)
+            glVertex3f(min[0], max[1], 0.)
+            glVertex3f(max[0], max[1], 0.)
+            glVertex3f(max[0], min[1], 0.)
             glEnd()
-
-            glLineStipple(4, 0xAAAA)
-            glEnable(GL_LINE_STIPPLE)
-
-            glLineWidth(2.5)
-
-            glBegin(GL_LINES)
-            glVertex3f(model.max[0], model.max[1], 0.)
-            glVertex3f(model.min[0], model.min[1], 0.)
-            glEnd()
-
-            glDisable(GL_LINE_STIPPLE)
 
             if model.scaleAxis == 'XYZ':
                 glColor3f(1.,0.,0.)
             else:
                 glColor3f(1.,1.,1.)
             glBegin(GL_TRIANGLES)
-            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
-            glVertex3f(model.max[0] - .1, model.max[1] + .1, 0.)
-            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
+            glVertex3f(max[0] - size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, max[1] + size_of_selector, 0.)
 
-            glVertex3f(model.max[0] + .1, model.max[1] + .1, 0.)
-            glVertex3f(model.max[0] + .1, model.max[1] - .1, 0.)
-            glVertex3f(model.max[0] - .1, model.max[1] - .1, 0.)
+            glVertex3f(max[0] + size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, max[1] - size_of_selector, 0.)
             glEnd()
 
             glBegin(GL_TRIANGLES)
-            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
-            glVertex3f(model.min[0] - .1, model.min[1] + .1, 0.)
-            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
+            glVertex3f(min[0] - size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, min[1] + size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, min[1] + size_of_selector, 0.)
 
-            glVertex3f(model.min[0] + .1, model.min[1] + .1, 0.)
-            glVertex3f(model.min[0] + .1, model.min[1] - .1, 0.)
-            glVertex3f(model.min[0] - .1, model.min[1] - .1, 0.)
+            glVertex3f(min[0] + size_of_selector, min[1] + size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, min[1] - size_of_selector, 0.)
+            glEnd()
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(max[0] - size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, min[1] + size_of_selector, 0.)
+
+            glVertex3f(max[0] + size_of_selector, min[1] + size_of_selector, 0.)
+            glVertex3f(max[0] + size_of_selector, min[1] - size_of_selector, 0.)
+            glVertex3f(max[0] - size_of_selector, min[1] + size_of_selector, 0.)
+            glEnd()
+
+            glBegin(GL_TRIANGLES)
+            glVertex3f(min[0] - size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, max[1] - size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, max[1] + size_of_selector, 0.)
+
+            glVertex3f(min[0] + size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(min[0] - size_of_selector, max[1] + size_of_selector, 0.)
+            glVertex3f(min[0] + size_of_selector, max[1] - size_of_selector, 0.)
             glEnd()
 
 
@@ -785,9 +827,12 @@ class GLWidget(QGLWidget):
         glPopMatrix()
 
 
-    def draw_rotation_circles(self, model, colors, position, radius, picking=False):
-
+    def draw_rotation_circle(self, model, colors, position, radius, picking=False):
         actual_angle = numpy.rad2deg(model.rot[2])
+        if actual_angle >= 360.:
+            n, actual_angle = divmod(actual_angle, 360)
+        elif actual_angle <= 0.:
+            n, actual_angle = divmod(actual_angle, -360)
 
         if not picking:
                 colors[2] = [255, 255, 255]
@@ -877,6 +922,7 @@ class GLWidget(QGLWidget):
                 glVertex3f(i[0], i[1], 0.)
             glEnd()
 
+            print("sceneRender: " + str(actual_angle))
             if model.rotationAxis == "Z":
                 glLineWidth(5)
             else:
@@ -885,6 +931,7 @@ class GLWidget(QGLWidget):
             glVertex3f(0., 0., 0.)
             glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0.)
             glEnd()
+
 
             glLineWidth(2.5)
             glBegin(GL_LINE_LOOP)
