@@ -351,8 +351,8 @@ class Model(object):
         self.is_in_printing_area = True
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
-        self.select_color = [255, 97, 0]
-        self.color = [224, 224, 224]
+        self.select_color = [255, 75, 0, 255]
+        self.color = [220, 220, 220, 255]
 
         self.face_colors = []
         self.normal_groups = {}
@@ -921,11 +921,11 @@ class Model(object):
             glDisable(GL_BLEND)
             glDisable(GL_LIGHTING)
         elif blending:
-            glCullFace(GL_BACK)
-            glEnable(GL_CULL_FACE)
+            #glCullFace(GL_BACK)
+            #glEnable(GL_CULL_FACE)
             glEnable(GL_LIGHTING)
-            glDisable(GL_DEPTH_TEST)
-            glEnable(GL_BLEND)
+            #glDisable(GL_DEPTH_TEST)
+            #glEnable(GL_BLEND)
         else:
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
@@ -940,11 +940,11 @@ class Model(object):
             else:
                 if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
                     if self.selected:
-                        glColor3ubv(self.select_color)
+                        glColor4ubv(self.select_color)
                     else:
-                        glColor3ubv(self.color)
+                        glColor4ubv(self.color)
                 else:
-                    glColor3f(0.35, 0.35, 0.35)
+                    glColor4f(0.25, 0.25, 0.25, 1.)
 
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)

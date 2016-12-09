@@ -252,11 +252,11 @@ class Controller:
 
         self.set_gcode_slider(min, max, min_l, max_l)
 
-        self.gcode_layer = self.gcode.data_keys[0]
+        self.gcode_layer = self.gcode.data_keys[1]
 
 
-        self.view.gcode_label.setText(self.gcode.data_keys[0])
-        self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
+        self.view.gcode_label.setText(self.gcode.data_keys[1])
+        self.view.gcode_slider.setValue(float(self.gcode.data_keys[1]))
 
         if filename:
             self.set_gcode_view()

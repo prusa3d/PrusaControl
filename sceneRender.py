@@ -74,6 +74,8 @@ class GLWidget(QGLWidget):
         self.hitPoint = numpy.array([0.,0.,0.])
         self.oldHitPoint = numpy.array([0.,0.,0.])
 
+        self.shaderProgram = QGLShaderProgram()
+
 
         #properties definition
         self.xRot = 0
@@ -82,11 +84,13 @@ class GLWidget(QGLWidget):
         self.zoom = 0
         self.camera_position = numpy.array([0., 0. ,0.])
 
+        self.shader_ok = False
+
         self.oldPos3d = [.0, .0, .0]
 
-        self.lightAmbient = [.0, .0, .0, .0]
-        self.lightDiffuse = [.0, .0, .0, .0]
-        self.lightPossition = [.0, .0, .0, .0]
+        #self.lightAmbient = [.0, .0, .0, .0]
+        #self.lightDiffuse = [.0, .0, .0, .0]
+        #self.lightPossition = [.0, .0, .0, .0]
 
         self.materialSpecular = [.0,.0,.0,.0]
         self.materialShiness = [.0]
@@ -135,14 +139,15 @@ class GLWidget(QGLWidget):
         self.fps_count = 0
         self.fps_time = 0.
 
+
         self.oldPos3d = [.0, .0, .0]
 
-        self.lightAmbient = [.95, .95, .95, 1.0]
-        self.lightDiffuse = [.5, .5, .5, 1.0]
-        self.lightPossition = [29.0, -48.0, 37.0, 1.0]
+        #self.lightAmbient = [.95, .95, .95, 1.0]
+        #self.lightDiffuse = [.5, .5, .5, 1.0]
+        #self.lightPossition = [29.0, -48.0, 37.0, 1.0]
 
-        self.materialSpecular = [.1, .1, .1, .1]
-        self.materialShiness = [0.01]
+        self.materialSpecular = [.0, .0, .0, 1.]
+        self.materialShiness = [0.0]
 
         #screen properties
         self.w = 0
@@ -327,7 +332,7 @@ class GLWidget(QGLWidget):
             self.printing_space[self.parent.controller.printing_parameters.get_printer_parameters(i)['name']] = self.make_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(i))
 
         glClearDepth(1.0)
-        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
+        #glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
         glShadeModel(GL_FLAT)
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
@@ -337,13 +342,20 @@ class GLWidget(QGLWidget):
 
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
+        glEnable(GL_LIGHT0)
+        glEnable(GL_LIGHT1)
+        glEnable(GL_LIGHTING)
+
         #new light settings
         glLightfv(GL_LIGHT0, GL_POSITION, _gl_vector(50, 50, 100, 0))
-        glLightfv(GL_LIGHT0, GL_SPECULAR, _gl_vector(.5, .5, 1., 1.))
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, _gl_vector(1, 1, 1, 1))
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, _gl_vector(1., 1., 1., 1.))
+        glLightfv(GL_LIGHT0, GL_AMBIENT, _gl_vector(0.15, 0.15, 0.15, 1.))
+        #glLightfv(GL_LIGHT0, GL_SPECULAR, _gl_vector(.5, .5, 1., 1.))
+
         glLightfv(GL_LIGHT1, GL_POSITION, _gl_vector(100, 0, 50, 0))
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, _gl_vector(.5, .5, .5, 1.))
-        glLightfv(GL_LIGHT1, GL_SPECULAR, _gl_vector(1., 1., 1., 1.))
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, _gl_vector(1., 1., 1., 1.0))
+        glLightfv(GL_LIGHT1, GL_AMBIENT, _gl_vector(0.15, 0.15, 0.15, 1.))
+        #glLightfv(GL_LIGHT1, GL_SPECULAR, _gl_vector(1., 1., 1., 1.))
         #new light settings
 
         #material
@@ -351,15 +363,22 @@ class GLWidget(QGLWidget):
         #glMaterialfv(GL_FRONT, GL_SHININESS, self.materialShiness)
 
 
-        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+        glColorMaterial(GL_FRONT, GL_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 
-        glEnable( GL_LIGHT0 )
-        glEnable( GL_LIGHT1 )
+
 
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
+
+
+        if self.shaderProgram.addShaderFromSourceFile(QGLShader.Vertex, "data/lightning.vert") \
+                and self.shaderProgram.addShaderFromSourceFile(QGLShader.Fragment, "data/lightning.frag"):
+            self.shader_ok = True
+            self.shaderProgram.log()
+            self.shaderProgram.link()
+
 
 
     #@timing
@@ -443,7 +462,11 @@ class GLWidget(QGLWidget):
             #render solid objects, possible to edit transformation, select objects
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
+                    if self.shader_ok:
+                        self.shaderProgram.bind()
                     model.render(picking=False, blending=not model_view)
+                    if self.shader_ok:
+                        self.shaderProgram.release()
 
             for model in self.parent.controller.scene.models:
                 if model.isVisible and model.selected:
@@ -458,7 +481,11 @@ class GLWidget(QGLWidget):
             #glEnable(GL_LIGHTING)
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
+                    if self.shader_ok:
+                        self.shaderProgram.bind()
                     model.render(picking=False, blending=not model_view)
+                    if self.shader_ok:
+                        self.shaderProgram.release()
             #glDisable(GL_LIGHTING)
 
             color_change_list = [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
@@ -478,8 +505,8 @@ class GLWidget(QGLWidget):
         if self.controller.status == 'generated':
             self.draw_information_window()
 
-        if self.controller.settings['debug']:
-            self.picking_render()
+        #if self.controller.settings['debug']:
+        #    self.picking_render()
 
         glFlush()
 
@@ -642,11 +669,6 @@ class GLWidget(QGLWidget):
 
     def draw_layer(self, layer, color, printer):
         printing_space = printer['printing_space']
-        #if self.controller.gcode_draw_from_button:
-        #    keys = [i for i in self.controller.gcode.data_keys if i <= self.controller.gcode_layer]
-        #    layer_datas = [self.controller.gcode.data[i] for i in keys]
-        #else:
-        #    layer_datas = [self.controller.gcode.data[self.controller.gcode_layer]]
         layer_data = self.controller.gcode.data[layer]
 
 
