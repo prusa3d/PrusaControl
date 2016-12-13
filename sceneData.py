@@ -542,8 +542,6 @@ class Model(object):
                                        (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x0000FF00) >> 8,
                                        (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x00FF0000) >> 16]] for i in self.mesh.normals]
 
-        pprint(d)
-
         '''
         for normal in self.mesh.normals:
             if str(normal) in self.normal_groups:

@@ -53,6 +53,8 @@ class GCode(object):
                 else:
                     continue
 
+        self.data_keys.sort(key=lambda x: float(x))
+
         self.printing_time = self.calculate_time_of_print()
         self.filament_length = 0.0#self.calculate_length_of_filament()
 

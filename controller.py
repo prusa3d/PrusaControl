@@ -673,7 +673,7 @@ class Controller:
         self.camera_rotate = False
 
     def is_some_tool_under_cursor(self, object_id):
-        #print("Is some tool under cursor")
+        print("Is some tool under cursor")
         for tool in self.tools:
             if tool.id == object_id:
                 return True
@@ -699,52 +699,53 @@ class Controller:
         if object_id == 0:
             return False
         for model in self.scene.models:
-            if model.rotateXId == object_id:
-                model.scalenAxis = []
-                model.selected = True
-                model.rotationAxis = 'x'
-                self.tool = 'rotate'
-                return True
-            elif model.rotateYId == object_id:
-                model.scalenAxis = []
-                model.selected = True
-                model.rotationAxis = 'y'
-                self.tool = 'rotate'
-                return True
-            elif model.rotateZId == object_id:
-                model.scalenAxis = []
-                model.selected = True
-                model.rotationAxis = 'z'
-                self.tool = 'rotate'
-                return True
-            elif model.scaleXId == object_id:
-                model.rotationAxis = []
-                model.selected = True
-                model.scaleAxis = 'x'
-                self.tool = 'scale'
-                return True
-            elif model.scaleYId == object_id:
-                model.rotationAxis = []
-                model.selected = True
-                model.scaleAxis = 'y'
-                self.tool = 'scale'
-                return True
-            elif model.scaleZId == object_id:
-                model.rotationAxis = []
-                model.selected = True
-                model.scaleAxis = 'z'
-                self.tool = 'scale'
-                return True
-            elif model.scaleXYZId == object_id:
-                model.rotationAxis = []
-                model.selected = True
-                model.scaleAxis = 'XYZ'
-                self.tool = 'scale'
-                return True
-            else:
-                model.rotationAxis = []
-                model.scalenAxis = []
-                model.selected = False
+            if model.selected:
+                if model.rotateXId == object_id:
+                    model.scalenAxis = []
+                    model.selected = True
+                    model.rotationAxis = 'x'
+                    self.tool = 'rotate'
+                    return True
+                elif model.rotateYId == object_id:
+                    model.scalenAxis = []
+                    model.selected = True
+                    model.rotationAxis = 'y'
+                    self.tool = 'rotate'
+                    return True
+                elif model.rotateZId == object_id:
+                    model.scalenAxis = []
+                    model.selected = True
+                    model.rotationAxis = 'z'
+                    self.tool = 'rotate'
+                    return True
+                elif model.scaleXId == object_id:
+                    model.rotationAxis = []
+                    model.selected = True
+                    model.scaleAxis = 'x'
+                    self.tool = 'scale'
+                    return True
+                elif model.scaleYId == object_id:
+                    model.rotationAxis = []
+                    model.selected = True
+                    model.scaleAxis = 'y'
+                    self.tool = 'scale'
+                    return True
+                elif model.scaleZId == object_id:
+                    model.rotationAxis = []
+                    model.selected = True
+                    model.scaleAxis = 'z'
+                    self.tool = 'scale'
+                    return True
+                elif model.scaleXYZId == object_id:
+                    model.rotationAxis = []
+                    model.selected = True
+                    model.scaleAxis = 'XYZ'
+                    self.tool = 'scale'
+                    return True
+                else:
+                    model.rotationAxis = []
+                    model.scalenAxis = []
+                    #model.selected = False
 
 
     def set_active_tool_helper_by_id(self, object_id):
@@ -761,16 +762,21 @@ class Controller:
             return False
 
     def is_object_already_selected(self, object_id):
+        print("is_object_already_selected")
         for model in self.scene.models:
             #object founded
             if model.id == object_id:
+                print("Je model oznaceny: " + str(model.selected))
                 if model.selected:
                     #object is selected
+                    print("return True")
                     return True
                 else:
                     #object is not selected
+                    print("return False")
                     return False
         #No object with id in scene.models
+        print("Neni")
         return None
 
     def unselect_objects_and_select_this_one(self, object_id):
@@ -872,6 +878,7 @@ class Controller:
                 else:
                     #Je pod kurzorem nejaky tool?
                     if self.is_some_tool_under_cursor(object_id):
+                        print("pod kurzorem je Tool")
                         self.unselect_objects()
                         self.tool_press_event_flag = True
                         tool = self.get_tool_by_id(object_id)
@@ -891,6 +898,7 @@ class Controller:
 
                     elif self.is_object_already_selected(object_id) and self.is_ctrl_pressed():
                         print("object already selected and ctrl pressed")
+                        self.object_select_event_flag = True
                         self.unselect_object(object_id)
                     elif self.is_ctrl_pressed():
                         print("ctrl pressed")
@@ -1051,14 +1059,6 @@ class Controller:
                         sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) * -1.
 
                         alpha = numpy.arctan2(sin_ang, cos_ang)
-                        '''
-                        if alpha < 0.:
-                            alpha = 2*numpy.pi
-                        elif alpha >= 2*numpy.pi:
-                            alpha = 0.
-                        '''
-                        print("angle: " + str(alpha))
-                        #alpha+= self.old_angle
 
                         radius = model.boundingSphereSize
 
@@ -1067,10 +1067,8 @@ class Controller:
 
                         if new_vect_leng >= radius:
                             model.set_rot(model.rot[0], model.rot[1], alpha, False, False, False)
-                            print("New angle: " + str(numpy.degrees(alpha)))
                         else:
                             alpha_new = numpy.degrees(alpha) // 45
-                            print("New round angle: " + str(alpha_new*45.))
                             model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
 
                         #self.view.update_object_settings(model.id)
@@ -1181,7 +1179,7 @@ class Controller:
         if event.button() & QtCore.Qt.LeftButton and self.mouse_press_event_flag and\
                 self.mouse_release_event_flag and self.mouse_move_event_flag == False and\
                 self.object_select_event_flag==False:
-            #print("Podminky splneny")
+            print("Podminky splneny")
             self.clear_event_flag_status()
             self.unselect_objects()
         self.update_scene()
@@ -1321,11 +1319,13 @@ class Controller:
                 possible_hit.append(model)
                 nSelected+=1
             else:
+                print("Tady bych to necekal")
                 model.selected = False
 
         if not nSelected:
             return False
 
+        print("A tady taky ne")
         for model in possible_hit:
             if model.intersection_ray_model(self.ray_start, self.ray_end):
                 model.selected = not model.selected
@@ -1380,6 +1380,7 @@ class Controller:
             return False
         for model in self.scene.models:
             if model.id == find_id:
+                print("Tady to je!!!")
                 model.selected = not model.selected
                 return True
 

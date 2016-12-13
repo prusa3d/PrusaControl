@@ -299,12 +299,12 @@ class GLWidget(QGLWidget):
                                     self.texture_from_png("data/img/gui/BackArrow_On.png"),
                                     self.texture_from_png("data/img/gui/BackArrow_Hover.png"),
                                     self.texture_from_png("data/img/gui/tool_mask.png"),
-                                    [40., 40.], [10, -50], True)
+                                    [40., 40.], [10, -50], True, "undo")
         self.do_button = GlButton(self.texture_from_png("data/img/gui/ForwardArrow_Off.png"),
                                   self.texture_from_png("data/img/gui/ForwardArrow_On.png"),
                                   self.texture_from_png("data/img/gui/ForwardArrow_Hover.png"),
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
-                                  [40., 40.], [60, -50], True)
+                                  [40., 40.], [60, -50], True, "do")
 
 
         #self.selectTool.set_callback(self.parent.controller.select_button_pressed)
@@ -719,10 +719,12 @@ class GLWidget(QGLWidget):
             rotateColors = [[180,180,180],[180,180,180],[180,180,180]]
             scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
 
-        if settings['toolButtons']['rotateButton']:
+        if self.rotateTool.is_pressed():
+        #if settings['toolButtons']['rotateButton']:
             #self.draw_rotation_circle(model, rotateColors, [i + o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
             self.draw_rotation_circle(model, rotateColors, model.pos, model.boundingSphereSize, picking)
-        elif settings['toolButtons']['scaleButton']:
+        if self.scaleTool.is_pressed():
+        #elif settings['toolButtons']['scaleButton']:
             self.draw_scale_rect(model, scaleColors, model.pos, model.boundingSphereSize, picking)
 
 

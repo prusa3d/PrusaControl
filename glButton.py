@@ -39,6 +39,7 @@ class GlButton(object):
             self.pressed = False
         else:
             self.pressed = not self.pressed
+        print("Byl stisknut " + self.tool_name)
         self.callback_function()
 
     def unpress_button(self):
@@ -52,6 +53,12 @@ class GlButton(object):
     def set_viewport(self, width, height):
         self.xW = width
         self.yH = height
+
+    def is_pressed(self):
+        if self.pressed:
+            return True
+        else:
+            return False
 
     def get_size(self):
         pass
