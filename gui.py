@@ -1384,10 +1384,11 @@ class PrusaControlView(QtGui.QMainWindow):
 
         return data
 
-    def save_gcode_file_dialog(self):
+    def save_gcode_file_dialog(self, filename = "sliced_model"):
         filters = "gcode (*.gcode *.GCODE)"
         title = 'Save G-Code file'
-        open_at = "/home"
+        #open_at = "/home"
+        open_at = "/" + filename
         data = QtGui.QFileDialog.getSaveFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data

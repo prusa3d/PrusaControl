@@ -371,6 +371,7 @@ class GLWidget(QGLWidget):
 
         glEnable(GL_MULTISAMPLE)
         glEnable(GL_LINE_SMOOTH)
+        glEnable(GL_NORMALIZE)
 
 
         if self.shaderProgram.addShaderFromSourceFile(QGLShader.Vertex, "data/lightning.vert") \
@@ -507,6 +508,10 @@ class GLWidget(QGLWidget):
 
         #if self.controller.settings['debug']:
         #    self.picking_render()
+
+        if self.controller.settings['debug']:
+            print("draw_debug")
+            self.draw_debug()
 
         glFlush()
 

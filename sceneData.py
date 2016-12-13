@@ -27,6 +27,8 @@ from OpenGL.GL import *
 from copy import deepcopy
 from pyrr import matrix44, Vector3, geometric_tests, line, ray, plane, matrix33
 
+from collections import namedtuple
+
 #glutInit()
 
 def timing(f):
@@ -52,6 +54,8 @@ class AppScene(object):
         self.copied_models = []
         self.printable = True
         self.camera_vector = np.array([0.,0.,0.])
+
+        self.place_offset = np.array([0., 0., 0.])
 
         self.transformation_list = []
         self.actual_list_position = 0
@@ -122,7 +126,6 @@ class AppScene(object):
     @timing
     def get_contact_faces_with_area_smaller_than(self, area_size, whole_scene):
         #whole_scene = self.get_whole_scene_in_one_mesh()
-
 
         b= whole_scene.vectors[:, :, 2] < 0.1
         b_tmp = np.array([i.all() for i in b])
@@ -227,17 +230,20 @@ class AppScene(object):
 
 
     def copy_selected_objects(self):
+        self.place_offset = np.array([0.,0.,0.])
         self.copied_models = []
         for m in self.models:
             if m.selected and m.isVisible:
                 self.copied_models.append(m)
 
     def paste_selected_objects(self):
+        self.place_offset += np.array([0.5, 0.5, 0.])
         for i in self.copied_models:
             m = deepcopy(i)
-            m.set_move([1.0,1.0,0.0], True, False)
+            m.set_move(self.place_offset, True, False)
             self.models.append(m)
 
+        self.controller.update_scene()
         #self.automatic_models_position()
 
     #TODO:Add brim and support message
@@ -284,7 +290,7 @@ class AppScene(object):
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
-            self.models[0 ].pos[0] = position_vector[0]
+            self.models[0].pos[0] = position_vector[0]
             self.models[0].pos[1] = position_vector[1]
 
             self.models[0].max_scene = self.models[0].max + self.models[0].pos
@@ -457,6 +463,7 @@ class Model(object):
         self.filename = ""
         self.normalization_flag = False
 
+
     def __deepcopy__(self, memodict={}):
         m = Model()
 
@@ -474,11 +481,30 @@ class Model(object):
         m.min = deepcopy(self.min)
         m.max = deepcopy(self.max)
 
+        m.v0 = deepcopy(self.v0)
+        m.v1 = deepcopy(self.v1)
+        m.v2 = deepcopy(self.v2)
+
+        m.t0 = deepcopy(self.v0)
+        m.t1 = deepcopy(self.t1)
+        m.t2 = deepcopy(self.t2)
+
+        m.n0 = deepcopy(self.n0)
+        m.n1 = deepcopy(self.n1)
+        m.n2 = deepcopy(self.n2)
+
+
         m.min_scene = deepcopy(self.min_scene)
         m.max_scene = deepcopy(self.max_scene)
 
         m.size = deepcopy(self.size)
         m.size_origin = deepcopy(self.size_origin)
+
+        m.boundingSphereSize = deepcopy(self.boundingSphereSize)
+        m.boundingSphereCenter = deepcopy(self.boundingSphereCenter)
+        m.boundingBox = deepcopy(self.boundingBox)
+        m.boundingMinimalPoint = deepcopy(self.boundingMinimalPoint)
+        m.zeroPoint = deepcopy(self.zeroPoint)
 
         m.temp_mesh = deepcopy(self.mesh)
         #print("Udelana kopie")
@@ -490,26 +516,33 @@ class Model(object):
         actual_id = 0
         id=0
 
-        d = defaultdict(int)
+        #d = defaultdict(int)
+
+        self.mesh.normals = np.array([n for n in self.mesh.normals])
+
+        Vect = namedtuple("Vect", ["x", "y", "z"])
+        d = {}
+
 
         for normal in self.mesh.normals:
-            if str(normal) in d:
-                id = d[str(normal)]
+            if Vect(self.str_c(normal[0]), self.str_c(normal[1]), self.str_c(normal[2])) in d:
+                id = d[Vect(self.str_c(normal[0]), self.str_c(normal[1]), self.str_c(normal[2]))]
             else:
-                d[str(normal)] = actual_id
+                d[Vect(self.str_c(normal[0]), self.str_c(normal[1]), self.str_c(normal[2]))] = actual_id
                 actual_id += 1
 
-        '''
-        self.face_colors = [[[(d[str(i)] & 0x000000FF) >> 0,
-                                       (d[str(i)] & 0x0000FF00) >> 8,
-                                       (d[str(i)] & 0x00FF0000) >> 16],
-                                      [(d[str(i)] & 0x000000FF) >> 0,
-                                       (d[str(i)] & 0x0000FF00) >> 8,
-                                       (d[str(i)] & 0x00FF0000) >> 16],
-                                      [(d[str(i)] & 0x000000FF) >> 0,
-                                       (d[str(i)] & 0x0000FF00) >> 8,
-                                       (d[str(i)] & 0x00FF0000) >> 16]] for i in self.mesh.normals]
-        '''
+
+        self.face_colors = [[[(d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x000000FF) >> 0,
+                                       (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x0000FF00) >> 8,
+                                       (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x00FF0000) >> 16],
+                                      [(d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x000000FF) >> 0,
+                                       (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x0000FF00) >> 8,
+                                       (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x00FF0000) >> 16],
+                                      [(d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x000000FF) >> 0,
+                                       (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x0000FF00) >> 8,
+                                       (d[Vect(self.str_c(i[0]), self.str_c(i[1]), self.str_c(i[2]))] & 0x00FF0000) >> 16]] for i in self.mesh.normals]
+
+        pprint(d)
 
         '''
         for normal in self.mesh.normals:
@@ -536,6 +569,11 @@ class Model(object):
 
         #print("Face colors:")
         #pprint(self.face_colors)
+
+    def str_c(self, input):
+        if input == 0.0:
+            input = 0.0
+        return str(input)
 
     def clear_state(self):
         self.is_changed = False
@@ -914,7 +952,8 @@ class Model(object):
         self.put_array_to_gl()
 
         glEnableClientState(GL_VERTEX_ARRAY)
-        #glEnableClientState(GL_COLOR_ARRAY)
+        #if not picking:
+        #    glEnableClientState(GL_COLOR_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
         if picking:
@@ -951,7 +990,8 @@ class Model(object):
 
 
         glDisableClientState(GL_VERTEX_ARRAY)
-        #glDisableClientState(GL_COLOR_ARRAY)
+        #if not picking:
+        #    glDisableClientState(GL_COLOR_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
 
         if self.is_in_printing_area == False:
@@ -1111,8 +1151,11 @@ class Model(object):
         beta = AppScene.calc_angle(up_vector, normal_face_vector_tmp2)
 
 
-        #print("Nalezeny uhly alpha %s a beta %s" % (str(alpha), str(beta)))
-        self.set_rot(np.deg2rad(alpha), 0., 0.)
+        print("Nalezeny uhly alpha %s a beta %s" % (str(alpha), str(beta)))
+        if alpha<=beta:
+            self.set_rot(np.deg2rad(alpha), 0., 0.)
+        else:
+            self.set_rot(0., np.deg2rad(beta), 0.)
         return deepcopy(hit_face)
 
 

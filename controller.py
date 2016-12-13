@@ -473,6 +473,36 @@ class Controller:
         elif i.text() == 'Cancel':
             self.canceled = True
 
+    #TODO:Better way
+    def generate_gcode_filename(self):
+        suggest_filename = ""
+        filename = ""
+        '''
+        list = []
+        if len(self.scene.models) == 1:
+            filename = self.scene.models[0].filename
+            suggest_filename = filename.split(".")
+            suggest_filename = suggest_filename[0]
+        else:
+            #for m in self.scene.models:
+            #    list.append(m.filename)
+            suggest_filename = "mix"
+        '''
+        for m in self.scene.models:
+            if m.isVisible:
+                filename = m.filename
+                break
+
+        suggest_filename = filename.split(".")
+        suggest_filename = suggest_filename[0]
+        data = self.get_actual_printing_data()
+        material_name = data['material']
+        quality_name = data['quality']
+
+        suggest_filename += "_" + material_name.upper() + "_" + quality_name.upper()
+
+        return suggest_filename
+
 
     def open_web_browser(self, url):
         webbrowser.open(url, 1)
@@ -534,7 +564,8 @@ class Controller:
         self.save_project(data)
 
     def save_gcode_file(self):
-        data = self.view.save_gcode_file_dialog()
+        suggested_filename = self.generate_gcode_filename()
+        data = self.view.save_gcode_file_dialog(suggested_filename)
         filename = data.split('.')
         if filename[-1] in ['gcode', 'GCODE']:
             filename_out = data
@@ -936,11 +967,11 @@ class Controller:
                     self.view.glWidget.rayStart = ray_start
                     self.view.glWidget.rayDir = numpy.array(ray_end) - numpy.array(ray_start)
                     face = model.place_on_face(ray_start, ray_end)
-                    #if not face == []:
-                    #    self.view.glWidget.v0 = face[0]
-                    #    self.view.glWidget.v1 = face[1]
-                    #    self.view.glWidget.v2 = face[2]
-                        #print("Nalezen objekt " + str(model))
+                    if not face == []:
+                        self.view.glWidget.v0 = face[0]
+                        self.view.glWidget.v1 = face[1]
+                        self.view.glWidget.v2 = face[2]
+                        print("Nalezen objekt " + str(model))
         elif self.tool == 'scale':
             ray_start, ray_end = self.view.get_cursor_position(event)
 
@@ -1128,6 +1159,7 @@ class Controller:
     def get_active_tool(self):
         for tool in self.tools:
             if tool.pressed:
+                print("Tool name: " + str(tool.tool_name))
                 return tool.tool_name
         return 'move'
 
