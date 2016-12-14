@@ -321,7 +321,9 @@ class GLWidget(QGLWidget):
         self.popup_widget = self.texture_from_png("data/img/gui/popup_window.png")
 
 
-        self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.undo_button, self.do_button]
+        #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.undo_button, self.do_button]
+        self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
+
         #self.tools = []
 
         self.bed = {}

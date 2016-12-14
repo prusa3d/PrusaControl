@@ -1173,8 +1173,10 @@ class Model(object):
 
         print("Nalezeny uhly alpha %s a beta %s" % (str(alpha), str(beta)))
         if alpha<=beta:
+            print("Alpha")
             self.set_rot(np.deg2rad(alpha), 0., 0.)
         else:
+            print("Beta")
             self.set_rot(0., np.deg2rad(beta), 0.)
         return deepcopy(hit_face)
 

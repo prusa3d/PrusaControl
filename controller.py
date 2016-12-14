@@ -880,12 +880,12 @@ class Controller:
                         print("pod kurzorem je Tool")
                         self.unselect_objects()
                         self.tool_press_event_flag = True
-                        tool = self.get_tool_by_id(object_id)
+                        self.tool = self.get_tool_by_id(object_id)
                         for t in self.tools:
-                            if not t == tool:
+                            if not t == self.tool:
                                 t.unpress_button()
                             else:
-                                tool.press_button()
+                                self.tool.press_button()
                         #tool.activate_tool()
 
                     #Je pod kurzorem nejaky tool helper?
@@ -902,6 +902,10 @@ class Controller:
                     elif self.is_ctrl_pressed():
                         print("ctrl pressed")
                         self.select_object(object_id)
+                    elif self.is_object_already_selected(object_id) and self.is_some_tool_active():
+                        print("object already selected and tool placeonface is on")
+                        self.tool=self.get_active_tool()
+                        self.prepare_tool(event)
                     elif self.is_object_already_selected(object_id):
                         print("object already selected")
                         pass
@@ -910,7 +914,7 @@ class Controller:
                         self.unselect_objects()
                         self.select_object(object_id)
 
-
+                    print("Aktualni tool je: " + self.tool)
                     self.tool = self.get_active_tool()
                     #Je objekt oznaceny?
                     '''
@@ -950,6 +954,20 @@ class Controller:
         self.update_scene()
         #self.view.update_scene()
 
+
+    def is_some_tool_active(self):
+        for tool in self.tools:
+            if tool.is_pressed() and tool.tool_name=='placeonface':
+                return True
+
+        return False
+
+    #def get_active_tool(self):
+    #    for tool in self.tools:
+    #        if tool.is_pressed():
+    #            return tool.tool_name
+
+
     def prepare_tool(self, event):
         print("prepare tool")
         if self.tool == 'rotate':
@@ -968,6 +986,7 @@ class Controller:
 
 
         elif self.tool == 'placeonface':
+            print("inside placeonface")
             ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected:
