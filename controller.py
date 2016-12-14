@@ -591,8 +591,7 @@ class Controller:
         if self.settings['automatic_placing']:
             self.scene.automatic_models_position()
         self.scene.clear_history()
-        for m in self.scene.models:
-            self.scene.save_change(m)
+        self.scene.save_change(self.scene.models)
         self.update_scene()
         #self.view.update_scene()
 
@@ -1032,81 +1031,84 @@ class Controller:
 
         #Rotate function
         elif self.tool == 'rotate':
-            print("rotate function")
-            newRayStart, newRayEnd = self.view.get_cursor_position(event)
-            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
-            if res is not None:
-                res_new = res - self.res_old
+            if self.tool_helper_press_event_flag:
+                print("rotate function")
+                newRayStart, newRayEnd = self.view.get_cursor_position(event)
+                res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+                if res is not None:
+                    res_new = res - self.res_old
+                    for model in self.scene.models:
+                        if model.selected:
+                            pos = deepcopy(model.pos)
+                            pos[2] = 0.
+
+                            #New
+                            new_vec = res - pos
+                            #self.view.glWidget.hitPoint = deepcopy(new_vec)
+                            new_vect_leng = numpy.linalg.norm(new_vec)
+                            new_vec /= new_vect_leng
+
+                            old_vec = self.res_old - pos
+                            #self.view.glWidget.oldHitPoint = deepcopy(old_vec)
+                            old_vec /= numpy.linalg.norm(old_vec)
+
+                            cos_ang = numpy.dot(old_vec, new_vec)
+                            cross = numpy.cross(old_vec, new_vec)
+
+                            neg = numpy.dot(cross, numpy.array([0., 0., 1.]))
+                            sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) * -1.
+
+                            alpha = numpy.arctan2(sin_ang, cos_ang)
+
+                            radius = model.boundingSphereSize
+
+                            if radius < 2.5:
+                                radius = 2.5
+
+                            if new_vect_leng >= radius:
+                                model.set_rot(model.rot[0], model.rot[1], alpha, False, False, False)
+                            else:
+                                alpha_new = numpy.degrees(alpha) // 45
+                                model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
+
+                            #self.view.update_object_settings(model.id)
+                            self.view.update_rotate_widgets(model.id)
+                            self.scene_was_changed()
+                    #self.res_old = res
+
+        #Scale function
+        elif self.tool == 'scale':
+            if self.tool_helper_press_event_flag:
+                print("scale function")
+                ray_start, ray_end = self.view.get_cursor_position(event)
+                #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+
                 for model in self.scene.models:
                     if model.selected:
                         pos = deepcopy(model.pos)
                         pos[2] = 0.
+                        new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
+                        new_scale_vect = new_scale_point - pos
 
-                        #New
-                        new_vec = res - pos
-                        #self.view.glWidget.hitPoint = deepcopy(new_vec)
-                        new_vect_leng = numpy.linalg.norm(new_vec)
-                        new_vec /= new_vect_leng
+                        l = numpy.linalg.norm(new_scale_vect)
+                        l-=.5
 
-                        old_vec = self.res_old - pos
-                        #self.view.glWidget.oldHitPoint = deepcopy(old_vec)
-                        old_vec /= numpy.linalg.norm(old_vec)
+                        origin_size = deepcopy(model.size_origin)
+                        origin_size[2] = 0.
+                        origin_size*=.5
 
-                        cos_ang = numpy.dot(old_vec, new_vec)
-                        cross = numpy.cross(old_vec, new_vec)
+                        new_scale = l/numpy.linalg.norm(origin_size)
+                        #print("Nova velikost scalu: " + str(new_scale))
 
-                        neg = numpy.dot(cross, numpy.array([0., 0., 1.]))
-                        sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) * -1.
+                        model.set_scale_abs(new_scale, new_scale, new_scale)
+                        #model.set_scale(new_scale)
+                        self.last_l=new_scale
 
-                        alpha = numpy.arctan2(sin_ang, cos_ang)
-
-                        radius = model.boundingSphereSize
-
-                        if radius < 2.5:
-                            radius = 2.5
-
-                        if new_vect_leng >= radius:
-                            model.set_rot(model.rot[0], model.rot[1], alpha, False, False, False)
-                        else:
-                            alpha_new = numpy.degrees(alpha) // 45
-                            model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
-
-                        #self.view.update_object_settings(model.id)
-                        self.view.update_rotate_widgets(model.id)
+                        self.view.update_scale_widgets(model.id)
                         self.scene_was_changed()
-                #self.res_old = res
-
-        #Scale function
-        elif self.tool == 'scale':
-            print("scale function")
-            ray_start, ray_end = self.view.get_cursor_position(event)
-            #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
-
-            for model in self.scene.models:
-                if model.selected:
-                    pos = deepcopy(model.pos)
-                    pos[2] = 0.
-                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
-                    new_scale_vect = new_scale_point - pos
-
-                    l = numpy.linalg.norm(new_scale_vect)
-                    l-=.5
-
-                    origin_size = deepcopy(model.size_origin)
-                    origin_size[2] = 0.
-                    origin_size*=.5
-
-                    new_scale = l/numpy.linalg.norm(origin_size)
-                    print("Nova velikost scalu: " + str(new_scale))
-
-                    model.set_scale_abs(new_scale, new_scale, new_scale)
-                    #model.set_scale(new_scale)
-                    self.last_l=new_scale
-
-                    #self.view.update_scale_widgets(model.id)
-                    self.scene_was_changed()
 
         else:
+            print("Mouse move event else vetev")
             if self.render_status == 'model_view':
                 object_id = self.get_id_under_cursor(event)
                 #TOOLs hover effect
@@ -1132,6 +1134,7 @@ class Controller:
         self.update_scene()
         #self.view.update_scene()
 
+
     def select_tool_helper(self, event):
         object_id = self.get_id_under_cursor(event)
         if object_id > 0:
@@ -1151,6 +1154,7 @@ class Controller:
                     m.scaleAxis = ""
 
 
+
     def organize_button_pressed(self):
         self.scene.automatic_models_position()
 
@@ -1162,6 +1166,7 @@ class Controller:
         return 'move'
 
     def mouse_release_event(self, event):
+        models_list = []
         #print("Mouse releas event")
         self.mouse_release_event_flag = True
         self.set_camera_function_false()
@@ -1172,14 +1177,17 @@ class Controller:
                     model.update_min_max()
                     if not self.tool == 'scale':
                         model.recalc_bounding_sphere()
-                    self.scene.save_change(model)
+                    models_list.append(model)
+            if models_list and self.mouse_move_event_flag:
+                self.scene.save_change(self.scene.models)
+                #self.scene.save_change(models_list)
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])
 
         if event.button() & QtCore.Qt.LeftButton and self.mouse_press_event_flag and\
                 self.mouse_release_event_flag and self.mouse_move_event_flag == False and\
                 self.object_select_event_flag==False:
-            print("Podminky splneny")
+            #print("Podminky splneny")
             self.clear_event_flag_status()
             self.unselect_objects()
         self.update_scene()
@@ -1443,14 +1451,16 @@ class Controller:
         pass
 
     def undo_button_pressed(self):
-        #print("Undo")
+        print("Undo")
         self.clear_tool_button_states()
         self.scene.make_undo()
+        self.update_scene()
 
     def do_button_pressed(self):
-        #print("Do")
+        print("Do")
         self.clear_tool_button_states()
         self.scene.make_do()
+        self.update_scene()
 
     def select_button_pressed(self):
         self.clear_tool_button_states()

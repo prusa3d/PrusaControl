@@ -63,41 +63,61 @@ class AppScene(object):
         self.analyze_result_data_tmp = []
 
     def clear_history(self):
+        #print("Mazu historii")
         self.transformation_list = []
         self.actual_list_position = 0
 
-    def save_change(self, old_instance):
+    def save_change(self, old_instances_list):
+        #print("Ukladam stav objektu")
         if self.actual_list_position < len(self.transformation_list)-1:
             self.transformation_list = self.transformation_list[:self.actual_list_position+1]
 
-        self.transformation_list.append([old_instance, deepcopy(old_instance.isVisible), np.copy(old_instance.scale), np.copy(old_instance.rot), np.copy(old_instance.pos)])
+        list_of_states = [[i, deepcopy(i.isVisible), deepcopy(i.scale), deepcopy(i.rot), deepcopy(i.pos)] for i in old_instances_list]
+
+        self.transformation_list.append(list_of_states)
         self.actual_list_position = len(self.transformation_list)-1
         #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
+        #pprint(self.transformation_list)
+
+
     def make_undo(self):
         #just move pointer of transformation to -1 or leave on 0
+        #print("Aktualni pozice je: " + str(self.actual_list_position))
+        #pprint(self.transformation_list)
         if self.actual_list_position >= 1:
             self.actual_list_position -= 1
-            old_instance, isVisible, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.isVisible = deepcopy(isVisible)
-            old_instance.scale = np.copy(scale)
-            old_instance.rot = np.copy(rot)
-            old_instance.pos = np.copy(pos)
-            old_instance.is_changed = True
-            old_instance.update_min_max()
+            list_of_states = self.transformation_list[self.actual_list_position]
+            #print("Vraceny stav:")
+            #pprint(list_of_states)
+            for i in list_of_states:
+                old_instance, isVisible, scale, rot, pos = i
+                old_instance.isVisible = deepcopy(isVisible)
+                old_instance.scale = deepcopy(scale)
+                old_instance.rot = deepcopy(rot)
+                old_instance.pos = deepcopy(pos)
+                old_instance.is_changed = True
+                old_instance.update_min_max()
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+        #print("Konec stavu")
 
     def make_do(self):
         #move pointer of transformation to +1 or leave on last
+        #print("Aktualni pozice je: " + str(self.actual_list_position))
+        #pprint(self.transformation_list)
         if self.actual_list_position < len(self.transformation_list)-1:
+            #print("jsem uvnitr")
             self.actual_list_position += 1
-            old_instance, isVisible, scale, rot, pos = self.transformation_list[self.actual_list_position]
-            old_instance.isVisible = deepcopy(isVisible)
-            old_instance.scale = np.copy(scale)
-            old_instance.rot = np.copy(rot)
-            old_instance.pos = np.copy(pos)
-            old_instance.is_changed = True
-            old_instance.update_min_max()
+            list_of_states = self.transformation_list[self.actual_list_position]
+            for i in list_of_states:
+                old_instance, isVisible, scale, rot, pos = i
+                old_instance.isVisible = deepcopy(isVisible)
+                old_instance.scale = deepcopy(scale)
+                old_instance.rot = deepcopy(rot)
+                old_instance.pos = deepcopy(pos)
+                old_instance.is_changed = True
+                old_instance.update_min_max()
+
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
 
 
@@ -285,6 +305,8 @@ class AppScene(object):
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
         for i, m in enumerate(self.models):
             self.find_new_position(i, m)
+
+        self.save_change(self.models)
 
 
     def find_new_position(self, index, model):

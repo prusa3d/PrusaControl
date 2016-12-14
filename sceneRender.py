@@ -803,7 +803,7 @@ class GLWidget(QGLWidget):
             glEnd()
 
             if model.scaleAxis == 'XYZ':
-                glColor3f(1.,0.,0.)
+                glColor3ub(255, 97, 0)
             else:
                 glColor3f(1.,1.,1.)
             glBegin(GL_TRIANGLES)
@@ -951,11 +951,13 @@ class GLWidget(QGLWidget):
                 glVertex3f(i[0], i[1], 0.)
             glEnd()
 
-            print("sceneRender: " + str(actual_angle))
+            #print("sceneRender: " + str(actual_angle))
             if model.rotationAxis == "Z":
                 glLineWidth(5)
+                glColor3ub(255, 97, 0)
             else:
                 glLineWidth(2.5)
+                glColor3ub(255, 255, 255)
             glBegin(GL_LINES)
             glVertex3f(0., 0., 0.)
             glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0.)

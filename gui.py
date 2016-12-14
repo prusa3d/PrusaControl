@@ -879,8 +879,9 @@ class PrusaControlView(QtGui.QMainWindow):
             if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
                 if self.controller.settings['toolButtons']['rotateButton'] or\
                         self.controller.settings['toolButtons']['scaleButton']:
+
                     self.controller.select_tool_helper(event)
-                    #self.update_scene()
+                    self.update_scene()
         return QtGui.QMainWindow.eventFilter(self, source, event)
 
 
