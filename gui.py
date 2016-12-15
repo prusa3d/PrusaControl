@@ -2,6 +2,7 @@
 import logging
 import math
 import os
+from pprint import pprint
 
 import numpy as np
 from OpenGL.GL import *
@@ -1370,9 +1371,11 @@ class PrusaControlView(QtGui.QMainWindow):
         filters = "STL (*.stl *.STL)"
         title = "Import model file"
         open_at = "/home"
-        data = QtGui.QFileDialog.getOpenFileName(None, title, open_at, filters)
-        data = self.convert_file_path_to_unicode(data)
-        return data
+        data = QtGui.QFileDialog.getOpenFileNames(None, title, open_at, filters)
+        filenames_list = []
+        for path in data:
+            filenames_list.append(self.convert_file_path_to_unicode(path))
+        return filenames_list
 
     def save_project_file_dialog(self):
         filters = "Prus (*.prus *.PRUS)"

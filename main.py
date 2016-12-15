@@ -3,6 +3,7 @@
 import atexit
 
 from PyQt4 import QtGui
+from tendo.singleton import SingleInstance
 
 from controller import Controller
 from sceneRender import *
@@ -32,6 +33,8 @@ def main():
             SCRIPT_ROOT = os.path.dirname(sys.executable)
     except AttributeError:
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
+    me = SingleInstance()
 
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))

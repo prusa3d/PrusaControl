@@ -114,6 +114,7 @@ class Controller:
         self.render_status = 'model_view'   #'gcode_view'
         self.status = 'edit'
         self.canceled = False
+        self.filament_use = ''
 
         self.mouse_double_click_event_flag = False
         self.mouse_press_event_flag = False
@@ -173,10 +174,10 @@ class Controller:
             return
 
         printing_time = self.gcode.printing_time
-        filament_length = self.gcode.filament_length
+        filament_length = self.filament_use
 
         printing_time_str = self.convert_printing_time_from_seconds(printing_time)
-        filament_length_str = "%.2d m" % (filament_length)
+        filament_length_str = "%s" % (filament_length)
 
         data = {'info_text': 'info total:',
                 'printing_time': printing_time_str,
@@ -282,6 +283,10 @@ class Controller:
         id = self.get_id_under_cursor(event)
         if self.is_some_tool_under_cursor(id):
             self.view.update_scene()
+
+    def unselect_tool_buttons(self):
+        for tool in self.tools:
+            tool.unpress_button()
 
 
     def set_gcode_view(self):
@@ -581,7 +586,8 @@ class Controller:
     def open_model_file(self):
         data = self.view.open_model_file_dialog()
         #logging.debug('open model file %s' %data)
-        self.import_model(data)
+        for path in data:
+            self.import_model(path)
 
     def import_model(self, path):
         self.view.statusBar().showMessage('Load file name: ' + path)
@@ -641,8 +647,10 @@ class Controller:
         exit()
 
     def set_print_info_text(self, string):
-
-        self.gcode.set_print_info_text(string)
+        #print("Nejaky text ze Sliceru: " + string)
+        string = string.split(' ')
+        self.filament_use = string[0]
+        #self.gcode.set_print_info_text(string[0])
 
     def scene_was_changed(self):
         if self.status == 'generating':
@@ -834,16 +842,71 @@ class Controller:
         key = event.key()
         if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view':
             self.scene.delete_selected_models()
+            self.update_scene()
         elif key in [Qt.Key_C] and self.is_ctrl_pressed() and self.render_status == 'model_view':
             #print("Copy models")
             self.scene.copy_selected_objects()
+            self.update_scene()
         elif key in [Qt.Key_V] and self.is_ctrl_pressed() and self.render_status == 'model_view':
             #print("Paste models")
             self.scene.paste_selected_objects()
+            self.update_scene()
+        elif key in [Qt.Key_Z] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+            print("Undo pressed")
+            self.unselect_tool_buttons()
+            self.view.glWidget.undo_button.press_button()
+            #self.undo_button_pressed()
+            self.update_scene()
+        elif key in [Qt.Key_Y] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+            print("Redo pressed")
+            self.unselect_tool_buttons()
+            self.view.glWidget.do_button.press_button()
+            #self.do_button_pressed()
+            self.update_scene()
+        elif key in [Qt.Key_R] and self.render_status == 'model_view':
+            print("R pressed ")
+            if self.view.glWidget.rotateTool.is_pressed():
+                self.unselect_tool_buttons()
+            else:
+                self.unselect_tool_buttons()
+                self.view.glWidget.rotateTool.press_button()
+            self.update_scene()
+        elif key in [Qt.Key_S] and self.render_status == 'model_view':
+            print("S pressed ")
+            if self.view.glWidget.scaleTool.is_pressed():
+                self.unselect_tool_buttons()
+            else:
+                self.unselect_tool_buttons()
+                self.view.glWidget.scaleTool.press_button()
+            self.update_scene()
+        elif key in [Qt.Key_A] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+            print("A and ctrl pressed")
+            self.select_all()
+            self.update_scene()
+        elif key in [Qt.Key_A] and self.render_status == 'model_view':
+            print("A pressed")
+            self.unselect_tool_buttons()
+            self.scene.automatic_models_position()
+            self.update_scene()
+        elif key in [Qt.Key_I] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+            print("I and ctrl pressed ")
+            self.invert_selection()
+            self.update_scene()
+
 
 
     def mouse_double_click(self, event):
         pass
+
+    def select_all(self):
+        for m in self.scene.models:
+            if m.isVisible:
+                m.selected = True
+
+    def invert_selection(self):
+        for m in self.scene.models:
+            if m.isVisible:
+                m.selected = not m.selected
 
     '''
     def mouse_double_click(self, event):
@@ -1136,6 +1199,7 @@ class Controller:
                     for tool in self.tools:
                         if tool.id == object_id:
                             tool.mouse_is_over(True)
+                            self.view.glWidget.setToolTip("Toto je %s" % tool.tool_name)
                         else:
                             tool.mouse_is_over(False)
 
@@ -1143,8 +1207,9 @@ class Controller:
                     #    self.select_tool_helper_by_id(object_id)
                         #for tool_helper in self.get_tools_helpers_id(1,0):
                         #    if tool_helper == object_id:
-
                 else:
+                    #TODO:Disable tooltip
+                    self.view.glWidget.setToolTip("")
                     for tool in self.tools:
                         tool.mouse_is_over(False)
 
