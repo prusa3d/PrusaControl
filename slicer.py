@@ -27,6 +27,10 @@ class SlicerEngineAbstract():
     def set_data(self, data):
         pass
 
+    @abstractmethod
+    def get_version(self):
+        pass
+
 
 #TODO:This is wrong design,
 class Slic3rEngineRunner(QObject):
@@ -68,7 +72,7 @@ class Slic3rEngineRunner(QObject):
             #['support_material', 'support', self.boolean_transform]
             ['support_material', 'support_on_off', self.support1_transform],
             ['support_material_buildplate_only', 'support_build_plate', self.support2_transform],
-            ['overhang', 'overhang', self.support3_transform]
+            ['overhangs', 'overhangs', self.support3_transform]
         ]
         for i in translation_table:
             old[i[0]] = i[2](update[i[1]])
@@ -173,6 +177,11 @@ class Slic3rEngineRunner(QObject):
     def end(self):
         self.end_callback()
 
+    def get_version(self):
+        version_process = subprocess.Popen(self.slicer_place + ["--version"], stdout=subprocess.PIPE)
+        version_info = version_process.stdout.readline()
+        return version_info
+
 class CuraEngine(SlicerEngineAbstract):
     '''
     This is just connector to console version of Slic3r software
@@ -195,7 +204,7 @@ class SlicerEngineManager(object):
     def __init__(self, controller):
         self.controller = controller
         self.slice_thread = None
-        self.slice_engine = None
+        self.slice_engine = Slic3rEngineRunner(self.controller)
 
 
     def slice(self):
@@ -207,7 +216,7 @@ class SlicerEngineManager(object):
         self.slice_engine.finished.connect(self.thread_ended)
         self.slice_engine.filament_info.connect(self.controller.set_print_info_text)
         self.slice_engine.step_increased.connect(self.controller.set_progress_bar)
-        self.slice_engine.send_message.connect(self.controller.show_message_on_status_bar)
+        #self.slice_engine.send_message.connect(self.controller.show_message_on_status_bar)
 
         self.slice_thread.start()
 
@@ -226,4 +235,8 @@ class SlicerEngineManager(object):
         self.slice_thread.quit()
         #TODO: add function to read gcode
         self.controller.scene_was_sliced()
+
+
+    def get_version(self):
+        return self.slice_engine.get_version()
 

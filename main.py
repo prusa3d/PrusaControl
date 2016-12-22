@@ -19,7 +19,7 @@ __author__ = 'Tibor Vavra'
 DEBUG = False
 
 def log_exception(excType, excValue, traceback):
-    print("Loguji")
+    #print("Loguji")
     logging.error("Logging an uncaught exception",
                  exc_info=(excType, excValue, traceback))
 
@@ -27,6 +27,8 @@ def log_exception(excType, excValue, traceback):
 
 def main():
     sys.excepthook = log_exception
+
+
 
     try:
         if sys.frozen or sys.importers:
@@ -36,12 +38,11 @@ def main():
 
     me = SingleInstance()
 
+
     app = QtGui.QApplication(sys.argv)
     app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
 
     local_path = os.path.realpath(__file__)
-
-
 
     controller = Controller(app, local_path)
     window = controller.get_view()

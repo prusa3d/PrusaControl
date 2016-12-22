@@ -9,7 +9,9 @@ from os.path import basename
 import time
 from PyQt4.QtCore import QObject
 from PyQt4.QtOpenGL import QGLBuffer
+from stl import Mode
 from stl.mesh import Mesh
+
 from random import randint
 import math
 import itertools

@@ -132,6 +132,8 @@ class Controller:
 
         self.app = app
         self.app_parameters = app.arguments()
+        self.dpi_coef = app.desktop().logicalDpiX()/96.
+        self.dpi_scale = 0 if self.dpi_coef==1.0 else 2
 
         self.translator = QtCore.QTranslator()
         self.set_language(self.settings['language'])
@@ -221,6 +223,15 @@ class Controller:
         with open(self.app_config.config_path, 'wb') as configfile:
             config.write(configfile)
 
+    def set_basic_settings(self):
+        self.view.object_variable_layer_box.setVisible(False)
+        self.view.object_group_box.setVisible(True)
+
+    def set_advance_settings(self):
+        self.view.object_group_box.setVisible(False)
+        self.view.object_variable_layer_box.setVisible(True)
+
+
     def set_gcode_slider(self, min, max, min_l, max_l):
         '''
         self.view.gcode_slider.setMinimum(min)
@@ -297,6 +308,10 @@ class Controller:
 
     def set_model_edit_view(self):
         self.render_status = 'model_view'
+        self.set_generate_button()
+        self.view.enable_editing()
+        self.status = 'edit'
+        #self.editable = editable
         self.view.close_gcode_view()
 
     def open_gcode_gui(self):
@@ -422,6 +437,16 @@ class Controller:
 
         return printing_settings_tmp
 
+    def get_infill_ls_and_index_of_default(self, default):
+        first = 0
+        infill_ls = ["0%", "10%", "15%", "20%", "25%", "30%", "50%", "70%"]
+        for i, data in enumerate(infill_ls):
+            if data == default:
+                first = i
+                break
+
+        return infill_ls, first
+
 
     def get_actual_printing_data(self):
         return self.view.get_actual_printing_data()
@@ -435,6 +460,7 @@ class Controller:
             if self.settings['analyze']:
                 self.analyze_result = self.analyzer.make_analyze(whole_scene)
                 self.make_reaction_on_analyzation_result(self.analyze_result)
+            self.view.disable_editing()
 
             if not self.canceled:
                 self.generate_gcode()
@@ -443,9 +469,12 @@ class Controller:
 
         elif self.status == 'generating':
             #generating in progress
+            self.view.enable_editing()
             self.cancel_generation()
             self.status = 'canceled'
             self.set_generate_button()
+
+
         elif self.status == 'generated':
             #already generated
             self.save_gcode_file()
@@ -629,6 +658,7 @@ class Controller:
         temp_settings = self.view.open_settings_dialog()
         if not temp_settings['language'] == self.settings['language']:
             self.set_language(temp_settings['language'])
+            self.show_message_on_status_bar(self.app.tr("Language change will take effect after application restart"))
         self.settings = temp_settings
 
     def open_about(self):
@@ -933,7 +963,7 @@ class Controller:
         #Je stisknuto leve tlacitko?
         elif event.button() & QtCore.Qt.LeftButton:
             #Je kurzor nad nejakym objektem?
-            if self.render_status == 'model_view':
+            if self.render_status == 'model_view' and self.status in ['edit', 'canceled']:
                 object_id = self.get_id_under_cursor(event)
                 if object_id==0:
                     self.set_camera_rotation_function()
@@ -1199,7 +1229,7 @@ class Controller:
                     for tool in self.tools:
                         if tool.id == object_id:
                             tool.mouse_is_over(True)
-                            self.view.glWidget.setToolTip("Toto je %s" % tool.tool_name)
+                            self.view.glWidget.setToolTip(tool.tool_tip)
                         else:
                             tool.mouse_is_over(False)
 

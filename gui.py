@@ -2,6 +2,7 @@
 import logging
 import math
 import os
+from copy import deepcopy
 from pprint import pprint
 
 import numpy as np
@@ -13,7 +14,7 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import QDateTime, Qt
 from PyQt4.QtCore import QRect
 from PyQt4.QtCore import QSettings
-from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox
+from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox, QAbstractScrollArea
 from PyQt4.QtGui import *
 from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
@@ -30,26 +31,6 @@ class Gcode_slider(QtGui.QWidget):
     def initUI(self):
         self.points = []
         self.init_points()
-
-        '''
-        for i in xrange(0, 20):
-            self.points = []
-
-            label = QtGui.QLabel(self)
-            label.setObjectName("gcode_slider_point_label")
-            label.setVisible(False)
-            label.setFixedWidth(50)
-            button = QtGui.QPushButton('', self)
-            button.setObjectName("gcode_slider_point_button")
-            button.setVisible(False)
-            button.setFixedWidth(20)
-
-            self.points.append({'value' : -1,
-                'label': label,
-                'button': button
-            })
-        '''
-
 
         self.max_label = QtGui.QLabel(self)
         self.max_label.setObjectName("gcode_slider_max_label")
@@ -70,15 +51,6 @@ class Gcode_slider(QtGui.QWidget):
         self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
         self.slider.setTickInterval(1)
 
-        '''
-        self.style = QtGui.QApplication.style()
-        self.opt = QtGui.QStyleOptionSlider()
-        self.slider.initStyleOption(self.opt)
-
-        rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
-        myPoint = rectHandle.topRight() + self.slider.pos()
-        '''
-
         self.value_label = QtGui.QLabel(self)
         self.value_label.setObjectName("gcode_slider_value_label")
         self.value_label.setVisible(False)
@@ -91,10 +63,6 @@ class Gcode_slider(QtGui.QWidget):
         self.add_button.setFixedWidth(20)
 
         self.add_button.clicked.connect(self.add_point)
-
-        #self.point_label = QtGui.QLabel(self)
-
-
 
         main_layout.addWidget(self.max_label)
 
@@ -224,13 +192,124 @@ class Gcode_slider(QtGui.QWidget):
 
     def setMinimum(self, minimum):
         #self.min_label.setText("%.2f" % minimum)
-        print(str(minimum))
+        #print(str(minimum))
         self.slider.setMinimum(minimum)
 
     def setMaximum(self, maximum):
         #self.max_label.setText("%.2f" % maximum)
-        print(str(maximum))
+        #print(str(maximum))
         self.slider.setMaximum(maximum)
+
+
+class Spline_editor(QtGui.QWidget):
+    def __init__(self, other, controller):
+        super(Spline_editor, self).__init__()
+        self.controller = controller
+        self.max_points = 7
+        self.initUI()
+
+
+    def initUI(self):
+        self.points = []
+        self.init_points()
+
+        main_layout = QtGui.QVBoxLayout(self)
+        main_layout.setAlignment(Qt.AlignCenter)
+
+        self.scene = QtGui.QGraphicsScene(self)
+        self.scene.setSceneRect(-100.0, -100.0, 200.0, 200.0)
+
+        self.spline_path = SplinePath(self.scene, self.points)#QtGui.QGraphicsPathItem(parent=None, scene=self.scene)
+
+
+        for p in self.points:
+            p.add_path(self.spline_path)
+            self.scene.addItem(p)
+
+        #self.spline_path.setPath(self.path)
+        #self.spline_path.setFlag( QtGui.QGraphicsItem.ItemIsMovable )
+
+
+
+        self.view = QtGui.QGraphicsView(self.scene)
+        self.view.setObjectName("spline_edit")
+        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view.setRenderHints(QtGui.QPainter.Antialiasing)
+
+        main_layout.addWidget(self.view)
+        self.setLayout(main_layout)
+
+    def init_points(self):
+        h = 300/self.max_points
+
+        if self.points:
+            pass
+            #for point in self.points:
+            #    point['value'] = -1
+                #point['spline_path'].move(0,0)
+                #point['spline_path'].setVisible(False)
+
+        else:
+            for i in xrange(0, self.max_points):
+                item = SplinePoint()
+                item.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+                item.setRect(-5, -5+i, 10, 10)
+                item.setPos(0, -149+(i*h))
+                #spline_path.setObjectName("gcode_slider_point_button")
+                #spline_path.setVisible(True)
+                #spline_path.setFixedWidth(20)
+
+                self.points.append(item)
+
+
+
+class SplinePoint(QtGui.QGraphicsEllipseItem):
+    def __init__(self, path=None):
+        super(SplinePoint, self).__init__()
+        self.setFlags(QGraphicsItem.ItemIsMovable |
+                      QGraphicsItem.ItemSendsGeometryChanges)
+        self.path = path
+
+    def add_path(self, path):
+        self.path = path
+
+    def itemChange(self, change, value):
+        if change == QGraphicsItem.ItemPositionHasChanged:
+            if self.path:
+                self.path.update_path()
+            #self.newPos.setX(min(self.rect.right() - self.boundingRect().right(), max(self.newPos.x(), self.rect.left())))
+            #self.newPos.setY(min(self.rect.bottom() - self.boundingRect().bottom(), max(self.newPos.y(), self.rect.top())))
+            #return self.newPos
+
+        return QtGui.QGraphicsEllipseItem.itemChange(self, change, value)
+
+
+
+class SplinePath(QtGui.QGraphicsPathItem):
+    def __init__(self, scene, points):
+        super(SplinePath, self).__init__(parent=None, scene=scene)
+        self.points = points
+
+        self.path = QtGui.QPainterPath()
+        self.path.moveTo(0, -150)
+        for p in self.points:
+            self.path.lineTo(p.x(), p.y())
+
+        self.setPath(self.path)
+
+
+    def update_path(self):
+        self.path = QtGui.QPainterPath()
+        self.path.moveTo(0, -150)
+        for p in self.points:
+            # self.path.lineTo(0, -180)
+            #self.path.lineTo(p.x(), p.y())
+            self.path.cubicTo(p.x(), p.y())
+
+        self.setPath(self.path)
+
+
 
 
 
@@ -296,7 +375,7 @@ class SettingsDialog(QDialog):
 
     @staticmethod
     def get_settings_data(controller, parent = None):
-        data = controller.settings
+        data = deepcopy(controller.settings)
         dialog = SettingsDialog(controller, parent)
         dialog.setWindowTitle("Settings")
         result = dialog.exec_()
@@ -362,6 +441,7 @@ class AboutDialog(QDialog):
         self.different_version = True
         #self.actual_version = '1.0.2'
         self.your_version = self.controller.app_config.version
+        self.slic3r_version = self.controller.slicer_manager.get_version()
 
         layout = QVBoxLayout(self)
 
@@ -370,7 +450,9 @@ class AboutDialog(QDialog):
 
         self.prusa_control_text = QtGui.QLabel("Created by Tibor Vavra for Prusa Research s.r.o.")
 
-        self.local_version_label = QtGui.QLabel("Your version is %s" % self.your_version)
+        self.local_version_label = QtGui.QLabel(self.tr("PrusaControl version is ") + str(self.your_version))
+        self.slic3r_engine_version_label = QtGui.QLabel(self.tr("Slic3r engine version is ") + str(self.slic3r_version))
+
 
         #self.check_version_button = QtGui.QPushButton(self.tr("Check version"))
         #TODO:Doplnit
@@ -381,6 +463,7 @@ class AboutDialog(QDialog):
         layout.addWidget(self.prusa_control_text)
 
         layout.addWidget(self.local_version_label)
+        layout.addWidget(self.slic3r_engine_version_label)
         #layout.addWidget(self.check_version_button)
 
         # Close button
@@ -434,16 +517,6 @@ class PrinterInfoDialog(QDialog):
         result = dialog.exec_()
         data = {'msg': 'Update is complete. New version is ....'}
         return (data, result == QDialog.Accepted)
-
-class Popup(QWidget):
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
-
-    def paintEvent(self, e):
-        dc = QPainter(self)
-        dc.drawLine(0, 0, 100, 100)
-        dc.drawLine(100, 0, 0, 100)
-
 
 
 class PrusaControlView(QtGui.QMainWindow):
@@ -653,16 +726,20 @@ class PrusaControlView(QtGui.QMainWindow):
         self.combobox_scale_units = QtGui.QComboBox()
         self.combobox_scale_units.setObjectName("combobox_scale_units")
         self.combobox_scale_units.addItems(["%", " mm"])
+        self.combobox_scale_units.setToolTip(self.tr("In what units you want to scale?"))
         self.combobox_scale_units.setCurrentIndex(0)
         self.scale_units = self.combobox_scale_units.currentText()
         self.combobox_scale_units.currentIndexChanged.connect(self.change_scale_units)
         self.lock_scale_axes_checkbox = QtGui.QCheckBox("")
         self.lock_scale_axes_checkbox.stateChanged.connect(self.lock_scale_axes_change)
         self.lock_scale_axes_checkbox.setChecked(True)
+        self.lock_scale_axes_checkbox.setToolTip(self.tr("Lock of scaling axis"))
+
         #self.lock_scale_axes_checkbox.setLayoutDirection(Qt.RightToLeft)
         self.place_on_zero = QtGui.QCheckBox("")
         self.place_on_zero.setChecked(True)
         self.place_on_zero.setObjectName("place_on_zero")
+        self.place_on_zero.setToolTip(self.tr("Automatic placing of models\n on printing bed in Z axis"))
         #self.place_on_zero.setLayoutDirection(Qt.RightToLeft)
 
         self.x_pos_l = QtGui.QLabel('X')
@@ -704,7 +781,19 @@ class PrusaControlView(QtGui.QMainWindow):
         self.place_on_zero_l = QtGui.QLabel(self.tr("Place on pad"))
         self.place_on_zero_l.setObjectName("place_on_zero_l")
 
+        self.advance_settings_b = QtGui.QPushButton(self.tr("Advance Settings"))
+        self.advance_settings_b.setObjectName("advance_settings_b")
+        self.advance_settings_b.clicked.connect(self.controller.set_advance_settings)
+
         # Object settings layout
+
+        # Object variable layer widget
+        self.variable_layer_widget = Spline_editor(self, self.controller)
+        self.variable_layer_widget.setObjectName("variable_layer_widget")
+        self.basic_settings_b = QtGui.QPushButton(self.tr("Basic Settings"))
+        self.basic_settings_b.setObjectName("basic_settings_b")
+        self.basic_settings_b.clicked.connect(self.controller.set_basic_settings)
+        # Object variable layer widget
 
         # Gcode view layout
         #self.gcode_view_layout = QtGui.QVBoxLayout()
@@ -712,7 +801,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
 
-        self.gcode_back_b = QtGui.QPushButton(self.tr("Edit scene"))
+        self.gcode_back_b = QtGui.QPushButton(self.tr("Back"))
         self.gcode_back_b.setObjectName("gcode_back_b")
         self.gcode_back_b.clicked.connect(self.controller.set_model_edit_view)
 
@@ -727,6 +816,9 @@ class PrusaControlView(QtGui.QMainWindow):
         self.right_panel_layout.setMargin(0)
         self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
 
+        #QtGui.QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
+        #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
+
 
         self.printer_settings_l = QtGui.QLabel(self.tr("Printer settings"))
         self.printer_settings_l.setObjectName('printer_settings_l')
@@ -739,35 +831,58 @@ class PrusaControlView(QtGui.QMainWindow):
         self.materialCombo.addItems(material_label_ls)
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
+        self.materialCombo.setToolTip(self.tr("Select material for printing"))
+        #self.materialCombo.setV
+        #view = self.materialCombo.view()
+
 
 
         self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
         self.qualityLabel.setObjectName('qualityLabel')
         self.qualityCombo = QtGui.QComboBox()
         self.qualityCombo.setObjectName('qualityCombo')
+        self.qualityCombo.setToolTip(self.tr("Select quality for printing"))
 
-        self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
+        #self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
+        #self.infillLabel.setObjectName('infillLabel')
+        #self.infillLabel.setFixedWidth(75)
+        #self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
+        #self.infillSlider.setObjectName('infillSlider')
+
+        self.infillLabel = QtGui.QLabel(self.tr("Infill"))
         self.infillLabel.setObjectName('infillLabel')
         self.infillLabel.setFixedWidth(75)
-        self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
-        self.infillSlider.setObjectName('infillSlider')
+        self.infillCombo = QtGui.QComboBox()
+        self.infillCombo.setObjectName('infillCombo')
+        infill_ls, f = self.controller.get_infill_ls_and_index_of_default("0%")
+        self.infillCombo.insertItems(len(infill_ls), infill_ls)
+        self.infillCombo.setToolTip(self.tr("Select how much space inside of model have to be filled"))
+
 
         #self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
         self.supportLabel = QtGui.QLabel(self.tr("Support"))
         self.supportLabel.setObjectName('supportLabel')
         self.supportCombo = QtGui.QComboBox()
-        self.supportCombo.addItems(["None", "Build plate only", "Everywhere"])
+        self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
         self.supportCombo.setObjectName('supportCombo')
+        self.supportCombo.setMaxVisibleItems(10)
+        self.supportCombo.setToolTip(self.tr("Select what kind of supports do you need, if any"))
 
         self.brim_label = QtGui.QLabel(self.tr("Brim"))
         self.brim_label.setObjectName('brim_label')
         self.brimCheckBox = QtGui.QCheckBox("")
         self.brimCheckBox.setObjectName('brimCheckBox')
+        self.brimCheckBox.setToolTip(self.tr("Do you need better adhesive of model and printing bed?"))
 
         self.object_group_box = QtGui.QGroupBox(self.tr("Object settings"))
         self.object_group_box.setObjectName('object_group_box')
         self.object_group_box.setLayout(self.create_object_settings_layout())
         self.object_group_box.setEnabled(False)
+
+        self.object_variable_layer_box = QtGui.QGroupBox(self.tr("Object advance settings"))
+        self.object_variable_layer_box.setObjectName('object_variable_layer_box')
+        self.object_variable_layer_box.setLayout(self.create_object_advance_settings_layout())
+        self.object_variable_layer_box.setVisible(False)
 
         self.gcode_group_box = QtGui.QGroupBox(self.tr("Overview"))
         self.gcode_group_box.setObjectName('gcode_group_box')
@@ -784,23 +899,11 @@ class PrusaControlView(QtGui.QMainWindow):
         self.generateButton.setObjectName('generateButton')
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
         self.generateButton.setEnabled(False)
+        self.generateButton.setToolTip(self.tr("Generate scene with actual options to gcode file"))
 
-        # printing info place
-        self.printingInfoLabel = QtGui.QLabel(self.tr("Print info:"))
-        self.printingInfoLabel.setObjectName('printingInfoLabel')
-
-        self.printing_filament_label = QtGui.QLabel(self.tr("Filament required:"))
-        self.printing_filament_label.setObjectName('printing_filament_label')
-        self.printing_filament_data = QtGui.QLabel('')
-        self.printing_filament_data.setObjectName('printing_filament_data')
-
-        # send feedback button
-        #self.send_feedback_button = QtGui.QPushButton(self.tr("Send feedback"))
-        #self.send_feedback_button.clicked.connect(self.controller.send_feedback)
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
         printing_parameters_layout = QtGui.QGridLayout()
-        #TODO:How???
         #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
         printing_parameters_layout.addWidget(self.printer_settings_l, 0, 0, 1, 3)
@@ -809,7 +912,8 @@ class PrusaControlView(QtGui.QMainWindow):
         printing_parameters_layout.addWidget(self.qualityLabel, 2, 0)
         printing_parameters_layout.addWidget(self.qualityCombo, 2, 1, 1, 3)
         printing_parameters_layout.addWidget(self.infillLabel, 3, 0)
-        printing_parameters_layout.addWidget(self.infillSlider, 3, 1, 1, 3)
+        #printing_parameters_layout.addWidget(self.infillSlider, 3, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.infillCombo, 3, 1, 1, 3)
         printing_parameters_layout.addWidget(self.supportLabel, 4, 0)
         printing_parameters_layout.addWidget(self.supportCombo, 4, 1, 1, 3)
         printing_parameters_layout.addWidget(self.brim_label, 5, 0)
@@ -818,19 +922,14 @@ class PrusaControlView(QtGui.QMainWindow):
         self.right_panel_layout.addLayout(printing_parameters_layout)
 
         self.right_panel_layout.addWidget(self.object_group_box)
+        self.right_panel_layout.addWidget(self.object_variable_layer_box)
         self.right_panel_layout.addWidget(self.gcode_group_box)
         self.right_panel_layout.addStretch()
         #self.right_panel_layout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
-
         self.right_panel_layout.addWidget(self.generateButton)
         self.right_panel_layout.addWidget(self.progressBar)
-
-        #TODO:Where to put this information? Info box?
-        #self.right_panel_layout.addRow(self.printingInfoLabel)
-        #self.right_panel_layout.addRow(self.printing_filament_label)
-        #self.right_panel_layout.addRow(self.printing_filament_data)
-
+        self.right_panel_layout.addSpacerItem(QtGui.QSpacerItem(0, 5, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum))
 
         self.right_panel.setLayout(self.right_panel_layout)
         self.right_panel.setFixedWidth(250)
@@ -840,7 +939,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_label = QLabel("0")
         self.gcode_label.setMaximumWidth(40)
         self.gcode_label.setAlignment(Qt.AlignCenter)
-
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.setSpacing(0)
@@ -856,7 +954,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
 
         self.setVisible(True)
-        #self.update_gui()
 
         self.changable_widgets['brimCheckBox'] = self.brimCheckBox
         #self.changable_widgets['supportCheckBox'] = self.supportCheckBox
@@ -864,7 +961,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
         self.qualityCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
-        self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
+        #self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
         #self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
         self.supportCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
@@ -874,7 +971,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.show()
 
 
-    #TODO:
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:
             if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
@@ -900,12 +996,15 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def set_save_gcode_button(self):
         self.generateButton.setText(self.tr("Save G-Code"))
+        self.generateButton.setToolTip(self.tr("Save generated gcode file"))
 
     def set_cancel_button(self):
         self.generateButton.setText(self.tr("Cancel"))
+        self.generateButton.setToolTip(self.tr("Cancel of generating gcode file"))
 
     def set_generate_button(self):
         self.generateButton.setText(self.tr("Generate"))
+        self.generateButton.setToolTip(self.tr("Generate scene with actual options to gcode file"))
 
     def set_print_info_text(self, string):
         self.printing_filament_data.setText(string)
@@ -915,6 +1014,36 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def get_object_id(self):
         return self.object_id
+
+    def enable_editing(self):
+        self.materialCombo.setEnabled(True)
+        self.qualityCombo.setEnabled(True)
+        self.infillCombo.setEnabled(True)
+        self.supportCombo.setEnabled(True)
+        self.brimCheckBox.setEnabled(True)
+
+        self.printer_settings_l.setEnabled(True)
+        self.materialLabel.setEnabled(True)
+        self.qualityLabel.setEnabled(True)
+        self.infillLabel.setEnabled(True)
+        self.supportLabel.setEnabled(True)
+        self.brim_label.setEnabled(True)
+
+
+
+    def disable_editing(self):
+        self.materialCombo.setEnabled(False)
+        self.qualityCombo.setEnabled(False)
+        self.infillCombo.setEnabled(False)
+        self.supportCombo.setEnabled(False)
+        self.brimCheckBox.setEnabled(False)
+
+        self.printer_settings_l.setEnabled(False)
+        self.materialLabel.setEnabled(False)
+        self.qualityLabel.setEnabled(False)
+        self.infillLabel.setEnabled(False)
+        self.supportLabel.setEnabled(False)
+        self.brim_label.setEnabled(False)
 
 
     def update_position_widgets(self, object_id):
@@ -954,7 +1083,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_rot_z.setDisabled(False)
 
 
-    #TODO:Dodelat!!!
     def update_scale_widgets(self, object_id):
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
@@ -982,14 +1110,12 @@ class PrusaControlView(QtGui.QMainWindow):
             self.set_gui_for_object(object_id)
             self.is_setting_panel_opened = True
         self.glWidget.setFocusPolicy(Qt.NoFocus)
-        #self.object_settings_panel.setFocusPolicy(Qt.StrongFocus)
 
     def set_gui_for_object(self, object_id, scale_units_perc=True):
         mesh = self.controller.get_object_by_id(object_id)
         if not mesh:
             return
         self.object_group_box.setEnabled(True)
-        #mesh.start_edit()
         self.object_id = object_id
 
         self.filename_label.setText(mesh.filename)
@@ -1064,26 +1190,6 @@ class PrusaControlView(QtGui.QMainWindow):
         self.object_id = 0
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
-    '''
-    def apply_object_settings(self):
-        object_id = self.get_object_id()
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
-            return
-        #mesh.apply_changes()
-        #self.controller.scene.save_change(mesh)
-        self.close_object_settings_panel()
-        self.controller.view.update_scene()
-
-    def cancel_object_settings(self):
-        object_id = self.get_object_id()
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
-            return
-        #mesh.discard_changes()
-        self.close_object_settings_panel()
-        self.controller.view.update_scene()
-    '''
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
@@ -1161,7 +1267,7 @@ class PrusaControlView(QtGui.QMainWindow):
                     #x = (x/model.size_origin[0])*0.1
                     #y = (y/model.size_origin[1])*0.1
                     #z = (z/model.size_origin[2])*0.1
-                    print("Vstupni parametry pro mm: %s %s %s" % (str(x), str(y), str(z)))
+                    #print("Vstupni parametry pro mm: %s %s %s" % (str(x), str(y), str(z)))
 
                     if active_axis == 'x':
                         x_recalc = x
@@ -1204,7 +1310,7 @@ class PrusaControlView(QtGui.QMainWindow):
                     y_recalc *= .1
                     z_recalc *= .1
 
-                    print("Vystupni parametry pro mm: %s %s %s" % (str(x_recalc), str(y_recalc), str(z_recalc)))
+                    #print("Vystupni parametry pro mm: %s %s %s" % (str(x_recalc), str(y_recalc), str(z_recalc)))
                     model.set_scale_abs(x_recalc, y_recalc, z_recalc)
                 else:
                     model.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
@@ -1284,7 +1390,18 @@ class PrusaControlView(QtGui.QMainWindow):
         object_settings_layout.addWidget(self.place_on_zero, 15, 2)
         self.place_on_zero.setFixedHeight(22)
 
+        #object_settings_layout.addWidget(self.advance_settings_b, 16, 0, 1, 3)
+
         return object_settings_layout
+
+    def create_object_advance_settings_layout(self):
+        object_variable_layer_layout = QtGui.QGridLayout()
+        object_variable_layer_layout.setRowMinimumHeight(0, 350)
+
+        object_variable_layer_layout.addWidget(self.variable_layer_widget, 0, 0, 3, 3)
+        object_variable_layer_layout.addWidget(self.basic_settings_b, 4, 0, 1, 3)
+
+        return object_variable_layer_layout
 
 
     def create_gcode_view_layout(self):
@@ -1292,21 +1409,8 @@ class PrusaControlView(QtGui.QMainWindow):
         gcode_view_layout = QtGui.QGridLayout()
         gcode_view_layout.setRowMinimumHeight(2, 350)
 
-
-        #gcode_view_layout.addWidget(self.gcode_display_units_l, 0, 0)
-        #gcode_view_layout.addWidget(self.gcode_display_units_cb, 0, 1)
-        #gcode_view_layout.addWidget(self.gcode_slider_max_l, 1, 0)
         gcode_view_layout.addWidget(self.gcode_slider, 1, 0, 3, 3)
-        #gcode_view_layout.addWidget(self.gcode_slider_min_l, 3, 0)
         gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
-
-        '''
-        qcode_view_layout = QtGui.QVBoxLayout()
-        qcode_view_layout.addWidget(self.gcode_display_units_l)
-        qcode_view_layout.addWidget(self.gcode_display_units_cb)
-        qcode_view_layout.addWidget(self.gcode_s)
-        qcode_view_layout.addWidget(self.gcode_back_b)
-        '''
 
         return gcode_view_layout
 
@@ -1330,11 +1434,8 @@ class PrusaControlView(QtGui.QMainWindow):
     def close_gcode_view(self):
         self.gcode_group_box.setVisible(False)
         self.object_group_box.setVisible(True)
+        self.progressBar.setValue(0)
 
-
-        #self.gcode_panel.setVisible(False)
-        #self.line.setVisible(False)
-        #self.right_panel.setMaximumWidth(250)
         self.controller.view.update_scene()
 
 
@@ -1410,7 +1511,7 @@ class PrusaControlView(QtGui.QMainWindow):
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
-                print(str())
+                #print(str())
                 self.statusBar().showMessage('Dropped file name is ' + str(url.toLocalFile().toLocal8Bit().data()))
                 #TODO: Add network files
                 path = url.toLocalFile().toLocal8Bit().data()
@@ -1454,9 +1555,16 @@ class PrusaControlView(QtGui.QMainWindow):
         self.qualityCombo.setCurrentIndex(first)
 
         # infill slider
-        self.infillSlider.setValue(material_printing_settings['infill'])
-        self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
-        self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
+        #self.infillSlider.setValue(material_printing_settings['infill'])
+        #self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
+        #self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
+
+        #material_printing_settings_infill_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
+
+
+        infill_value = str(material_printing_settings['infill'])+'%'
+        infill_list, first_infill = self.controller.get_infill_ls_and_index_of_default(infill_value)
+        self.infillCombo.setCurrentIndex(first_infill)
 
     def get_actual_printing_data(self):
         material_label = self.materialCombo.currentText()
@@ -1464,7 +1572,10 @@ class PrusaControlView(QtGui.QMainWindow):
         quality_label = self.qualityCombo.currentText()
         quality_name = self.controller.get_material_quality_name_by_quality_label(material_name, quality_label)
 
-        infill_value = self.infillSlider.value()
+        #infill_value = self.infillSlider.value()
+        infill_value_text = self.infillCombo.currentText()
+        infill_value_text = infill_value_text[0:-1]
+        infill_value = int(infill_value_text)
         brim = self.brimCheckBox.isChecked()
         #support = self.supportCheckBox.isChecked()
         support = self.supportCombo.currentText()
@@ -1475,7 +1586,7 @@ class PrusaControlView(QtGui.QMainWindow):
                 'brim': brim,
                 'support_on_off': support,
                 'support_build_plate': support,
-                'overhang': support
+                'overhangs': support
                 }
         return data
 
