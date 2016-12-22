@@ -1385,7 +1385,7 @@ class PrusaControlView(QtGui.QMainWindow):
         object_settings_layout.addWidget(self.lock_scale_axes_checkbox, 13, 2)
         self.lock_scale_axes_checkbox.setFixedHeight(22)
 
-        object_settings_layout.addWidget(self.place_on_zero_l, 15, 0)
+        object_settings_layout.addWidget(self.place_on_zero_l, 15, 0, 1, 2)
         self.place_on_zero_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.place_on_zero, 15, 2)
         self.place_on_zero.setFixedHeight(22)
