@@ -1,10 +1,16 @@
+
+
+
 .QWidget {
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
     font-family: 'Titillium Web';
     font-size: 12px;
-
 }
+
+QScrollBar {width:0px;}
+
+
 
 /*
 QWidget {
@@ -19,6 +25,15 @@ QWidget {
     font-size: 12px;
 }
 
+QToolTip {
+    font-family: 'Titillium Web';
+    background-color: rgb(132, 132, 132);
+    color:rgb(255, 255, 255);
+    font-size: 12px;
+    border: none;
+    text-align:center;
+}
+
 QLabel#printer_settings_l {
     margin: 13px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
@@ -26,10 +41,30 @@ QLabel#printer_settings_l {
     font-weight: bold;
 }
 
-QLabel#infillLabel, QLabel#supportLabel, QLabel#qualityLabel, QLabel#materialLabel, QLabel#brim_label {
+QLabel#infillLabel,
+QLabel#supportLabel,
+QLabel#qualityLabel,
+QLabel#materialLabel,
+QLabel#brim_label {
     margin: 0px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
     font-size: 12px;
+}
+
+QLabel#printer_settings_l:disabled,
+QLabel#infillLabel:disabled,
+QLabel#supportLabel:disabled,
+QLabel#qualityLabel:disabled,
+QLabel#materialLabel:disabled,
+QLabel#brim_label:disabled {
+    /*
+    margin: 0px 0px 0px 26px;
+    padding: 0px 0px 0px 0px;
+    */
+    color: rgb(132, 132, 132);
+    /*
+    background-color:rgb(89, 89, 89);
+*/
 }
 
 QComboBox {
@@ -44,56 +79,46 @@ QComboBox {
 }
 
 QComboBox#combobox_scale_units {
-    margin: 0px 0px 0px 0px;
-    padding: 0px 0px 1px 3px;
     font-size: 12px;
     height: 22px;
-    border: 1px solid rgb(77, 77, 77);
-    border-radius: 5px;
-
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 1px 3px;
+    border: 1px solid rgb(181, 181, 181);
     background-color:rgb(181, 181, 181);
     color:rgb(255, 255, 255);
+    border-radius: 5px;
+
 }
 
 
 
-QComboBox#combobox_scale_units::down-arrow, QComboBox#gcode_display_units_cb::down-arrow{
-    background-color:rgb(181, 181, 181);
-    color:rgb(255, 255, 255);
+QComboBox#combobox_scale_units::down-arrow{
+    /*background-color:rgb(181, 181, 181);
+    color:rgb(255, 255, 255);*/
     image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
     width: 13px;
     height: 13px;
 }
 
 QComboBox#combobox_scale_units::down-arrow:disabled {
-   color: rgb(112, 112, 112);
+    color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
     image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
     width: 13px;
     height: 13px;
 }
 
-QComboBox#combobox_scale_units::drop-down, QComboBox#gcode_display_units_cb::drop-down {
+QComboBox#combobox_scale_units::drop-down{
+    border-radius: 5px;
     background-color:rgb(181, 181, 181);
     color:rgb(255, 255, 255);
-    border-radius: 5px;
 }
 
-QComboBox#combobox_scale_units QAbstractItemView, QComboBox#gcode_display_units_cb QAbstractItemView{
-    margin: 0px 10px 0px 0px;
-    padding: 0px 0px 0px 0px;
-    background-color:rgb(181, 181, 181);
-    selection-background-color: rgb(255, 97, 0);
-    selection-color: rgb(25, 25, 25);
-    color:rgb(0, 0, 0);
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    outline: 0px;
-}
 
 QComboBox#combobox_scale_units::drop-down:disabled {
     color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
+    border: 1px solid rgb(96, 96, 96);
     border-radius: 5px;
 }
 
@@ -104,17 +129,24 @@ QComboBox#combobox_scale_units:disabled{
 }
 
 
-QComboBox:hover, QPushButton:hover {
+QComboBox:hover,
+QPushButton:hover {
     border: 1px solid rgb(255, 255, 255);
     color: rgb(255, 255, 255);
 }
-
+/*
 QComboBox:on {
-}
+}*/
 
 QComboBox::drop-down {
     background-color:rgb(77, 77, 77);
     color:rgb(255, 255, 255);
+    border-radius: 5px;
+}
+
+QComboBox::drop-down:disabled {
+    color: rgb(112, 112, 112);
+    background-color:rgb(89, 89, 89);
     border-radius: 5px;
 }
 
@@ -124,8 +156,44 @@ QComboBox::down-arrow {
     height: 13px;
 }
 
-QComboBox#materialCombo QAbstractItemView, QComboBox#qualityCombo QAbstractItemView,
-QComboBox#supportCombo QAbstractItemView {
+QComboBox::down-arrow:disabled {
+    image: url(data/img/gui/Arrow_DropDownMenu.png);
+    width: 13px;
+    height: 13px;
+    color: rgb(112, 112, 112);
+    background-color:rgb(89, 89, 89);
+}
+
+/*
+QComboBox::down-arrow:disabled, QComboBox::drop-down:disabled {
+    image: url(data/img/gui/Arrow_DropDownMenu.png);
+    color: rgb(112, 112, 112);
+    background-color:rgb(89, 89, 89);
+}*/
+
+QComboBox:disabled{
+    color: rgb(130, 130, 130);
+    background-color:rgb(96, 96, 96);
+    border: 1px solid rgb(96, 96, 96);
+}
+
+QComboBox::down-arrow:disabled{
+    color: rgb(130, 130, 130);
+    background-color:rgb(96, 96, 96);
+}
+
+QComboBox::drop-down:disabled{
+    color: rgb(130, 130, 130);
+    background-color:rgb(96, 96, 96);
+}
+
+
+
+QComboBox#materialCombo QAbstractItemView,
+QComboBox#qualityCombo QAbstractItemView,
+QComboBox#supportCombo QAbstractItemView,
+QComboBox#infillCombo QAbstractItemView,
+QComboBox#combobox_scale_units QAbstractItemView{
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 0px 0px;
     background-color:rgb(181, 181, 181);
@@ -135,9 +203,26 @@ QComboBox#supportCombo QAbstractItemView {
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     outline: 0px;
+    height: 300px;
 }
+/*
+QComboBox#combobox_scale_units QAbstractItemView{
+    margin: 0px 10px 0px 0px;
+    padding: 0px 0px 0px 0px;
+    background-color:rgb(181, 181, 181);
+    selection-background-color: rgb(255, 97, 0);
+    selection-color: rgb(25, 25, 25);
+    color:rgb(0, 0, 0);
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    outline: 0px;
+}*/
 
-QGroupBox#object_group_box, QGroupBox#gcode_group_box {
+QGroupBox#object_group_box,
+QGroupBox#gcode_group_box,
+QGroupBox#object_variable_layer_box,
+QGraphicsView#spline_edit
+{
     color: rgb(255, 255, 255);
     margin: 8px 0px 0px 29px;
     padding: 20px 0px 0px 0px;
@@ -149,10 +234,14 @@ QGroupBox#object_group_box, QGroupBox#gcode_group_box {
     font-weight: bold;
 }
 
-QGroupBox#object_group_box:disabled, QGroupBox#gcode_group_box:disabled {
+QGroupBox#object_group_box:disabled,
+QGroupBox#gcode_group_box:disabled,
+QGroupBox#object_variable_layer_box:disabled  {
     color: rgb(112, 112, 112);
     background-color:rgb(89, 89, 89);
 }
+
+
 
 QLabel#x_pos_l:disabled, QLabel#y_pos_l:disabled, QLabel#z_pos_l:disabled, QLabel#x_rot_l:disabled,
 QLabel#y_rot_l:disabled, QLabel#z_rot_l:disabled, QLabel#x_scale_l:disabled, QLabel#y_scale_l:disabled,
@@ -184,21 +273,6 @@ QLabel#gcode_slider_point_label{
 }
 
 
-/*
-QLabel#place_on_zero_l, QLabel#position_l, QLabel#rotation_l, QLabel#scale_l{
-    margin: 0px 0 0 0;
-    background-color:rgb(77, 77, 77);
-}*/
-/*
-QSpinBox#edit_pos_x, QSpinBox#edit_rot_x, QSpinBox#edit_scale_x{
-    margin: 10px 0 0 0;
-}*/
-
-/*
-QCheckBox#place_on_zero{
-    margin: 2px 0 0 0;
-}*/
-
 QGLWidget{
     font-family: 'Titillium Web';
     font-weight: bold;
@@ -220,9 +294,6 @@ QSlider::groove:horizontal {
 QSlider::groove:vertical {
     border-image: url(data/img/gui/slider_path_vert.png) 0 0 0 0 stretch stretch;
     background-color: transparent;
-    /*
-    height: 500px;
-    */
     width: 17px;
 }
 
@@ -233,27 +304,10 @@ QSlider::handle {
     height: 17px;
 }
 
-/*
-QSlider::groove:vertical {
-    background: red;
-    left: 4px; right: 4px;
-}
-
-QSlider::handle:vertical {
-    height: 10px;
-    background: green;
-    margin: 0 -4px;
-}
-
-QSlider::add-page:vertical {
-    background: white;
-}
-
-QSlider::sub-page:vertical {
-    background: pink;
-}*/
-
-QPushButton#generateButton, QPushButton#gcode_back_b {
+QPushButton#generateButton,
+QPushButton#gcode_back_b,
+QPushButton#basic_settings_b,
+QPushButton#advance_settings_b{
     font-family: 'Titillium Web';
     font-size: 12px;
     font-weight: bold;
@@ -269,29 +323,49 @@ QPushButton#generateButton, QPushButton#gcode_back_b {
 
 QPushButton#gcode_slider_add_button,
 QPushButton#gcode_slider_add_button:pressed,
-QPushButton#gcode_slider_add_button:flat,
-QPushButton#gcode_slider_add_button:hover
+QPushButton#gcode_slider_add_button:flat
 {
-    image: url(data/img/gui/plusButton.png);
+    /*image: url(data/img/gui/plusButton.png);*/
+    image: url(data/img/gui/ColorChange_ADD_OFF.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
     border-width: 0px;
 }
+
+QPushButton#gcode_slider_add_button:hover
+{
+    image: url(data/img/gui/ColorChange_ADD_ON.png);
+    background-color: transparent;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
 
 QPushButton#gcode_slider_point_button,
 QPushButton#gcode_slider_point_button:pressed,
-QPushButton#gcode_slider_point_button:flat,
-QPushButton#gcode_slider_point_button:hover
+QPushButton#gcode_slider_point_button:flat
 {
-    image: url(data/img/gui/deleteButton.png);
+    image: url(data/img/gui/ColorChange_DELETE_OFF.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
     border-width: 0px;
 }
 
-QPushButton#generateButton:disabled{
+QPushButton#gcode_slider_point_button:hover
+{
+    image: url(data/img/gui/ColorChange_DELETE_ON.png);
+    background-color: transparent;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
+QPushButton#generateButton:disabled,
+QPushButton#variable_layer_back_b:disabled,
+QPushButton#advance_settings_b:disabled{
     background-color: rgb(132, 132, 132);
     color: rgb(112, 112, 112);
 }
@@ -310,10 +384,11 @@ QProgressBar {
 
 QProgressBar::chunk {
     background-color: rgb(255, 97, 0);
-    width: 20px;
+    border-radius: 5px;
 }
 
-QSpinBox, QDoubleSpinBox {
+QSpinBox,
+QDoubleSpinBox {
     font-family: 'Titillium Web';
     font-size: 12px;
     height: 22px;
@@ -323,32 +398,39 @@ QSpinBox, QDoubleSpinBox {
     padding-right: 15px;
 }
 
-QSpinBox:disabled, QDoubleSpinBox:disabled {
+QSpinBox:disabled,
+QDoubleSpinBox:disabled {
     color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
 }
 
-QSpinBox::up-button, QDoubleSpinBox::up-button{
+QSpinBox::up-button,
+QDoubleSpinBox::up-button{
     image: url(data/img/gui/Arrow_Up_ObjectAdjust_OFF.png);
 }
 
-QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover{
+QSpinBox::up-button:hover,
+QDoubleSpinBox::up-button:hover{
     image: url(data/img/gui/Arrow_Up_ObjectAdjust_Hover.png);
 }
 
-QSpinBox::up-button:pressed, QDoubleSpinBox::up-button:pressed{
+QSpinBox::up-button:pressed,
+QDoubleSpinBox::up-button:pressed{
     image: url(data/img/gui/Arrow_Up_ObjectAdjust_ON.png);
 }
 
-QSpinBox::down-button, QDoubleSpinBox::down-button{
+QSpinBox::down-button,
+QDoubleSpinBox::down-button{
     image: url(data/img/gui/Arrow_Down_ObjectAdjust_OFF.png);
 }
 
-QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover{
+QSpinBox::down-button:hover,
+QDoubleSpinBox::down-button:hover{
     image: url(data/img/gui/Arrow_Down_ObjectAdjust_Hover.png);
 }
 
-QSpinBox::down-button:pressed, QDoubleSpinBox::down-button:pressed{
+QSpinBox::down-button:pressed,
+QDoubleSpinBox::down-button:pressed{
     image: url(data/img/gui/Arrow_Down_ObjectAdjust_ON.png);
 }
 
@@ -424,6 +506,8 @@ QCheckBox::indicator {
     height: 17px;
 }
 
+
+
 QCheckBox::indicator:checked:hover {
     image: url(data/img/gui/checkbox_On_hover.png);
 }
@@ -431,6 +515,8 @@ QCheckBox::indicator:checked:hover {
 QCheckBox#brimCheckBox::indicator:unchecked {
     image: url(data/img/gui/checkbox_dark_Off.png);
 }
+
+
 
 QCheckBox#brimCheckBox::indicator:unchecked:hover {
     image: url(data/img/gui/checkbox_dark_Off_hover.png);
@@ -446,19 +532,29 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:checked:disabled {
-    image: url(data/img/gui/Disable_checkbox_On.png);
+    /*image: url(data/img/gui/Disable_checkbox_On.png);*/
+    image: url(data/img/gui/checkbox_On_disabled.png);
     color: rgb(0,0,0);
+    background-color: transparent;
 }
 
 QCheckBox::indicator:unchecked:disabled {
     image: url(data/img/gui/Disable_checkbox_Off.png);
     color: rgb(0,0,0);
+    background-color: transparent;
 }
 
 QCheckBox::indicator:unchecked:hover {
     image: url(data/img/gui/checkbox_Off_hover.png);
 }
 
+QCheckBox#brimCheckBox::indicator:unchecked:disabled {
+    image: url(data/img/gui/checkbox_dark_Off_disabled.png);
+    /*
+    color: rgb(112, 112, 112);
+    background-color: transparent;
+    */
+}
 
 
 
