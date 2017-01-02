@@ -224,6 +224,7 @@ class GLWidget(QGLWidget):
         angle = self.normalize_angle_x(angle)
         if angle != self.xRot:
             self.xRot = angle
+            print("X rot: " + str(self.xRot))
 
     def set_y_rotation(self, angle):
         angle = self.normalize_angle(angle)
@@ -234,6 +235,7 @@ class GLWidget(QGLWidget):
         angle = self.normalize_angle(angle)
         if angle != self.zRot:
             self.zRot = angle
+            print("Z rot: " + str(self.zRot))
 
     def texture_from_png(self, filename):
         mode_to_bpp = {'1':1, 'L':8, 'P':8, 'RGB':24, 'RGBA':32, 'CMYK':32, 'YCbCr':24, 'I':32, 'F':32}
@@ -469,7 +471,16 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-        glCallList(heat_bed)
+        if self.xRot < 0:
+            glEnable(GL_BLEND)
+            glDisable(GL_DEPTH_TEST)
+            glCallList(heat_bed)
+            glDisable(GL_BLEND)
+        else:
+            glDisable(GL_BLEND)
+            glCallList(heat_bed)
+
+
 
         glEnable(GL_DEPTH_TEST)
 
@@ -593,7 +604,7 @@ class GLWidget(QGLWidget):
             font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
             self.renderText(115, sH - 153, u"WARNING", font)
 
-            font.setPointSize(9*self.controller.dpi_coef - self.controller.dpi_scale)
+            font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
             for n, message in enumerate(messages):
                 #Maximum of massages in warning box
                 if n > 5:

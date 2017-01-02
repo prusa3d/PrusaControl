@@ -190,7 +190,7 @@ class Controller:
     def convert_printing_time_from_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
-        return "%02d:%02d:%02d" % (h, m, s)
+        return "%02d:%02d" % (h, m)
 
 
     def clear_event_flag_status(self):
@@ -868,29 +868,46 @@ class Controller:
                 self.update_scene()
                 #self.view.update_scene()
 
+    def copy_selected_objects(self):
+        self.scene.copy_selected_objects()
+
+    def paste_selected_objects(self):
+        self.scene.paste_selected_objects()
+
+    def delete_selected_objects(self):
+        self.scene.delete_selected_models()
+
+    def do_function(self):
+        self.view.glWidget.do_button.press_button()
+
+    def undo_function(self):
+        self.view.glWidget.undo_button.press_button()
+
+
+
     def key_press_event(self, event):
         key = event.key()
         if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view':
-            self.scene.delete_selected_models()
+            self.delete_selected_objects()
             self.update_scene()
         elif key in [Qt.Key_C] and self.is_ctrl_pressed() and self.render_status == 'model_view':
             #print("Copy models")
-            self.scene.copy_selected_objects()
+            self.copy_selected_objects()
             self.update_scene()
         elif key in [Qt.Key_V] and self.is_ctrl_pressed() and self.render_status == 'model_view':
             #print("Paste models")
-            self.scene.paste_selected_objects()
+            self.paste_selected_objects()
             self.update_scene()
         elif key in [Qt.Key_Z] and self.is_ctrl_pressed() and self.render_status == 'model_view':
             print("Undo pressed")
             self.unselect_tool_buttons()
-            self.view.glWidget.undo_button.press_button()
+            self.undo_function()
             #self.undo_button_pressed()
             self.update_scene()
         elif key in [Qt.Key_Y] and self.is_ctrl_pressed() and self.render_status == 'model_view':
             print("Redo pressed")
             self.unselect_tool_buttons()
-            self.view.glWidget.do_button.press_button()
+            self.do_function()
             #self.do_button_pressed()
             self.update_scene()
         elif key in [Qt.Key_R] and self.render_status == 'model_view':

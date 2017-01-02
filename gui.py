@@ -570,6 +570,18 @@ class PrusaControlView(QtGui.QMainWindow):
         self.file_menu.addAction(self.tr('Close'), self.controller.close)
         # file menu definition
 
+        # edit menu definition
+        self.edit_menu = self.menubar.addMenu(self.tr('&Edit'))
+        self.edit_menu.addAction(self.tr('Undo\tCtrl+Z'), self.controller.undo_function)
+        self.edit_menu.addAction(self.tr('Do\tCtrl+Y'), self.controller.do_function)
+        self.edit_menu.addSeparator()
+        self.edit_menu.addAction(self.tr('Copy\tCtrl+C'), self.controller.copy_selected_objects)
+        self.edit_menu.addAction(self.tr('Paste\tCtrl+V'), self.controller.paste_selected_objects)
+        self.edit_menu.addAction(self.tr('Delete\tDel'), self.controller.delete_selected_objects)
+        # self.edit_menu.addSeparator()
+        # self.edit_menu.addAction(self.tr('Info'), self.controller.close)
+        # edit menu definition
+
         # TODO:Uncoment after new function created/tested
         # printer menu
         # self.printer_menu = self.menubar.addMenu(self.tr('&Printer'))
@@ -804,7 +816,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_back_b = QtGui.QPushButton(self.tr("Back"))
         self.gcode_back_b.setObjectName("gcode_back_b")
         self.gcode_back_b.clicked.connect(self.controller.set_model_edit_view)
-
+        self.gcode_back_b.setVisible(False)
         # Gcode view layout
 
         self.right_panel = QtGui.QWidget(self)
@@ -929,6 +941,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.right_panel_layout.addWidget(self.generateButton)
         self.right_panel_layout.addWidget(self.progressBar)
+        self.right_panel_layout.addWidget(self.gcode_back_b)
         self.right_panel_layout.addSpacerItem(QtGui.QSpacerItem(0, 5, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum))
 
         self.right_panel.setLayout(self.right_panel_layout)
@@ -1410,7 +1423,7 @@ class PrusaControlView(QtGui.QMainWindow):
         gcode_view_layout.setRowMinimumHeight(2, 350)
 
         gcode_view_layout.addWidget(self.gcode_slider, 1, 0, 3, 3)
-        gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
+        #gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
 
         return gcode_view_layout
 
@@ -1424,6 +1437,8 @@ class PrusaControlView(QtGui.QMainWindow):
     def open_gcode_view(self):
         self.object_group_box.setVisible(False)
         self.gcode_group_box.setVisible(True)
+        self.progressBar.setVisible(False)
+        self.gcode_back_b.setVisible(True)
         self.controller.view.update_scene()
         self.gcode_slider.setTickInterval(0)
 
@@ -1433,6 +1448,8 @@ class PrusaControlView(QtGui.QMainWindow):
     # TODO:Debug new design
     def close_gcode_view(self):
         self.gcode_group_box.setVisible(False)
+        self.gcode_back_b.setVisible(False)
+        self.progressBar.setVisible(True)
         self.object_group_box.setVisible(True)
         self.progressBar.setValue(0)
 
