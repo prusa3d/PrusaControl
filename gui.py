@@ -311,9 +311,6 @@ class SplinePath(QtGui.QGraphicsPathItem):
 
 
 
-
-
-
 class SettingsDialog(QDialog):
     def __init__(self, controller, parent = None):
         super(SettingsDialog, self).__init__(parent)
@@ -622,7 +619,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_x.setObjectName("edit_pos_x")
         self.edit_pos_x.setMaximum(200)
         self.edit_pos_x.setMinimum(-200)
-        self.edit_pos_x.setSuffix(" mm")
+        self.edit_pos_x.setSuffix("mm")
         self.edit_pos_x.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_x,
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
@@ -634,7 +631,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_y.setObjectName("edit_pos_y")
         self.edit_pos_y.setMaximum(200)
         self.edit_pos_y.setMinimum(-200)
-        self.edit_pos_y.setSuffix(" mm")
+        self.edit_pos_y.setSuffix("mm")
         self.edit_pos_y.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_y,
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
@@ -646,7 +643,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_pos_z.setObjectName("edit_pos_z")
         self.edit_pos_z.setMaximum(300)
         self.edit_pos_z.setMinimum(-50)
-        self.edit_pos_z.setSuffix(" mm")
+        self.edit_pos_z.setSuffix("mm")
         self.edit_pos_z.valueChanged.connect(lambda: self.set_position_on_object(self.edit_pos_z,
                                                                                  self.get_object_id(),
                                                                                  self.edit_pos_x.value(),
@@ -737,7 +734,7 @@ class PrusaControlView(QtGui.QMainWindow):
                                                                                 self.place_on_zero.isChecked()))
         self.combobox_scale_units = QtGui.QComboBox()
         self.combobox_scale_units.setObjectName("combobox_scale_units")
-        self.combobox_scale_units.addItems(["%", " mm"])
+        self.combobox_scale_units.addItems(["%", "mm"])
         self.combobox_scale_units.setToolTip(self.tr("In what units you want to scale?"))
         self.combobox_scale_units.setCurrentIndex(0)
         self.scale_units = self.combobox_scale_units.currentText()
@@ -984,6 +981,50 @@ class PrusaControlView(QtGui.QMainWindow):
         self.show()
 
 
+    def exit_message_continue_exitting(self):
+        if self.controller.is_something_to_save():
+            msgBox = QMessageBox(self)
+            msgBox.setObjectName("msgBox")
+            msgBox.setWindowTitle(self.tr("Save"))
+            msgBox.setText(self.tr("Scene is not saved."))
+            msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
+            msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+            msgBox.setDefaultButton(QMessageBox.Save)
+            ret = msgBox.exec_()
+
+            if ret == QMessageBox.Save:
+                self.controller.save_project_file()
+                return True
+            elif ret == QMessageBox.Discard:
+                return True
+            elif ret == QMessageBox.Cancel:
+                return False
+        else:
+            return True
+
+
+    def open_project_asking_dialog(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Open project file"))
+        msgBox.setText(self.tr("In scene are some objects"))
+        msgBox.setInformativeText(self.tr("Do you want to load project file in actual scene?"))
+        msgBox.setStandardButtons(QMessageBox.Accepted | QMessageBox.Open | QMessageBox.Cancel)
+        msgBox.setDefaultButton(QMessageBox.Save)
+        ret = msgBox.exec_()
+
+        if ret == QMessageBox.Accepted:
+            self.controller.save_project_file()
+            return True
+        elif ret == QMessageBox.Discard:
+            return True
+        elif ret == QMessageBox.Cancel:
+            return False
+
+        return False
+
+
+
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:
             if event.buttons() == QtCore.Qt.NoButton and isinstance(source, sceneRender.GLWidget):
@@ -996,9 +1037,13 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
     def closeEvent(self, event):
-        self.settings.setValue("geometry", self.saveGeometry())
-        self.settings.setValue("windowState", self.saveState())
-        QMainWindow.closeEvent(self, event)
+        if self.exit_message_continue_exitting():
+            self.settings.setValue("geometry", self.saveGeometry())
+            self.settings.setValue("windowState", self.saveState())
+            QMainWindow.closeEvent(self, event)
+        else:
+            event.ignore()
+
 
     def reinit(self):
         self.update_gui_for_material()
@@ -1172,11 +1217,11 @@ class PrusaControlView(QtGui.QMainWindow):
             self.edit_scale_z.setSuffix("%")
             self.edit_scale_z.setValue(mesh.scale[2] * 100)
         else:
-            self.edit_scale_x.setSuffix(" mm")
+            self.edit_scale_x.setSuffix("mm")
             self.edit_scale_x.setValue(mesh.scale[0] * mesh.size_origin[0] * 10)
-            self.edit_scale_y.setSuffix(" mm")
+            self.edit_scale_y.setSuffix("mm")
             self.edit_scale_y.setValue(mesh.scale[1] * mesh.size_origin[1] * 10)
-            self.edit_scale_z.setSuffix(" mm")
+            self.edit_scale_z.setSuffix("mm")
             self.edit_scale_z.setValue(mesh.scale[2] * mesh.size_origin[2] * 10)
 
         self.edit_scale_x.setDisabled(False)
@@ -1427,9 +1472,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
         return gcode_view_layout
 
-    def create_information_window(self, text):
-
-        pass
+   # def create_information_window(self, text):
+   #     pass
 
 
 
@@ -1595,7 +1639,7 @@ class PrusaControlView(QtGui.QMainWindow):
         infill_value = int(infill_value_text)
         brim = self.brimCheckBox.isChecked()
         #support = self.supportCheckBox.isChecked()
-        support = self.supportCombo.currentText()
+        support = self.supportCombo.currentIndex()
 
         data = {'material': material_name,
                 'quality': quality_name,

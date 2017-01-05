@@ -113,6 +113,7 @@ class Controller:
         self.res_old = numpy.array([0., 0., 0.])
         self.render_status = 'model_view'   #'gcode_view'
         self.status = 'edit'
+        self.is_model_loaded = False
         self.canceled = False
         self.filament_use = ''
 
@@ -170,6 +171,12 @@ class Controller:
         else:
             self.warning_message_buffer.append(u"•  Object %s has some other problem!" % object.filename)
     '''
+
+    def is_something_to_save(self):
+        if len(self.scene.models) == 0:
+            return False
+        else:
+            return True
 
     def get_informations(self):
         if not self.gcode:
@@ -350,6 +357,8 @@ class Controller:
 
     def get_printer_variations_labels_ls(self, printer_name):
         printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
+        print("Nastaveni tiskaren: ")
+        pprint(printer_settings)
         return [printer_settings["printer_type"][printer_type]["label"] for printer_type in printer_settings["printer_type"]]
 
     def get_printer_variations_names_ls(self, printer_name):
@@ -628,17 +637,26 @@ class Controller:
         self.scene.clear_history()
         self.scene.save_change(self.scene.models)
         self.update_scene()
+        self.is_model_loaded = True
         #self.view.update_scene()
 
     def import_project(self, path):
+        if self.is_model_loaded:
+            res = self.open_asking_dialog("project")
         project_file = ProjectFile(self.scene, path)
         self.update_scene()
+
         #self.view.update_scene()
 
     def save_project(self, path):
         self.scene.check_models_name()
         project_file = ProjectFile(self.scene)
         project_file.save(path)
+
+    '''
+    def open_asking_dialog(self, type):
+        if type=="project":
+    '''
 
     def update_scene(self):
         self.view.update_scene()
@@ -1562,6 +1580,7 @@ class Controller:
     def reset_scene(self):
         self.scene.clear_scene()
         self.update_scene()
+        self.is_model_loaded = False
         #self.view.update_scene(True)
 
     def clear_gui(self):

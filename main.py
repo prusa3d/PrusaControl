@@ -19,7 +19,6 @@ __author__ = 'Tibor Vavra'
 DEBUG = False
 
 def log_exception(excType, excValue, traceback):
-    #print("Loguji")
     logging.error("Logging an uncaught exception",
                  exc_info=(excType, excValue, traceback))
 
@@ -36,7 +35,7 @@ def main():
     except AttributeError:
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-    me = SingleInstance()
+    #me = SingleInstance()
 
 
     app = QtGui.QApplication(sys.argv)

@@ -140,7 +140,6 @@ class PrintingParameters(object):
 
 
     def get_actual_settings(self, printer_name, printer_variation, material_name, quality_seting):
-        #print("Option: " + str(printer_name) + ' ' + str(printer_variation) + ' ' + str(material_name) + ' ' + str(quality_seting))
         if not printer_name or not printer_variation or not material_name or not quality_seting:
             return None
         else:
@@ -173,7 +172,6 @@ class PrintingParameters(object):
 
 
     def read_material_quality_parameters_for_printer(self, printer_config_file):
-        #print(printer_config_file)
         if not printer_config_file:
             return None
 
@@ -204,14 +202,16 @@ class AppParameters(object):
             self.data_folder = "data/"
             self.config_path = os.path.expanduser("~/.prusacontrol")
             self.user_folder = os.path.expanduser("~/.prusacontrol/")
-            self.printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Darwin']:
             self.data_folder = "data/"
             self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/.prusacontrol")
             self.user_folder = os.path.expanduser("~/.prusacontrol/")
-            self.printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Windows']:
             self.data_folder = "data\\"
@@ -221,7 +221,8 @@ class AppParameters(object):
             #self.user_folder = os.path.expanduser("~\\.prusacontrol\\")
             self.user_folder = self.tmp_place.split("\\appdata")[0] + "\\.prusacontrol\\"
 
-            self.printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data\\defaults.cfg'))
             #print("Executable: " + sys.executable)
         else:
@@ -229,7 +230,8 @@ class AppParameters(object):
             self.tmp_place = './'
             self.config_path = 'prusacontrol.cfg'
             self.user_folder = os.path.expanduser("~/.prusacontrol/")
-            self.printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
+            self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data/defaults.cfg'))
 
         self.config.read(self.config_path)

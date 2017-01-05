@@ -2,6 +2,7 @@ import time
 #from fastnumbers import fast_float
 from copy import deepcopy
 from pprint import pprint
+import os
 
 import numpy as np
 
@@ -32,6 +33,7 @@ class GCode(object):
         self.data_keys = []
         self.actual_z = '0.0'
         self.speed = 0.0
+        self.z_hop = False
         self.last_point = [0.0, 0.0, 0.0]
         self.actual_point = [0.0, 0.0, 0.0]
 
@@ -42,14 +44,15 @@ class GCode(object):
 
         #buffering=(2 << 16) + 8
         with open(filename, 'r', buffering=(2 << 16) + 8) as f:
-            for line in f:
+            data = f.readlines()
+            for line in data:
                 #striped_line = line.rstrip()
                 #bits = striped_line.split(';', 1)
                 bits = line.split(';', 1)
                 if bits[0] == '':
                     continue
                 if 'G1' in bits[0]:
-                    self.parse_g1_line(bits[0])
+                    self.parse_g1_line(bits)
                 else:
                     continue
 
@@ -67,7 +70,7 @@ class GCode(object):
             speed = line[3] #mm/min
             vect = b-a
             leng = np.linalg.norm(vect)
-            time = leng / speed
+            time = np.divide(leng, speed)
             time_of_print += time
 
         #Magic constant :-)
@@ -92,17 +95,27 @@ class GCode(object):
         print("Info: " + string)
 
     #only G1 lines
-    def parse_g1_line(self, text):
+    def parse_g1_line(self, data):
+        if len(data)>1:
+            text = data[0]
+            comment = data[1]
+        else:
+            text = data[0]
+            comment = ""
+
         line = text.split(' ')
         line = filter(None, line)
+
+        comment_line = comment.split(' ')
+        comment_line = filter(None, comment_line)
+
         if 'Z' in line[1]:
-            #Set of Z axis
-            self.actual_z = "%.2f" % float(line[1][1:])
-
-            self.last_point =[]
+            # Set of Z axis
+            new_z = float(line[1][1:])
+            self.actual_z = "%.2f" % new_z
+            self.last_point[2] = new_z
             return
-
-        if 'F' in line[1]:
+        elif 'F' in line[1]:
             self.speed = float(line[1][1:])
         elif len(line)<4:
             return
@@ -127,7 +140,6 @@ class GCode(object):
             else:
                 self.last_point = deepcopy(self.actual_point)
         elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
-            print("nasel samostatne X")
             #Extrusion point
             self.actual_point[0] = float(line[1][1:])
 
@@ -141,7 +153,6 @@ class GCode(object):
             else:
                 self.last_point = deepcopy(self.actual_point)
         elif 'Y' in line[1] and 'F' in line[2]:
-            print("nasel samostatne Y")
             #Move point
             self.actual_point[1] = float(line[1][1:])
 

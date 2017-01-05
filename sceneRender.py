@@ -224,7 +224,7 @@ class GLWidget(QGLWidget):
         angle = self.normalize_angle_x(angle)
         if angle != self.xRot:
             self.xRot = angle
-            print("X rot: " + str(self.xRot))
+            #print("X rot: " + str(self.xRot))
 
     def set_y_rotation(self, angle):
         angle = self.normalize_angle(angle)
@@ -235,7 +235,7 @@ class GLWidget(QGLWidget):
         angle = self.normalize_angle(angle)
         if angle != self.zRot:
             self.zRot = angle
-            print("Z rot: " + str(self.zRot))
+            #print("Z rot: " + str(self.zRot))
 
     def texture_from_png(self, filename):
         mode_to_bpp = {'1':1, 'L':8, 'P':8, 'RGB':24, 'RGBA':32, 'CMYK':32, 'YCbCr':24, 'I':32, 'F':32}
@@ -717,8 +717,8 @@ class GLWidget(QGLWidget):
 
         glLineWidth(1.5)
 
-        glEnable(GL_LINE_SMOOTH)
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+        #glEnable(GL_LINE_SMOOTH)
+        #glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
         glBegin(GL_LINES)
         #for layer_data in layer_datas:

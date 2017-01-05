@@ -85,33 +85,33 @@ class Slic3rEngineRunner(QObject):
         return "%s" % str(int(in_value)*10)
 
     def support1_transform(self, in_value):
-        if in_value == "None":
+        if in_value == 0:   #None
             return "0"
-        elif in_value == "Build plate only":
+        elif in_value == 1: #Build plate only
             return "1"
-        elif in_value == "Everywhere":
+        elif in_value == 2: #Everywhere
             return "1"
         else:
             return "0"
         return "0"
 
     def support2_transform(self, in_value):
-        if in_value == "None":
+        if in_value == 0:   #None
             return "0"
-        elif in_value == "Build plate only":
+        elif in_value == 1: #Build plate only
             return "1"
-        elif in_value == "Everywhere":
+        elif in_value == 2: #Everywhere
             return "0"
         else:
             return "0"
         return "0"
 
     def support3_transform(self, in_value):
-        if in_value == "None":
+        if in_value == 0:   #None
             return "0"
-        elif in_value == "Build plate only":
+        elif in_value == 1: #Build plate only
             return "1"
-        elif in_value == "Everywhere":
+        elif in_value == 2: #Everywhere
             return "1"
         else:
             return "1"
@@ -216,7 +216,7 @@ class SlicerEngineManager(object):
         self.slice_engine.finished.connect(self.thread_ended)
         self.slice_engine.filament_info.connect(self.controller.set_print_info_text)
         self.slice_engine.step_increased.connect(self.controller.set_progress_bar)
-        #self.slice_engine.send_message.connect(self.controller.show_message_on_status_bar)
+        self.slice_engine.send_message.connect(self.controller.show_message_on_status_bar)
 
         self.slice_thread.start()
 

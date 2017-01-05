@@ -2,6 +2,7 @@
 import logging
 from collections import defaultdict
 
+import gc
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from os.path import basename
@@ -1359,6 +1360,8 @@ class ModelTypeStl(ModelTypeAbstract):
 
         #model.displayList = model.make_display_list()
         #model.make_vao()
+
+        gc.collect()
 
         return model
 
