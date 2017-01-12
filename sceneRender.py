@@ -5,6 +5,7 @@ from copy import deepcopy
 from pprint import pprint
 
 import OpenGL
+import numpy as np
 
 from sceneData import ModelTypeStl, ModelTypeObj
 
@@ -707,6 +708,8 @@ class GLWidget(QGLWidget):
         printing_space = printer['printing_space']
         layer_data = self.controller.gcode.data[layer]
 
+        line_width = .01
+        left = True
 
         glPushMatrix()
         #TODO: Better solution
@@ -720,10 +723,19 @@ class GLWidget(QGLWidget):
         #glEnable(GL_LINE_SMOOTH)
         #glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
+
         glBegin(GL_LINES)
         #for layer_data in layer_datas:
         for p in layer_data:
-            if p[2] == 'E':
+            if 'E-sk' in p[2]:
+                color = [255, 255, 255]
+            elif 'E-su' in p[2]:
+                color = [0, 0, 255]
+            elif 'E-i' in p[2]:
+                color = [ 0,255, 0]
+            elif 'E-p' in p[2]:
+                color = [255, 255, 0]
+            if 'E' in p[2]:
                 glColor3ub(color[0], color[1], color[2])
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
                 glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
@@ -731,11 +743,58 @@ class GLWidget(QGLWidget):
             #    glColor3f(0.0, 0.0, 1.0)
             #    glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
             #    glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
-        '''
-        else:
-            glColor3f(0.0, 0.0, 1.0)
-        '''
         glEnd()
+
+        '''
+        glBegin(GL_TRIANGLE_STRIP)
+        #glBegin(GL_TRIANGLES)
+        # for layer_data in layer_datas:
+
+        for p in layer_data:
+            a = numpy.array(p[0])
+            a *= .1
+            b = numpy.array(p[1])
+            b *= .1
+            dx = b[0] - a[0] #x2-x1
+            dy = b[1] - a[1] #y2-y1
+            n1 = numpy.array([-dy, dx, a[2]])
+            n1 /= numpy.linalg.norm(n1)
+            n2 = numpy.array([dy, -dx, a[2]])
+            n2 /= numpy.linalg.norm(n2)
+
+
+
+
+            if 'E-sk' in p[2]:
+                color = [255, 255, 255]
+            elif 'E-su' in p[2]:
+                color = [0, 0, 255]
+            elif 'E-i' in p[2]:
+                color = [0, 255, 0]
+            elif 'E-p' in p[2]:
+                color = [255, 255, 0]
+            if 'E' in p[2]:
+                glColor3ub(color[0], color[1], color[2])
+
+                a00 = a + n2 * line_width
+                a01 = a + n1 * line_width
+
+                b00 = b + n2 * line_width
+                b01 = b + n1 * line_width
+
+                glVertex3f(a00[0], a00[1], a00[2])
+                glVertex3f(a01[0], a01[1], a01[2])
+
+                glVertex3f(b00[0], b00[1], b00[2])
+                glVertex3f(b01[0], b01[1], b01[2])
+
+                # elif p[2] == 'M':
+                #    glColor3f(0.0, 0.0, 1.0)
+                #    glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
+                #    glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
+        glEnd()
+        '''
+
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_LIGHTING)

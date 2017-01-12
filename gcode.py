@@ -5,28 +5,109 @@ from pprint import pprint
 import os
 
 import numpy as np
+from PyQt4.QtCore import QFile
+from PyQt4.QtCore import QIODevice
+from PyQt4.QtCore import QObject
+from PyQt4.QtCore import QTextStream
+from PyQt4.QtCore import QThread
+from PyQt4.QtCore import pyqtSignal
 
 
-def timing(f):
-    def wrap(*args):
-        time1 = time.time()
-        ret = f(*args)
-        time2 = time.time()
-        print('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
-        return ret
-    return wrap
 
 class GCode(object):
-    #@timing
-    def __init__(self, filename):
-        """
-            data =
-            {
-                '0.0':[[[1.0, 2.0, 0.0],[2.0, 1.2, 0.0], 'E']], [[2.0, 1.2, 0.0], [3.0,11.0, 0.0], 'M'],
-                '0.15':[[[0.0,0.0, 0.15], [...]], [...], ...],
-                ''
-            }
-        """
+
+    def __init__(self, filename, controller, done_loading_callback):
+        self.controller = controller
+        self.done_loading_callback = done_loading_callback
+        self.data = {}
+        self.all_data = []
+        self.data_keys = []
+        self.actual_z = '0.0'
+        self.speed = 0.0
+        self.z_hop = False
+        self.last_point = [0.0, 0.0, 0.0]
+        self.actual_point = [0.0, 0.0, 0.0]
+
+        self.printing_time = 0.0
+        self.filament_length = 0.0
+
+        self.filename = filename
+        self.is_loaded = False
+
+        self.gcode_parser = GcodeParserRunner(controller, filename)
+        self.gcode_parser_thread = QThread()
+
+    def cancel(self):
+        if self.gcode_parser and self.gcode_parser_thread and self.gcode_parser_thread.isRunning():
+            self.gcode_parser.is_running = False
+            self.gcode_parser.kill()
+            self.gcode_parser_thread.quit()
+            self.gcode_parser_thread.wait()
+            self.is_loaded = False
+
+    def read_in_thread(self, update_progressbar_function, after_done_function):
+        self.gcode_parser.moveToThread(self.gcode_parser_thread)
+        self.done_loading_callback = after_done_function
+
+        # connect all signals to thread class
+        self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file)
+        # connect all signals to parser class
+        self.gcode_parser.finished.connect(self.set_finished)
+        self.gcode_parser.set_update_progress.connect(update_progressbar_function)
+        self.gcode_parser.set_data_keys.connect(self.set_data_keys)
+        self.gcode_parser.set_data.connect(self.set_data)
+        self.gcode_parser.set_all_data.connect(self.set_all_data)
+        self.gcode_parser.set_printing_time.connect(self.set_printig_time)
+
+        self.gcode_parser_thread.start()
+
+
+    def read_in_realtime(self):
+        self.gcode_parser.set_data_keys.connect(self.set_data_keys)
+        self.gcode_parser.set_data.connect(self.set_data)
+        self.gcode_parser.set_all_data.connect(self.set_all_data)
+        self.gcode_parser.set_printing_time.connect(self.set_printig_time)
+
+        self.gcode_parser.load_gcode_file()
+
+        self.is_loaded = True
+
+
+    def set_printig_time(self, time):
+        self.printing_time = time
+
+    def set_data_keys(self, data_keys):
+        self.data_keys = data_keys
+
+    def set_all_data(self, all_data):
+        self.all_data = all_data
+
+    def set_data(self, data):
+        self.data = data
+
+    def set_finished(self):
+        self.gcode_parser_thread.quit()
+        self.is_loaded = True
+        self.done_loading_callback()
+        #self.controller.set_gcode()
+
+
+
+
+class GcodeParserRunner(QObject):
+    finished = pyqtSignal()
+    set_data_keys = pyqtSignal(list)
+    set_data = pyqtSignal(dict)
+    set_all_data = pyqtSignal(list)
+    set_printing_time = pyqtSignal(float)
+    set_update_progress = pyqtSignal(int)
+
+
+    def __init__(self, controller, filename):
+        super(GcodeParserRunner, self).__init__()
+        self.is_running = True
+        self.controller = controller
+        self.filename = filename
 
         self.data = {}
         self.all_data = []
@@ -42,24 +123,42 @@ class GCode(object):
 
 
 
-        #buffering=(2 << 16) + 8
-        with open(filename, 'r', buffering=(2 << 16) + 8) as f:
-            data = f.readlines()
-            for line in data:
-                #striped_line = line.rstrip()
-                #bits = striped_line.split(';', 1)
-                bits = line.split(';', 1)
-                if bits[0] == '':
-                    continue
-                if 'G1' in bits[0]:
-                    self.parse_g1_line(bits)
-                else:
-                    continue
+    def load_gcode_file(self):
+        file = QFile(self.filename)
+        file.open(QIODevice.ReadOnly | QIODevice.Text)
+        in_stream = QTextStream(file)
+        file_size = file.size()
+        counter = 0
+
+        while not in_stream.atEnd() and self.is_running is True:
+            counter+=1
+            if self.set_update_progress and counter==10000:
+                progress = (in_stream.pos()*1./file_size*1.) * 100.
+                self.set_update_progress.emit(int(progress))
+                counter=0
+            # print("ctu")
+            line = str(in_stream.readLine())
+            # print(line)
+            # self.process_line(line)
+            bits = line.split(';', 1)
+            if bits[0] == '':
+                continue
+            if 'G1' in bits[0]:
+                self.parse_g1_line(bits)
+            else:
+                continue
 
         self.data_keys.sort(key=lambda x: float(x))
 
         self.printing_time = self.calculate_time_of_print()
-        self.filament_length = 0.0#self.calculate_length_of_filament()
+        self.filament_length = 0.0  # self.calculate_length_of_filament()
+
+        self.set_data_keys.emit(self.data_keys)
+        self.set_data.emit(self.data)
+        self.set_all_data.emit(self.all_data)
+        self.set_printing_time.emit(self.printing_time)
+
+        self.finished.emit()
 
 
     def calculate_time_of_print(self):
@@ -106,9 +205,9 @@ class GCode(object):
         line = text.split(' ')
         line = filter(None, line)
 
+        #print(comment)
         comment_line = comment.split(' ')
         comment_line = filter(None, comment_line)
-
         if 'Z' in line[1]:
             # Set of Z axis
             new_z = float(line[1][1:])
@@ -132,9 +231,19 @@ class GCode(object):
             self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
                 if float(line[3][1:])>0.:
-                    type = 'E'
+                    if 'infill' in comment_line[0]:
+                        type = 'E-i'
+                    elif 'perimeter' in comment_line[0]:
+                        type = 'E-p'
+                    elif 'support' in comment_line[0] and 'material' in comment_line[1]:
+                        type = 'E-su'
+                    elif 'skirt' in comment_line[0]:
+                        type = 'E-sk'
+                    else:
+                        type = 'E'
                 else:
                     type = 'M'
+
                 self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed)
                 self.last_point = deepcopy(self.actual_point)
             else:
@@ -145,7 +254,16 @@ class GCode(object):
 
             if self.last_point:
                 if float(line[2][1:])>0.:
-                    type = 'E'
+                    if 'infill' in comment_line[0]:
+                        type = 'E-i'
+                    elif 'perimeter' in comment_line[0]:
+                        type = 'E-p'
+                    elif 'support' in comment_line[0] and 'material' in comment_line[1]:
+                        type = 'E-su'
+                    elif 'skirt' in comment_line[0]:
+                        type = 'E-sk'
+                    else:
+                        type = 'E'
                 else:
                     type = 'M'
                 self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]))
@@ -187,5 +305,3 @@ class GCode(object):
             self.data[key] = []
             self.data[key].append([x, y, z])
             self.all_data.append([x, y, z])
-
-

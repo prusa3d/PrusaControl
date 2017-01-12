@@ -12,6 +12,8 @@ from copy import deepcopy
 import cStringIO
 from PyQt4.QtCore import QObject, QThread, pyqtSignal
 
+from gcode import GCode
+
 
 class SlicerEngineAbstract():
     '''
@@ -42,11 +44,14 @@ class Slic3rEngineRunner(QObject):
     filament_info = pyqtSignal(str)
     finished = pyqtSignal()
     send_message = pyqtSignal(str)
+    send_gcodedata = pyqtSignal(GCode)
 
     def __init__(self, controller):
         super(Slic3rEngineRunner, self).__init__()
         self.is_running = True
         self.controller = controller
+
+        self.gcode = GCode(self.controller.app_config.tmp_place + 'out.gcode', self.controller, None)
 
         system_platform = platform.system()
         if system_platform in ['Linux']:
@@ -121,7 +126,7 @@ class Slic3rEngineRunner(QObject):
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
         for i in actual_printing_data:
-            if i in ['brim', 'support_on_off', 'support_build_plate'] and actual_printing_data[i]==True:
+            if i in ['brim', 'support_on_off'] and actual_printing_data[i]==True:
                 self.step_max+=1
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
@@ -153,26 +158,31 @@ class Slic3rEngineRunner(QObject):
         self.process.kill()
 
     def check_progress(self):
-        while self.step <= self.step_max and self.is_running is True:
+        self.step = 1
+        while self.is_running is True:
+            self.step+=1
             line = self.process.stdout.readline()
-            if self.controller.settings['debug']:
-                print(line)
-            self.step += 1
+            parsed_line = line.rsplit()
             if not line:
-                break
-            self.step_increased.emit(int(((10. / (self.step_max+1)*1.) * (self.step + 1)) * 10))
-            if self.step == self.step_max:
-                filament_str = line.rsplit()
-                filament_str = filament_str[2:4]
-                filament_str = str(filament_str[0] + ' ' + filament_str[1])
+                continue
+            if 'Done.' in parsed_line[0]:
+                self.step_increased.emit(95)
+                self.send_message.emit("Generating G-code preview")
+                self.gcode.read_in_realtime()
+                self.send_gcodedata.emit(self.gcode)
+            elif 'Filament' in parsed_line[0] and 'required:' in parsed_line[1]:
+                filament_str = str(parsed_line[2] + ' ' + parsed_line[3])
+                print(filament_str)
                 self.filament_info.emit(filament_str)
                 self.finished.emit()
+                self.step_increased.emit(100)
                 break
             else:
                 text = line.rsplit()[1:]
                 if text[0] == 'Exporting':
                     text = text[:2]
                 self.send_message.emit(" ".join(text))
+            self.step_increased.emit(int((self.step / 11.) * 100))
 
     def end(self):
         self.end_callback()
@@ -216,7 +226,8 @@ class SlicerEngineManager(object):
         self.slice_engine.finished.connect(self.thread_ended)
         self.slice_engine.filament_info.connect(self.controller.set_print_info_text)
         self.slice_engine.step_increased.connect(self.controller.set_progress_bar)
-        self.slice_engine.send_message.connect(self.controller.show_message_on_status_bar)
+        self.slice_engine.send_message.connect(self.controller.slicing_message)
+        self.slice_engine.send_gcodedata.connect(self.controller.set_gcode_instance)
 
         self.slice_thread.start()
 

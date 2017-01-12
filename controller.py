@@ -180,6 +180,7 @@ class Controller:
 
     def get_informations(self):
         if not self.gcode:
+            print("Neni gcode instance")
             return
 
         printing_time = self.gcode.printing_time
@@ -255,14 +256,23 @@ class Controller:
         self.view.gcode_slider.max_label.setText(str(max_l))
 
 
+    def set_gcode_instance(self, gcode_instance):
+        self.gcode = gcode_instance
+        self.set_gcode()
+
+    def print_progress(self, progress):
+        print("Progress: " + str(progress))
 
 
     def read_gcode(self, filename = ''):
         if filename:
-            self.gcode = GCode(filename)
+            self.gcode = GCode(filename, self, self.set_gcode)
         else:
-            self.gcode = GCode(self.app_config.tmp_place + 'out.gcode')
+            self.gcode = GCode(self.app_config.tmp_place + 'out.gcode', self, self.set_gcode)
 
+        self.gcode.read_in_thread(self.set_progress_bar, self.set_gcode)
+
+        '''
         min = 0
         max = len(self.gcode.data_keys)-1
 
@@ -276,9 +286,30 @@ class Controller:
 
         self.view.gcode_label.setText(self.gcode.data_keys[1])
         self.view.gcode_slider.setValue(float(self.gcode.data_keys[1]))
+        '''
 
-        if filename:
-            self.set_gcode_view()
+        #if filename:
+        #    self.set_gcode_view()
+
+
+    def set_gcode(self):
+        if not self.gcode.is_loaded:
+            return
+
+        min = 0
+        max = len(self.gcode.data_keys) - 1
+
+        min_l = float(self.gcode.data_keys[0])
+        max_l = float(self.gcode.data_keys[-1])
+
+        self.set_gcode_slider(min, max, min_l, max_l)
+
+        self.gcode_layer = self.gcode.data_keys[1]
+
+        self.view.gcode_label.setText(self.gcode.data_keys[1])
+        self.view.gcode_slider.setValue(float(self.gcode.data_keys[1]))
+
+        self.set_gcode_view()
 
     def set_gcode_layer(self, value):
         self.gcode_layer = self.gcode.data_keys[value]
@@ -288,10 +319,9 @@ class Controller:
     def set_gcode_draw_from_button(self, val):
         self.gcode_draw_from_button = val
 
-
     def scene_was_sliced(self):
         self.set_save_gcode_button()
-        self.read_gcode()
+        #self.read_gcode()
         self.view.gcode_slider.init_points()
         self.set_gcode_view()
         self.status = 'generated'
@@ -683,7 +713,7 @@ class Controller:
         self.view.open_about_dialog()
 
     def generate_gcode(self):
-        self.set_progress_bar(int(((10. / 9.) * 1) * 10))
+        self.set_progress_bar(int((100. / 9.)))
         if self.scene.models:
             self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")
             self.slicer_manager.slice()
@@ -917,19 +947,19 @@ class Controller:
             self.paste_selected_objects()
             self.update_scene()
         elif key in [Qt.Key_Z] and self.is_ctrl_pressed() and self.render_status == 'model_view':
-            print("Undo pressed")
+            #print("Undo pressed")
             self.unselect_tool_buttons()
             self.undo_function()
             #self.undo_button_pressed()
             self.update_scene()
         elif key in [Qt.Key_Y] and self.is_ctrl_pressed() and self.render_status == 'model_view':
-            print("Redo pressed")
+            #print("Redo pressed")
             self.unselect_tool_buttons()
             self.do_function()
             #self.do_button_pressed()
             self.update_scene()
         elif key in [Qt.Key_R] and self.render_status == 'model_view':
-            print("R pressed ")
+            #print("R pressed ")
             if self.view.glWidget.rotateTool.is_pressed():
                 self.unselect_tool_buttons()
             else:
@@ -937,7 +967,7 @@ class Controller:
                 self.view.glWidget.rotateTool.press_button()
             self.update_scene()
         elif key in [Qt.Key_S] and self.render_status == 'model_view':
-            print("S pressed ")
+            #print("S pressed ")
             if self.view.glWidget.scaleTool.is_pressed():
                 self.unselect_tool_buttons()
             else:
@@ -945,16 +975,16 @@ class Controller:
                 self.view.glWidget.scaleTool.press_button()
             self.update_scene()
         elif key in [Qt.Key_A] and self.is_ctrl_pressed() and self.render_status == 'model_view':
-            print("A and ctrl pressed")
+            #print("A and ctrl pressed")
             self.select_all()
             self.update_scene()
         elif key in [Qt.Key_A] and self.render_status == 'model_view':
-            print("A pressed")
+            #print("A pressed")
             self.unselect_tool_buttons()
             self.scene.automatic_models_position()
             self.update_scene()
         elif key in [Qt.Key_I] and self.is_ctrl_pressed() and self.render_status == 'model_view':
-            print("I and ctrl pressed ")
+            #print("I and ctrl pressed ")
             self.invert_selection()
             self.update_scene()
 
@@ -986,7 +1016,7 @@ class Controller:
 
 
     def mouse_press_event(self, event):
-        print("Mouse press event")
+        #print("Mouse press event")
         self.clear_event_flag_status()
         self.mouse_press_event_flag = True
 
@@ -1005,7 +1035,7 @@ class Controller:
                 else:
                     #Je pod kurzorem nejaky tool?
                     if self.is_some_tool_under_cursor(object_id):
-                        print("pod kurzorem je Tool")
+                        #print("pod kurzorem je Tool")
                         self.unselect_objects()
                         self.tool_press_event_flag = True
                         self.tool = self.get_tool_by_id(object_id)
@@ -1018,31 +1048,31 @@ class Controller:
 
                     #Je pod kurzorem nejaky tool helper?
                     elif self.is_some_tool_helper_under_cursor(object_id):
-                        print("tool helper under cursor")
+                        #print("tool helper under cursor")
                         self.tool_helper_press_event_flag = True
                         #self.set_active_tool_helper_by_id(object_id)
                         self.prepare_tool(event)
 
                     elif self.is_object_already_selected(object_id) and self.is_ctrl_pressed():
-                        print("object already selected and ctrl pressed")
+                        #print("object already selected and ctrl pressed")
                         self.object_select_event_flag = True
                         self.unselect_object(object_id)
                     elif self.is_ctrl_pressed():
-                        print("ctrl pressed")
+                        #print("ctrl pressed")
                         self.select_object(object_id)
                     elif self.is_object_already_selected(object_id) and self.is_some_tool_active():
-                        print("object already selected and tool placeonface is on")
+                        #print("object already selected and tool placeonface is on")
                         self.tool=self.get_active_tool()
                         self.prepare_tool(event)
                     elif self.is_object_already_selected(object_id):
-                        print("object already selected")
+                        #print("object already selected")
                         pass
                     else:
-                        print("else")
+                        #print("else")
                         self.unselect_objects()
                         self.select_object(object_id)
 
-                    print("Aktualni tool je: " + self.tool)
+                    #print("Aktualni tool je: " + self.tool)
                     self.tool = self.get_active_tool()
                     #Je objekt oznaceny?
                     '''
@@ -1097,7 +1127,7 @@ class Controller:
 
 
     def prepare_tool(self, event):
-        print("prepare tool")
+        #print("prepare tool")
         if self.tool == 'rotate':
             for model in self.scene.models:
                 if model.selected:
@@ -1114,7 +1144,7 @@ class Controller:
 
 
         elif self.tool == 'placeonface':
-            print("inside placeonface")
+            #print("inside placeonface")
             ray_start, ray_end = self.view.get_cursor_position(event)
             for model in self.scene.models:
                 if model.selected:
@@ -1125,7 +1155,7 @@ class Controller:
                         self.view.glWidget.v0 = face[0]
                         self.view.glWidget.v1 = face[1]
                         self.view.glWidget.v2 = face[2]
-                        print("Nalezen objekt " + str(model))
+                        #print("Nalezen objekt " + str(model))
         elif self.tool == 'scale':
             ray_start, ray_end = self.view.get_cursor_position(event)
 
@@ -1140,14 +1170,14 @@ class Controller:
 
 
     def mouse_move_event(self, event):
-        print("Mouse move event")
+        #print("Mouse move event")
         self.mouse_move_event_flag = True
         dx = event.x() - self.last_pos.x()
         dy = event.y() - self.last_pos.y()
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
 
         if self.camera_move:
-            print("camera move")
+            #print("camera move")
             camStart, camDir, camUp, camRight = self.view.get_camera_direction(event)
             right_move = -0.025*dx * camRight
             up_move = 0.025*dy * camUp
@@ -1156,14 +1186,14 @@ class Controller:
             self.add_camera_position(move_vector)
 
         elif self.camera_rotate:
-            print("camera rotate")
+            #print("camera rotate")
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
             #self.scene.camera_vector = direction - camera_pos
         #Move function
         elif self.tool== 'move':
-            print("move function")
+            #print("move function")
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
@@ -1179,7 +1209,7 @@ class Controller:
         #Rotate function
         elif self.tool == 'rotate':
             if self.tool_helper_press_event_flag:
-                print("rotate function")
+                #print("rotate function")
                 newRayStart, newRayEnd = self.view.get_cursor_position(event)
                 res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
                 if res is not None:
@@ -1226,7 +1256,7 @@ class Controller:
         #Scale function
         elif self.tool == 'scale':
             if self.tool_helper_press_event_flag:
-                print("scale function")
+                #print("scale function")
                 ray_start, ray_end = self.view.get_cursor_position(event)
                 #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
 
@@ -1255,7 +1285,7 @@ class Controller:
                         self.scene_was_changed()
 
         else:
-            print("Mouse move event else vetev")
+            #print("Mouse move event else vetev")
             if self.render_status == 'model_view':
                 object_id = self.get_id_under_cursor(event)
                 #TOOLs hover effect
@@ -1310,7 +1340,7 @@ class Controller:
     def get_active_tool(self):
         for tool in self.tools:
             if tool.pressed:
-                print("Tool name: " + str(tool.tool_name))
+                #print("Tool name: " + str(tool.tool_name))
                 return tool.tool_name
         return 'move'
 
@@ -1476,13 +1506,13 @@ class Controller:
                 possible_hit.append(model)
                 nSelected+=1
             else:
-                print("Tady bych to necekal")
+                #print("Tady bych to necekal")
                 model.selected = False
 
         if not nSelected:
             return False
 
-        print("A tady taky ne")
+        #print("A tady taky ne")
         for model in possible_hit:
             if model.intersection_ray_model(self.ray_start, self.ray_end):
                 model.selected = not model.selected
@@ -1537,7 +1567,7 @@ class Controller:
             return False
         for model in self.scene.models:
             if model.id == find_id:
-                print("Tady to je!!!")
+                #print("Tady to je!!!")
                 model.selected = not model.selected
                 return True
 
@@ -1601,13 +1631,13 @@ class Controller:
         pass
 
     def undo_button_pressed(self):
-        print("Undo")
+        #print("Undo")
         self.clear_tool_button_states()
         self.scene.make_undo()
         self.update_scene()
 
     def do_button_pressed(self):
-        print("Do")
+        #print("Do")
         self.clear_tool_button_states()
         self.scene.make_do()
         self.update_scene()
@@ -1652,6 +1682,28 @@ class Controller:
     def clear_tool_button_states(self):
         self.settings['toolButtons'] = {a: False for a in self.settings['toolButtons']}
 
+    def slicing_message(self, string_in):
+        #Translation of messages from slicing engine
+
+        translation_table = {'Generating perimeters': self.view.tr('Generating perimeters'),
+                             'Processing triangulated mesh': self.view.tr('Processing triangulated mesh'),
+                             'Infilling layers': self.view.tr('Infilling layers'),
+                             'Preparing infill': self.view.tr('Preparing infill'),
+                             'Generating skirt': self.view.tr('Generating skirt'),
+                             'Exporting G-code to': self.view.tr('Exporting G-code to'),
+                             'Done. Process took': self.view.tr('Done. Process took')
+                             }
+
+        string_in_str = str(string_in)
+        if string_in_str in translation_table:
+            string_out = translation_table[string_in_str]
+        else:
+            string_out = string_in
+
+        self.show_message_on_status_bar(string_out)
+
+
+
     def show_message_on_status_bar(self, string):
         self.view.statusBar().showMessage(string)
 
@@ -1674,13 +1726,13 @@ class Controller:
             fileEnd=''
 
         if fileEnd in ['stl', 'STL', 'Stl']:
-            print('import model')
+            #print('import model')
             self.import_model(url)
         elif fileEnd in ['prus', 'PRUS']:
-            print('open project')
+            #print('open project')
             self.open_project_file(url)
         elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
-            print('import image')
+            #print('import image')
             self.import_image(url)
         elif fileEnd in ['gcode']:
             self.read_gcode(url)
