@@ -828,29 +828,31 @@ class PrusaControlView(QtGui.QMainWindow):
         #QtGui.QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
         #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
 
-
+        self.material_tooltip = self.tr("Select material for printing")
         self.printer_settings_l = QtGui.QLabel(self.tr("Printer settings"))
         self.printer_settings_l.setObjectName('printer_settings_l')
         # print tab
         self.materialLabel = QtGui.QLabel(self.tr("Material"))
         self.materialLabel.setObjectName('materialLabel')
+        self.materialLabel.setToolTip(self.material_tooltip)
         self.materialCombo = QtGui.QComboBox()
         self.materialCombo.setObjectName('materialCombo')
         material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
         self.materialCombo.addItems(material_label_ls)
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
-        self.materialCombo.setToolTip(self.tr("Select material for printing"))
+        self.materialCombo.setToolTip(self.material_tooltip)
         #self.materialCombo.setV
         #view = self.materialCombo.view()
 
 
-
+        self.quality_tooltip = self.tr("Select quality for printing")
         self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
         self.qualityLabel.setObjectName('qualityLabel')
+        self.qualityLabel.setToolTip(self.quality_tooltip)
         self.qualityCombo = QtGui.QComboBox()
         self.qualityCombo.setObjectName('qualityCombo')
-        self.qualityCombo.setToolTip(self.tr("Select quality for printing"))
+        self.qualityCombo.setToolTip(self.quality_tooltip)
 
         #self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
         #self.infillLabel.setObjectName('infillLabel')
@@ -858,30 +860,36 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
         #self.infillSlider.setObjectName('infillSlider')
 
+        self.infill_tooltip = self.tr("Select how much space inside of model have to be filled")
         self.infillLabel = QtGui.QLabel(self.tr("Infill"))
         self.infillLabel.setObjectName('infillLabel')
         self.infillLabel.setFixedWidth(75)
+        self.infillLabel.setToolTip(self.infill_tooltip)
         self.infillCombo = QtGui.QComboBox()
         self.infillCombo.setObjectName('infillCombo')
         infill_ls, f = self.controller.get_infill_ls_and_index_of_default("0%")
         self.infillCombo.insertItems(len(infill_ls), infill_ls)
-        self.infillCombo.setToolTip(self.tr("Select how much space inside of model have to be filled"))
+        self.infillCombo.setToolTip(self.infill_tooltip)
 
 
         #self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
+        self.support_tooltip = self.tr("Select what kind of supports do you need, if any")
         self.supportLabel = QtGui.QLabel(self.tr("Support"))
         self.supportLabel.setObjectName('supportLabel')
+        self.supportLabel.setToolTip(self.support_tooltip)
         self.supportCombo = QtGui.QComboBox()
         self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
         self.supportCombo.setObjectName('supportCombo')
         self.supportCombo.setMaxVisibleItems(10)
-        self.supportCombo.setToolTip(self.tr("Select what kind of supports do you need, if any"))
+        self.supportCombo.setToolTip(self.support_tooltip)
 
+        self.brim_tooltip = self.tr("Do you need better adhesive of model and printing bed?")
         self.brim_label = QtGui.QLabel(self.tr("Brim"))
         self.brim_label.setObjectName('brim_label')
+        self.brim_label.setToolTip(self.brim_tooltip)
         self.brimCheckBox = QtGui.QCheckBox("")
         self.brimCheckBox.setObjectName('brimCheckBox')
-        self.brimCheckBox.setToolTip(self.tr("Do you need better adhesive of model and printing bed?"))
+        self.brimCheckBox.setToolTip(self.brim_tooltip)
 
         self.object_group_box = QtGui.QGroupBox(self.tr("Object settings"))
         self.object_group_box.setObjectName('object_group_box')
@@ -903,6 +911,8 @@ class PrusaControlView(QtGui.QMainWindow):
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
+        self.progressBar.setAlignment(Qt.AlignCenter)
+        #self.progressBar.setFormat("Generovani GCodu %p%")
 
         self.generateButton = QtGui.QPushButton(self.tr("Generate"))
         self.generateButton.setObjectName('generateButton')
@@ -1063,6 +1073,11 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_generate_button(self):
         self.generateButton.setText(self.tr("Generate"))
         self.generateButton.setToolTip(self.tr("Generate scene with actual options to gcode file"))
+
+    def set_cancel_of_loading_gcode_file(self):
+        self.generateButton.setEnabled(True)
+        self.generateButton.setText(self.tr("Cancel file read"))
+        self.generateButton.setToolTip(self.tr("Cancel of reading file"))
 
     def set_print_info_text(self, string):
         self.printing_filament_data.setText(string)
@@ -1479,6 +1494,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
     #TODO:Debug new design
     def open_gcode_view(self):
+        self.set_save_gcode_button()
         self.object_group_box.setVisible(False)
         self.gcode_group_box.setVisible(True)
         self.progressBar.setVisible(False)

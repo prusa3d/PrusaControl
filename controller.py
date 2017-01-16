@@ -123,7 +123,7 @@ class Controller:
         self.mouse_release_event_flag = False
         self.tool_press_event_flag = False
         self.object_select_event_flag = False
-        #TODO:Add clear event flags function
+        self.cursor_over_object = False
 
         self.gcode_layer = '0.0'
         self.gcode_draw_from_button = True
@@ -159,18 +159,6 @@ class Controller:
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
 
 
-    #TODO:Better construction
-    '''
-    def add_warning_message(self, object, problem):
-        if problem == "out_of_printing_space":
-            text = u"•  Object %s is out of printable area!" % object.filename
-            if not text in self.warning_message_buffer:
-                self.warning_message_buffer.append(text)
-        elif problem == "something_else":
-            pass
-        else:
-            self.warning_message_buffer.append(u"•  Object %s has some other problem!" % object.filename)
-    '''
 
     def is_something_to_save(self):
         if len(self.scene.models) == 0:
@@ -195,6 +183,7 @@ class Controller:
 
         return data
 
+    #TODO:Add some human readable form of printing time
     def convert_printing_time_from_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
@@ -209,6 +198,7 @@ class Controller:
         self.tool_press_event_flag = False
         self.object_select_event_flag = False
         self.tool_helper_press_event_flag = False
+        self.cursor_over_object = False
 
     def clear_gcode(self):
         self.gcode = None
@@ -270,29 +260,13 @@ class Controller:
         else:
             self.gcode = GCode(self.app_config.tmp_place + 'out.gcode', self, self.set_gcode)
 
+        self.view.set_cancel_of_loading_gcode_file()
+        self.status = 'loading_gcode'
         self.gcode.read_in_thread(self.set_progress_bar, self.set_gcode)
-
-        '''
-        min = 0
-        max = len(self.gcode.data_keys)-1
-
-        min_l = float(self.gcode.data_keys[0])
-        max_l = float(self.gcode.data_keys[-1])
-
-        self.set_gcode_slider(min, max, min_l, max_l)
-
-        self.gcode_layer = self.gcode.data_keys[1]
-
-
-        self.view.gcode_label.setText(self.gcode.data_keys[1])
-        self.view.gcode_slider.setValue(float(self.gcode.data_keys[1]))
-        '''
-
-        #if filename:
-        #    self.set_gcode_view()
 
 
     def set_gcode(self):
+        print("Set gcode")
         if not self.gcode.is_loaded:
             return
 
@@ -320,7 +294,7 @@ class Controller:
         self.gcode_draw_from_button = val
 
     def scene_was_sliced(self):
-        self.set_save_gcode_button()
+        #self.set_save_gcode_button()
         #self.read_gcode()
         self.view.gcode_slider.init_points()
         self.set_gcode_view()
@@ -491,8 +465,8 @@ class Controller:
         return self.view.get_actual_printing_data()
 
     def generate_button_pressed(self):
-        whole_scene = self.scene.get_whole_scene_in_one_mesh()
         if self.status in ['edit', 'canceled']:
+            whole_scene = self.scene.get_whole_scene_in_one_mesh()
             #prepared to be g-code generated
             self.canceled = False
             self.close_object_settings()
@@ -513,6 +487,13 @@ class Controller:
             self.status = 'canceled'
             self.set_generate_button()
 
+        elif self.status == 'loading_gcode':
+            self.gcode.cancel()
+            self.gcode = None
+            self.status='canceled'
+            self.disable_generate_button()
+            self.set_generate_button()
+            self.set_progress_bar(0)
 
         elif self.status == 'generated':
             #already generated
@@ -690,10 +671,11 @@ class Controller:
 
     def update_scene(self):
         self.view.update_scene()
-        if self.scene.is_scene_printable():
-            self.enable_generate_button()
-        else:
-            self.disable_generate_button()
+        if self.status in ['edit', 'canceled']:
+            if self.scene.is_scene_printable():
+                self.enable_generate_button()
+            else:
+                self.disable_generate_button()
 
     def update_firmware(self):
         #TODO:Add code for update of firmware
@@ -738,6 +720,19 @@ class Controller:
         self.set_generate_button()
         self.set_progress_bar(0.0)
 
+    '''
+    def set_model_view_mode(self):
+        if self.status in ['generating']:
+            pass
+        elif self.status in ['loading_gcode']:
+            #set progressbar
+            self.set_progress_bar(0)
+            #set generate button
+            self.set_generate_button()
+
+        self.render_status == 'model_view'
+    '''
+
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
         #self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
@@ -752,10 +747,12 @@ class Controller:
     def set_camera_rotation_function(self):
         self.camera_move = False
         self.camera_rotate = True
+        self.cursor_over_object = False
 
     def set_camera_function_false(self):
         self.camera_move = False
         self.camera_rotate = False
+        self.cursor_over_object = False
 
     def is_some_tool_under_cursor(self, object_id):
         print("Is some tool under cursor")
@@ -1036,7 +1033,7 @@ class Controller:
                     #Je pod kurzorem nejaky tool?
                     if self.is_some_tool_under_cursor(object_id):
                         #print("pod kurzorem je Tool")
-                        self.unselect_objects()
+                        #self.unselect_objects()
                         self.tool_press_event_flag = True
                         self.tool = self.get_tool_by_id(object_id)
                         for t in self.tools:
@@ -1056,21 +1053,26 @@ class Controller:
                     elif self.is_object_already_selected(object_id) and self.is_ctrl_pressed():
                         #print("object already selected and ctrl pressed")
                         self.object_select_event_flag = True
+                        self.cursor_over_object = True
                         self.unselect_object(object_id)
                     elif self.is_ctrl_pressed():
                         #print("ctrl pressed")
                         self.select_object(object_id)
+                        self.cursor_over_object = True
                     elif self.is_object_already_selected(object_id) and self.is_some_tool_active():
                         #print("object already selected and tool placeonface is on")
                         self.tool=self.get_active_tool()
                         self.prepare_tool(event)
+                        self.cursor_over_object = True
                     elif self.is_object_already_selected(object_id):
                         #print("object already selected")
                         pass
+                        self.cursor_over_object = True
                     else:
                         #print("else")
                         self.unselect_objects()
                         self.select_object(object_id)
+                        self.cursor_over_object = True
 
                     #print("Aktualni tool je: " + self.tool)
                     self.tool = self.get_active_tool()
@@ -1191,24 +1193,10 @@ class Controller:
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
             #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
             #self.scene.camera_vector = direction - camera_pos
-        #Move function
-        elif self.tool== 'move':
-            #print("move function")
-            newRayStart, newRayEnd = self.view.get_cursor_position(event)
-            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
-            if res is not None:
-                res_new = res - self.res_old
-                for model in self.scene.models:
-                    if model.selected:
-                        model.set_move(res_new)
-                        #self.view.update_object_settings(model.id)
-                        self.view.update_position_widgets(model.id)
-                        self.scene_was_changed()
-                self.res_old = res
-
-        #Rotate function
-        elif self.tool == 'rotate':
-            if self.tool_helper_press_event_flag:
+        #Check if some tool helper is pressed after that decide which tool is selected and
+        #make some change, other way move
+        elif self.tool_helper_press_event_flag:
+            if self.tool == 'rotate':
                 #print("rotate function")
                 newRayStart, newRayEnd = self.view.get_cursor_position(event)
                 res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
@@ -1251,14 +1239,10 @@ class Controller:
                             #self.view.update_object_settings(model.id)
                             self.view.update_rotate_widgets(model.id)
                             self.scene_was_changed()
-                    #self.res_old = res
-
-        #Scale function
-        elif self.tool == 'scale':
-            if self.tool_helper_press_event_flag:
-                #print("scale function")
+            elif self.tool == 'scale':
+                # print("scale function")
                 ray_start, ray_end = self.view.get_cursor_position(event)
-                #camera_pos, direction, _, _ = self.view.get_camera_direction(event)
+                # camera_pos, direction, _, _ = self.view.get_camera_direction(event)
 
                 for model in self.scene.models:
                     if model.selected:
@@ -1268,21 +1252,37 @@ class Controller:
                         new_scale_vect = new_scale_point - pos
 
                         l = numpy.linalg.norm(new_scale_vect)
-                        l-=.5
+                        l -= .5
 
                         origin_size = deepcopy(model.size_origin)
                         origin_size[2] = 0.
-                        origin_size*=.5
+                        origin_size *= .5
 
-                        new_scale = l/numpy.linalg.norm(origin_size)
-                        #print("Nova velikost scalu: " + str(new_scale))
+                        new_scale = l / numpy.linalg.norm(origin_size)
+                        # print("Nova velikost scalu: " + str(new_scale))
 
                         model.set_scale_abs(new_scale, new_scale, new_scale)
-                        #model.set_scale(new_scale)
-                        self.last_l=new_scale
+                        # model.set_scale(new_scale)
+                        self.last_l = new_scale
 
                         self.view.update_scale_widgets(model.id)
                         self.scene_was_changed()
+        #Move function
+        elif not self.tool_helper_press_event_flag \
+                and self.mouse_press_event_flag \
+                and self.cursor_over_object:
+            print("move function")
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            if res is not None:
+                res_new = res - self.res_old
+                for model in self.scene.models:
+                    if model.selected:
+                        model.set_move(res_new)
+                        #self.view.update_object_settings(model.id)
+                        self.view.update_position_widgets(model.id)
+                        self.scene_was_changed()
+                self.res_old = res
 
         else:
             #print("Mouse move event else vetev")
@@ -1312,7 +1312,6 @@ class Controller:
         self.last_pos = QtCore.QPoint(event.pos())
         self.update_scene()
         #self.view.update_scene()
-
 
     def select_tool_helper(self, event):
         object_id = self.get_id_under_cursor(event)
@@ -1365,7 +1364,7 @@ class Controller:
 
         if event.button() & QtCore.Qt.LeftButton and self.mouse_press_event_flag and\
                 self.mouse_release_event_flag and self.mouse_move_event_flag == False and\
-                self.object_select_event_flag==False:
+                self.object_select_event_flag==False and self.tool_press_event_flag == False:
             #print("Podminky splneny")
             self.clear_event_flag_status()
             self.unselect_objects()
@@ -1376,109 +1375,6 @@ class Controller:
 
     def close_object_settings(self):
         self.view.close_object_settings_panel()
-
-
-    '''
-    def mouse_move_event(self, event):
-        if event.buttons() & QtCore.Qt.LeftButton or event.buttons() & QtCore.Qt.RightButton:
-            self.in_move = True
-        elif self.settings['toolButtons']['rotateButton']:
-            self.check_rotation_axis(event)
-        else:
-            return
-
-        dx = event.x() - self.last_pos.x()
-        dy = event.y() - self.last_pos.y()
-        diff = numpy.linalg.norm(numpy.array([dx, dy]))
-
-        newRayStart, newRayEnd = self.view.get_cursor_position(event)
-
-        if event.buttons() & QtCore.Qt.LeftButton and self.over_object and self.models_selected:
-            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
-            if res is not None:
-                #res_new = sceneData.Vector.minusAB(res, self.res_old)
-                res_new = res - self.res_old
-                for model in self.scene.models:
-                    if model.selected:
-                        model.set_move(res_new)
-                        self.scene_was_changed()
-                    self.res_old = res
-                self.view.update_scene()
-
-        elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['rotateButton']:
-            res = [.0, .0, .0]
-            #find plane(axis) in which rotation will be made
-            #newRayStart, newRayEnd = self.view.get_cursor_position(event)
-            ray_start, ray_end = self.view.get_cursor_position(event)
-            for model in self.scene.models:
-                if model.selected and model.rotationAxis:
-
-                    if model.rotationAxis == 'x':
-                        rotation_axis = numpy.array([1.0, 0.0, 0.0])
-                    elif model.rotationAxis == 'y':
-                        rotation_axis = numpy.array([0.0, 1.0, 0.0])
-                    elif model.rotationAxis == 'z':
-                        rotation_axis = numpy.array([0.0, 0.0, 1.0])
-
-                    res = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.pos, rotation_axis))
-                    new_vec = res - model.pos
-                    new_vec /= numpy.linalg.norm(new_vec)
-                    old_vec = self.origin_rotation_point - model.pos
-                    old_vec /= numpy.linalg.norm(old_vec)
-
-                    cos_ang = numpy.dot(old_vec, new_vec)
-                    cross = numpy.cross(old_vec, new_vec)
-
-                    neg = numpy.dot(cross, rotation_axis)
-                    sin_ang = numpy.linalg.norm(cross) * numpy.sign(neg) *-1.
-
-                    alpha = numpy.arctan2(sin_ang, cos_ang)
-
-                    model.set_rotation(rotation_axis, alpha)
-
-                    self.scene_was_changed()
-                self.res_old = res
-            self.view.update_scene()
-
-
-        elif event.buttons() & QtCore.Qt.LeftButton & self.settings['toolButtons']['scaleButton']:
-            res = [.0, .0, .0]
-            camera_pos, direction, _ ,_   = self.view.get_camera_direction(event)
-            ray_start, ray_end = self.view.get_cursor_position(event)
-            for model in self.scene.models:
-                #if model.selected and model.scaleAxis:
-                    #if model.scaleAxis == 'xyz':
-                if model.selected:
-                    new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end, model.zeroPoint, direction))
-                    new_scale_vec = new_scale_point - model.zeroPoint
-                    l = numpy.linalg.norm(new_scale_vec)/self.original_scale
-                    model.set_scale(numpy.array([l, l, l]))
-                else:
-                    res = [.0, .0, .0]
-            self.scene_was_changed()
-            self.res_old = res
-            self.view.update_scene()
-
-        elif event.buttons() & QtCore.Qt.LeftButton and not self.over_object:
-            #TODO:Add controll of camera instance
-            self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
-            self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
-            self.last_pos = QtCore.QPoint(event.pos())
-            camera_pos, direction, _ ,_   = self.view.get_camera_direction(event)
-            self.scene.camera_vector = direction - camera_pos
-            self.view.update_scene()
-
-        elif event.buttons() & QtCore.Qt.MiddleButton:
-            #TODO:Make it better
-            pos, _ = self.view.get_cursor_position(event)
-            #plane = pyrr.plane.create_from_position(pos, normal)
-
-            new_pos = numpy.array(pos)
-            diff = (self.last_ray_pos - new_pos)
-            self.last_ray_pos = new_pos
-            self.view.add_camera_position(diff)
-            #self.view.update_scene()
-    '''
 
     def set_printable(self, is_printable):
         self.scene.printable = is_printable

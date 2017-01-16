@@ -518,9 +518,11 @@ class GLWidget(QGLWidget):
 
             color_change_list = [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
 
-            color = [255, 255, 255]
+            color = [13, 82, 78]
             for color_change in color_change_list:
                 self.draw_layer(color_change, color, printer)
+                #Add text note for ColorChange
+
 
             color = [255, 97, 0]
             self.draw_layer(self.controller.gcode_layer, color, printer)
@@ -726,15 +728,16 @@ class GLWidget(QGLWidget):
 
         glBegin(GL_LINES)
         #for layer_data in layer_datas:
+        #( brim, perimetry,  infill, support, colorchange)
         for p in layer_data:
             if 'E-sk' in p[2]:
                 color = [255, 255, 255]
             elif 'E-su' in p[2]:
-                color = [0, 0, 255]
+                color = [88, 117, 69]
             elif 'E-i' in p[2]:
-                color = [ 0,255, 0]
+                color = [ 255,158, 60]
             elif 'E-p' in p[2]:
-                color = [255, 255, 0]
+                color = [247, 108, 49]
             if 'E' in p[2]:
                 glColor3ub(color[0], color[1], color[2])
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)

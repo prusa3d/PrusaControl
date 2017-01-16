@@ -38,12 +38,16 @@ class GCode(object):
         self.gcode_parser_thread = QThread()
 
     def cancel(self):
+        print("Cancel presset")
         if self.gcode_parser and self.gcode_parser_thread and self.gcode_parser_thread.isRunning():
             self.gcode_parser.is_running = False
-            self.gcode_parser.kill()
             self.gcode_parser_thread.quit()
             self.gcode_parser_thread.wait()
             self.is_loaded = False
+            self.data = {}
+            self.all_data = []
+            self.data_keys = []
+
 
     def read_in_thread(self, update_progressbar_function, after_done_function):
         self.gcode_parser.moveToThread(self.gcode_parser_thread)
