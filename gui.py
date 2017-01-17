@@ -334,6 +334,7 @@ class SettingsDialog(QDialog):
         self.printer_type_label = QtGui.QLabel(self.tr("Printer variation"))
         self.printer_type_combo = QtGui.QComboBox()
         self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
+        print("Aktualni list: " + str(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer)))
         self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
 
         self.debug_checkbox = QtGui.QCheckBox(self.tr("Debug"))
@@ -611,6 +612,15 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.name_l = QtGui.QLabel(self.tr("Name"))
         self.name_l.setObjectName("name_l")
+
+        self.object_extruder_l = QtGui.QLabel(self.tr("Extruder"))
+        self.object_extruder_l.setObjectName("object_extruder_l")
+        self.object_extruder_c = QtGui.QComboBox()
+        self.object_extruder_c.setObjectName("object_extruder_c")
+        self.object_extruder_c.insertItems(4, ['Extruder 1', 'Extruder 2', 'Extruder 3', 'Extruder 4'])
+        self.object_extruder_c.setCurrentIndex(0)
+
+
         self.filename_label = QtGui.QLabel("")
         self.filename_label.setObjectName("filename_label")
         self.position_l = QtGui.QLabel(self.tr("Position"))
@@ -740,6 +750,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.scale_units = self.combobox_scale_units.currentText()
         self.combobox_scale_units.currentIndexChanged.connect(self.change_scale_units)
         self.lock_scale_axes_checkbox = QtGui.QCheckBox("")
+        self.lock_scale_axes_checkbox.setObjectName("lock_axis_checkbox")
         self.lock_scale_axes_checkbox.stateChanged.connect(self.lock_scale_axes_change)
         self.lock_scale_axes_checkbox.setChecked(True)
         self.lock_scale_axes_checkbox.setToolTip(self.tr("Lock of scaling axis"))
@@ -891,6 +902,39 @@ class PrusaControlView(QtGui.QMainWindow):
         self.brimCheckBox.setObjectName('brimCheckBox')
         self.brimCheckBox.setToolTip(self.brim_tooltip)
 
+        #multimaterial settings
+        self.materials_settings_l = QtGui.QLabel(self.tr("Material Settings"))
+        self.materials_settings_l.setObjectName("materials_settings_l")
+
+        self.extruder1_l = QtGui.QLabel(self.tr("Extruder 1"))
+        self.extruder1_l.setObjectName("extruder1_l")
+        self.extruder1_c = QtGui.QComboBox()
+        self.extruder1_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder1_c.setCurrentIndex(first)
+        self.extruder1_c.setObjectName("extruder1_c")
+
+        self.extruder2_l = QtGui.QLabel(self.tr("Extruder 2"))
+        self.extruder2_l.setObjectName("extruder2_l")
+        self.extruder2_c = QtGui.QComboBox()
+        self.extruder2_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder2_c.setCurrentIndex(first)
+        self.extruder2_c.setObjectName("extruder2_c")
+
+        self.extruder3_l = QtGui.QLabel(self.tr("Extruder 3"))
+        self.extruder3_l.setObjectName("extruder3_l")
+        self.extruder3_c = QtGui.QComboBox()
+        self.extruder3_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder3_c.setCurrentIndex(first)
+        self.extruder3_c.setObjectName("extruder3_c")
+
+        self.extruder4_l = QtGui.QLabel(self.tr("Extruder 4"))
+        self.extruder4_l.setObjectName("extruder4_l")
+        self.extruder4_c = QtGui.QComboBox()
+        self.extruder4_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder4_c.setCurrentIndex(first)
+        self.extruder4_c.setObjectName("extruder4_c")
+        # multimaterial settings
+
         self.object_group_box = QtGui.QGroupBox(self.tr("Object settings"))
         self.object_group_box.setObjectName('object_group_box')
         self.object_group_box.setLayout(self.create_object_settings_layout())
@@ -925,18 +969,28 @@ class PrusaControlView(QtGui.QMainWindow):
         printing_parameters_layout = QtGui.QGridLayout()
         #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
-        printing_parameters_layout.addWidget(self.printer_settings_l, 0, 0, 1, 3)
-        printing_parameters_layout.addWidget(self.materialLabel, 1,0)
-        printing_parameters_layout.addWidget(self.materialCombo, 1, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.qualityLabel, 2, 0)
-        printing_parameters_layout.addWidget(self.qualityCombo, 2, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.infillLabel, 3, 0)
+        printing_parameters_layout.addWidget(self.materials_settings_l, 0, 0, 1, 3)
+        printing_parameters_layout.addWidget(self.extruder1_l, 1, 0)
+        printing_parameters_layout.addWidget(self.extruder1_c, 1, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.extruder2_l, 2, 0)
+        printing_parameters_layout.addWidget(self.extruder2_c, 2, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.extruder3_l, 3, 0)
+        printing_parameters_layout.addWidget(self.extruder3_c, 3, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.extruder4_l, 4, 0)
+        printing_parameters_layout.addWidget(self.extruder4_c, 4, 1, 1, 3)
+
+        printing_parameters_layout.addWidget(self.printer_settings_l, 6, 0, 1, 3)
+        printing_parameters_layout.addWidget(self.materialLabel, 7,0)
+        printing_parameters_layout.addWidget(self.materialCombo, 7, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.qualityLabel, 8, 0)
+        printing_parameters_layout.addWidget(self.qualityCombo, 8, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.infillLabel, 9, 0)
         #printing_parameters_layout.addWidget(self.infillSlider, 3, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.infillCombo, 3, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.supportLabel, 4, 0)
-        printing_parameters_layout.addWidget(self.supportCombo, 4, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.brim_label, 5, 0)
-        printing_parameters_layout.addWidget(self.brimCheckBox, 5, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.infillCombo, 9, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.supportLabel, 10, 0)
+        printing_parameters_layout.addWidget(self.supportCombo, 10, 1, 1, 3)
+        printing_parameters_layout.addWidget(self.brim_label, 11, 0)
+        printing_parameters_layout.addWidget(self.brimCheckBox, 11, 1, 1, 3)
 
         self.right_panel_layout.addLayout(printing_parameters_layout)
 
@@ -990,27 +1044,107 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
+    def set_multimaterial_gui_on(self):
+        self.materials_settings_l.setVisible(True)
+        self.extruder1_l.setVisible(True)
+        self.extruder1_c.setVisible(True)
+        self.extruder2_l.setVisible(True)
+        self.extruder2_c.setVisible(True)
+        self.extruder3_l.setVisible(True)
+        self.extruder3_c.setVisible(True)
+        self.extruder4_l.setVisible(True)
+        self.extruder4_c.setVisible(True)
 
-    def exit_message_continue_exitting(self):
-        if self.controller.is_something_to_save():
-            msgBox = QMessageBox(self)
-            msgBox.setObjectName("msgBox")
-            msgBox.setWindowTitle(self.tr("Save"))
-            msgBox.setText(self.tr("Scene is not saved."))
-            msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
-            msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
-            msgBox.setDefaultButton(QMessageBox.Save)
-            ret = msgBox.exec_()
+        self.object_extruder_l.setVisible(True)
+        self.object_extruder_c.setVisible(True)
 
-            if ret == QMessageBox.Save:
-                self.controller.save_project_file()
-                return True
-            elif ret == QMessageBox.Discard:
-                return True
-            elif ret == QMessageBox.Cancel:
-                return False
-        else:
-            return True
+        self.materialCombo.setVisible(False)
+        self.materialLabel.setVisible(False)
+
+
+
+    def set_multimaterial_gui_off(self):
+        self.materials_settings_l.setVisible(False)
+        self.extruder1_l.setVisible(False)
+        self.extruder1_c.setVisible(False)
+        self.extruder2_l.setVisible(False)
+        self.extruder2_c.setVisible(False)
+        self.extruder3_l.setVisible(False)
+        self.extruder3_c.setVisible(False)
+        self.extruder4_l.setVisible(False)
+        self.extruder4_c.setVisible(False)
+
+        self.object_extruder_l.setVisible(False)
+        self.object_extruder_c.setVisible(False)
+
+        self.materialCombo.setVisible(True)
+        self.materialLabel.setVisible(True)
+
+
+    def show_exit_message_scene_not_saved(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Save"))
+        msgBox.setText(self.tr("Scene is not saved."))
+        msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
+        msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+        msgBox.setDefaultButton(QMessageBox.Save)
+
+        return msgBox.exec_()
+
+
+    def show_exit_message_generating_scene(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Exit"))
+        msgBox.setText(self.tr("GCode is in generating process."))
+        msgBox.setInformativeText(self.tr("Do you want to cancel generating of GCode and exit?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+
+        return msgBox.exec_()
+
+    def show_cancel_generating_dialog_and_load_file(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Load file"))
+        msgBox.setText(self.tr("GCode is in generating process."))
+        msgBox.setInformativeText(self.tr("Do you want to cancel generating of GCode and load file?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+
+        return msgBox.exec_()
+
+    def show_cancel_generating_dialog_and_load_file(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Load file"))
+        msgBox.setText(self.tr("GCode file is in loading process."))
+        msgBox.setInformativeText(self.tr("Do you want to cancel loading of GCode file and load this file?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+
+        return msgBox.exec_()
+
+    def show_clear_scene_and_load_gcode_file_dialog(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Scene not empty"))
+        msgBox.setText(self.tr("Some objects are in scene"))
+        msgBox.setInformativeText(self.tr("Do you want to clear scene and load GCode file?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+        return msgBox.exec_()
+
+    def show_open_cancel_gcode_preview_dialog(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("GCode is generated"))
+        msgBox.setText(self.tr("Scene is generated to GCode"))
+        msgBox.setInformativeText(self.tr("Do you want to close GCode preview and import new file?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+        return msgBox.exec_()
 
 
     def open_project_asking_dialog(self):
@@ -1047,7 +1181,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
     def closeEvent(self, event):
-        if self.exit_message_continue_exitting():
+        if self.controller.exit_event():
+        #if self.exit_message_continue_exitting():
             self.settings.setValue("geometry", self.saveGeometry())
             self.settings.setValue("windowState", self.saveState())
             QMainWindow.closeEvent(self, event)
@@ -1394,9 +1529,9 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def create_object_settings_layout(self):
         object_settings_layout = QtGui.QGridLayout()
-        object_settings_layout.setRowMinimumHeight(4, 10)
-        object_settings_layout.setRowMinimumHeight(8, 10)
-        object_settings_layout.setRowMinimumHeight(14, 10)
+        object_settings_layout.setRowMinimumHeight(5, 10)
+        object_settings_layout.setRowMinimumHeight(9, 10)
+        object_settings_layout.setRowMinimumHeight(15, 10)
         object_settings_layout.setVerticalSpacing(2)
 
 
@@ -1405,59 +1540,65 @@ class PrusaControlView(QtGui.QMainWindow):
         object_settings_layout.addWidget(self.filename_label, 0, 1, 1, 2)
         self.filename_label.setFixedHeight(22)
 
-        object_settings_layout.addWidget(self.position_l, 1, 0)
+        self.object_extruder_l.setFixedHeight(22)
+        self.object_extruder_c.setFixedHeight(22)
+        object_settings_layout.addWidget(self.object_extruder_l, 1, 0, 1, 1)
+        object_settings_layout.addWidget(self.object_extruder_c, 1, 1, 1, 2)
+        #1
+        object_settings_layout.addWidget(self.position_l, 2, 0)
         self.position_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.x_pos_l, 1, 1)
+        object_settings_layout.addWidget(self.x_pos_l, 2, 1)
         self.x_pos_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_pos_x, 1, 2)
+        object_settings_layout.addWidget(self.edit_pos_x, 2, 2)
         self.edit_pos_x.setFixedHeight(22)
-        object_settings_layout.addWidget(self.y_pos_l, 2, 1)
+        object_settings_layout.addWidget(self.y_pos_l, 3, 1)
         self.y_pos_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_pos_y, 2, 2)
+        object_settings_layout.addWidget(self.edit_pos_y, 3, 2)
         self.edit_pos_y.setFixedHeight(22)
-        object_settings_layout.addWidget(self.z_pos_l, 3, 1)
+        object_settings_layout.addWidget(self.z_pos_l, 4, 1)
         self.z_pos_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_pos_z, 3, 2)
+        object_settings_layout.addWidget(self.edit_pos_z, 4, 2)
         self.edit_pos_z.setFixedHeight(22)
-
-        object_settings_layout.addWidget(self.rotation_l, 5, 0)
+        #5
+        object_settings_layout.addWidget(self.rotation_l, 6, 0)
         self.rotation_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.x_rot_l, 5, 1)
+        object_settings_layout.addWidget(self.x_rot_l, 6, 1)
         self.x_rot_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_rot_x, 5, 2)
+        object_settings_layout.addWidget(self.edit_rot_x, 6, 2)
         self.edit_rot_x.setFixedHeight(22)
-        object_settings_layout.addWidget(self.y_rot_l, 6, 1)
+        object_settings_layout.addWidget(self.y_rot_l, 7, 1)
         self.y_rot_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_rot_y, 6, 2)
+        object_settings_layout.addWidget(self.edit_rot_y, 7, 2)
         self.edit_rot_y.setFixedHeight(22)
-        object_settings_layout.addWidget(self.z_rot_l, 7, 1)
+        object_settings_layout.addWidget(self.z_rot_l, 8, 1)
         self.z_rot_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_rot_z, 7, 2)
+        object_settings_layout.addWidget(self.edit_rot_z, 8, 2)
         self.edit_rot_z.setFixedHeight(22)
-
-        object_settings_layout.addWidget(self.scale_l, 9, 0)
+        #9
+        object_settings_layout.addWidget(self.scale_l, 10, 0)
         self.scale_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.x_scale_l, 9, 1)
+        object_settings_layout.addWidget(self.x_scale_l, 10, 1)
         self.x_scale_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_scale_x, 9, 2)
+        object_settings_layout.addWidget(self.edit_scale_x, 10, 2)
         self.edit_scale_x.setFixedHeight(22)
-        object_settings_layout.addWidget(self.y_scale_l, 10, 1)
+        object_settings_layout.addWidget(self.y_scale_l, 11, 1)
         self.y_scale_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_scale_y, 10, 2)
+        object_settings_layout.addWidget(self.edit_scale_y, 11, 2)
         self.edit_scale_y.setFixedHeight(22)
-        object_settings_layout.addWidget(self.z_scale_l, 11, 1)
+        object_settings_layout.addWidget(self.z_scale_l, 12, 1)
         self.z_scale_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.edit_scale_z, 11, 2)
+        object_settings_layout.addWidget(self.edit_scale_z, 12, 2)
         self.edit_scale_z.setFixedHeight(22)
-        object_settings_layout.addWidget(self.units_l, 12, 1)
+        object_settings_layout.addWidget(self.lock_scale_axes_checkbox, 10, 1, 3, 1, Qt.AlignRight)
+        self.lock_scale_axes_checkbox.setFixedHeight(51)
+        object_settings_layout.addWidget(self.units_l, 13, 1)
         self.units_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.combobox_scale_units, 12, 2)
+        object_settings_layout.addWidget(self.combobox_scale_units, 13, 2)
         self.combobox_scale_units.setFixedHeight(22)
-        object_settings_layout.addWidget(self.lock_scale_axes_l, 13, 1)
-        self.lock_scale_axes_l.setFixedHeight(22)
-        object_settings_layout.addWidget(self.lock_scale_axes_checkbox, 13, 2)
-        self.lock_scale_axes_checkbox.setFixedHeight(22)
+        #object_settings_layout.addWidget(self.lock_scale_axes_l, 13, 1)
+        #self.lock_scale_axes_l.setFixedHeight(22)
 
+        #14
         object_settings_layout.addWidget(self.place_on_zero_l, 15, 0, 1, 2)
         self.place_on_zero_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.place_on_zero, 15, 2)

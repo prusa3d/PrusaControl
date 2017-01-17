@@ -222,7 +222,8 @@ class GcodeParserRunner(QObject):
             self.speed = float(line[1][1:])
         elif len(line)<4:
             return
-        elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]) and 'F' in line[3]:
+        elif 'X' in line[1] and 'Y' in line[2] and not('E' in line[3]) and 'F' in line[3] and not ('intro' in comment_line[0] and 'line' in comment_line[1]):
+        #elif 'X' in line[1] and 'Y' in line[2] and not ('E' in line[3]) and 'F' in line[3]:
             #Move point
             self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
@@ -230,19 +231,23 @@ class GcodeParserRunner(QObject):
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
-        elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
+        elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3] and not ('intro' in comment_line[0] and 'line' in comment_line[1]):
+        #elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
             #Extrusion point
             self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
             if self.last_point:
                 if float(line[3][1:])>0.:
-                    if 'infill' in comment_line[0]:
-                        type = 'E-i'
-                    elif 'perimeter' in comment_line[0]:
-                        type = 'E-p'
-                    elif 'support' in comment_line[0] and 'material' in comment_line[1]:
-                        type = 'E-su'
-                    elif 'skirt' in comment_line[0]:
-                        type = 'E-sk'
+                    if len(comment_line)>0:
+                        if 'infill' in comment_line[0]:
+                            type = 'E-i'
+                        elif 'perimeter' in comment_line[0]:
+                            type = 'E-p'
+                        elif 'support' in comment_line[0] and 'material' in comment_line[1]:
+                            type = 'E-su'
+                        elif 'skirt' in comment_line[0]:
+                            type = 'E-sk'
+                        else:
+                            type = 'E'
                     else:
                         type = 'E'
                 else:
@@ -252,20 +257,24 @@ class GcodeParserRunner(QObject):
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
-        elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
+        elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3] and not ('intro' in comment_line[0] and 'line' in comment_line[1]):
+        #elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
             #Extrusion point
             self.actual_point[0] = float(line[1][1:])
 
             if self.last_point:
                 if float(line[2][1:])>0.:
-                    if 'infill' in comment_line[0]:
-                        type = 'E-i'
-                    elif 'perimeter' in comment_line[0]:
-                        type = 'E-p'
-                    elif 'support' in comment_line[0] and 'material' in comment_line[1]:
-                        type = 'E-su'
-                    elif 'skirt' in comment_line[0]:
-                        type = 'E-sk'
+                    if len(comment_line)>0:
+                        if 'infill' in comment_line[0]:
+                            type = 'E-i'
+                        elif 'perimeter' in comment_line[0]:
+                            type = 'E-p'
+                        elif 'support' in comment_line[0] and 'material' in comment_line[1]:
+                            type = 'E-su'
+                        elif 'skirt' in comment_line[0]:
+                            type = 'E-sk'
+                        else:
+                            type = 'E'
                     else:
                         type = 'E'
                 else:
@@ -274,7 +283,8 @@ class GcodeParserRunner(QObject):
                 self.last_point = deepcopy(self.actual_point)
             else:
                 self.last_point = deepcopy(self.actual_point)
-        elif 'Y' in line[1] and 'F' in line[2]:
+        elif 'Y' in line[1] and 'F' in line[2] and not ('go' in comment_line[0] and 'outside' in comment_line[1]):
+        #elif 'Y' in line[1] and 'F' in line[2]:
             #Move point
             self.actual_point[1] = float(line[1][1:])
 

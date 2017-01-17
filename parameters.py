@@ -31,6 +31,7 @@ class PrintingParameters(object):
         self.materials_quality_parameters = {}
 
         #read printers json file
+        print(self.application_parameters.printers_parameters_file)
         self.all_printers_parameters = self.read_printers_parameters(self.application_parameters.printers_parameters_file)['printers']
 
         #apply default printer type settings

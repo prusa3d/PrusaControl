@@ -20,7 +20,7 @@ from PyQt4.QtGui import QApplication
 import sceneData
 from analyzer import Analyzer
 from gcode import GCode
-from gui import PrusaControlView
+from gui import PrusaControlView, QMessageBox
 from parameters import AppParameters, PrintingParameters
 from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
@@ -117,13 +117,23 @@ class Controller:
         self.canceled = False
         self.filament_use = ''
 
+        #event flow flags
         self.mouse_double_click_event_flag = False
         self.mouse_press_event_flag = False
         self.mouse_move_event_flag = False
         self.mouse_release_event_flag = False
         self.tool_press_event_flag = False
+        self.tool_helper_press_event_flag = False
         self.object_select_event_flag = False
         self.cursor_over_object = False
+
+        #scene work flags
+        self.scene_was_saved = False
+        self.scene_was_generated = False
+        self.gcode_was_saved = False
+        self.scene_is_not_empty = True
+
+        self.is_multimaterial = False
 
         self.gcode_layer = '0.0'
         self.gcode_draw_from_button = True
@@ -151,6 +161,15 @@ class Controller:
         self.camera_rotate = False
         self.view.update_gui_for_material()
 
+        printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
+        if printer_settings['printer_type'][self.settings['printer_type']]['multimaterial']:
+            self.is_multimaterial = True
+            self.view.set_multimaterial_gui_on()
+        else:
+            self.is_multimaterial = False
+            self.view.set_multimaterial_gui_off()
+
+
         logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
 
         if len(self.app_parameters) >= 3:
@@ -159,9 +178,34 @@ class Controller:
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
 
 
+    def exit_event(self):
+        if self.status in ['loading_gcode']:
+            self.gcode.cancel()
+            return True
+        elif self.status in ['generating']:
+            ret = self.view.show_exit_message_generating_scene()
+            if ret == QMessageBox.Yes:
+                self.cancel_generation()
+                return True
+            elif ret == QMessageBox.No:
+                return False
+        elif self.is_something_to_save() and not self.scene_was_saved:
+            ret = self.view.show_exit_message_scene_not_saved()
+            if ret == QMessageBox.Save:
+                self.save_project_file()
+                return True
+            elif ret == QMessageBox.Discard:
+                return True
+            elif ret == QMessageBox.Cancel:
+                return False
+        else:
+            return True
+
+
 
     def is_something_to_save(self):
-        if len(self.scene.models) == 0:
+        models_lst = [m for m in self.scene.models if m.isVisible]
+        if len(models_lst) == 0:
             return False
         else:
             return True
@@ -269,6 +313,7 @@ class Controller:
         print("Set gcode")
         if not self.gcode.is_loaded:
             return
+        self.status = 'generated'
 
         min = 0
         max = len(self.gcode.data_keys) - 1
@@ -460,9 +505,26 @@ class Controller:
 
         return infill_ls, first
 
-
     def get_actual_printing_data(self):
         return self.view.get_actual_printing_data()
+
+
+    def open_cancel_generating_dialog(self):
+        ret = self.view.show_cancel_generating_dialog_and_load_file()
+        if ret == QtGui.QMessageBox.Yes:
+            self.cancel_generation()
+            return True
+        elif ret == QtGui.QMessageBox.No:
+            return False
+
+
+    def open_cancel_gcode_reading_dialog(self):
+        ret = self.view.show_cancel_generating_dialog_and_load_file()
+        if ret == QtGui.QMessageBox.Yes:
+            self.cancel_gcode_loading()
+            return True
+        elif ret == QtGui.QMessageBox.No:
+            return False
 
     def generate_button_pressed(self):
         if self.status in ['edit', 'canceled']:
@@ -488,16 +550,19 @@ class Controller:
             self.set_generate_button()
 
         elif self.status == 'loading_gcode':
-            self.gcode.cancel()
-            self.gcode = None
-            self.status='canceled'
-            self.disable_generate_button()
-            self.set_generate_button()
-            self.set_progress_bar(0)
-
+            self.cancel_gcode_loading()
         elif self.status == 'generated':
             #already generated
             self.save_gcode_file()
+
+
+    def cancel_gcode_loading(self):
+        self.gcode.cancel()
+        self.gcode = None
+        self.status = 'canceled'
+        self.disable_generate_button()
+        self.set_generate_button()
+        self.set_progress_bar(0)
 
 
     def make_reaction_on_analyzation_result(self, result):
@@ -652,8 +717,6 @@ class Controller:
         #self.view.update_scene()
 
     def import_project(self, path):
-        if self.is_model_loaded:
-            res = self.open_asking_dialog("project")
         project_file = ProjectFile(self.scene, path)
         self.update_scene()
 
@@ -663,6 +726,7 @@ class Controller:
         self.scene.check_models_name()
         project_file = ProjectFile(self.scene)
         project_file.save(path)
+        self.scene_was_saved = True
 
     '''
     def open_asking_dialog(self, type):
@@ -686,9 +750,19 @@ class Controller:
 
     def open_settings(self):
         temp_settings = self.view.open_settings_dialog()
+        print("Tmp_nastaveni: " + str(temp_settings))
         if not temp_settings['language'] == self.settings['language']:
             self.set_language(temp_settings['language'])
             self.show_message_on_status_bar(self.app.tr("Language change will take effect after application restart"))
+
+        printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
+        if printer_settings['printer_type'][temp_settings['printer_type']]['multimaterial']:
+            self.is_multimaterial = True
+            self.view.set_multimaterial_gui_on()
+        else:
+            self.is_multimaterial = False
+            self.view.set_multimaterial_gui_off()
+
         self.settings = temp_settings
 
     def open_about(self):
@@ -1467,42 +1541,6 @@ class Controller:
                 model.selected = not model.selected
                 return True
 
-    '''
-    def find_object_and_rotation_axis_by_color(self, event):
-        #color = self.view.get_cursor_pixel_color(event)
-        #color to id
-        find_id = self.get_id_under_cursor(event)
-        if find_id == 0:
-            return False
-        for model in self.scene.models:
-            if model.rotateXId == find_id:
-                model.selected = True
-                model.rotationAxis = 'x'
-                return True
-            elif model.rotateYId == find_id:
-                model.selected = True
-                model.rotationAxis = 'y'
-                return True
-            elif model.rotateZId == find_id:
-                model.selected = True
-                model.rotationAxis = 'z'
-                return True
-            else:
-                model.rotationAxis = []
-
-    def find_object_and_scale_axis_by_color(self, event):
-        self.scene.clear_selected_models()
-        find_id = self.get_id_under_cursor(event)
-        if find_id == 0:
-            return False
-        for model in self.scene.models:
-            if model.id == find_id:
-                model.selected = True
-                model.scaleAxis = 'xyz'
-                return True
-    '''
-
-
     def reset_scene(self):
         self.scene.clear_scene()
         self.update_scene()
@@ -1599,14 +1637,43 @@ class Controller:
         self.show_message_on_status_bar(string_out)
 
 
-
     def show_message_on_status_bar(self, string):
         self.view.statusBar().showMessage(string)
+
+    def open_clear_scene_and_load_gcode_file(self):
+        ret = self.view.show_clear_scene_and_load_gcode_file_dialog()
+        if ret == QtGui.QMessageBox.Yes:
+            self.scene.clear_scene()
+            return True
+        elif ret == QtGui.QMessageBox.No:
+            return False
+
+    def open_cancel_gcode_preview_dialog(self):
+        ret = self.view.show_open_cancel_gcode_preview_dialog()
+        if ret == QtGui.QMessageBox.Yes:
+            self.status = 'edit'
+            self.set_model_edit_view()
+            return True
+        elif ret == QtGui.QMessageBox.No:
+            return False
+
 
     def open_file(self, url):
         '''
         function for resolve which file type will be loaded
         '''
+        if self.status in ['generating']:
+            if not self.open_cancel_generating_dialog():
+                return
+        elif self.status in ['loading_gcode']:
+            if not self.open_cancel_gcode_reading_dialog():
+                return
+        elif self.status in ['generated']:
+            if not self.open_cancel_gcode_preview_dialog():
+                return
+
+
+
         #self.view.statusBar().showMessage('Load file name: ')
 
         #TODO:Why?
@@ -1626,11 +1693,15 @@ class Controller:
             self.import_model(url)
         elif fileEnd in ['prus', 'PRUS']:
             #print('open project')
+
             self.open_project_file(url)
         elif fileEnd in ['jpeg', 'jpg', 'png', 'bmp']:
             #print('import image')
             self.import_image(url)
         elif fileEnd in ['gcode']:
+            if self.is_something_to_save():
+                if not self.open_clear_scene_and_load_gcode_file():
+                    return
             self.read_gcode(url)
 
 
