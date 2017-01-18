@@ -141,13 +141,10 @@ class Gcode_slider(QtGui.QWidget):
         self.points[number]['label'].setVisible(True)
         self.points[number]['label'].move(35, myPoint.y() - 9)
 
-
-
     def delete_point(self, number):
         self.points[number]['value'] = -1
         self.points[number]['button'].setVisible(False)
         self.points[number]['label'].setVisible(False)
-
 
     def set_value_label(self, value):
         self.slider.initStyleOption(self.opt)
@@ -167,12 +164,10 @@ class Gcode_slider(QtGui.QWidget):
         self.add_button.setVisible(True)
         self.value_label.setVisible(True)
 
-
     def setRange(self, rangeMin, rangeMax):
         self.max_label.setText("%3.2f" % rangeMax)
         self.min_label.setText("%3.2f" % rangeMin)
         self.slider.setRange(rangeMin, rangeMax)
-
 
     def setSingleStep(self, step):
         self.slider.setSingleStep(step)
@@ -200,7 +195,231 @@ class Gcode_slider(QtGui.QWidget):
         #print(str(maximum))
         self.slider.setMaximum(maximum)
 
+class Spline_editor(QtGui.QWidget):
+    def __init__(self, other, controller):
+        super(Spline_editor, self).__init__()
+        self.controller = controller
+        self.initUI()
 
+    def initUI(self):
+        self.points = []
+        self.init_points()
+
+        self.double_value = 0.0
+        self.number_of_ticks = 10
+        self.min = 0.0
+        self.max = 1.0
+
+        self.scene = QtGui.QGraphicsScene(self)
+        #self.scene.setSceneRect(-100.0, -100.0, 200.0, 200.0)
+        self.scene.setSceneRect(0., 0., self.width(), self.height())
+        self.view = QtGui.QGraphicsView(self.scene)
+        self.view.setObjectName("spline_edit")
+        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view.setRenderHints(QtGui.QPainter.Antialiasing)
+        #self.line = QGraphicsLineItem(-100.,-100., 200.,-100.)
+        #self.spline_path = QtGui.QGraphicsPathItem(parent=None, scene=self.scene)
+
+        for x in xrange(0, 500, 50):
+            self.scene.addLine(x, 0, x, 500, QPen(QtCore.Qt.red))
+
+
+        #for (int y=0; y <= 500; y += 50)
+        #scene->addLine(0, y, 500, y, QPen(Qt::green))
+        #self.scene.addItem(QGraphicsLineItem(-100., -100., 200., -100.))
+        #self.scene.addItem(QGraphicsLineItem(-100., -100., 200., -100.))
+
+
+        self.max_label = QtGui.QLabel(self)
+        self.max_label.setObjectName("gcode_slider_max_label")
+        #self.max_label.set
+        self.max_label.setText("Max")
+        self.max_label.setAlignment(Qt.AlignCenter)
+        self.min_label = QtGui.QLabel(self)
+        self.min_label.setObjectName("gcode_slider_min_label")
+        self.min_label.setText("Min")
+        self.min_label.setAlignment(Qt.AlignCenter)
+
+        main_layout = QtGui.QVBoxLayout(self)
+        main_layout.setAlignment(Qt.AlignCenter)
+
+        self.slider = QtGui.QSlider(parent=self.view)
+        self.slider.setOrientation(QtCore.Qt.Vertical)
+        self.slider.setObjectName("")
+        #self.slider.setFixedWidth(144)
+        self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
+
+        self.value_label = QtGui.QLabel(parent=self.view)
+        self.value_label.setObjectName("spline_slider_value_label")
+        self.value_label.setVisible(False)
+        self.value_label.setText(u"─0.00mm")
+        self.value_label.setFixedWidth(75)
+
+        self.plus_button = QtGui.QPushButton("", parent=self.view)
+        self.plus_button.setObjectName("variable_hight_plus_button")
+        self.plus_button.setVisible(False)
+        self.plus_button.setFixedWidth(20)
+        self.plus_button.clicked.connect(self.plus_value)
+
+        self.minus_button = QtGui.QPushButton("", parent=self.view)
+        self.minus_button.setObjectName("variable_hight_minus_button")
+        self.minus_button.setVisible(False)
+        self.minus_button.setFixedWidth(20)
+        self.minus_button.clicked.connect(self.minus_value)
+
+        #self.scene.addWidget(self.max_label)
+        #self.scene.addWidget(self.slider)
+        #self.scene.addWidget(self.min_label)
+
+        #main_layout.addWidget(self.view)
+
+        main_layout.addWidget(self.max_label)
+        main_layout.addWidget(self.slider)
+        main_layout.addWidget(self.min_label)
+
+        self.view.setLayout(main_layout)
+
+        box_l = QtGui.QBoxLayout(QBoxLayout.LeftToRight, self)
+        box_l.addWidget(self.view)
+        self.setLayout(box_l)
+
+        self.style = QtGui.QApplication.style()
+        self.opt = QtGui.QStyleOptionSlider()
+        self.slider.initStyleOption(self.opt)
+
+        self.set_value_label(0.00)
+
+
+    def init_points(self):
+        if self.points:
+            for point in self.points:
+                point['value'] = -1
+
+                point['label'].setText('')
+                point['label'].move(0,0)
+                point['label'].setVisible(False)
+                point['button'].move(0,0)
+                point['button'].setVisible(False)
+
+        else:
+            for i in xrange(0, 30):
+                label = QtGui.QLabel(self)
+                label.setObjectName("gcode_slider_point_label")
+                label.setVisible(False)
+                label.setFixedWidth(50)
+                button = QtGui.QPushButton('', self)
+                button.setObjectName("gcode_slider_point_button")
+                button.setVisible(False)
+                button.setFixedWidth(20)
+
+                self.points.append({'value': -1,
+                                    'label': label,
+                                    'button': button
+                                    })
+
+    def add_point(self):
+        self.slider.initStyleOption(self.opt)
+
+        rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
+        myPoint = rectHandle.topRight() + self.slider.pos()
+
+        value = self.slider.value()
+        layer_value = self.controller.gcode.data_keys[value]
+
+        #delete_button = QtGui.QPushButton("X", self)
+        #delete_button.setFixedWidth(20)
+        #self.point_label = QtGui.QLabel(self)
+        number = 0
+
+
+        for p in self.points:
+            if p['value'] == layer_value:
+                return
+
+        for i, p in enumerate(self.points):
+            number = i
+            if p['value'] == -1:
+                break
+
+        self.points[number]['value'] = layer_value
+
+        self.points[number]['button'].setVisible(True)
+        self.points[number]['button'].move(10, myPoint.y() - 9)
+        self.points[number]['button'].clicked.connect(lambda: self.delete_point(number))
+
+        self.points[number]['label'].setText(u"%s  ─" % layer_value)
+        self.points[number]['label'].setVisible(True)
+        self.points[number]['label'].move(35, myPoint.y() - 9)
+
+    def plus_value(self):
+        #TODO:read value from slider and increment quality for this layer
+        pass
+
+    def minus_value(self):
+        # TODO:read value from slider and decrease quality for this layer
+        pass
+
+    def delete_point(self, number):
+        self.points[number]['value'] = -1
+        self.points[number]['button'].setVisible(False)
+        self.points[number]['label'].setVisible(False)
+
+    def set_value_label(self, value):
+        self.slider.initStyleOption(self.opt)
+
+        rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
+        myPoint = rectHandle.topRight() + self.slider.pos()
+
+        self.double_value = ((self.max-self.min)/self.number_of_ticks) * value
+        self.value_label.setText(u"─%3.2fmm" % self.double_value)
+        self.value_label.move(self.slider.width() + 70, myPoint.y() - 9)
+        self.plus_button.move(self.slider.width() + 25, myPoint.y() - 9)
+        self.minus_button.move(self.slider.width(), myPoint.y() - 9)
+
+        self.plus_button.setVisible(True)
+        self.minus_button.setVisible(True)
+        self.value_label.setVisible(True)
+
+    def setRange(self, rangeMin, rangeMax):
+        self.max_label.setText("%3.2f" % rangeMax)
+        self.min_label.setText("%3.2f" % rangeMin)
+        self.slider.setRange(rangeMin, rangeMax)
+
+    def setSingleStep(self, step):
+        self.slider.setSingleStep(step)
+
+    def setPageStep(self, step):
+        self.slider.setPageStep(step)
+
+    def setTickInterval(self, tick):
+        self.slider.setTickInterval(tick)
+
+    def setValue(self, value):
+        self.value_label.setText(u"─%3.2fmm" % value)
+        self.slider.setValue(value)
+
+    def setTickPosition(self, position):
+        self.slider.setTickPosition(position)
+
+    def set_number_of_ticks(self, number):
+        self.number_of_ticks = number
+        self.slider.setTickInterval(1)
+        self.slider.setMaximum(number)
+
+    def setMinimum(self, minimum):
+        self.min = minimum
+        self.min_label.setText("%.2fmm" % minimum)
+        #print(str(minimum))
+        self.slider.setMinimum(0)
+
+    def setMaximum(self, maximum):
+        self.max = maximum
+        self.max_label.setText("%.2fmm" % maximum)
+        #print(str(maximum))
+        self.slider.setMaximum(10)
+
+'''
 class Spline_editor(QtGui.QWidget):
     def __init__(self, other, controller):
         super(Spline_editor, self).__init__()
@@ -226,8 +445,8 @@ class Spline_editor(QtGui.QWidget):
             p.add_path(self.spline_path)
             self.scene.addItem(p)
 
-        #self.spline_path.setPath(self.path)
-        #self.spline_path.setFlag( QtGui.QGraphicsItem.ItemIsMovable )
+        self.spline_path.setPath(self.path)
+        self.spline_path.setFlag( QtGui.QGraphicsItem.ItemIsMovable )
 
 
 
@@ -256,9 +475,9 @@ class Spline_editor(QtGui.QWidget):
                 item.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
                 item.setRect(-5, -5+i, 10, 10)
                 item.setPos(0, -149+(i*h))
-                #spline_path.setObjectName("gcode_slider_point_button")
-                #spline_path.setVisible(True)
-                #spline_path.setFixedWidth(20)
+                self.spline_path.setObjectName("gcode_slider_point_button")
+                self.spline_path.setVisible(True)
+                self.spline_path.setFixedWidth(20)
 
                 self.points.append(item)
 
@@ -308,7 +527,7 @@ class SplinePath(QtGui.QGraphicsPathItem):
             self.path.cubicTo(p.x(), p.y())
 
         self.setPath(self.path)
-
+'''
 
 
 class SettingsDialog(QDialog):
@@ -1353,6 +1572,10 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.set_scale_widgets(mesh)
 
+        self.variable_layer_widget.setMaximum(mesh.size[2]*10.)
+        self.variable_layer_widget.setMinimum(0.0)
+        self.variable_layer_widget.set_number_of_ticks(20)
+
 
     def set_scale_widgets(self, mesh):
         self.edit_scale_x.setDisabled(True)
@@ -1604,7 +1827,7 @@ class PrusaControlView(QtGui.QMainWindow):
         object_settings_layout.addWidget(self.place_on_zero, 15, 2)
         self.place_on_zero.setFixedHeight(22)
 
-        #object_settings_layout.addWidget(self.advance_settings_b, 16, 0, 1, 3)
+        object_settings_layout.addWidget(self.advance_settings_b, 16, 0, 1, 3)
 
         return object_settings_layout
 

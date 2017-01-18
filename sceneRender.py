@@ -303,6 +303,13 @@ class GLWidget(QGLWidget):
                                       [40., 40.], [10., -380.], False,
                                       self.tr("Multiplication tool"), 'multi')
 
+        self.support_tool = GlButton(self.texture_from_png("data/img/gui/Support_Off.png"),
+                                      self.texture_from_png("data/img/gui/Support_On.png"),
+                                      self.texture_from_png("data/img/gui/Support_Hover.png"),
+                                      self.texture_from_png("data/img/gui/tool_mask.png"),
+                                      [40., 40.], [10., -425.], False,
+                                      self.tr("Support tool"), 'support')
+
 
 
         #back, forward buttons
@@ -336,7 +343,7 @@ class GLWidget(QGLWidget):
 
         #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.undo_button, self.do_button]
         #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
-        self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
+        self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
 
         #self.tools = []
 
