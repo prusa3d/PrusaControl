@@ -209,26 +209,7 @@ class Spline_editor(QtGui.QWidget):
         self.number_of_ticks = 10
         self.min = 0.0
         self.max = 1.0
-
-        self.scene = QtGui.QGraphicsScene(self)
-        #self.scene.setSceneRect(-100.0, -100.0, 200.0, 200.0)
-        self.scene.setSceneRect(0., 0., self.width(), self.height())
-        self.view = QtGui.QGraphicsView(self.scene)
-        self.view.setObjectName("spline_edit")
-        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.view.setRenderHints(QtGui.QPainter.Antialiasing)
-        #self.line = QGraphicsLineItem(-100.,-100., 200.,-100.)
-        #self.spline_path = QtGui.QGraphicsPathItem(parent=None, scene=self.scene)
-
-        for x in xrange(0, 500, 50):
-            self.scene.addLine(x, 0, x, 500, QPen(QtCore.Qt.red))
-
-
-        #for (int y=0; y <= 500; y += 50)
-        #scene->addLine(0, y, 500, y, QPen(Qt::green))
-        #self.scene.addItem(QGraphicsLineItem(-100., -100., 200., -100.))
-        #self.scene.addItem(QGraphicsLineItem(-100., -100., 200., -100.))
+        self.label_height = 0
 
 
         self.max_label = QtGui.QLabel(self)
@@ -236,6 +217,8 @@ class Spline_editor(QtGui.QWidget):
         #self.max_label.set
         self.max_label.setText("Max")
         self.max_label.setAlignment(Qt.AlignCenter)
+
+
         self.min_label = QtGui.QLabel(self)
         self.min_label.setObjectName("gcode_slider_min_label")
         self.min_label.setText("Min")
@@ -243,52 +226,46 @@ class Spline_editor(QtGui.QWidget):
 
         main_layout = QtGui.QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(2)
 
-        self.slider = QtGui.QSlider(parent=self.view)
+        self.slider = QtGui.QSlider(parent=self)
         self.slider.setOrientation(QtCore.Qt.Vertical)
         self.slider.setObjectName("")
-        #self.slider.setFixedWidth(144)
+        self.slider.setFixedHeight(350)
+
         self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
 
-        self.value_label = QtGui.QLabel(parent=self.view)
+        self.value_label = QtGui.QLabel(parent=self)
         self.value_label.setObjectName("spline_slider_value_label")
         self.value_label.setVisible(False)
         self.value_label.setText(u"─0.00mm")
         self.value_label.setFixedWidth(75)
 
-        self.plus_button = QtGui.QPushButton("", parent=self.view)
+        self.plus_button = QtGui.QPushButton("", parent=self)
         self.plus_button.setObjectName("variable_hight_plus_button")
         self.plus_button.setVisible(False)
         self.plus_button.setFixedWidth(20)
         self.plus_button.clicked.connect(self.plus_value)
 
-        self.minus_button = QtGui.QPushButton("", parent=self.view)
+        self.minus_button = QtGui.QPushButton("", parent=self)
         self.minus_button.setObjectName("variable_hight_minus_button")
         self.minus_button.setVisible(False)
         self.minus_button.setFixedWidth(20)
         self.minus_button.clicked.connect(self.minus_value)
 
-        #self.scene.addWidget(self.max_label)
-        #self.scene.addWidget(self.slider)
-        #self.scene.addWidget(self.min_label)
-
-        #main_layout.addWidget(self.view)
 
         main_layout.addWidget(self.max_label)
         main_layout.addWidget(self.slider)
         main_layout.addWidget(self.min_label)
 
-        self.view.setLayout(main_layout)
-
-        box_l = QtGui.QBoxLayout(QBoxLayout.LeftToRight, self)
-        box_l.addWidget(self.view)
-        self.setLayout(box_l)
+        self.setLayout(main_layout)
 
         self.style = QtGui.QApplication.style()
         self.opt = QtGui.QStyleOptionSlider()
         self.slider.initStyleOption(self.opt)
 
         self.set_value_label(0.00)
+        self.label_height = self.max_label.height() -1
 
 
     def init_points(self):
@@ -317,6 +294,50 @@ class Spline_editor(QtGui.QWidget):
                                     'label': label,
                                     'button': button
                                     })
+
+    def paintEvent(self, event):
+
+        path = QPainterPath()
+        path.moveTo(85, self.label_height)
+        #path.lineTo(80, 400-self.label_height)
+
+        path.cubicTo(100, 100, 100, 200, 85, 400-self.label_height)
+
+        #path.lineTo(100, 100)
+        #path.lineTo(150, 150)
+        #path.cubicTo(50, 50, 50, 50, 80, 80)
+        #path.cubicTo(80, 80, 50, 50, 80, 80)
+        pen01 = QPen(QtCore.Qt.white)
+        pen02 = QPen(QtCore.Qt.green)
+        pen02.setWidthF(2.0)
+
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        qp.setRenderHint(QPainter.Antialiasing)
+        #grid
+        qp.setPen(pen01)
+        qp.drawLine(20, self.label_height, 160, self.label_height)
+        #qp.drawLine(20, self.label_height + 50, 160, self.label_height + 50)
+        #qp.drawLine(20, self.label_height + 100, 160, self.label_height + 100)
+        #qp.drawLine(20, self.label_height + 150, 160, self.label_height + 150)
+        #qp.drawLine(20, self.label_height + 200, 160, self.label_height + 200)
+        #qp.drawLine(20, self.label_height + 250, 160, self.label_height + 250)
+        #qp.drawLine(20, self.label_height + 300, 160, self.label_height + 300)
+        qp.drawLine(20, self.label_height + 350, 160, self.label_height + 350)
+
+        qp.drawLine(20, self.label_height, 20, 350 + self.label_height)
+        #qp.drawLine(70, self.label_height, 70, 350 + self.label_height)
+        #qp.drawLine(120, self.label_height, 120, 350 + self.label_height)
+        qp.drawLine(160, self.label_height, 160, 350 + self.label_height)
+
+        #path
+        qp.setPen(pen02)
+        qp.drawPath(path)
+
+        qp.end()
+
+
+
 
     def add_point(self):
         self.slider.initStyleOption(self.opt)
@@ -1029,6 +1050,7 @@ class PrusaControlView(QtGui.QMainWindow):
         # Object variable layer widget
         self.variable_layer_widget = Spline_editor(self, self.controller)
         self.variable_layer_widget.setObjectName("variable_layer_widget")
+        self.variable_layer_widget.setFixedHeight(400)
         self.basic_settings_b = QtGui.QPushButton(self.tr("Basic Settings"))
         self.basic_settings_b.setObjectName("basic_settings_b")
         self.basic_settings_b.clicked.connect(self.controller.set_basic_settings)

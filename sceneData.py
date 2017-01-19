@@ -383,7 +383,7 @@ class Model(object):
 
         self.colorId = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
         self.select_color = [255, 75, 0, 255]
-        self.color = [220, 220, 220, 255]
+        self.color = [235, 235, 235, 255]
 
         self.face_colors = []
         self.normal_groups = {}
