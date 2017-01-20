@@ -381,6 +381,11 @@ QLabel#gcode_slider_value_label, QLabel#gcode_slider_point_label, QLabel#object_
     background-color:rgb(77, 77, 77);
 }
 
+QLabel#spline_slider_min_label
+{
+    background-color:transparent;
+}
+
 QLabel#spline_slider_value_label{
     background-color: transparent;
 }
@@ -395,7 +400,6 @@ QGLWidget{
     font-weight: bold;
     font-size: 18px;
 }
-
 
 QSlider#infillSlider{
     margin: 0px 10px 0px 0px;
@@ -421,6 +425,13 @@ QSlider::handle {
     height: 17px;
 }
 
+QSlider#spline_slider::groove:vertical{
+    border-image: url(data/img/gui/slider_path_vert.png) 0 0 0 0 stretch stretch;
+    background-color: transparent;
+    width: 17px;
+}
+
+
 QPushButton#generateButton,
 QPushButton#gcode_back_b,
 QPushButton#basic_settings_b,
@@ -443,13 +454,30 @@ QPushButton#gcode_slider_add_button:pressed,
 QPushButton#gcode_slider_add_button:flat,
 QPushButton#variable_hight_plus_button,
 QPushButton#variable_hight_plus_button:pressed,
-QPushButton#variable_hight_plus_button:flat,
+QPushButton#variable_hight_plus_button:flat
+{
+    /*image: url(data/img/gui/plusButton.png);*/
+    image: url(data/img/gui/ColorChange_ADD_OFF.png);
+    background-color: transparent;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
 QPushButton#variable_hight_minus_button,
 QPushButton#variable_hight_minus_button:pressed,
 QPushButton#variable_hight_minus_button:flat
 {
-    /*image: url(data/img/gui/plusButton.png);*/
-    image: url(data/img/gui/ColorChange_ADD_OFF.png);
+    image: url(data/img/gui/remove_OFF.png);
+    background-color: transparent;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
+QPushButton#variable_hight_minus_button:hover
+{
+    image: url(data/img/gui/remove_ON.png);
     background-color: transparent;
     height: 19px;
     width: 19px;

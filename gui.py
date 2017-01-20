@@ -203,7 +203,7 @@ class Spline_editor(QtGui.QWidget):
 
     def initUI(self):
         self.points = []
-        self.init_points()
+        #self.init_points()
 
         self.double_value = 0.0
         self.number_of_ticks = 10
@@ -214,23 +214,44 @@ class Spline_editor(QtGui.QWidget):
 
         self.max_label = QtGui.QLabel(self)
         self.max_label.setObjectName("gcode_slider_max_label")
-        #self.max_label.set
         self.max_label.setText("Max")
         self.max_label.setAlignment(Qt.AlignCenter)
 
+        '''
+        self.minimal_detail_l = QtGui.QLabel(self)
+        self.minimal_detail_l.setObjectName("gcode_slider_max_label")
+        self.minimal_detail_l.setText(self.tr("Minimal detail"))
+        self.minimal_detail_l.setAlignment(Qt.AlignCenter)
+
+        self.maximal_detail_l = QtGui.QLabel(self)
+        self.maximal_detail_l.setObjectName("gcode_slider_max_label")
+        self.maximal_detail_l.setText(self.tr("Maximal detail"))
+        self.maximal_detail_l.setAlignment(Qt.AlignCenter)
+
+
+        top_labels_widget = QtGui.QWidget()
+        top_labels_layout = QtGui.QHBoxLayout()
+        top_labels_layout.setSpacing(0)
+        top_labels_layout.setMargin(0)
+        top_labels_layout.addWidget(self.minimal_detail_l)
+        top_labels_layout.addWidget(self.max_label)
+        top_labels_layout.addWidget(self.maximal_detail_l)
+        top_labels_widget.setLayout(top_labels_layout)
+        '''
 
         self.min_label = QtGui.QLabel(self)
-        self.min_label.setObjectName("gcode_slider_min_label")
+        self.min_label.setObjectName("spline_slider_min_label")
         self.min_label.setText("Min")
         self.min_label.setAlignment(Qt.AlignCenter)
 
         main_layout = QtGui.QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
-        main_layout.setSpacing(2)
+        #main_layout.setSpacing(2)
+        main_layout.setMargin(2)
 
         self.slider = QtGui.QSlider(parent=self)
         self.slider.setOrientation(QtCore.Qt.Vertical)
-        self.slider.setObjectName("")
+        self.slider.setObjectName("spline_slider")
         self.slider.setFixedHeight(350)
 
         self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
@@ -242,12 +263,14 @@ class Spline_editor(QtGui.QWidget):
         self.value_label.setFixedWidth(75)
 
         self.plus_button = QtGui.QPushButton("", parent=self)
+        self.plus_button.setAutoRepeat(True)
         self.plus_button.setObjectName("variable_hight_plus_button")
         self.plus_button.setVisible(False)
         self.plus_button.setFixedWidth(20)
         self.plus_button.clicked.connect(self.plus_value)
 
         self.minus_button = QtGui.QPushButton("", parent=self)
+        self.minus_button.setAutoRepeat(True)
         self.minus_button.setObjectName("variable_hight_minus_button")
         self.minus_button.setVisible(False)
         self.minus_button.setFixedWidth(20)
@@ -264,52 +287,75 @@ class Spline_editor(QtGui.QWidget):
         self.opt = QtGui.QStyleOptionSlider()
         self.slider.initStyleOption(self.opt)
 
-        self.set_value_label(0.00)
         self.label_height = self.max_label.height() -1
 
 
     def init_points(self):
+        start_y = self.label_height
+        end_y = 350.+self.label_height
+
         if self.points:
             for point in self.points:
-                point['value'] = -1
-
-                point['label'].setText('')
-                point['label'].move(0,0)
-                point['label'].setVisible(False)
-                point['button'].move(0,0)
-                point['button'].setVisible(False)
-
+                #TODO: set for other objects on scene
+                pass
         else:
-            for i in xrange(0, 30):
-                label = QtGui.QLabel(self)
-                label.setObjectName("gcode_slider_point_label")
-                label.setVisible(False)
-                label.setFixedWidth(50)
-                button = QtGui.QPushButton('', self)
-                button.setObjectName("gcode_slider_point_button")
-                button.setVisible(False)
-                button.setFixedWidth(20)
-
-                self.points.append({'value': -1,
-                                    'label': label,
-                                    'button': button
+            for i in xrange(0, self.number_of_ticks+1):
+                #first and last layer
+                '''
+                if i == 0:
+                    value = i
+                    y = start_y
+                elif i == self.number_of_ticks-1:
+                    value = i
+                    y = end_y
+                else:
+                    value = 0
+                    y = (400/self.number_of_ticks-1) * i
+                '''
+                y = (350./ (self.number_of_ticks)) * i + start_y
+                #clear points values
+                self.points.append({'value': 0,
+                                    'detail' : 0.0,      #x value
+                                    'y' : y
                                     })
 
+
+
+    def compute_double_value(self, value):
+        return ((self.max-self.min)/self.number_of_ticks) * value
+
+
     def paintEvent(self, event):
-
         path = QPainterPath()
-        path.moveTo(85, self.label_height)
-        #path.lineTo(80, 400-self.label_height)
+        #path.moveTo(85, self.label_height)
+        #path.moveTo(85, 400-self.label_height)
 
-        path.cubicTo(100, 100, 100, 200, 85, 400-self.label_height)
+        defined_points = [p for p in self.points if not p['value'] == -1]
+
+        if len(defined_points)>2:
+            for i, p in enumerate(defined_points):
+                if i == 0:
+                    path.moveTo((p['detail'] * 10.) + 85, p['y'])
+                else:
+                    path.lineTo((p['detail'] * 10.) + 85, p['y'])
+
+            #path.cubicTo((defined_points[0]['detail'] * 10.) + 85, self.label_height,
+            #            (defined_points[1]['detail'] * 10.) + 85, 200,
+            #            (defined_points[2]['detail'] * 10.) + 85, 400-self.label_height)
+        else:
+            #print("Count of height for point: " + str((((self.max-self.min)/self.number_of_ticks) * defined_points[0]['value'])))
+            path.lineTo((defined_points[0]['detail']*10.)+85, self.label_height)
+            path.lineTo((defined_points[1]['detail']*10.)+85, 350+self.label_height)
 
         #path.lineTo(100, 100)
         #path.lineTo(150, 150)
         #path.cubicTo(50, 50, 50, 50, 80, 80)
         #path.cubicTo(80, 80, 50, 50, 80, 80)
         pen01 = QPen(QtCore.Qt.white)
+        pen01.setWidthF(2.0)
         pen02 = QPen(QtCore.Qt.green)
-        pen02.setWidthF(2.0)
+        pen03 = QPen(QtCore.Qt.red)
+        pen02.setWidthF(2.5)
 
         qp = QtGui.QPainter()
         qp.begin(self)
@@ -317,74 +363,38 @@ class Spline_editor(QtGui.QWidget):
         #grid
         qp.setPen(pen01)
         qp.drawLine(20, self.label_height, 160, self.label_height)
-        #qp.drawLine(20, self.label_height + 50, 160, self.label_height + 50)
-        #qp.drawLine(20, self.label_height + 100, 160, self.label_height + 100)
-        #qp.drawLine(20, self.label_height + 150, 160, self.label_height + 150)
-        #qp.drawLine(20, self.label_height + 200, 160, self.label_height + 200)
-        #qp.drawLine(20, self.label_height + 250, 160, self.label_height + 250)
-        #qp.drawLine(20, self.label_height + 300, 160, self.label_height + 300)
-        qp.drawLine(20, self.label_height + 350, 160, self.label_height + 350)
-
+        qp.drawLine(20, self.label_height + 350, 160, 350 + self.label_height)
         qp.drawLine(20, self.label_height, 20, 350 + self.label_height)
-        #qp.drawLine(70, self.label_height, 70, 350 + self.label_height)
-        #qp.drawLine(120, self.label_height, 120, 350 + self.label_height)
         qp.drawLine(160, self.label_height, 160, 350 + self.label_height)
 
         #path
         qp.setPen(pen02)
         qp.drawPath(path)
 
+
         qp.end()
 
 
-
-
-    def add_point(self):
-        self.slider.initStyleOption(self.opt)
-
-        rectHandle = self.style.subControlRect(self.style.CC_Slider, self.opt, self.style.SC_SliderHandle)
-        myPoint = rectHandle.topRight() + self.slider.pos()
-
-        value = self.slider.value()
-        layer_value = self.controller.gcode.data_keys[value]
-
-        #delete_button = QtGui.QPushButton("X", self)
-        #delete_button.setFixedWidth(20)
-        #self.point_label = QtGui.QLabel(self)
-        number = 0
-
-
-        for p in self.points:
-            if p['value'] == layer_value:
-                return
-
-        for i, p in enumerate(self.points):
-            number = i
-            if p['value'] == -1:
-                break
-
-        self.points[number]['value'] = layer_value
-
-        self.points[number]['button'].setVisible(True)
-        self.points[number]['button'].move(10, myPoint.y() - 9)
-        self.points[number]['button'].clicked.connect(lambda: self.delete_point(number))
-
-        self.points[number]['label'].setText(u"%s  ─" % layer_value)
-        self.points[number]['label'].setVisible(True)
-        self.points[number]['label'].move(35, myPoint.y() - 9)
-
     def plus_value(self):
         #TODO:read value from slider and increment quality for this layer
-        pass
+        slider_value = (self.number_of_ticks) - self.slider.value()
+        for n, p in enumerate(self.points):
+            if n == slider_value:
+                p['value'] = n
+                if p['detail'] <= 4.5:
+                    p['detail'] += 0.2
+        self.repaint()
 
     def minus_value(self):
         # TODO:read value from slider and decrease quality for this layer
-        pass
+        slider_value = (self.number_of_ticks) - self.slider.value()
+        for n, p in enumerate(self.points):
+            if n == slider_value:
+                p['value'] = n
+                if p['detail'] >= -4.5:
+                    p['detail'] -= 0.2
+        self.repaint()
 
-    def delete_point(self, number):
-        self.points[number]['value'] = -1
-        self.points[number]['button'].setVisible(False)
-        self.points[number]['label'].setVisible(False)
 
     def set_value_label(self, value):
         self.slider.initStyleOption(self.opt)
@@ -393,7 +403,7 @@ class Spline_editor(QtGui.QWidget):
         myPoint = rectHandle.topRight() + self.slider.pos()
 
         self.double_value = ((self.max-self.min)/self.number_of_ticks) * value
-        self.value_label.setText(u"─%3.2fmm" % self.double_value)
+        self.value_label.setText(u" ─ %3.2fmm" % self.double_value)
         self.value_label.move(self.slider.width() + 70, myPoint.y() - 9)
         self.plus_button.move(self.slider.width() + 25, myPoint.y() - 9)
         self.minus_button.move(self.slider.width(), myPoint.y() - 9)
@@ -427,17 +437,16 @@ class Spline_editor(QtGui.QWidget):
         self.number_of_ticks = number
         self.slider.setTickInterval(1)
         self.slider.setMaximum(number)
+        self.init_points()
 
     def setMinimum(self, minimum):
         self.min = minimum
         self.min_label.setText("%.2fmm" % minimum)
-        #print(str(minimum))
         self.slider.setMinimum(0)
 
     def setMaximum(self, maximum):
         self.max = maximum
         self.max_label.setText("%.2fmm" % maximum)
-        #print(str(maximum))
         self.slider.setMaximum(10)
 
 '''
@@ -1596,7 +1605,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.variable_layer_widget.setMaximum(mesh.size[2]*10.)
         self.variable_layer_widget.setMinimum(0.0)
-        self.variable_layer_widget.set_number_of_ticks(20)
+        self.variable_layer_widget.set_number_of_ticks(10)
 
 
     def set_scale_widgets(self, mesh):
