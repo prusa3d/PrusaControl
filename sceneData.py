@@ -385,6 +385,8 @@ class Model(object):
         self.select_color = [255, 75, 0, 255]
         self.color = [235, 235, 235, 255]
 
+        self.z_cursor = 0.0
+
         self.face_colors = []
         self.normal_groups = {}
 

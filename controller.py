@@ -140,6 +140,7 @@ class Controller:
 
         self.over_object = False
         self.models_selected = False
+        self.advance_settings = False
 
         self.app = app
         self.app_parameters = app.arguments()
@@ -266,13 +267,16 @@ class Controller:
             config.write(configfile)
 
     def set_basic_settings(self):
+        self.advance_settings = False
         self.view.object_variable_layer_box.setVisible(False)
         self.view.object_group_box.setVisible(True)
+        self.update_scene()
 
     def set_advance_settings(self):
+        self.advance_settings = True
         self.view.object_group_box.setVisible(False)
         self.view.object_variable_layer_box.setVisible(True)
-
+        self.update_scene()
 
     def set_gcode_slider(self, min, max, min_l, max_l):
         '''
@@ -329,6 +333,13 @@ class Controller:
         self.view.gcode_slider.setValue(float(self.gcode.data_keys[1]))
 
         self.set_gcode_view()
+
+    def set_variable_layer_cursor(self, double_value):
+        for m in self.scene.models:
+            if m.isVisible and m.selected:
+                m.z_cursor = double_value
+        self.update_scene()
+
 
     def set_gcode_layer(self, value):
         self.gcode_layer = self.gcode.data_keys[value]

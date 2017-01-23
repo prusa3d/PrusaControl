@@ -1,4 +1,4 @@
-#version 120
+#version 110
 
 
 varying vec4 diffuse,ambientGlobal, ambient, ecPos;

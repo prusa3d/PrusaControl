@@ -1060,6 +1060,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.variable_layer_widget = Spline_editor(self, self.controller)
         self.variable_layer_widget.setObjectName("variable_layer_widget")
         self.variable_layer_widget.setFixedHeight(400)
+        self.connect(self.variable_layer_widget.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_variable_layer_slider)
         self.basic_settings_b = QtGui.QPushButton(self.tr("Basic Settings"))
         self.basic_settings_b.setObjectName("basic_settings_b")
         self.basic_settings_b.clicked.connect(self.controller.set_basic_settings)
@@ -2102,6 +2103,10 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_gcode_slider(self, val):
         self.controller.set_gcode_layer(val)
         self.gcode_label.setText(self.controller.gcode.data_keys[val])
+
+    def set_variable_layer_slider(self, val):
+        self.controller.set_variable_layer_cursor(self.variable_layer_widget.double_value)
+
 
     def set_infill(self, val):
         self.infillValue = val

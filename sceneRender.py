@@ -75,7 +75,8 @@ class GLWidget(QGLWidget):
         self.hitPoint = numpy.array([0.,0.,0.])
         self.oldHitPoint = numpy.array([0.,0.,0.])
 
-        self.shaderProgram = QGLShaderProgram()
+        self.lightning_shader_program = QGLShaderProgram()
+        self.variable_layer_shader_program = QGLShaderProgram()
 
 
         #properties definition
@@ -85,7 +86,7 @@ class GLWidget(QGLWidget):
         self.zoom = 0
         self.camera_position = numpy.array([0., 0. ,0.])
 
-        self.shader_ok = False
+        self.lightning_shader_ok = False
 
         self.oldPos3d = [.0, .0, .0]
 
@@ -115,6 +116,7 @@ class GLWidget(QGLWidget):
         self.sceneFrameBuffer = []
         self.image_background = []
         self.image_hotbed = []
+        self.test_img = []
 
         #tools
         self.selectTool = None
@@ -265,6 +267,8 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("data/img/background.png")
+        self.test_img = self.texture_from_png("data/img/test_4.png")
+
 
         #tools
         #self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
@@ -397,11 +401,20 @@ class GLWidget(QGLWidget):
         glEnable(GL_NORMALIZE)
 
 
-        if self.shaderProgram.addShaderFromSourceFile(QGLShader.Vertex, "data/lightning.vert") \
-                and self.shaderProgram.addShaderFromSourceFile(QGLShader.Fragment, "data/lightning.frag"):
-            self.shader_ok = True
-            self.shaderProgram.log()
-            self.shaderProgram.link()
+        if self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/lightning.vert") \
+                and self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/lightning.frag"):
+            self.lightning_shader_ok = True
+            self.lightning_shader_program.log()
+            self.lightning_shader_program.link()
+            self.lightning_shader_program.release()
+
+
+        if self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/variable_height_slic3r.vert") \
+                and self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/variable_height_slic3r.frag"):
+            self.variable_layer_shader_ok = True
+            self.variable_layer_shader_program.log()
+            self.variable_layer_shader_program.link()
+            self.variable_layer_shader_program.release()
 
 
 
@@ -496,11 +509,29 @@ class GLWidget(QGLWidget):
             #render solid objects, possible to edit transformation, select objects
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
-                    if self.shader_ok:
-                        self.shaderProgram.bind()
-                    model.render(picking=False, blending=not model_view)
-                    if self.shader_ok:
-                        self.shaderProgram.release()
+                    if model.selected and self.controller.advance_settings:
+                        if self.variable_layer_shader_ok:
+                            self.variable_layer_shader_program.bind()
+                            self.variable_layer_shader_program.setUniformValue("height_of_object", model.size[2])
+                            self.variable_layer_shader_program.setUniformValue("z_cursor", model.z_cursor*.1)
+                            self.variable_layer_shader_program.setUniformValue("z_cursor_band_width", 0.75)
+                            #self.variable_layer_shader_program.setUniformValueArray(self.z_texture)
+
+                            #glActiveTexture(GL_TEXTURE0)
+                            glBindTexture(GL_TEXTURE_2D, self.test_img)
+                            self.variable_layer_shader_program.setUniformValue("z_texture", 0)
+
+                            self.variable_layer_shader_program.setUniformValue("z_to_texture_row", (512.*512.-1)/512.*model.size[2])
+                            self.variable_layer_shader_program.setUniformValue("z_texture_row_to_normalized", 1./512.)
+                        model.render(picking=False, blending=not model_view)
+                        if self.variable_layer_shader_ok:
+                            self.variable_layer_shader_program.release()
+                    else:
+                        if self.lightning_shader_ok:
+                            self.lightning_shader_program.bind()
+                        model.render(picking=False, blending=not model_view)
+                        if self.lightning_shader_ok:
+                            self.lightning_shader_program.release()
 
             for model in self.parent.controller.scene.models:
                 if model.isVisible and model.selected:
@@ -516,11 +547,11 @@ class GLWidget(QGLWidget):
             #glEnable(GL_LIGHTING)
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
-                    if self.shader_ok:
-                        self.shaderProgram.bind()
+                    if self.lightning_shader_ok:
+                        self.lightning_shader_program.bind()
                     model.render(picking=False, blending=not model_view)
-                    if self.shader_ok:
-                        self.shaderProgram.release()
+                    if self.lightning_shader_ok:
+                        self.lightning_shader_program.release()
             #glDisable(GL_LIGHTING)
 
             color_change_list = [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
@@ -1181,19 +1212,6 @@ class GLWidget(QGLWidget):
         glLineWidth(2)
         glPushMatrix()
         glTranslatef(printer_data['model_offset'][0], printer_data['model_offset'][1], printer_data['model_offset'][2])
-
-        #glEnable(GL_BLEND)
-        #glDisable(GL_DEPTH_TEST)
-        '''
-        #STL version
-        glColor4f(.4, .4, .4, .75)
-        glBegin(GL_TRIANGLES)
-        for i in Model.mesh.vectors:
-            glVertex3f(i[0][0], i[0][1], i[0][2])
-            glVertex3f(i[1][0], i[1][1], i[1][2])
-            glVertex3f(i[2][0], i[2][1], i[2][2])
-        glEnd()
-        '''
 
         glDisable(GL_BLEND)
         glEnable(GL_TEXTURE_2D)
