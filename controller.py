@@ -133,7 +133,7 @@ class Controller:
         self.gcode_was_saved = False
         self.scene_is_not_empty = True
 
-        self.is_multimaterial = False
+        self.printer_number_of_materials = False
 
         self.gcode_layer = '0.0'
         self.gcode_draw_from_button = True
@@ -163,11 +163,10 @@ class Controller:
         self.view.update_gui_for_material()
 
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
-        if printer_settings['printer_type'][self.settings['printer_type']]['multimaterial']:
-            self.is_multimaterial = True
-            self.view.set_multimaterial_gui_on()
+        self.printer_number_of_materials = printer_settings['multimaterial']
+        if self.printer_number_of_materials > 1:
+            self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
         else:
-            self.is_multimaterial = False
             self.view.set_multimaterial_gui_off()
 
 
@@ -417,8 +416,8 @@ class Controller:
 
     def get_printer_variations_labels_ls(self, printer_name):
         printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
-        print("Nastaveni tiskaren: ")
-        pprint(printer_settings)
+        #print("Nastaveni tiskaren: ")
+        #pprint(printer_settings)
         return [printer_settings["printer_type"][printer_type]["label"] for printer_type in printer_settings["printer_type"]]
 
     def get_printer_variations_names_ls(self, printer_name):
@@ -761,17 +760,15 @@ class Controller:
 
     def open_settings(self):
         temp_settings = self.view.open_settings_dialog()
-        print("Tmp_nastaveni: " + str(temp_settings))
         if not temp_settings['language'] == self.settings['language']:
             self.set_language(temp_settings['language'])
             self.show_message_on_status_bar(self.app.tr("Language change will take effect after application restart"))
 
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
-        if printer_settings['printer_type'][temp_settings['printer_type']]['multimaterial']:
-            self.is_multimaterial = True
-            self.view.set_multimaterial_gui_on()
+        self.printer_number_of_materials = printer_settings['multimaterial']
+        if self.printer_number_of_materials>1:
+            self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
         else:
-            self.is_multimaterial = False
             self.view.set_multimaterial_gui_off()
 
         self.settings = temp_settings
@@ -1456,9 +1453,11 @@ class Controller:
         self.update_scene()
 
     def open_object_settings(self, object_id):
+        self.set_basic_settings()
         self.view.create_object_settings_menu(object_id)
 
     def close_object_settings(self):
+        self.set_basic_settings()
         self.view.close_object_settings_panel()
 
     def set_printable(self, is_printable):

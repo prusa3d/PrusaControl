@@ -1295,16 +1295,28 @@ class PrusaControlView(QtGui.QMainWindow):
 
         self.show()
 
-    def set_multimaterial_gui_on(self):
+    def set_multimaterial_gui_on(self, number_of_materials):
         self.materials_settings_l.setVisible(True)
-        self.extruder1_l.setVisible(True)
-        self.extruder1_c.setVisible(True)
-        self.extruder2_l.setVisible(True)
-        self.extruder2_c.setVisible(True)
-        self.extruder3_l.setVisible(True)
-        self.extruder3_c.setVisible(True)
-        self.extruder4_l.setVisible(True)
-        self.extruder4_c.setVisible(True)
+        if number_of_materials==2:
+            self.extruder1_l.setVisible(True)
+            self.extruder1_c.setVisible(True)
+            self.extruder2_l.setVisible(True)
+            self.extruder2_c.setVisible(True)
+
+            self.extruder3_l.setVisible(False)
+            self.extruder3_c.setVisible(False)
+            self.extruder4_l.setVisible(False)
+            self.extruder4_c.setVisible(False)
+        elif number_of_materials==4:
+            self.extruder1_l.setVisible(True)
+            self.extruder1_c.setVisible(True)
+            self.extruder2_l.setVisible(True)
+            self.extruder2_c.setVisible(True)
+
+            self.extruder3_l.setVisible(True)
+            self.extruder3_c.setVisible(True)
+            self.extruder4_l.setVisible(True)
+            self.extruder4_c.setVisible(True)
 
         self.object_extruder_l.setVisible(True)
         self.object_extruder_c.setVisible(True)
@@ -1475,6 +1487,15 @@ class PrusaControlView(QtGui.QMainWindow):
         return self.object_id
 
     def enable_editing(self):
+        self.extruder1_l.setEnabled(True)
+        self.extruder1_c.setEnabled(True)
+        self.extruder2_l.setEnabled(True)
+        self.extruder2_c.setEnabled(True)
+        self.extruder3_l.setEnabled(True)
+        self.extruder3_c.setEnabled(True)
+        self.extruder4_l.setEnabled(True)
+        self.extruder4_c.setEnabled(True)
+
         self.materialCombo.setEnabled(True)
         self.qualityCombo.setEnabled(True)
         self.infillCombo.setEnabled(True)
@@ -1491,6 +1512,15 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
     def disable_editing(self):
+        self.extruder1_l.setEnabled(False)
+        self.extruder1_c.setEnabled(False)
+        self.extruder2_l.setEnabled(False)
+        self.extruder2_c.setEnabled(False)
+        self.extruder3_l.setEnabled(False)
+        self.extruder3_c.setEnabled(False)
+        self.extruder4_l.setEnabled(False)
+        self.extruder4_c.setEnabled(False)
+
         self.materialCombo.setEnabled(False)
         self.qualityCombo.setEnabled(False)
         self.infillCombo.setEnabled(False)
