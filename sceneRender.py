@@ -267,7 +267,7 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("data/img/background.png")
-        self.test_img = self.texture_from_png("data/img/test_4.png")
+        self.test_img = self.texture_from_png("data/img/test_.png")
 
 
         #tools
@@ -337,6 +337,9 @@ class GLWidget(QGLWidget):
         self.scaleTool.set_callback(self.controller.scale_button_pressed)
         self.placeOnFaceTool.set_callback(self.controller.place_on_face_button_pressed)
         self.organize_tool.set_callback(self.controller.organize_button_pressed)
+
+        self.support_tool.set_callback(self.controller.support_button_pressed)
+
         self.undo_button.set_callback(self.controller.undo_button_pressed)
         self.do_button.set_callback(self.controller.do_button_pressed)
 
@@ -347,7 +350,8 @@ class GLWidget(QGLWidget):
 
         #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.undo_button, self.do_button]
         #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
-        self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
+        #self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
+        self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
 
         #self.tools = []
 
@@ -520,9 +524,10 @@ class GLWidget(QGLWidget):
                             #glActiveTexture(GL_TEXTURE0)
                             glBindTexture(GL_TEXTURE_2D, self.test_img)
                             self.variable_layer_shader_program.setUniformValue("z_texture", 0)
-
-                            self.variable_layer_shader_program.setUniformValue("z_to_texture_row", (512.*512.-1)/512.*model.size[2])
-                            self.variable_layer_shader_program.setUniformValue("z_texture_row_to_normalized", 1./512.)
+                            self.variable_layer_shader_program.setUniformValue("z_to_texture_row", (16.*16.)/(16.*model.size[2]))
+                            #self.variable_layer_shader_program.setUniformValue("z_to_texture_row",
+                            #                                                   0.195)
+                            self.variable_layer_shader_program.setUniformValue("z_texture_row_to_normalized", 1./16.)
                         model.render(picking=False, blending=not model_view)
                         if self.variable_layer_shader_ok:
                             self.variable_layer_shader_program.release()
@@ -532,6 +537,16 @@ class GLWidget(QGLWidget):
                         model.render(picking=False, blending=not model_view)
                         if self.lightning_shader_ok:
                             self.lightning_shader_program.release()
+
+
+            if not self.controller.advance_settings:
+                for support in self.parent.controller.scene.supports:
+                    self.draw_support(support)
+
+
+            if self.parent.controller.settings['toolButtons']['supportButton'] and self.parent.controller.scene.actual_support:
+                print("Support height: " + str(self.parent.controller.scene.actual_support['height']))
+                self.draw_support(self.parent.controller.scene.actual_support)
 
             for model in self.parent.controller.scene.models:
                 if model.isVisible and model.selected:
@@ -594,6 +609,27 @@ class GLWidget(QGLWidget):
                 self.fps_count+=1
                 self.fps_time+=t1-t0
                 self.renderText(100, 100, 'FPS: %3.1f' % self.last_fps)
+
+
+    def draw_support(self, support):
+        pos = support['pos']
+        height = support['height']
+
+        glPushMatrix()
+        glTranslatef(pos[0], pos[1], 0.0)
+        glDisable(GL_LIGHTING)
+        glDisable(GL_DEPTH_TEST)
+
+        glLineWidth(2.5)
+        glColor3f(1.0, 0.0, 0.0)
+        glBegin(GL_LINES)
+        glVertex3f(0.0, 0.0, 0.0)
+        glVertex3f(0.0, 0.0, height)
+        glEnd()
+
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_LIGHTING)
+        glPopMatrix()
 
 
     def draw_warning_window(self):

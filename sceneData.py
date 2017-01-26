@@ -54,6 +54,8 @@ class AppScene(object):
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
+        self.supports = []
+        self.actual_support = []
         self.copied_models = []
         self.printable = True
         self.camera_vector = np.array([0.,0.,0.])
@@ -64,6 +66,10 @@ class AppScene(object):
         self.actual_list_position = 0
 
         self.analyze_result_data_tmp = []
+
+    def save_actual_support(self):
+        self.supports.append(self.actual_support)
+        self.actual_support = []
 
     def clear_history(self):
         #print("Mazu historii")
@@ -122,6 +128,37 @@ class AppScene(object):
                 old_instance.update_min_max()
 
             #self.controller.show_message_on_status_bar("Set state %s from %s" % ('{:2}'.format(self.actual_list_position), '{:2}'.format(len(self.transformation_list))))
+
+
+    def calculate_support(self, pos):
+        height = 25
+        # self.supports.append({"pos": pos, "height": height})
+        for m in self.models:
+            height = self.find_support_height(m, pos)
+            if height:
+                self.actual_support = {"pos": pos, "height": height}
+            else:
+                self.actual_support = {"pos": pos, "height": 25}
+
+    def create_support(self, pos):
+        height = 25
+        #self.supports.append({"pos": pos, "height": height})
+        for m in self.models:
+            height = self.find_support_height(m, pos)
+            if height:
+                self.supports.append({"pos": pos, "height": height})
+                break
+
+
+
+
+
+    def find_support_height(self, m, pos):
+        ret, point = m.intersectionRayModel(pos, np.array([pos[0], pos[1], 1.]))
+        if ret:
+            return np.sqrt(point.dot(point))
+        else:
+            return False
 
 
     def check_models_name(self):
@@ -628,6 +665,7 @@ class Model(object):
             self.is_in_printing_area = False
             return False
 
+    #@timing
     def get_mesh(self, transform=True, generate_gcode=False, default_scale=True):
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
@@ -1096,45 +1134,32 @@ class Model(object):
                     return True
         return False
 
-
     def intersectionRayModel(self, rayStart, rayEnd):
-        #self.dataTmp = itertools.izip(self.v0, self.v1, self.v2)
-        #matrix = Matrix44.from_scale(Vector3(self.scale))
-        #matrix = matrix * Matrix44.from_translation(Vector3(self.pos))
-        #self.temp_mesh
-
-
-        #w = deepcopy(rayEnd)
-        #w -= rayStart
-        #w.normalize()
-
         w = rayEnd - rayStart
         w /= np.linalg.norm(w)
 
-        data = self.get_mesh(True, False, False)
+        data = self.temp_mesh
 
-
-        for i, tri in enumerate(data.vectors):
-            v0 = tri[0]# + self.pos
-            v1 = tri[1]# + self.pos
-            v2 = tri[2]# + self.pos
-
+        counter = 0
+        for tri in data.vectors+self.pos:
             b = [.0, .0, .0]
-            e1 = np.array(v1)
-            e1 -= v0
-            e2 = np.array(v2)
-            e2 -= v0
 
-            n = self.temp_mesh.normals[i]
+            e1 = tri[1]
+            e1 -= tri[0]
+            e2 = tri[2]
+            e2 -= tri[0]
+
+            n = self.temp_mesh.normals[counter]
 
             q = np.cross(w, e2)
             a = np.dot(e1, q)
 
+            counter += 1
             if (np.dot(n, w) >= .0) or (abs(a) <= .0001):
                 continue
 
             s = np.array(rayStart)
-            s -= v0
+            s -= tri[0]
             s /= a
 
             r = np.cross(s, e1)
@@ -1147,7 +1172,81 @@ class Model(object):
 
             t = np.dot(e2, r)
             if t >= .0:
-                return tri, n
+                point = rayStart + t*w
+                return True, point
+            else:
+                continue
+        return False, None
+
+    @timing
+    def intersectionRayModel2(self, rayStart, rayEnd):
+        ray = rayEnd - rayStart
+        ray /= np.linalg.norm(ray)
+
+        # data = self.get_mesh(True, False, False)
+        data = self.temp_mesh
+
+        tri_0 = data.vectors[:, 0]
+        tri_1 = data.vectors[:, 1]
+        tri_2 = data.vectors[:, 2]
+
+        e1 = tri_1
+        e1 -= tri_0
+        e2 = tri_2
+        e2 -= tri_0
+
+        n = data.normals
+
+        q = np.cross(ray, e2)
+        a = np.dot(e1, q)
+
+
+
+
+        counter = 0
+        for tri in data.vectors + self.pos:
+            # for tri in np.nditer(data.vectors):
+
+            # v0 = tri[0]# + self.pos
+            # v1 = tri[1]# + self.pos
+            # v2 = tri[2]# + self.pos
+
+            b = [.0, .0, .0]
+            # e1 = np.array(v1)
+            # e1 -= v0
+            # e2 = np.array(v2)
+            # e2 -= v0
+
+            e1 = tri[1]
+            e1 -= tri[0]
+            e2 = tri[2]
+            e2 -= tri[0]
+
+            n = self.temp_mesh.normals[counter]
+
+            q = np.cross(ray, e2)
+            a = np.dot(e1, q)
+
+            counter += 1
+            if (np.dot(n, ray) >= .0) or (abs(a) <= .0001):
+                continue
+
+            s = np.array(rayStart)
+            s -= tri[0]
+            s /= a
+
+            r = np.cross(s, e1)
+            b[0] = np.dot(s, q)
+            b[1] = np.dot(r, ray)
+            b[2] = 1.0 - b[0] - b[1]
+
+            if (b[0] < .0) or (b[1] < .0) or (b[2] < .0):
+                continue
+
+            t = np.dot(e2, r)
+            if t >= .0:
+                point = rayStart + t * ray
+                return tri, point
             else:
                 continue
         return False

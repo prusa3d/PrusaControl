@@ -71,7 +71,8 @@ class Controller:
                 'selectButton': False,
                 'moveButton': False,
                 'rotateButton': False,
-                'scaleButton': False
+                'scaleButton': False,
+                'supportButton': False
         }
 
         self.set_printer(self.settings['printer'])
@@ -326,10 +327,10 @@ class Controller:
 
         self.set_gcode_slider(min, max, min_l, max_l)
 
-        self.gcode_layer = self.gcode.data_keys[1]
+        self.gcode_layer = self.gcode.data_keys[0]
 
-        self.view.gcode_label.setText(self.gcode.data_keys[1])
-        self.view.gcode_slider.setValue(float(self.gcode.data_keys[1]))
+        self.view.gcode_label.setText(self.gcode.data_keys[0])
+        self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
 
         self.set_gcode_view()
 
@@ -984,7 +985,8 @@ class Controller:
         for model in self.scene.models:
             model.selected = False
 
-        self.close_object_settings()
+        if self.status in ['edit', 'canceled']:
+            self.close_object_settings()
 
     def add_camera_position(self, vec):
         self.view.add_camera_position(vec)
@@ -1109,7 +1111,10 @@ class Controller:
             #Je kurzor nad nejakym objektem?
             if self.render_status == 'model_view' and self.status in ['edit', 'canceled']:
                 object_id = self.get_id_under_cursor(event)
-                if object_id==0:
+                if object_id == 0 and self.settings['toolButtons']['supportButton']:
+                    if self.scene.actual_support:
+                        self.scene.save_actual_support()
+                elif object_id==0:
                     self.set_camera_rotation_function()
                 else:
                     #Je pod kurzorem nejaky tool?
@@ -1253,6 +1258,8 @@ class Controller:
 
 
 
+
+
     def mouse_move_event(self, event):
         #print("Mouse move event")
         self.mouse_move_event_flag = True
@@ -1260,7 +1267,7 @@ class Controller:
         dy = event.y() - self.last_pos.y()
         #diff = numpy.linalg.norm(numpy.array([dx, dy]))
 
-        if self.camera_move:
+        if self.camera_move and self.mouse_press_event_flag:
             #print("camera move")
             camStart, camDir, camUp, camRight = self.view.get_camera_direction(event)
             right_move = -0.025*dx * camRight
@@ -1269,7 +1276,7 @@ class Controller:
             move_vector = right_move + up_move
             self.add_camera_position(move_vector)
 
-        elif self.camera_rotate:
+        elif self.camera_rotate and self.mouse_press_event_flag:
             #print("camera rotate")
             self.view.set_x_rotation(self.view.get_x_rotation() + 8 * dy)
             self.view.set_z_rotation(self.view.get_z_rotation() + 8 * dx)
@@ -1350,6 +1357,13 @@ class Controller:
                         self.view.update_scale_widgets(model.id)
                         self.scene_was_changed()
         #Move function
+        elif self.settings['toolButtons']['supportButton']:
+            print("support function")
+            newRayStart, newRayEnd = self.view.get_cursor_position(event)
+            res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
+            if res is not None:
+                self.scene.calculate_support(res)
+
         elif not self.tool_helper_press_event_flag \
                 and self.mouse_press_event_flag \
                 and self.cursor_over_object:
@@ -1413,7 +1427,8 @@ class Controller:
                     m.rotationAxis = ""
                     m.scaleAxis = ""
 
-
+    #def support_tool_button_pressed(self):
+    #    self.tool = "support"
 
     def organize_button_pressed(self):
         self.scene.automatic_models_position()
@@ -1609,6 +1624,15 @@ class Controller:
             self.settings['toolButtons']['rotateButton'] = True
         self.update_scene()
         #self.view.update_scene()
+
+    def support_button_pressed(self):
+        if self.settings['toolButtons']['supportButton']:
+            self.settings['toolButtons']['supportButton'] = not(self.settings['toolButtons']['supportButton'])
+        else:
+            self.clear_tool_button_states()
+            self.settings['toolButtons']['supportButton'] = True
+        self.update_scene()
+
 
     def scale_button_pressed(self):
         if self.settings['toolButtons']['scaleButton']:
