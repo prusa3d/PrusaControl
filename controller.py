@@ -117,6 +117,7 @@ class Controller:
         self.is_model_loaded = False
         self.canceled = False
         self.filament_use = ''
+        self.resolution_of_texture = 16
 
         #event flow flags
         self.mouse_double_click_event_flag = False
@@ -276,6 +277,7 @@ class Controller:
         self.advance_settings = True
         self.view.object_group_box.setVisible(False)
         self.view.object_variable_layer_box.setVisible(True)
+        #self.view.variable_layer_widget.set_model(self.ac)
         self.update_scene()
 
     def set_gcode_slider(self, min, max, min_l, max_l):
@@ -539,6 +541,7 @@ class Controller:
 
     def generate_button_pressed(self):
         if self.status in ['edit', 'canceled']:
+            self.clear_tool_button_states()
             whole_scene = self.scene.get_whole_scene_in_one_mesh()
             #prepared to be g-code generated
             self.canceled = False
@@ -714,17 +717,30 @@ class Controller:
         for path in data:
             self.import_model(path)
 
-    def import_model(self, path):
+    def open_multipart_model(self):
+        data = self.view.open_model_file_dialog()
+        model_lst = []
+        for path in data:
+            model_lst.append(self.import_model(path, one_model=True))
+
+        for m in model_lst:
+            m.pos = model_lst[0].pos
+            m.rot = model_lst[0].rot
+            m.scale = model_lst[0].scale
+
+
+    def import_model(self, path, one_model=False):
         self.view.statusBar().showMessage('Load file name: ' + path)
         model = ModelTypeStl().load(path)
         model.parent = self.scene
         self.scene.models.append(model)
-        if self.settings['automatic_placing']:
+        if self.settings['automatic_placing'] and not one_model:
             self.scene.automatic_models_position()
         self.scene.clear_history()
         self.scene.save_change(self.scene.models)
         self.update_scene()
         self.is_model_loaded = True
+        return model
         #self.view.update_scene()
 
     def import_project(self, path):
@@ -941,7 +957,6 @@ class Controller:
                     print("return False")
                     return False
         #No object with id in scene.models
-        print("Neni")
         return None
 
     def unselect_objects_and_select_this_one(self, object_id):

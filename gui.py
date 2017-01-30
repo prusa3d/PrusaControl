@@ -202,6 +202,7 @@ class Spline_editor(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
+        self.data = np.zeros((11), dtype=np.float32)
         self.points = []
         #self.init_points()
 
@@ -294,6 +295,7 @@ class Spline_editor(QtGui.QWidget):
         start_y = self.label_height
         end_y = 350.+self.label_height
 
+
         if self.points:
             for point in self.points:
                 #TODO: set for other objects on scene
@@ -314,10 +316,13 @@ class Spline_editor(QtGui.QWidget):
                 '''
                 y = (350./ (self.number_of_ticks)) * i + start_y
                 #clear points values
+                '''
                 self.points.append({'value': 0,
                                     'detail' : 0.0,      #x value
                                     'y' : y
                                     })
+                '''
+
 
 
 
@@ -325,27 +330,33 @@ class Spline_editor(QtGui.QWidget):
         return ((self.max-self.min)/self.number_of_ticks) * value
 
 
+    def set_model(self, mesh):
+        self.mesh = mesh
+        self.data = mesh.variable_layer_height_data
+
     def paintEvent(self, event):
         path = QPainterPath()
+        start_y = self.label_height
         #path.moveTo(85, self.label_height)
         #path.moveTo(85, 400-self.label_height)
 
-        defined_points = [p for p in self.points if not p['value'] == -1]
+        #defined_points = [p for p in self.points if not p['value'] == -1]
 
-        if len(defined_points)>2:
-            for i, p in enumerate(defined_points):
-                if i == 0:
-                    path.moveTo((p['detail'] * 10.) + 85, p['y'])
-                else:
-                    path.lineTo((p['detail'] * 10.) + 85, p['y'])
+        #if len(defined_points)>2:
+        for i, p in enumerate(self.data):
+            y = (350./ (self.number_of_ticks)) * i + start_y
+            if i == 0:
+                path.moveTo((p * 20.) + 85, y)
+            else:
+                path.lineTo((p * 20.) + 85, y)
 
             #path.cubicTo((defined_points[0]['detail'] * 10.) + 85, self.label_height,
             #            (defined_points[1]['detail'] * 10.) + 85, 200,
             #            (defined_points[2]['detail'] * 10.) + 85, 400-self.label_height)
-        else:
+        #else:
             #print("Count of height for point: " + str((((self.max-self.min)/self.number_of_ticks) * defined_points[0]['value'])))
-            path.lineTo((defined_points[0]['detail']*10.)+85, self.label_height)
-            path.lineTo((defined_points[1]['detail']*10.)+85, 350+self.label_height)
+        #    path.lineTo((defined_points[0]['detail']*10.)+85, self.label_height)
+        #    path.lineTo((defined_points[1]['detail']*10.)+85, 350+self.label_height)
 
         #path.lineTo(100, 100)
         #path.lineTo(150, 150)
@@ -376,24 +387,32 @@ class Spline_editor(QtGui.QWidget):
 
 
     def plus_value(self):
+        print("Slider plus")
         #TODO:read value from slider and increment quality for this layer
         slider_value = (self.number_of_ticks) - self.slider.value()
-        for n, p in enumerate(self.points):
+        print(slider_value)
+        for n, p in enumerate(self.data):
             if n == slider_value:
-                p['value'] = n
-                if p['detail'] <= 4.5:
-                    p['detail'] += 0.2
+                if self.data[n] <= 0.99:
+                    self.data[n] += 0.2
+        print(self.data)
         self.repaint()
+        self.mesh.recalculate_texture()
+        self.controller.update_scene()
 
     def minus_value(self):
+        print("Slider minus")
         # TODO:read value from slider and decrease quality for this layer
         slider_value = (self.number_of_ticks) - self.slider.value()
-        for n, p in enumerate(self.points):
+        print(slider_value)
+        for n, p in enumerate(self.data):
             if n == slider_value:
-                p['value'] = n
-                if p['detail'] >= -4.5:
-                    p['detail'] -= 0.2
+                if self.data[n] >= -0.99:
+                    self.data[n] -= 0.2
+        print(self.data)
         self.repaint()
+        self.mesh.recalculate_texture()
+        self.controller.update_scene()
 
 
     def set_value_label(self, value):
@@ -808,6 +827,7 @@ class PrusaControlView(QtGui.QMainWindow):
         # file menu definition
         self.file_menu = self.menubar.addMenu(self.tr('&File'))
         self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
+        self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
         self.file_menu.addAction(self.tr('Save project'), self.controller.save_project_file)
@@ -1637,6 +1657,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.variable_layer_widget.setMaximum(mesh.size[2]*10.)
         self.variable_layer_widget.setMinimum(0.0)
         self.variable_layer_widget.set_number_of_ticks(10)
+        self.variable_layer_widget.set_model(mesh)
 
 
     def set_scale_widgets(self, mesh):
@@ -1912,11 +1933,6 @@ class PrusaControlView(QtGui.QMainWindow):
         #gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
 
         return gcode_view_layout
-
-   # def create_information_window(self, text):
-   #     pass
-
-
 
     #TODO:Debug new design
     def open_gcode_view(self):

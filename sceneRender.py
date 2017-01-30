@@ -267,7 +267,7 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("data/img/background.png")
-        self.test_img = self.texture_from_png("data/img/test_.png")
+        #self.test_img = self.texture_from_png("data/img/test_5.png")
 
 
         #tools
@@ -463,6 +463,7 @@ class GLWidget(QGLWidget):
         return ord(color[0])+(256*ord(color[1]))+(256*256*ord(color[2]))
 
 
+
     def paintGL(self, selection = 1):
         #print("Draw")
         t0 = time.time()
@@ -522,12 +523,15 @@ class GLWidget(QGLWidget):
                             #self.variable_layer_shader_program.setUniformValueArray(self.z_texture)
 
                             #glActiveTexture(GL_TEXTURE0)
-                            glBindTexture(GL_TEXTURE_2D, self.test_img)
+                            glBindTexture(GL_TEXTURE_2D, model.variable_texture)
+                            #glBindTexture(GL_TEXTURE_2D, self.test_img)
                             self.variable_layer_shader_program.setUniformValue("z_texture", 0)
-                            self.variable_layer_shader_program.setUniformValue("z_to_texture_row", (16.*16.)/(16.*model.size[2]))
+                            self.variable_layer_shader_program.setUniformValue("z_to_texture_row",
+                                                                               (model.size[2]/self.controller.resolution_of_texture*self.controller.resolution_of_texture))
+                                                                               #(self.controller.resolution_of_texture * self.controller.resolution_of_texture)/(self.controller.resolution_of_texture*model.size[2]))
                             #self.variable_layer_shader_program.setUniformValue("z_to_texture_row",
                             #                                                   0.195)
-                            self.variable_layer_shader_program.setUniformValue("z_texture_row_to_normalized", 1./16.)
+                            self.variable_layer_shader_program.setUniformValue("z_texture_row_to_normalized", 1./self.controller.resolution_of_texture)
                         model.render(picking=False, blending=not model_view)
                         if self.variable_layer_shader_ok:
                             self.variable_layer_shader_program.release()

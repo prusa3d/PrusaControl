@@ -21,6 +21,8 @@ uniform float z_cursor_band_width;
 
 void main()
 {
+   //float object_z_row = (z_to_texture_row * object_z) + height_of_object;
+   //float object_z_row = z_to_texture_row * (object_z + height_of_object*.5);
    float object_z_row = z_to_texture_row * object_z;
    // Index of the row in the texture.
    float z_texture_row = floor(object_z_row);
@@ -30,18 +32,13 @@ void main()
 //    float z_blend = 0.5 * cos(min(M_PI, abs(M_PI * (object_z - z_cursor)))) + 0.5;
    float z_blend = 0.25 * cos(min(M_PI, abs(M_PI * (object_z + height_of_object*.5 - z_cursor) * 1.8 / z_cursor_band_width))) + 0.25;
 
-   //float z_blend = 0.0;
-   //if(object_z + height_of_object*.5 >= z_cursor)
-   //     z_blend = 1.0;
-   //else
-   //     z_blend = 0.0;
-   //float z_blend = z_cursor;
    // Scale z_texture_row to normalized coordinates.
    // Sample the Z texture.
    gl_FragColor =
        vec4(intensity_specular, intensity_specular, intensity_specular, 1.) +
-//        intensity_tainted * texture2D(z_texture, vec2(z_texture_col, z_texture_row_to_normalized * (z_texture_row + 0.5)), -2.5);
-       (1. - z_blend) * intensity_tainted * texture2D(z_texture, vec2(z_texture_col, z_texture_row_to_normalized * (z_texture_row + 0.5)), -200.) +
+ //       intensity_tainted * texture2D(z_texture, vec2(z_texture_col, z_texture_row_to_normalized * (z_texture_row + 0.5)), -2.5);
+ //      (1. - z_blend) * intensity_tainted * texture2D(z_texture, vec2(z_texture_col, z_texture_row_to_normalized * (z_texture_row + 0.5)), -200.) +
+       (1. - z_blend) * intensity_tainted * texture2D(z_texture, vec2(0.01, (object_z-height_of_object*.5)/height_of_object), 0.) +
        z_blend * vec4(1., 1., 0., 0.);
 
    // and reset the transparency.

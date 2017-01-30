@@ -249,8 +249,10 @@ class AppScene(object):
 
     @staticmethod
     def calc_angle(normal, vector):
-        normal /= np.linalg.norm(normal)
-        vector /= np.linalg.norm(vector)
+        normal /= np.sqrt(normal.dot(normal))
+        #normal /= np.linalg.norm(normal)
+        vector /= np.sqrt(vector.dot(vector))
+        #vector /= np.linalg.norm(vector)
         cos_ang = np.dot(normal, vector)
         sin_ang = np.linalg.norm(np.cross(normal, vector))
         deg = np.degrees(np.arctan2(sin_ang, cos_ang))
@@ -330,7 +332,7 @@ class AppScene(object):
         #sort objects over size of bounding sphere
 
         #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
-        self.models = sorted(self.models, key=lambda k: np.linalg.norm(k.size), reverse=True)
+        self.models = sorted(self.models, key=lambda k: np.sqrt(k.size.dot(k.size)), reverse=True)
 
         #null position of all objects
         for m in self.models:
@@ -469,6 +471,12 @@ class Model(object):
         self.temp_mesh = None
         self.vao = None
 
+        self.texture_size = 16
+        self.variable_texture_data = np.full((self.texture_size*self.texture_size*4), 255, dtype=np.int)
+        self.variable_layer_height_data = np.zeros((11), dtype=np.float32)
+
+        self.variable_texture = []
+
 
         #transformation data, connected to scene
         self.pos = np.array([.0, .0, .0])
@@ -527,6 +535,8 @@ class Model(object):
         self.filename = ""
         self.normalization_flag = False
 
+        self.recalculate_texture()
+
 
     def __deepcopy__(self, memodict={}):
         m = Model()
@@ -571,9 +581,86 @@ class Model(object):
         m.zeroPoint = deepcopy(self.zeroPoint)
 
         m.temp_mesh = deepcopy(self.mesh)
-        #print("Udelana kopie")
-        #print("Stary model ma id %s a ten novy ma %s" % (str(self.id), str(m.id)))
         return m
+
+
+
+    def recalculate_texture(self):
+        #TODO:
+        #coef = (self.texture_size*self.texture_size)/11.
+        #coef = [int(np.floor(((self.texture_size * self.texture_size*4.) / 11.) * i)) for i in xrange(0, 11)]
+        #interpolate = [i for i in xrange(0, self.texture_size * self.texture_size)]
+        #self.variable_layer_height_data
+        #print("Coef: " + str(coef))
+
+        print("variable vector: " + str(len(self.variable_layer_height_data)))
+        pprint(self.variable_layer_height_data)
+
+        interpolated_vector = np.array([])
+        for i in xrange(0, 10, 1):
+            interpolated_vector = np.append(interpolated_vector,
+                np.linspace(self.variable_layer_height_data[i],
+                            self.variable_layer_height_data[i+1],
+                            np.floor(self.texture_size*self.texture_size)/11.)
+                )
+
+        print("Interpolated vector: " + str(len(interpolated_vector)))
+        pprint(interpolated_vector)
+
+
+        '''
+        n = 0
+        for i in xrange(0, self.texture_size*self.texture_size*4, 4):
+            change = 0.0
+            if i in coef:
+                print(i)
+                change = self.variable_layer_height_data[n]
+                n+=1
+
+            self.variable_texture_data[i + 0] = 100 + int(change*75) # R
+            self.variable_texture_data[i + 1] = 100 + int(change*75) # G
+            self.variable_texture_data[i + 2] = 100 + int(change*75) # B
+            self.variable_texture_data[i + 3] = 255 # A
+        '''
+
+        #self.variable_texture_data = np.array([], dtype=np.int)
+
+
+        for n in xrange(0, self.texture_size*self.texture_size, 1):
+            if n in interpolated_vector:
+                i = interpolated_vector[n*-1]
+            else:
+                i = 0.0
+            if i == 0.0:
+                self.variable_texture_data[n * 4 + 0] = 255
+                self.variable_texture_data[n * 4 + 1] = 255
+                self.variable_texture_data[n * 4 + 2] = 255
+                self.variable_texture_data[n * 4 + 3] = 255
+                #np.append(self.variable_texture_data, np.array([255, 255, 255, 255], dtype=np.int))
+            elif i < 0.0:
+                self.variable_texture_data[n * 4 + 0] = 1
+                self.variable_texture_data[n * 4 + 1] = 1
+                self.variable_texture_data[n * 4 + 2] = int(100*-i)
+                self.variable_texture_data[n * 4 + 3] = 255
+                #np.append(self.variable_texture_data, np.array([55, 55, int(100*i), 255], dtype=np.int))
+            elif i > 0.0:
+                self.variable_texture_data[n * 4 + 0] = int(100*i)
+                self.variable_texture_data[n * 4 + 1] = 1
+                self.variable_texture_data[n * 4 + 2] = 1
+                self.variable_texture_data[n * 4 + 3] = 255
+                #np.append(self.variable_texture_data, np.array([int(100*i), 55, 55, 255], dtype=np.int))
+
+        #print("Data: " + str(self.variable_texture_data))
+
+
+        self.variable_texture = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, self.variable_texture)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.texture_size, self.texture_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.variable_texture_data)
+        glBindTexture(GL_TEXTURE_2D, 0)
 
 
     def calculate_normal_groups(self):
