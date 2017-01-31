@@ -118,6 +118,7 @@ class GcodeParserRunner(QObject):
         self.data_keys = []
         self.actual_z = '0.0'
         self.speed = 0.0
+        self.extrucion = 0.0
         self.z_hop = False
         self.last_point = [0.0, 0.0, 0.0]
         self.actual_point = [0.0, 0.0, 0.0]
@@ -141,7 +142,8 @@ class GcodeParserRunner(QObject):
                 self.set_update_progress.emit(int(progress))
                 counter=0
             # print("ctu")
-            line = str(in_stream.readLine())
+
+            line = unicode(in_stream.readLine().toUtf8(), encoding="UTF-8")
             # print(line)
             # self.process_line(line)
             bits = line.split(';', 1)
@@ -152,10 +154,31 @@ class GcodeParserRunner(QObject):
             else:
                 continue
 
-        self.data_keys.sort(key=lambda x: float(x))
-
         self.printing_time = self.calculate_time_of_print()
         self.filament_length = 0.0  # self.calculate_length_of_filament()
+
+        ###
+        self.non_extruding_layers = []
+        for i in self.data:
+            layer_flag = 'M'
+            for l in self.data[i]:
+                _start, _end, flag, _speed, _extr = l
+                if flag in ['E', 'E-sk', 'E-su', 'E-i', 'E-p']:
+                    layer_flag = 'E'
+                    break
+            if layer_flag == 'M':
+                self.non_extruding_layers.append(i)
+
+        for i in self.non_extruding_layers:
+            self.data.pop(i, None)
+
+        #print("Data:")
+        #pprint(self.data)
+
+        self.data_keys = []
+        self.data_keys = self.data.keys()
+        self.data_keys.sort(key=lambda x: float(x))
+
 
         self.set_data_keys.emit(self.data_keys)
         self.set_data.emit(self.data)
@@ -236,6 +259,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # Extrusion point
                 self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
+                self.extrucion = float(line[3][1:])
                 if self.last_point:
                     if float(line[3][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -254,7 +278,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrucion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -262,7 +286,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # Extrusion point
                 self.actual_point[0] = float(line[1][1:])
-
+                self.extrucion = float(line[2][1:])
                 if self.last_point:
                     if float(line[2][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -280,7 +304,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]))
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrucion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -320,6 +344,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # Extrusion point
                 self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
+                self.extrucion = float(line[3][1:])
                 if self.last_point:
                     if float(line[3][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -338,7 +363,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrucion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -347,7 +372,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # Extrusion point
                 self.actual_point[0] = float(line[1][1:])
-
+                self.extrucion = float(line[2][1:])
                 if self.last_point:
                     if float(line[2][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -365,7 +390,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]))
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrucion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -382,16 +407,16 @@ class GcodeParserRunner(QObject):
 
         return
 
-    def add_line(self, first_point, second_point, actual_z, type, speed=0.):
+    def add_line(self, first_point, second_point, actual_z, type, speed=0., extrusion=0.):
         key = actual_z
         if key in self.data_keys:
-            self.data[key].append([first_point, second_point, type, speed])
-            self.all_data.append([first_point, second_point, type, speed])
+            self.data[key].append([first_point, second_point, type, speed, extrusion])
+            self.all_data.append([first_point, second_point, type, speed, extrusion])
         else:
             self.data_keys.append(key)
             self.data[key] = []
-            self.data[key].append([first_point, second_point, type, speed])
-            self.all_data.append([first_point, second_point, type, speed])
+            self.data[key].append([first_point, second_point, type, speed, extrusion])
+            self.all_data.append([first_point, second_point, type, speed, extrusion])
 
 
 

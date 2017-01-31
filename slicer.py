@@ -10,6 +10,8 @@ import subprocess
 from copy import deepcopy
 
 import cStringIO
+
+import signal
 from PyQt4.QtCore import QObject, QThread, pyqtSignal
 
 from gcode import GCode
@@ -161,6 +163,9 @@ class Slic3rEngineRunner(QObject):
         self.step = 1
         while self.is_running is True:
             self.step+=1
+            if self.process.returncode == -signal.SIGSEGV:
+                self.send_message.emit("Slic3r engine crash")
+                break
             line = self.process.stdout.readline()
             parsed_line = line.rsplit()
             if not line:

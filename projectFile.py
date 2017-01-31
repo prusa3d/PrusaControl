@@ -138,7 +138,10 @@ class Version_1_0(VersionAbstract):
                     #generate ascii format of stl(bug in numpy-stl)
                     #fileHandler = opened_zipfile.write(model.filename)
                     fileLike = StringIO()
+                    #fileLike =
                     mesh._write_ascii(fh=fileLike, name=model.filename)
+                    #mesh.save(model.filename, fh=fileLike, update_normals=False)
+
                     openedZipfile.writestr(model.filename, fileLike.getvalue())
                     fileLike.close()
 
