@@ -350,8 +350,8 @@ class GLWidget(QGLWidget):
 
         #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.undo_button, self.do_button]
         #self.tools = [self.scaleTool, self.placeOnFaceTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
-        #self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
-        self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
+        self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
+        #self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
 
         #self.tools = []
 
@@ -497,14 +497,10 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-        if self.xRot < 0:
-            glEnable(GL_BLEND)
-            glDisable(GL_DEPTH_TEST)
-            glCallList(heat_bed)
+
+        if self.xRot >= 0.:
             glDisable(GL_BLEND)
-        else:
-            glDisable(GL_BLEND)
-            glCallList(heat_bed)
+            glCallList(heat_bed[0])
 
 
 
@@ -586,6 +582,13 @@ class GLWidget(QGLWidget):
             glCallList(printing_space)
 
         self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
+
+        if self.xRot < 0:
+            glEnable(GL_BLEND)
+            glDisable(GL_DEPTH_TEST)
+            glCallList(heat_bed[1])
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
 
         self.draw_warning_window()
 
@@ -803,7 +806,7 @@ class GLWidget(QGLWidget):
         #glEnable(GL_LINE_SMOOTH)
         #glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
 
-
+        '''
         glBegin(GL_LINES)
         #for layer_data in layer_datas:
         #( brim, perimetry,  infill, support, colorchange)
@@ -825,7 +828,7 @@ class GLWidget(QGLWidget):
             #    glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
             #    glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
         glEnd()
-
+        '''
 
         #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
@@ -865,11 +868,11 @@ class GLWidget(QGLWidget):
             elif 'E-p' == p[2]:
                 glColor3ub(247, 108, 49)
 
-            a00 = a + n2 * ((p[4]*.025)/ab_leng)
-            a01 = a + n1 * ((p[4]*.025)/ab_leng)
+            a00 = a + n2 * ((p[4]*.02404)/ab_leng)
+            a01 = a + n1 * ((p[4]*.02404)/ab_leng)
 
-            b00 = b + n2 * ((p[4]*.025)/ab_leng)
-            b01 = b + n1 * ((p[4]*.025)/ab_leng)
+            b00 = b + n2 * ((p[4]*.02404)/ab_leng)
+            b01 = b + n1 * ((p[4]*.02404)/ab_leng)
 
             glVertex3f(a00[0], a00[1], p[0][2]*.1)
             glVertex3f(a01[0], a01[1], p[0][2]*.1)
@@ -1245,12 +1248,15 @@ class GLWidget(QGLWidget):
         #Model = ModelTypeStl.load(printer_data['model'])
         Model = ModelTypeObj.load(printer_data['model'])
         bed_texture = printer_data['texture']
+        bed_texture_from_button = printer_data['texture_from_button']
         printing_space = printer_data['printing_space']
 
         image_hotbed = self.texture_from_png(bed_texture)
+        image_hotbed_from_button = self.texture_from_png(bed_texture_from_button)
 
-        genList = glGenLists(1)
-        glNewList(genList, GL_COMPILE)
+
+        genList_top = glGenLists(1)
+        glNewList(genList_top, GL_COMPILE)
 
         glLineWidth(2)
         glPushMatrix()
@@ -1292,7 +1298,50 @@ class GLWidget(QGLWidget):
         glEndList()
 
 
-        return genList
+        genList_button = glGenLists(1)
+        glNewList(genList_button, GL_COMPILE)
+
+        glPushMatrix()
+        glTranslatef(printer_data['model_offset'][0], printer_data['model_offset'][1], printer_data['model_offset'][2])
+
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, image_hotbed_from_button)
+
+        #button view
+        glColor3f(1, 1, 1)
+        glBegin(GL_TRIANGLES)
+        glTexCoord2f(0., 0.)
+        glNormal3f(0., 0., 1.)
+        glVertex3f(printing_space[0]*-.05, printing_space[1]*-.05, 0.)
+
+        glTexCoord2f(1., 0.)
+        glNormal3f(0., 0., 1.)
+        glVertex3f(printing_space[0]*.05, printing_space[1]*-.05, 0.)
+
+        glTexCoord2f(0., 1.)
+        glNormal3f(0., 0., 1.)
+        glVertex3f(printing_space[0]*-.05, printing_space[1]*.05, 0.)
+
+        glTexCoord2f(0., 1.)
+        glNormal3f(0., 0., 1.)
+        glVertex3f(printing_space[0]*-.05, printing_space[1]*.05, 0.)
+
+        glTexCoord2f(1., 1.)
+        glNormal3f(0., 0., 1.)
+        glVertex3f(printing_space[0]*.05, printing_space[1]*.05, 0.)
+
+        glTexCoord2f(1., 0.)
+        glNormal3f(0., 0., 1.)
+        glVertex3f(printing_space[0]*.05, printing_space[1]*-.05, 0.)
+        glEnd()
+
+        glPopMatrix()
+
+        glEndList()
+
+
+        return genList_top, genList_button
+
 
     def make_printing_space(self, printer_data):
         printing_space = printer_data['printing_space']

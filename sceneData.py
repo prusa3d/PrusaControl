@@ -154,7 +154,7 @@ class AppScene(object):
 
 
     def find_support_height(self, m, pos):
-        ret, point = m.intersectionRayModel(pos, np.array([pos[0], pos[1], 1.]))
+        ret, point = m.intersectionRayModel3(pos, np.array([pos[0], pos[1], 1.]))
         if ret:
             return np.sqrt(point.dot(point))
         else:
@@ -1221,9 +1221,10 @@ class Model(object):
                     return True
         return False
 
+    @timing
     def intersectionRayModel(self, rayStart, rayEnd):
-        w = rayEnd - rayStart
-        w /= np.linalg.norm(w)
+        ray = rayEnd - rayStart
+        ray /= np.linalg.norm(ray)
 
         data = self.temp_mesh
 
@@ -1238,11 +1239,11 @@ class Model(object):
 
             n = self.temp_mesh.normals[counter]
 
-            q = np.cross(w, e2)
+            q = np.cross(ray, e2)
             a = np.dot(e1, q)
 
             counter += 1
-            if (np.dot(n, w) >= .0) or (abs(a) <= .0001):
+            if (np.dot(n, ray) >= .0) or (abs(a) <= .0001):
                 continue
 
             s = np.array(rayStart)
@@ -1251,7 +1252,7 @@ class Model(object):
 
             r = np.cross(s, e1)
             b[0] = np.dot(s, q)
-            b[1] = np.dot(r, w)
+            b[1] = np.dot(r, ray)
             b[2] = 1.0 - b[0] - b[1]
 
             if (b[0] < .0) or (b[1] < .0) or (b[2] < .0):
@@ -1259,7 +1260,7 @@ class Model(object):
 
             t = np.dot(e2, r)
             if t >= .0:
-                point = rayStart + t*w
+                point = rayStart + t*ray
                 return True, point
             else:
                 continue
@@ -1337,6 +1338,75 @@ class Model(object):
             else:
                 continue
         return False
+
+    @timing
+    def intersectionRayModel3(self, rayStart, rayEnd):
+        ray = rayEnd - rayStart
+        ray /= np.linalg.norm(ray)
+
+        n = self.temp_mesh.normals
+        vectors = self.temp_mesh.vectors
+
+        #b = np.array([0., 0., 0.])
+
+        # print(tri_1)
+
+        tri_0 = vectors[:, 0]
+        tri_1 = vectors[:, 1]
+        tri_2 = vectors[:, 2]
+
+        e1 = tri_1
+        e1 -= tri_0
+        e2 = tri_2
+        e2 -= tri_0
+
+        q = np.cross(ray, e2)
+        a = np.einsum('ij,ij->i', e1, q)
+        shape_tri = tri_0.shape
+        # a = np.dot(e1, q)
+
+        f1 = (np.dot(n, ray) >= .0) | (np.absolute(a) <= .0001)
+        #print("F1:" + str(f1))
+        if not f1.any():
+            print("Nic v F1")
+            return False, None
+
+        s = np.tile(rayStart, shape_tri[0])
+        s = s.reshape(shape_tri)
+        s -= tri_0
+        # s = np.divide(s, a[:, None])
+        # s /= a[:, None]
+        s = np.nan_to_num(s / a[:, None])
+
+        r = np.nan_to_num(np.cross(s, e1))
+
+        # b[0] = np.dot(s, q)
+        b_0 = np.nan_to_num(np.einsum('ij,ij->i', s, q))
+        # b[1] = np.dot(r, ray)
+        # b_1 = np.einsum('ij,ij->i', r, ray)
+        b_1 = np.nan_to_num(np.dot(r, ray))
+        # b[2] = 1.0 - b[0] - b[1]
+        b_2 = np.nan_to_num(1.0 - b_0 - b_1)
+
+        f2 = (b_0 < .0) | (b_1 < .0) | (b_2 < .0)
+        #print("F2:" + str(f2))
+        if not np.logical_xor(f1, f2).any():
+            print("Nic v F2")
+            return False, None
+
+        # t = np.dot(e2, r)
+        t = np.nan_to_num(np.einsum('ij,ij->i', e2, r))
+        f3 = (t >= 0.)
+        f_final = np.logical_xor(f1, f2, f3)
+        if not f_final.any():
+            print("Nic v F3")
+            return False, None
+        else:
+            #t_fin = np.min(t[f_final])
+            t_fin = t[f_final][0]*.001
+            point = rayStart + t_fin * ray
+            return True, point
+
 
 
     #TODO:Better!!!
