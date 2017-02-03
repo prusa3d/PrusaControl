@@ -990,6 +990,7 @@ class Controller:
                 model.selected = True
                 self.object_select_event_flag = True
                 self.open_object_settings(object_id)
+                self.scene.last_selected_object = model.id
                 return True
         return False
 
@@ -1159,6 +1160,8 @@ class Controller:
                         self.unselect_object(object_id)
                     elif self.is_ctrl_pressed():
                         #print("ctrl pressed")
+                        if self.settings['toolButtons']['rotateButton'] or self.settings['toolButtons']['scaleButton']:
+                            self.unselect_objects()
                         self.select_object(object_id)
                         self.cursor_over_object = True
                     elif self.is_object_already_selected(object_id) and self.is_some_tool_active():
@@ -1269,7 +1272,7 @@ class Controller:
                     pos[2] = 0.
                     self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
                     self.original_scale = numpy.linalg.norm(self.original_scale_point - pos)
-                    self.last_l = 0.0
+                    self.last_l = self.original_scale.copy()
 
 
 
@@ -1358,16 +1361,17 @@ class Controller:
                         l = numpy.linalg.norm(new_scale_vect)
                         l -= .5
 
-                        origin_size = deepcopy(model.size_origin)
-                        origin_size[2] = 0.
-                        origin_size *= .5
+                        if not self.last_l == l:
+                            origin_size = deepcopy(model.size_origin)
+                            origin_size[2] = 0.
+                            origin_size *= .5
 
-                        new_scale = l / numpy.linalg.norm(origin_size)
-                        # print("Nova velikost scalu: " + str(new_scale))
+                            new_scale = l / numpy.linalg.norm(origin_size)
+                            # print("Nova velikost scalu: " + str(new_scale))
 
-                        model.set_scale_abs(new_scale, new_scale, new_scale)
-                        # model.set_scale(new_scale)
-                        self.last_l = new_scale
+                            model.set_scale_abs(new_scale, new_scale, new_scale)
+                            # model.set_scale(new_scale)
+                            self.last_l = new_scale
 
                         self.view.update_scale_widgets(model.id)
                         self.scene_was_changed()
@@ -1638,6 +1642,8 @@ class Controller:
             self.clear_tool_button_states()
             self.settings['toolButtons']['rotateButton'] = True
         self.update_scene()
+        self.unselect_objects()
+        self.select_object(self.scene.last_selected_object)
         #self.view.update_scene()
 
     def support_button_pressed(self):
@@ -1656,6 +1662,8 @@ class Controller:
             self.clear_tool_button_states()
             self.settings['toolButtons']['scaleButton'] = True
         self.update_scene()
+        self.unselect_objects()
+        self.select_object(self.scene.last_selected_object)
         #self.view.update_scene()
 
     def place_on_face_button_pressed(self):

@@ -134,10 +134,12 @@ class GcodeParserRunner(QObject):
         in_stream = QTextStream(file)
         file_size = file.size()
         counter = 0
-
+        line = 0
         while not in_stream.atEnd() and self.is_running is True:
+
             counter+=1
             if self.set_update_progress and counter==10000:
+                #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
                 progress = (in_stream.pos()*1./file_size*1.) * 100.
                 self.set_update_progress.emit(int(progress))
                 counter=0

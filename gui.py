@@ -973,7 +973,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_scale_x = QtGui.QDoubleSpinBox()
         self.edit_scale_x.setObjectName("edit_scale_x")
         self.edit_scale_x.setMaximum(9999)
-        self.edit_scale_x.setMinimum(1)
+        self.edit_scale_x.setMinimum(-999)
         self.edit_scale_x.setSuffix("%")
         self.edit_scale_x.setDecimals(0)
         self.edit_scale_x.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_x,
@@ -987,7 +987,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_scale_y = QtGui.QDoubleSpinBox()
         self.edit_scale_y.setObjectName("edit_scale_y")
         self.edit_scale_y.setMaximum(9999)
-        self.edit_scale_y.setMinimum(1)
+        self.edit_scale_y.setMinimum(-999)
         self.edit_scale_y.setSuffix("%")
         self.edit_scale_y.setDecimals(0)
         self.edit_scale_y.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_y,
@@ -1001,7 +1001,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.edit_scale_z = QtGui.QDoubleSpinBox()
         self.edit_scale_z.setObjectName("edit_scale_z")
         self.edit_scale_z.setMaximum(9999)
-        self.edit_scale_z.setMinimum(1)
+        self.edit_scale_z.setMinimum(-999)
         self.edit_scale_z.setSuffix("%")
         self.edit_scale_z.setDecimals(0)
         self.edit_scale_z.valueChanged.connect(lambda: self.set_scale_on_object(self.edit_scale_z,
@@ -1123,6 +1123,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.materialCombo.addItems(material_label_ls)
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
+        self.materialCombo.setMaxVisibleItems(len(material_label_ls))
         self.materialCombo.setToolTip(self.material_tooltip)
         #self.materialCombo.setV
         #view = self.materialCombo.view()
@@ -1151,6 +1152,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.infillCombo.setObjectName('infillCombo')
         infill_ls, f = self.controller.get_infill_ls_and_index_of_default("0%")
         self.infillCombo.insertItems(len(infill_ls), infill_ls)
+        self.infillCombo.setMaxVisibleItems(len(infill_ls))
         self.infillCombo.setToolTip(self.infill_tooltip)
 
 
@@ -1694,8 +1696,8 @@ class PrusaControlView(QtGui.QMainWindow):
 
     def lock_scale_axes_change(self):
         self.lock_scale_axis = self.lock_scale_axes_checkbox.isChecked()
-        if self.lock_scale_axis:
-            self.scale_ration = [1.,.5,.5]
+        #if self.lock_scale_axis:
+            #self.scale_ration = [1.,.5,.5]
 
 
     def close_object_settings_panel(self):
@@ -2057,6 +2059,7 @@ class PrusaControlView(QtGui.QMainWindow):
             labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
             self.materialCombo.addItems(labels)
             self.materialCombo.setCurrentIndex(first)
+            self.materialCombo.setMaxVisibleItems((len(labels)))
 
 
 
@@ -2072,6 +2075,7 @@ class PrusaControlView(QtGui.QMainWindow):
         #print("Quality list: " + str(material_printing_settings_quality_ls))
         self.qualityCombo.addItems(material_printing_settings_quality_ls)
         self.qualityCombo.setCurrentIndex(first)
+        self.qualityCombo.setMaxVisibleItems(len(material_printing_settings_quality_ls))
 
         # infill slider
         #self.infillSlider.setValue(material_printing_settings['infill'])

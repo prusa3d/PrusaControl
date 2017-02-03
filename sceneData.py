@@ -59,6 +59,7 @@ class AppScene(object):
         self.copied_models = []
         self.printable = True
         self.camera_vector = np.array([0.,0.,0.])
+        self.last_selected_object = []
 
         self.place_offset = np.array([0., 0., 0.])
 
@@ -407,6 +408,9 @@ class AppScene(object):
             if not model.is_in_printing_space(self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)):
                 return False
         return True
+
+
+
 
 class Model(object):
     '''
@@ -959,21 +963,31 @@ class Model(object):
             self.place_on_zero()
 
     def set_scale_abs(self, x, y, z):
-        printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
-        if (x * self.size_origin[0] > .5) and (y * self.size_origin[1] > .5) and (z * self.size_origin[2] > .5)\
-            and (x * self.size_origin[0] < printer['printing_space'][0]*.1) and\
-                (y * self.size_origin[1] < printer['printing_space'][1]*.1) and\
-                (z * self.size_origin[2] < printer['printing_space'][2]*.1):
+        #printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
+        #if (x * self.size_origin[0] > .5) and (y * self.size_origin[1] > .5) and (z * self.size_origin[2] > .5)\
+        #    and (x * self.size_origin[0] < printer['printing_space'][0]*.1) and\
+        #        (y * self.size_origin[1] < printer['printing_space'][1]*.1) and\
+        #        (z * self.size_origin[2] < printer['printing_space'][2]*.1):
 
-            self.old_scale = deepcopy(self.scale)
+        self.old_scale = deepcopy(self.scale)
 
-            self.scale[0] = x
-            self.scale[1] = y
-            self.scale[2] = z
+        self.scale[0] = x
+        self.scale[1] = y
+        self.scale[2] = z
 
-            #self.update_min_max()
-            self.update_min_max_quick_change_of_scale()
-            self.place_on_zero()
+        #self.update_min_max()
+        self.update_min_max_quick_change_of_scale()
+        self.place_on_zero()
+
+    def set_scale_coef(self, coef):
+        self.old_scale = deepcopy(self.scale)
+
+        self.scale *= coef
+
+        # self.update_min_max()
+        self.update_min_max_quick_change_of_scale()
+        self.place_on_zero()
+
 
 
     def update_position(self):
@@ -1345,7 +1359,7 @@ class Model(object):
         ray /= np.linalg.norm(ray)
 
         n = self.temp_mesh.normals
-        vectors = self.temp_mesh.vectors
+        vectors = self.temp_mesh.vectors+self.pos
 
         #b = np.array([0., 0., 0.])
 
@@ -1361,9 +1375,10 @@ class Model(object):
         e2 -= tri_0
 
         q = np.cross(ray, e2)
+        # a = np.dot(e1, q)
         a = np.einsum('ij,ij->i', e1, q)
         shape_tri = tri_0.shape
-        # a = np.dot(e1, q)
+
 
         f1 = (np.dot(n, ray) >= .0) | (np.absolute(a) <= .0001)
         #print("F1:" + str(f1))
