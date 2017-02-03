@@ -1368,8 +1368,10 @@ class Controller:
 
                             new_scale = l / numpy.linalg.norm(origin_size)
                             # print("Nova velikost scalu: " + str(new_scale))
+                            scale_prop = model.scale / numpy.linalg.norm(model.scale)
+                            scale_prop *=new_scale
 
-                            model.set_scale_abs(new_scale, new_scale, new_scale)
+                            model.set_scale_abs(scale_prop[0], scale_prop[1], scale_prop[2])
                             # model.set_scale(new_scale)
                             self.last_l = new_scale
 
