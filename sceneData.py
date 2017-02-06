@@ -9,6 +9,7 @@ from os.path import basename
 
 import time
 from PyQt4.QtCore import QObject
+from PyQt4.QtGui import QFont
 from PyQt4.QtOpenGL import QGLBuffer
 #from stl import Mode
 from stl.mesh import Mesh
@@ -1161,11 +1162,10 @@ class Model(object):
         if self.is_in_printing_area == False:
             font = self.parent.controller.view.font
             font.setPointSize(35)
+            glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
             glColor3ub(255, 97, 0)
             self.parent.controller.view.glWidget.renderText(0., 0., 0., "!", font)
-            glEnable(GL_DEPTH_TEST)
-
         if blending:
             glCullFace(GL_BACK)
             glDisable(GL_CULL_FACE)

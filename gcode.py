@@ -16,9 +16,10 @@ from PyQt4.QtCore import pyqtSignal
 
 class GCode(object):
 
-    def __init__(self, filename, controller, done_loading_callback):
+    def __init__(self, filename, controller, done_loading_callback, done_writing_callback):
         self.controller = controller
         self.done_loading_callback = done_loading_callback
+        self.writing_done_callback = done_writing_callback
         self.data = {}
         self.all_data = []
         self.data_keys = []
@@ -37,7 +38,11 @@ class GCode(object):
         self.gcode_parser = GcodeParserRunner(controller, filename)
         self.gcode_parser_thread = QThread()
 
-    def cancel(self):
+        self.gcode_copy = GcodeCopyRunner(filename, "", color_change_lst=[])
+        self.gcode_copy_thread = QThread()
+
+
+    def cancel_parsing_gcode(self):
         print("Cancel presset")
         if self.gcode_parser and self.gcode_parser_thread and self.gcode_parser_thread.isRunning():
             self.gcode_parser.is_running = False
@@ -48,6 +53,13 @@ class GCode(object):
             self.all_data = []
             self.data_keys = []
 
+    def cancel_writing_gcode(self):
+        print("Cancel writing gcode")
+        if self.gcode_copy and self.gcode_copy_thread and self.gcode_copy_thread.isRunning():
+            self.gcode_copy.quit()
+            self.gcode_copy_thread.wait()
+
+
 
     def read_in_thread(self, update_progressbar_function, after_done_function):
         self.gcode_parser.moveToThread(self.gcode_parser_thread)
@@ -56,7 +68,7 @@ class GCode(object):
         # connect all signals to thread class
         self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file)
         # connect all signals to parser class
-        self.gcode_parser.finished.connect(self.set_finished)
+        self.gcode_parser.finished.connect(self.set_finished_read)
         self.gcode_parser.set_update_progress.connect(update_progressbar_function)
         self.gcode_parser.set_data_keys.connect(self.set_data_keys)
         self.gcode_parser.set_data.connect(self.set_data)
@@ -89,13 +101,71 @@ class GCode(object):
     def set_data(self, data):
         self.data = data
 
-    def set_finished(self):
+    def set_finished_read(self):
         self.gcode_parser_thread.quit()
         self.is_loaded = True
         self.done_loading_callback()
         #self.controller.set_gcode()
 
+    def set_finished_copy(self):
+        self.gcode_copy_thread.quit()
+        print(str(self.writing_done_callback))
+        self.writing_done_callback()
 
+
+    def write_with_changes_in_thread(self, filename_in, filename_out, update_function):
+        self.gcode_copy.filename_in = filename_in
+        self.gcode_copy.filename_out = filename_out
+        self.gcode_copy.moveToThread(self.gcode_copy_thread)
+
+        self.gcode_copy_thread.started.connect(self.gcode_copy.write_file)
+
+        self.gcode_copy.finished.connect(self.set_finished_copy)
+        self.gcode_copy.set_update_progress.connect(update_function)
+
+        self.gcode_copy_thread.start()
+
+
+
+
+class GcodeCopyRunner(QObject):
+    finished = pyqtSignal()
+    set_update_progress = pyqtSignal(int)
+
+    def __init__(self, filename_in, filename_out, color_change_lst):
+        super(GcodeCopyRunner, self).__init__()
+        self.filename_in = filename_in
+        self.filename_out = filename_out
+        self.color_change_lst = color_change_lst
+        self.is_running = True
+
+
+    def write_file(self):
+
+        if self.color_change_lst:
+            #some color changes
+            pass
+
+        else:
+            self.copy_file_with_progress(self.filename_in, self.filename_out)
+
+
+    def copy_file_with_progress(self, filename_in, filename_out, length=16*1024):
+        fsrc = src_file = open(filename_in, 'r')
+        fdst = dst_file = open(filename_out, 'w')
+
+        fsrc_size = os.fstat(fsrc.fileno()).st_size
+
+        copied = 0
+        while self.is_running is True:
+            buf = fsrc.read(length)
+            if not buf:
+                self.finished.emit()
+                break
+            fdst.write(buf)
+            copied += len(buf)
+            self.set_update_progress.emit((copied * 1. / fsrc_size * 1.)*100)
+            #progress_callback((copied * 1. / fsrc_size * 1.))
 
 
 class GcodeParserRunner(QObject):
@@ -118,7 +188,7 @@ class GcodeParserRunner(QObject):
         self.data_keys = []
         self.actual_z = '0.0'
         self.speed = 0.0
-        self.extrucion = 0.0
+        self.extrusion = 0.0
         self.z_hop = False
         self.last_point = [0.0, 0.0, 0.0]
         self.actual_point = [0.0, 0.0, 0.0]
@@ -261,7 +331,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # Extrusion point
                 self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
-                self.extrucion = float(line[3][1:])
+                self.extrusion = float(line[3][1:])
                 if self.last_point:
                     if float(line[3][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -280,7 +350,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrucion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -288,7 +358,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # Extrusion point
                 self.actual_point[0] = float(line[1][1:])
-                self.extrucion = float(line[2][1:])
+                self.extrusion = float(line[2][1:])
                 if self.last_point:
                     if float(line[2][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -306,7 +376,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrucion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -346,7 +416,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # Extrusion point
                 self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
-                self.extrucion = float(line[3][1:])
+                self.extrusion = float(line[3][1:])
                 if self.last_point:
                     if float(line[3][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -365,7 +435,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrucion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -374,7 +444,7 @@ class GcodeParserRunner(QObject):
                 # elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # Extrusion point
                 self.actual_point[0] = float(line[1][1:])
-                self.extrucion = float(line[2][1:])
+                self.extrusion = float(line[2][1:])
                 if self.last_point:
                     if float(line[2][1:]) > 0.:
                         if len(comment_line) > 0:
@@ -392,7 +462,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrucion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)

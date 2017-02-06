@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
-import json
+#import json
 import logging
 
-import functools
+#import functools
 
 
 import time
 import webbrowser
-from pprint import pprint
+#from pprint import pprint
 from ConfigParser import RawConfigParser
 
 from shutil import copyfile, Error
 
 import numpy
-import pyrr
-from PyQt4.QtCore import Qt
+#import pyrr
+from PyQt4.QtCore import QTranslator, Qt, QPoint
+#from PyQt4 import QtGui
 from PyQt4.QtGui import QApplication
 
 import sceneData
@@ -24,14 +25,14 @@ from gui import PrusaControlView, QMessageBox
 from parameters import AppParameters, PrintingParameters
 from projectFile import ProjectFile
 from sceneData import AppScene, ModelTypeStl
-from sceneRender import GLWidget
+#from sceneRender import GLWidget
 from copy import deepcopy
 
 
-import xml.etree.cElementTree as ET
-from zipfile import ZipFile
+#import xml.etree.cElementTree as ET
+#from zipfile import ZipFile
 
-from PyQt4 import QtCore, QtGui
+#from PyQt4 import QtCore, QtGui
 
 #Mesure
 from slicer import SlicerEngineManager
@@ -103,7 +104,7 @@ class Controller:
 
 
         #variables for help
-        self.last_pos = QtCore.QPoint()
+        self.last_pos = QPoint()
         self.ray_start = [.0, .0, .0]
         self.ray_end = [.0, .0, .0]
         self.hitPoint = [.0, .0, .0]
@@ -149,7 +150,7 @@ class Controller:
         self.dpi_coef = app.desktop().logicalDpiX()/96.
         self.dpi_scale = 0 if self.dpi_coef==1.0 else 2
 
-        self.translator = QtCore.QTranslator()
+        self.translator = QTranslator()
         self.set_language(self.settings['language'])
 
         self.scene = AppScene(self)
@@ -182,7 +183,7 @@ class Controller:
 
     def exit_event(self):
         if self.status in ['loading_gcode']:
-            self.gcode.cancel()
+            self.gcode.cancel_parsing_gcode()
             return True
         elif self.status in ['generating']:
             ret = self.view.show_exit_message_generating_scene()
@@ -298,6 +299,8 @@ class Controller:
 
     def set_gcode_instance(self, gcode_instance):
         self.gcode = gcode_instance
+        self.gcode.done_loading_callback = self.set_gcode
+        self.gcode.writing_done_callback = self.set_saved_gcode
         self.set_gcode()
 
     def print_progress(self, progress):
@@ -306,13 +309,19 @@ class Controller:
 
     def read_gcode(self, filename = ''):
         if filename:
-            self.gcode = GCode(filename, self, self.set_gcode)
+            self.gcode = GCode(filename, self, self.set_gcode, self.set_saved_gcode)
         else:
-            self.gcode = GCode(self.app_config.tmp_place + 'out.gcode', self, self.set_gcode)
+            self.gcode = GCode(self.app_config.tmp_place + 'out.gcode', self, self.set_gcode, self.set_saved_gcode)
 
         self.view.set_cancel_of_loading_gcode_file()
         self.status = 'loading_gcode'
         self.gcode.read_in_thread(self.set_progress_bar, self.set_gcode)
+
+
+    def set_saved_gcode(self):
+        self.set_progress_bar(100)
+        self.status = 'generated'
+        self.set_gcode_view()
 
 
     def set_gcode(self):
@@ -335,6 +344,11 @@ class Controller:
         self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
 
         self.set_gcode_view()
+
+
+    #def save_gcode(self, filename = ''):
+    #    pass
+
 
     def set_variable_layer_cursor(self, double_value):
         for m in self.scene.models:
@@ -533,10 +547,10 @@ class Controller:
 
     def open_cancel_gcode_reading_dialog(self):
         ret = self.view.show_cancel_generating_dialog_and_load_file()
-        if ret == QtGui.QMessageBox.Yes:
+        if ret == QMessageBox.Yes:
             self.cancel_gcode_loading()
             return True
-        elif ret == QtGui.QMessageBox.No:
+        elif ret == QMessageBox.No:
             return False
 
     def generate_button_pressed(self):
@@ -555,6 +569,10 @@ class Controller:
                 self.generate_gcode()
                 self.set_cancel_button()
                 self.status = 'generating'
+        elif self.status == 'saving_gcode':
+            self.gcode.cancel_writing_gcode()
+            self.status = 'generated'
+            self.view.open_gcode_view()
 
         elif self.status == 'generating':
             #generating in progress
@@ -571,7 +589,7 @@ class Controller:
 
 
     def cancel_gcode_loading(self):
-        self.gcode.cancel()
+        self.gcode.cancel_parsing_gcode()
         self.gcode = None
         self.status = 'canceled'
         self.disable_generate_button()
@@ -584,14 +602,14 @@ class Controller:
         if result_text:
             result_text = "\n".join(result_text)
 
-            msg = QtGui.QMessageBox()
-            msg.setIcon(QtGui.QMessageBox.Warning)
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
 
             msg.setText("Do you want to apply recommended settings?")
             msg.setInformativeText("PrusaControl make analyze of printing scene, recommending different printing settings")
             msg.setWindowTitle("Analyze of printing scene")
             msg.setDetailedText(result_text)
-            msg.setStandardButtons(QtGui.QMessageBox.Ignore | QtGui.QMessageBox.Apply | QtGui.QMessageBox.Cancel)
+            msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Apply | QMessageBox.Cancel)
             msg.buttonClicked.connect(self.reaction_button_pressed)
 
             retval = msg.exec_()
@@ -705,11 +723,16 @@ class Controller:
         else:
             filename_out = data + '.gcode'
         try:
-            copyfile(self.app_config.tmp_place + "out.gcode", filename_out)
+            self.status = "saving_gcode"
+            self.view.saving_gcode()
+            #copyfile(self.app_config.tmp_place + "out.gcode", filename_out)
+            self.gcode.write_with_changes_in_thread(self.gcode.filename, filename_out, self.set_progress_bar)
+
         except Error as e:
             logging.debug('Error: %s' % e)
         except IOError as e:
             logging.debug('Error: %s' % e.strerror)
+
 
     def open_model_file(self):
         data = self.view.open_model_file_dialog()
@@ -936,8 +959,8 @@ class Controller:
     @staticmethod
     def is_ctrl_pressed():
         #print("is_ctrl_pressed")
-        modifiers = QtGui.QApplication.keyboardModifiers()
-        if modifiers == QtCore.Qt.ControlModifier:
+        modifiers = QApplication.keyboardModifiers()
+        if modifiers == Qt.ControlModifier:
             return True
         else:
             return False
@@ -1120,10 +1143,10 @@ class Controller:
         newRayStart, newRayEnd = self.view.get_cursor_position(event)
         self.res_old = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
         #Je stisknuto prave tlacitko?
-        if event.button() & QtCore.Qt.RightButton:
+        if event.button() & Qt.RightButton:
             self.set_camera_move_function()
         #Je stisknuto leve tlacitko?
-        elif event.button() & QtCore.Qt.LeftButton:
+        elif event.button() & Qt.LeftButton:
             #Je kurzor nad nejakym objektem?
             if self.render_status == 'model_view' and self.status in ['edit', 'canceled']:
                 object_id = self.get_id_under_cursor(event)
@@ -1426,7 +1449,7 @@ class Controller:
                         tool.mouse_is_over(False)
 
 
-        self.last_pos = QtCore.QPoint(event.pos())
+        self.last_pos = QPoint(event.pos())
         self.update_scene()
         #self.view.update_scene()
 
@@ -1480,7 +1503,7 @@ class Controller:
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])
 
-        if event.button() & QtCore.Qt.LeftButton and self.mouse_press_event_flag and\
+        if event.button() & Qt.LeftButton and self.mouse_press_event_flag and\
                 self.mouse_release_event_flag and self.mouse_move_event_flag == False and\
                 self.object_select_event_flag==False and self.tool_press_event_flag == False:
             #print("Podminky splneny")
@@ -1701,19 +1724,19 @@ class Controller:
 
     def open_clear_scene_and_load_gcode_file(self):
         ret = self.view.show_clear_scene_and_load_gcode_file_dialog()
-        if ret == QtGui.QMessageBox.Yes:
+        if ret == QMessageBox.Yes:
             self.scene.clear_scene()
             return True
-        elif ret == QtGui.QMessageBox.No:
+        elif ret == QMessageBox.No:
             return False
 
     def open_cancel_gcode_preview_dialog(self):
         ret = self.view.show_open_cancel_gcode_preview_dialog()
-        if ret == QtGui.QMessageBox.Yes:
+        if ret == QMessageBox.Yes:
             self.status = 'edit'
             self.set_model_edit_view()
             return True
-        elif ret == QtGui.QMessageBox.No:
+        elif ret == QMessageBox.No:
             return False
 
 

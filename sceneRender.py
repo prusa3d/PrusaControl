@@ -592,14 +592,14 @@ class GLWidget(QGLWidget):
 
         self.draw_warning_window()
 
-        if self.controller.status == 'generated':
+        if self.controller.status in ['generated', 'saving_gcode']:
             self.draw_information_window()
 
         #if self.controller.settings['debug']:
         #    self.picking_render()
 
         if self.controller.settings['debug']:
-            print("draw_debug")
+            #print("draw_debug")
             self.draw_debug()
 
         glFlush()

@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 import atexit
 
-from PyQt4 import QtGui
-from tendo.singleton import SingleInstance
+from PyQt4.QtGui import QApplication, QIcon
+#from tendo.singleton import SingleInstance
 
 from controller import Controller
 from sceneRender import *
-from sceneData import *
+#from sceneData import *
 import logging
 import cProfile
 import os
-import shutil
+#import shutil
 
 
 __author__ = 'Tibor Vavra'
@@ -38,8 +38,8 @@ def main():
     #me = SingleInstance()
 
 
-    app = QtGui.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon("data/icon/favicon.ico"))
+    app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("data/icon/favicon.ico"))
 
     local_path = os.path.realpath(__file__)
 

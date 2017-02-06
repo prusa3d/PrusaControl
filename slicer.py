@@ -53,7 +53,7 @@ class Slic3rEngineRunner(QObject):
         self.is_running = True
         self.controller = controller
 
-        self.gcode = GCode(self.controller.app_config.tmp_place + 'out.gcode', self.controller, None)
+        self.gcode = GCode(self.controller.app_config.tmp_place + 'out.gcode', self.controller, None, None)
 
         system_platform = platform.system()
         if system_platform in ['Linux']:

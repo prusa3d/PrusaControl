@@ -7,22 +7,28 @@ from pprint import pprint
 
 import numpy as np
 from OpenGL.GL import *
-from OpenGL.GLU import *
-from PyQt4 import *
+#from OpenGL.GLU import *
+#from PyQt4 import *
 from PyQt4 import QtGui
 
-from PyQt4.QtCore import QDateTime, Qt
-from PyQt4.QtCore import QRect
+from PyQt4.QtCore import QDateTime, Qt, SIGNAL
+#from PyQt4.QtCore import QRect
 from PyQt4.QtCore import QSettings
+from PyQt4.QtGui import QApplication
+from PyQt4.QtGui import QCheckBox
+from PyQt4.QtGui import QComboBox
 from PyQt4.QtGui import QDialog, QDateTimeEdit, QDialogButtonBox, QAbstractScrollArea
-from PyQt4.QtGui import *
-from PyQt4.QtOpenGL import *
+#from PyQt4.QtGui import *
+#from PyQt4.QtOpenGL import *
 from PyQt4 import QtCore
+from PyQt4.QtGui import QFont, QFontDatabase, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow
+from PyQt4.QtGui import QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget
+from PyQt4.QtGui import QPainterPath, QPen, QStyleOptionSlider, QSlider
 
 import projectFile
 import sceneRender
 
-class Gcode_slider(QtGui.QWidget):
+class Gcode_slider(QWidget):
     def __init__(self, other, controller):
         super(Gcode_slider, self).__init__()
         self.controller = controller
@@ -195,7 +201,7 @@ class Gcode_slider(QtGui.QWidget):
         #print(str(maximum))
         self.slider.setMaximum(maximum)
 
-class Spline_editor(QtGui.QWidget):
+class Spline_editor(QWidget):
     def __init__(self, other, controller):
         super(Spline_editor, self).__init__()
         self.controller = controller
@@ -240,37 +246,37 @@ class Spline_editor(QtGui.QWidget):
         top_labels_widget.setLayout(top_labels_layout)
         '''
 
-        self.min_label = QtGui.QLabel(self)
+        self.min_label = QLabel(self)
         self.min_label.setObjectName("spline_slider_min_label")
         self.min_label.setText("Min")
         self.min_label.setAlignment(Qt.AlignCenter)
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
         #main_layout.setSpacing(2)
         main_layout.setMargin(2)
 
-        self.slider = QtGui.QSlider(parent=self)
-        self.slider.setOrientation(QtCore.Qt.Vertical)
+        self.slider = QSlider(parent=self)
+        self.slider.setOrientation(Qt.Vertical)
         self.slider.setObjectName("spline_slider")
         self.slider.setFixedHeight(350)
 
-        self.connect(self.slider, QtCore.SIGNAL("valueChanged(int)"), self.set_value_label)
+        self.connect(self.slider, SIGNAL("valueChanged(int)"), self.set_value_label)
 
-        self.value_label = QtGui.QLabel(parent=self)
+        self.value_label = QLabel(parent=self)
         self.value_label.setObjectName("spline_slider_value_label")
         self.value_label.setVisible(False)
         self.value_label.setText(u"─0.00mm")
         self.value_label.setFixedWidth(75)
 
-        self.plus_button = QtGui.QPushButton("", parent=self)
+        self.plus_button = QPushButton("", parent=self)
         self.plus_button.setAutoRepeat(True)
         self.plus_button.setObjectName("variable_hight_plus_button")
         self.plus_button.setVisible(False)
         self.plus_button.setFixedWidth(20)
         self.plus_button.clicked.connect(self.plus_value)
 
-        self.minus_button = QtGui.QPushButton("", parent=self)
+        self.minus_button = QPushButton("", parent=self)
         self.minus_button.setAutoRepeat(True)
         self.minus_button.setObjectName("variable_hight_minus_button")
         self.minus_button.setVisible(False)
@@ -284,8 +290,8 @@ class Spline_editor(QtGui.QWidget):
 
         self.setLayout(main_layout)
 
-        self.style = QtGui.QApplication.style()
-        self.opt = QtGui.QStyleOptionSlider()
+        self.style = QApplication.style()
+        self.opt = QStyleOptionSlider()
         self.slider.initStyleOption(self.opt)
 
         self.label_height = self.max_label.height() -1
@@ -1092,16 +1098,16 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,QtCore.Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
 
-        self.gcode_back_b = QtGui.QPushButton(self.tr("Back"))
+        self.gcode_back_b = QPushButton(self.tr("Back"))
         self.gcode_back_b.setObjectName("gcode_back_b")
         self.gcode_back_b.clicked.connect(self.controller.set_model_edit_view)
         self.gcode_back_b.setVisible(False)
         # Gcode view layout
 
-        self.right_panel = QtGui.QWidget(self)
+        self.right_panel = QWidget(self)
         self.right_panel.setObjectName('right_panel')
         #self.right_panel_layout = QtGui.QFormLayout()
-        self.right_panel_layout = QtGui.QVBoxLayout()
+        self.right_panel_layout = QVBoxLayout()
         self.right_panel_layout.setObjectName('right_panel_layout')
         self.right_panel_layout.setSpacing(5)
         self.right_panel_layout.setMargin(0)
@@ -1111,13 +1117,13 @@ class PrusaControlView(QtGui.QMainWindow):
         #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
 
         self.material_tooltip = self.tr("Select material for printing")
-        self.printer_settings_l = QtGui.QLabel(self.tr("Printer settings"))
+        self.printer_settings_l = QLabel(self.tr("Printer settings"))
         self.printer_settings_l.setObjectName('printer_settings_l')
         # print tab
-        self.materialLabel = QtGui.QLabel(self.tr("Material"))
+        self.materialLabel = QLabel(self.tr("Material"))
         self.materialLabel.setObjectName('materialLabel')
         self.materialLabel.setToolTip(self.material_tooltip)
-        self.materialCombo = QtGui.QComboBox()
+        self.materialCombo = QComboBox()
         self.materialCombo.setObjectName('materialCombo')
         material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
         self.materialCombo.addItems(material_label_ls)
@@ -1130,10 +1136,10 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
         self.quality_tooltip = self.tr("Select quality for printing")
-        self.qualityLabel = QtGui.QLabel(self.tr("Quality"))
+        self.qualityLabel = QLabel(self.tr("Quality"))
         self.qualityLabel.setObjectName('qualityLabel')
         self.qualityLabel.setToolTip(self.quality_tooltip)
-        self.qualityCombo = QtGui.QComboBox()
+        self.qualityCombo = QComboBox()
         self.qualityCombo.setObjectName('qualityCombo')
         self.qualityCombo.setToolTip(self.quality_tooltip)
 
@@ -1144,11 +1150,11 @@ class PrusaControlView(QtGui.QMainWindow):
         #self.infillSlider.setObjectName('infillSlider')
 
         self.infill_tooltip = self.tr("Select how much space inside of model have to be filled")
-        self.infillLabel = QtGui.QLabel(self.tr("Infill"))
+        self.infillLabel = QLabel(self.tr("Infill"))
         self.infillLabel.setObjectName('infillLabel')
         self.infillLabel.setFixedWidth(75)
         self.infillLabel.setToolTip(self.infill_tooltip)
-        self.infillCombo = QtGui.QComboBox()
+        self.infillCombo = QComboBox()
         self.infillCombo.setObjectName('infillCombo')
         infill_ls, f = self.controller.get_infill_ls_and_index_of_default("0%")
         self.infillCombo.insertItems(len(infill_ls), infill_ls)
@@ -1158,72 +1164,72 @@ class PrusaControlView(QtGui.QMainWindow):
 
         #self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
         self.support_tooltip = self.tr("Select what kind of supports do you need, if any")
-        self.supportLabel = QtGui.QLabel(self.tr("Support"))
+        self.supportLabel = QLabel(self.tr("Support"))
         self.supportLabel.setObjectName('supportLabel')
         self.supportLabel.setToolTip(self.support_tooltip)
-        self.supportCombo = QtGui.QComboBox()
+        self.supportCombo = QComboBox()
         self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
         self.supportCombo.setObjectName('supportCombo')
         self.supportCombo.setMaxVisibleItems(10)
         self.supportCombo.setToolTip(self.support_tooltip)
 
         self.brim_tooltip = self.tr("Do you need better adhesive of model and printing bed?")
-        self.brim_label = QtGui.QLabel(self.tr("Brim"))
+        self.brim_label = QLabel(self.tr("Brim"))
         self.brim_label.setObjectName('brim_label')
         self.brim_label.setToolTip(self.brim_tooltip)
-        self.brimCheckBox = QtGui.QCheckBox("")
+        self.brimCheckBox = QCheckBox("")
         self.brimCheckBox.setObjectName('brimCheckBox')
         self.brimCheckBox.setToolTip(self.brim_tooltip)
 
         #multimaterial settings
-        self.materials_settings_l = QtGui.QLabel(self.tr("Material Settings"))
+        self.materials_settings_l = QLabel(self.tr("Material Settings"))
         self.materials_settings_l.setObjectName("materials_settings_l")
 
-        self.extruder1_l = QtGui.QLabel(self.tr("Extruder 1"))
+        self.extruder1_l = QLabel(self.tr("Extruder 1"))
         self.extruder1_l.setObjectName("extruder1_l")
-        self.extruder1_c = QtGui.QComboBox()
+        self.extruder1_c = QComboBox()
         self.extruder1_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder1_c.setCurrentIndex(first)
         self.extruder1_c.setObjectName("extruder1_c")
 
-        self.extruder2_l = QtGui.QLabel(self.tr("Extruder 2"))
+        self.extruder2_l = QLabel(self.tr("Extruder 2"))
         self.extruder2_l.setObjectName("extruder2_l")
-        self.extruder2_c = QtGui.QComboBox()
+        self.extruder2_c = QComboBox()
         self.extruder2_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder2_c.setCurrentIndex(first)
         self.extruder2_c.setObjectName("extruder2_c")
 
-        self.extruder3_l = QtGui.QLabel(self.tr("Extruder 3"))
+        self.extruder3_l = QLabel(self.tr("Extruder 3"))
         self.extruder3_l.setObjectName("extruder3_l")
-        self.extruder3_c = QtGui.QComboBox()
+        self.extruder3_c = QComboBox()
         self.extruder3_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder3_c.setCurrentIndex(first)
         self.extruder3_c.setObjectName("extruder3_c")
 
-        self.extruder4_l = QtGui.QLabel(self.tr("Extruder 4"))
+        self.extruder4_l = QLabel(self.tr("Extruder 4"))
         self.extruder4_l.setObjectName("extruder4_l")
-        self.extruder4_c = QtGui.QComboBox()
+        self.extruder4_c = QComboBox()
         self.extruder4_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder4_c.setCurrentIndex(first)
         self.extruder4_c.setObjectName("extruder4_c")
         # multimaterial settings
 
-        self.object_group_box = QtGui.QGroupBox(self.tr("Object settings"))
+        self.object_group_box = QGroupBox(self.tr("Object settings"))
         self.object_group_box.setObjectName('object_group_box')
         self.object_group_box.setLayout(self.create_object_settings_layout())
         self.object_group_box.setEnabled(False)
 
-        self.object_variable_layer_box = QtGui.QGroupBox(self.tr("Object advance settings"))
+        self.object_variable_layer_box = QGroupBox(self.tr("Object advance settings"))
         self.object_variable_layer_box.setObjectName('object_variable_layer_box')
         self.object_variable_layer_box.setLayout(self.create_object_advance_settings_layout())
         self.object_variable_layer_box.setVisible(False)
 
-        self.gcode_group_box = QtGui.QGroupBox(self.tr("Overview"))
+        self.gcode_group_box = QGroupBox(self.tr("Overview"))
         self.gcode_group_box.setObjectName('gcode_group_box')
         self.gcode_group_box.setLayout(self.create_gcode_view_layout())
         self.gcode_group_box.setVisible(False)
 
-        self.progressBar = QtGui.QProgressBar()
+        self.progressBar = QProgressBar()
         self.progressBar.setObjectName('progressBar')
         self.progressBar.setMinimum(0)
         self.progressBar.setMaximum(100)
@@ -1231,7 +1237,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.progressBar.setAlignment(Qt.AlignCenter)
         #self.progressBar.setFormat("Generovani GCodu %p%")
 
-        self.generateButton = QtGui.QPushButton(self.tr("Generate"))
+        self.generateButton = QPushButton(self.tr("Generate"))
         self.generateButton.setObjectName('generateButton')
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
         self.generateButton.setEnabled(False)
@@ -1239,7 +1245,7 @@ class PrusaControlView(QtGui.QMainWindow):
 
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
-        printing_parameters_layout = QtGui.QGridLayout()
+        printing_parameters_layout = QGridLayout()
         #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
         printing_parameters_layout.addWidget(self.materials_settings_l, 0, 0, 1, 3)
@@ -1276,7 +1282,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.right_panel_layout.addWidget(self.generateButton)
         self.right_panel_layout.addWidget(self.progressBar)
         self.right_panel_layout.addWidget(self.gcode_back_b)
-        self.right_panel_layout.addSpacerItem(QtGui.QSpacerItem(0, 5, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum))
+        self.right_panel_layout.addSpacerItem(QSpacerItem(0, 5, QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.right_panel.setLayout(self.right_panel_layout)
         self.right_panel.setFixedWidth(250)
@@ -1287,7 +1293,7 @@ class PrusaControlView(QtGui.QMainWindow):
         self.gcode_label.setMaximumWidth(40)
         self.gcode_label.setAlignment(Qt.AlignCenter)
 
-        mainLayout = QtGui.QHBoxLayout()
+        mainLayout = QHBoxLayout()
         mainLayout.setSpacing(0)
         mainLayout.setMargin(0)
         #mainLayout.setContentsMargins(0, 0, 0, 0)
@@ -1489,6 +1495,10 @@ class PrusaControlView(QtGui.QMainWindow):
     def set_cancel_button(self):
         self.generateButton.setText(self.tr("Cancel"))
         self.generateButton.setToolTip(self.tr("Cancel of generating gcode file"))
+
+    def set_cancel_saving_gcode_button(self):
+        self.generateButton.setText(self.tr("Cancel"))
+        self.generateButton.setToolTip(self.tr("Cancel of saving gcode file"))
 
     def set_generate_button(self):
         self.generateButton.setText(self.tr("Generate"))
@@ -1936,6 +1946,11 @@ class PrusaControlView(QtGui.QMainWindow):
 
         return gcode_view_layout
 
+    def saving_gcode(self):
+        self.set_cancel_saving_gcode_button()
+        self.progressBar.setVisible(True)
+        self.gcode_back_b.setVisible(False)
+
     #TODO:Debug new design
     def open_gcode_view(self):
         self.set_save_gcode_button()
@@ -2177,7 +2192,7 @@ class PrusaControlView(QtGui.QMainWindow):
         slider.setTickPosition(QtGui.QSlider.TicksRight)
 
         if base_class == Gcode_slider:
-            self.connect(slider.slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
+            self.connect(slider.slider, SIGNAL("valueChanged(int)"), setterSlot)
         else:
-            self.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
+            self.connect(slider, SIGNAL("valueChanged(int)"), setterSlot)
         return slider
