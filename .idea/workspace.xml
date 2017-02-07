@@ -1,45 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="nove gui prvky, disable of">
+    <list default="true" id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="some changes for manual">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/combobox_light.css" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/shaders/f.frag" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/shaders/v.vert" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/shaders/variable_height.frag" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/shaders/variable_height.vert" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/shaders/variable_height_slic3r.vert" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/BackArrow_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/BackArrow_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/BackArrow_Off.png" afterPath="$PROJECT_DIR$/data/img/gui/BackArrow_Off.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/BackArrow_On.png" afterPath="$PROJECT_DIR$/data/img/gui/BackArrow_On.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/ForwardArrow_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/ForwardArrow_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/ForwardArrow_Off.png" afterPath="$PROJECT_DIR$/data/img/gui/ForwardArrow_Off.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/ForwardArrow_On.png" afterPath="$PROJECT_DIR$/data/img/gui/ForwardArrow_On.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Multi_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/Multi_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Multi_OFF.png" afterPath="$PROJECT_DIR$/data/img/gui/Multi_OFF.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Multi_ON.png" afterPath="$PROJECT_DIR$/data/img/gui/Multi_ON.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Organize_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/Organize_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Organize_Off.png" afterPath="$PROJECT_DIR$/data/img/gui/Organize_Off.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Organize_On.png" afterPath="$PROJECT_DIR$/data/img/gui/Organize_On.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/PlaceOnFace_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/PlaceOnFace_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/PlaceOnFace_Off.png" afterPath="$PROJECT_DIR$/data/img/gui/PlaceOnFace_Off.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/PlaceOnFace_On.png" afterPath="$PROJECT_DIR$/data/img/gui/PlaceOnFace_On.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Rotate_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/Rotate_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Rotate_Off.png" afterPath="$PROJECT_DIR$/data/img/gui/Rotate_Off.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Rotate_On.png" afterPath="$PROJECT_DIR$/data/img/gui/Rotate_On.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Scale_Hover.png" afterPath="$PROJECT_DIR$/data/img/gui/Scale_Hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Scale_Off.png" afterPath="$PROJECT_DIR$/data/img/gui/Scale_Off.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/Scale_On.png" afterPath="$PROJECT_DIR$/data/img/gui/Scale_On.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/new/Back_Arrow_ON.png" afterPath="$PROJECT_DIR$/data/img/new/Back_Arrow_ON.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/new/Place_on_Face_ON.png" afterPath="$PROJECT_DIR$/data/img/new/Place_on_Face_ON.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/new/Rotate_ON.png" afterPath="$PROJECT_DIR$/data/img/new/Rotate_ON.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/new/Scale_ON.png" afterPath="$PROJECT_DIR$/data/img/new/Scale_ON.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/PrusaControll.iml" afterPath="$PROJECT_DIR$/.idea/PrusaControll.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Back_Arrow_Background.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Back_Arrow_OFF.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Back_Arrow_ON.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Front_Arrow_Background.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Front_Arrow_OFF.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Front_Arrow_ON.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Place_on_Face_Background.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Place_on_Face_OFF.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Place_on_Face_ON.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Rotate_Background.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Rotate_OFF.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Rotate_ON.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Scale_Background.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Scale_OFF.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/img/new/Scale_ON.png" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller.py" afterPath="$PROJECT_DIR$/controller.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/shaders/lightning.frag" afterPath="$PROJECT_DIR$/data/shaders/lightning.frag" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/shaders/lightning.vert" afterPath="$PROJECT_DIR$/data/shaders/lightning.vert" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/my_stylesheet.css" afterPath="$PROJECT_DIR$/data/my_stylesheet.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui.py" afterPath="$PROJECT_DIR$/gui.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sceneData.py" afterPath="$PROJECT_DIR$/sceneData.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sceneRender.py" afterPath="$PROJECT_DIR$/sceneRender.py" />
@@ -56,21 +41,21 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/prusacontrol_new$jehlan_test.coverage" NAME="jehlan_test Coverage Results" MODIFIED="1481806431467" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$cone_test.coverage" NAME="cone_test Coverage Results" MODIFIED="1483967222293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$big_gcode_test.coverage" NAME="big_gcode_test Coverage Results" MODIFIED="1484655139725" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$cone_test.coverage" NAME="cone_test Coverage Results" MODIFIED="1485443317431" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$jehlan_test.coverage" NAME="jehlan_test Coverage Results" MODIFIED="1486480680233" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$big_gcode_test.coverage" NAME="big_gcode_test Coverage Results" MODIFIED="1486464554677" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$test_configuration_2.coverage" NAME="cone_test Coverage Results" MODIFIED="1479489936792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$test_configuration.coverage" NAME="test_configuration Coverage Results" MODIFIED="1479316817692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$gcode_test.coverage" NAME="gcode_test Coverage Results" MODIFIED="1484234398682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$benchy_test.coverage" NAME="benchy_test Coverage Results" MODIFIED="1484750294708" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$benchy_mega_test.coverage" NAME="benchy_mega_test Coverage Results" MODIFIED="1484217059151" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$init.coverage" NAME="init Coverage Results" MODIFIED="1482423385846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$benchy_test.coverage" NAME="benchy_test Coverage Results" MODIFIED="1486140566761" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$benchy_mega_test.coverage" NAME="benchy_mega_test Coverage Results" MODIFIED="1486401825533" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$init.coverage" NAME="init Coverage Results" MODIFIED="1486140979481" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PrusaControll$Unittests_in_PrusaControll.coverage" NAME="Unittests in PrusaControll Coverage Results" MODIFIED="1458295271918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$cube_test.coverage" NAME="cube_test Coverage Results" MODIFIED="1484654268335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$main.coverage" NAME="main Coverage Results" MODIFIED="1485181371230" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$cubes_test.coverage" NAME="cubes_test Coverage Results" MODIFIED="1485177152470" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$cube_gcode_test.coverage" NAME="cube_gcode_test Coverage Results" MODIFIED="1484236132537" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$anubis.coverage" NAME="anubis Coverage Results" MODIFIED="1485190721974" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$cube_test.coverage" NAME="cube_test Coverage Results" MODIFIED="1486471129303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$main.coverage" NAME="main Coverage Results" MODIFIED="1486477845260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$cubes_test.coverage" NAME="cubes_test Coverage Results" MODIFIED="1486391317558" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$cube_gcode_test.coverage" NAME="cube_gcode_test Coverage Results" MODIFIED="1485883895709" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$anubis.coverage" NAME="anubis Coverage Results" MODIFIED="1486402941171" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -88,44 +73,51 @@
     <favorites_list name="PrusaControll" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.4769071">
+    <splitter split-orientation="horizontal" split-proportion="0.516428">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="controller.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/controller.py">
+          <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/main.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="428">
-                  <caret line="273" column="0" selection-start-line="273" selection-start-column="0" selection-end-line="273" selection-end-column="0" />
+                <state relative-caret-position="323">
+                  <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
                   <folding>
-                    <element signature="e#24#35#0" expanded="true" />
-                    <marker date="1485188146191" expanded="true" signature="43474:45005" ph="..." />
-                    <marker date="1485188146191" expanded="true" signature="44756:45005" ph="..." />
-                    <marker date="1485188146191" expanded="true" signature="45775:52010" ph="..." />
+                    <element signature="e#46#59#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="gui.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/gui.py">
+          <file leaf-file-name="controller.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/controller.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="462">
-                  <caret line="1062" column="122" selection-start-line="1062" selection-start-column="97" selection-end-line="1062" selection-end-column="122" />
+                <state relative-caret-position="102">
+                  <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
                   <folding>
-                    <element signature="e#577#6520#0" expanded="false" />
-                    <element signature="e#3458#4591#0" expanded="false" />
-                    <element signature="e#4637#4781#0" expanded="false" />
-                    <element signature="e#4829#5576#0" expanded="false" />
-                    <element signature="e#5630#5772#0" expanded="false" />
-                    <element signature="e#5817#5848#0" expanded="false" />
-                    <element signature="e#5891#5920#0" expanded="false" />
-                    <element signature="e#5967#6000#0" expanded="false" />
-                    <element signature="e#6041#6122#0" expanded="false" />
-                    <element signature="e#6173#6210#0" expanded="false" />
-                    <element signature="e#23050#24576#0" expanded="false" />
-                    <element signature="e#24611#26483#0" expanded="false" />
-                    <element signature="e#26524#27847#0" expanded="false" />
+                    <marker date="1486480353468" expanded="true" signature="45371:46902" ph="..." />
+                    <marker date="1486480353468" expanded="true" signature="46653:46902" ph="..." />
+                    <marker date="1486480353468" expanded="true" signature="47697:54549" ph="..." />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="slicer.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/slicer.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="412">
+                  <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="gcode.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/gcode.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="510">
+                  <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -133,59 +125,25 @@
           <file leaf-file-name="sceneData.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sceneData.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="323">
-                  <caret line="387" column="21" selection-start-line="387" selection-start-column="13" selection-end-line="387" selection-end-column="21" />
-                  <folding />
+                <state relative-caret-position="765">
+                  <caret line="66" column="36" selection-start-line="66" selection-start-column="36" selection-end-line="66" selection-end-column="36" />
+                  <folding>
+                    <element signature="e#24#38#0" expanded="true" />
+                    <marker date="1486476584608" expanded="true" signature="22349:22624" ph="..." />
+                  </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="sceneRender.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="sceneRender.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sceneRender.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="207">
-                  <caret line="233" column="30" selection-start-line="233" selection-start-column="30" selection-end-line="233" selection-end-column="30" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="variable_height.vert" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/variable_height.vert">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="34">
-                  <caret line="2" column="21" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="21" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="variable_height.frag" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/variable_height.frag">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="102">
-                  <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="variable_height_slic3r.vert" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.vert">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="272">
-                  <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="variable_height_slic3r.frag" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="272">
-                  <caret line="18" column="7" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="7" />
-                  <folding />
+                <state relative-caret-position="9707">
+                  <caret line="578" column="0" selection-start-line="578" selection-start-column="0" selection-end-line="578" selection-end-column="0" />
+                  <folding>
+                    <marker date="1486478548190" expanded="true" signature="21020:21191" ph="'''...'''" />
+                    <marker date="1486478548190" expanded="true" signature="30381:31273" ph="'''...'''" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -197,66 +155,60 @@
           <file leaf-file-name="controller.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/controller.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="307">
-                  <caret line="173" column="52" selection-start-line="173" selection-start-column="52" selection-end-line="173" selection-end-column="52" />
+                <state relative-caret-position="684">
+                  <caret line="329" column="24" selection-start-line="329" selection-start-column="24" selection-end-line="329" selection-end-column="24" />
                   <folding>
-                    <element signature="e#24#35#0" expanded="true" />
-                    <marker date="1485188146191" expanded="true" signature="43474:45005" ph="..." />
-                    <marker date="1485188146191" expanded="true" signature="44756:45005" ph="..." />
-                    <marker date="1485188146191" expanded="true" signature="45775:52010" ph="..." />
+                    <element signature="e#37#51#0" expanded="true" />
+                    <marker date="1486480353468" expanded="true" signature="45371:46902" ph="..." />
+                    <marker date="1486480353468" expanded="true" signature="46653:46902" ph="..." />
+                    <marker date="1486480353468" expanded="true" signature="47697:54549" ph="..." />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="lightning.vert" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/lightning.vert">
+          <file leaf-file-name="gcode.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/gcode.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="119">
-                  <caret line="7" column="1" selection-start-line="7" selection-start-column="1" selection-end-line="7" selection-end-column="1" />
+                <state relative-caret-position="153">
+                  <caret line="21" column="34" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="34" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="lightning.frag" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/lightning.frag">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="68">
-                  <caret line="4" column="29" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="variable_height_slic3r.vert" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.vert">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="289">
-                  <caret line="17" column="30" selection-start-line="17" selection-start-column="14" selection-end-line="17" selection-end-column="30" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="variable_height_slic3r.frag" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="731">
-                  <caret line="43" column="13" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="13" />
-                  <folding>
-                    <marker date="1485187062727" expanded="true" signature="664:1936" ph="{...}" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="sceneRender.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="sceneRender.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sceneRender.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="581">
-                  <caret line="411" column="124" selection-start-line="411" selection-start-column="102" selection-end-line="411" selection-end-column="124" />
+                <state relative-caret-position="691">
+                  <caret line="833" column="0" selection-start-line="833" selection-start-column="0" selection-end-line="833" selection-end-column="0" />
+                  <folding>
+                    <marker date="1486478548190" expanded="true" signature="21020:21191" ph="'''...'''" />
+                    <marker date="1486478548190" expanded="true" signature="30381:31273" ph="'''...'''" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="my_stylesheet.css" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/data/my_stylesheet.css">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="204">
+                  <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
                   <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="sceneData.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/sceneData.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="476">
+                  <caret line="658" column="0" selection-start-line="658" selection-start-column="0" selection-end-line="658" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#24#38#0" expanded="true" />
+                    <marker date="1486476584608" expanded="true" signature="22349:22624" ph="..." />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -264,21 +216,23 @@
           <file leaf-file-name="gui.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/gui.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="28050">
-                  <caret line="2087" column="41" selection-start-line="2087" selection-start-column="41" selection-end-line="2087" selection-end-column="41" />
+                <state relative-caret-position="374">
+                  <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
                   <folding>
-                    <element signature="e#3458#4591#0" expanded="false" />
-                    <element signature="e#4637#4781#0" expanded="false" />
-                    <element signature="e#5630#5772#0" expanded="false" />
-                    <element signature="e#5817#5848#0" expanded="false" />
-                    <element signature="e#5891#5920#0" expanded="false" />
-                    <element signature="e#5967#6000#0" expanded="false" />
-                    <element signature="e#6041#6122#0" expanded="false" />
-                    <element signature="e#6173#6210#0" expanded="false" />
-                    <element signature="e#6562#15599#0" expanded="false" />
-                    <element signature="e#23050#24576#0" expanded="false" />
-                    <element signature="e#24611#26483#0" expanded="false" />
-                    <element signature="e#26524#27847#0" expanded="false" />
+                    <element signature="e#24#38#0" expanded="true" />
+                    <element signature="e#3631#4764#0" expanded="false" />
+                    <element signature="e#4810#4954#0" expanded="false" />
+                    <element signature="e#5002#5749#0" expanded="false" />
+                    <element signature="e#5803#5945#0" expanded="false" />
+                    <element signature="e#5990#6021#0" expanded="false" />
+                    <element signature="e#6064#6093#0" expanded="false" />
+                    <element signature="e#6140#6173#0" expanded="false" />
+                    <element signature="e#6214#6295#0" expanded="false" />
+                    <element signature="e#6346#6383#0" expanded="false" />
+                    <element signature="e#16223#20045#0" expanded="false" />
+                    <element signature="e#20089#21603#0" expanded="false" />
+                    <element signature="e#21638#23486#0" expanded="false" />
+                    <element signature="e#23527#24838#0" expanded="false" />
                   </folding>
                 </state>
               </provider>
@@ -324,7 +278,6 @@
         <option value="$PROJECT_DIR$/data/printers.json" />
         <option value="$USER_HOME$/.prusacontrol/materials_i3_mk2.json" />
         <option value="$PROJECT_DIR$/data/materials_i3_mk2.json" />
-        <option value="$PROJECT_DIR$/projectFile.py" />
         <option value="$PROJECT_DIR$/.gcode" />
         <option value="$PROJECT_DIR$/data/shader.vert" />
         <option value="$PROJECT_DIR$/data/shader.frag" />
@@ -332,26 +285,27 @@
         <option value="$PROJECT_DIR$/data/lightning.frag" />
         <option value="$PROJECT_DIR$/data/defaults.cfg" />
         <option value="$PROJECT_DIR$/glButton.py" />
-        <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/slicer.py" />
-        <option value="$PROJECT_DIR$/gcode.py" />
         <option value="$PROJECT_DIR$/parameters.py" />
         <option value="$PROJECT_DIR$/data/combobox_light.css" />
         <option value="$PROJECT_DIR$/data/variable_height.vert" />
         <option value="$PROJECT_DIR$/data/variable_height.frag" />
         <option value="$PROJECT_DIR$/data/shaders/v.vert" />
         <option value="$PROJECT_DIR$/data/shaders/f.frag" />
-        <option value="$PROJECT_DIR$/data/my_stylesheet.css" />
         <option value="$PROJECT_DIR$/data/shaders/lightning.frag" />
         <option value="$PROJECT_DIR$/data/shaders/lightning.vert" />
         <option value="$PROJECT_DIR$/data/shaders/variable_height.vert" />
         <option value="$PROJECT_DIR$/data/shaders/variable_height.frag" />
-        <option value="$PROJECT_DIR$/sceneData.py" />
-        <option value="$PROJECT_DIR$/gui.py" />
         <option value="$PROJECT_DIR$/data/shaders/variable_height_slic3r.vert" />
         <option value="$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag" />
-        <option value="$PROJECT_DIR$/controller.py" />
+        <option value="$PROJECT_DIR$/projectFile.py" />
+        <option value="$PROJECT_DIR$/slicer.py" />
+        <option value="$PROJECT_DIR$/gcode.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/sceneData.py" />
+        <option value="$PROJECT_DIR$/gui.py" />
         <option value="$PROJECT_DIR$/sceneRender.py" />
+        <option value="$PROJECT_DIR$/controller.py" />
+        <option value="$PROJECT_DIR$/data/my_stylesheet.css" />
       </list>
     </option>
   </component>
@@ -392,6 +346,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -425,49 +380,30 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="prusacontrol_new" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="prusacontrol_new" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="shaders" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../anubis.stl" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/prusacontrol.profile" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\projects\prusacontrol_new\data\shaders" />
+      <recent name="C:\projects\prusacontrol_new\data\new_parameters" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\projects\prusacontrol_new\data\shaders" />
       <recent name="C:\projects\prusacontrol_new\data" />
       <recent name="$PROJECT_DIR$" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\projects\prusacontrol_new\data\shaders" />
-      <recent name="C:\projects\prusacontrol_new\data\new_parameters" />
-    </key>
   </component>
-  <component name="RunManager" selected="Python.anubis">
+  <component name="RunManager" selected="Python.jehlan_test">
     <configuration default="false" name="Unittests in PrusaControll" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -1174,7 +1110,84 @@
       <option name="project" value="LOCAL" />
       <updated>1484931301762</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="uz funguje cursor v shaderu u nastaveni variabilni vysky, jeste je potreba rozchodit vizualizaci ruzneho detailu pomoci barev a car">
+      <created>1485191287454</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1485191287454</updated>
+    </task>
+    <task id="LOCAL-00034" summary="nove ikonky do GUI">
+      <created>1485250401427</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1485250401427</updated>
+    </task>
+    <task id="LOCAL-00035" summary="uprava GUI pro multimaterial je hotova">
+      <created>1485251736505</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1485251736505</updated>
+    </task>
+    <task id="LOCAL-00036" summary="predelavani vypoctu pro rucni supporty">
+      <created>1485441063683</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1485441063683</updated>
+    </task>
+    <task id="LOCAL-00037" summary="plno uprav">
+      <created>1485774846470</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1485774846470</updated>
+    </task>
+    <task id="LOCAL-00038" summary="dost uprav v gcode preview a hlavne v jeho nacitani-uz zadne diry ve vrstvach a hlavne zobrazeni uz neni pomoci car ale pomoci triangle stripu ktere ty cary kresli&#10;Jeste je potreba dodelat color change!!!">
+      <created>1485884215011</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1485884215011</updated>
+    </task>
+    <task id="LOCAL-00039" summary="pruhledna podlozka pri pohledu ze spodu">
+      <created>1485969834791</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1485969834791</updated>
+    </task>
+    <task id="LOCAL-00040" summary="some changes">
+      <created>1486137897395</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1486137897395</updated>
+    </task>
+    <task id="LOCAL-00041" summary="some changes for manual">
+      <created>1486137929256</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1486137929256</updated>
+    </task>
+    <task id="LOCAL-00042" summary="hruba oprava scalovani">
+      <created>1486140671430</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1486140671430</updated>
+    </task>
+    <task id="LOCAL-00043" summary="ukladani gcode souboru pres vlakno s progressbarem, jeste je potreba dodelat m600, uprava importu aby se zbytecne moc neimportovalo a nebylo tak pomale spousteni">
+      <created>1486403205123</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1486403205123</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1195,23 +1208,23 @@
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12470215" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12192216" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32864866" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32864866" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.4918919" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37821013" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286026" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32684824" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18347895" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40622568" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15488483" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7161572" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39823008" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39766538" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37579113" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
     </layout>
@@ -1223,18 +1236,18 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32864866" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286026" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32684824" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22041303" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40622568" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15488483" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7161572" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.10524225" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12192216" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.4918919" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37821013" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37579113" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39823008" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39766538" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -1249,17 +1262,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="funkcni gui prvek slideru pro gcode, spolu i se zobrazovanim vrstev(jeste je potreba doresit barvu zmen. vrstev). Neni tam jeste funkcionalita pridavajici do gcodu tyto zmeny." />
-    <MESSAGE value="nove verze gui prvku, upravy v layoutu prave listy, uprava nacitani gcodu a jeho vizualizace-je ale jeste potreba na tom zapracovat" />
-    <MESSAGE value="Doplnen jednoduchy vypocet delky tisku, opraveno nacitani gcodu(ale jeste je problem se z-hopem), priprava na scale tool helper." />
-    <MESSAGE value="plno drobnustek, informacni a warning widget je jiz funkcni" />
-    <MESSAGE value="zapomenuty gui obrazek" />
-    <MESSAGE value="predelavani scale a rotate mouse controller casti, jeste neni hotovo" />
-    <MESSAGE value="Oprava scale a rotate toolu, jeste je tam chyba s prace s celym objektem ale tool helpery jiz funguji jak maji." />
-    <MESSAGE value="po vygenerovani gcodu zobrazovat druhou vrstvu, apply and cancel refactoring, scale and rotate" />
-    <MESSAGE value="oprava osvetleni, pridani nejakych zakladnich shaderu, automaticke pojmenovavani gcodu na ulozeni, kopirovani objektu s offsetem, opraven error s automatickym umistovanim nakopirovanych objektu" />
-    <MESSAGE value="plno drobnosti" />
-    <MESSAGE value="opraveno undo/do, chytani rotate a scale helperu" />
     <MESSAGE value="royfungovani placeonface ale jeste ma sve chyby, treba u 3dbanchy to dost trva" />
     <MESSAGE value="moznost vybrat vice souboru najednou, tooltips na tools, one instance only, klavesove zkratky" />
     <MESSAGE value="Plno drobnych uprav pro beta release." />
@@ -1274,7 +1276,18 @@
     <MESSAGE value="nove gui prvky, novy tool a podobne" />
     <MESSAGE value="dost velky posun s GUI variabilni vysky vrstvy, jeste je ale potreba dotahnout nejake detaily..." />
     <MESSAGE value="zakladni verze GUI pro variabilni vysku tak aby to bylo pouzitelne" />
-    <option name="LAST_COMMIT_MESSAGE" value="zakladni verze GUI pro variabilni vysku tak aby to bylo pouzitelne" />
+    <MESSAGE value="uz funguje cursor v shaderu u nastaveni variabilni vysky, jeste je potreba rozchodit vizualizaci ruzneho detailu pomoci barev a car" />
+    <MESSAGE value="nove ikonky do GUI" />
+    <MESSAGE value="uprava GUI pro multimaterial je hotova" />
+    <MESSAGE value="predelavani vypoctu pro rucni supporty" />
+    <MESSAGE value="plno uprav" />
+    <MESSAGE value="dost uprav v gcode preview a hlavne v jeho nacitani-uz zadne diry ve vrstvach a hlavne zobrazeni uz neni pomoci car ale pomoci triangle stripu ktere ty cary kresli&#10;Jeste je potreba dodelat color change!!!" />
+    <MESSAGE value="pruhledna podlozka pri pohledu ze spodu" />
+    <MESSAGE value="some changes" />
+    <MESSAGE value="some changes for manual" />
+    <MESSAGE value="hruba oprava scalovani" />
+    <MESSAGE value="ukladani gcode souboru pres vlakno s progressbarem, jeste je potreba dodelat m600, uprava importu aby se zbytecne moc neimportovalo a nebylo tak pomale spousteni" />
+    <option name="LAST_COMMIT_MESSAGE" value="ukladani gcode souboru pres vlakno s progressbarem, jeste je potreba dodelat m600, uprava importu aby se zbytecne moc neimportovalo a nebylo tak pomale spousteni" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1283,7 +1296,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/.PyCharm2016.1/system/python_stubs/-1685156371/PyQt4/QtGui/QLayout.py" />
     <entry file="file://$USER_HOME$/.PyCharm2016.1/system/python_stubs/-1685156371/PyQt4/QtGui/QBoxLayout.py" />
     <entry file="file://$USER_HOME$/.PyCharm2016.1/system/python_stubs/-1685156371/PyQt4/QtGui/QGridLayout.py" />
     <entry file="file://$USER_HOME$/.PyCharm2016.1/system/python_stubs/-1685156371/PyQt4/QtCore/QObject.py" />
@@ -1364,13 +1376,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/projectFile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1088">
-          <caret line="78" column="43" selection-start-line="78" selection-start-column="43" selection-end-line="78" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/dev/Python/Python27/Lib/site-packages/stl/stl.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -1434,20 +1439,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="37" column="5" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/slicer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1122">
-          <caret line="79" column="63" selection-start-line="79" selection-start-column="63" selection-end-line="79" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/combobox_light.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
@@ -1455,29 +1446,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gcode.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3842">
-          <caret line="238" column="41" selection-start-line="238" selection-start-column="41" selection-end-line="238" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/parameters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="631">
-          <caret line="73" column="49" selection-start-line="73" selection-start-column="37" selection-end-line="73" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/shaders/lightning1.vert" />
     <entry file="file://$PROJECT_DIR$/data/shaders/lightning1.frag" />
-    <entry file="file://$PROJECT_DIR$/data/my_stylesheet.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="402">
-          <caret line="383" column="29" selection-start-line="383" selection-start-column="29" selection-end-line="383" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/shaders/v.vert">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="799">
@@ -1492,103 +1462,158 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/shaders/lightning.vert">
+    <entry file="file://$PROJECT_DIR$/data/shaders/variable_height.vert">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="1" selection-start-line="7" selection-start-column="1" selection-end-line="7" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/shaders/lightning.frag">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="29" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
-          <folding />
+        <state relative-caret-position="170">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/shaders/variable_height.frag">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+        <state relative-caret-position="187">
+          <caret line="11" column="72" selection-start-line="11" selection-start-column="72" selection-end-line="11" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="39" column="80" selection-start-line="39" selection-start-column="80" selection-end-line="39" selection-end-column="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parameters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="73" column="49" selection-start-line="73" selection-start-column="37" selection-end-line="73" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/projectFile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="477">
+          <caret line="110" column="45" selection-start-line="110" selection-start-column="45" selection-end-line="110" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/shaders/lightning.frag">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="32" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/shaders/lightning.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="42" selection-start-line="13" selection-start-column="42" selection-end-line="13" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2016.2/system/python_stubs/-1685156371/PyQt4/QtOpenGL.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="1418" column="8" selection-start-line="1418" selection-start-column="8" selection-end-line="1418" selection-end-column="8" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/shaders/variable_height.vert">
+    <entry file="file://$PROJECT_DIR$/gcode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="21" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="21" />
+        <state relative-caret-position="510">
+          <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/slicer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sceneData.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="387" column="21" selection-start-line="387" selection-start-column="13" selection-end-line="387" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.vert">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="30" selection-start-line="17" selection-start-column="14" selection-end-line="17" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="43" column="13" selection-start-line="43" selection-start-column="13" selection-end-line="43" selection-end-column="13" />
+        <state relative-caret-position="765">
+          <caret line="66" column="36" selection-start-line="66" selection-start-column="36" selection-end-line="66" selection-end-column="36" />
           <folding>
-            <marker date="1485187062727" expanded="true" signature="664:1936" ph="{...}" />
+            <element signature="e#24#38#0" expanded="true" />
+            <marker date="1486476584608" expanded="true" signature="22349:22624" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+          <folding>
+            <element signature="e#46#59#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="28050">
-          <caret line="2087" column="41" selection-start-line="2087" selection-start-column="41" selection-end-line="2087" selection-end-column="41" />
+        <state relative-caret-position="374">
+          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding>
-            <element signature="e#3458#4591#0" expanded="false" />
-            <element signature="e#4637#4781#0" expanded="false" />
-            <element signature="e#5630#5772#0" expanded="false" />
-            <element signature="e#5817#5848#0" expanded="false" />
-            <element signature="e#5891#5920#0" expanded="false" />
-            <element signature="e#5967#6000#0" expanded="false" />
-            <element signature="e#6041#6122#0" expanded="false" />
-            <element signature="e#6173#6210#0" expanded="false" />
-            <element signature="e#6562#15599#0" expanded="false" />
-            <element signature="e#23050#24576#0" expanded="false" />
-            <element signature="e#24611#26483#0" expanded="false" />
-            <element signature="e#26524#27847#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="307">
-          <caret line="173" column="52" selection-start-line="173" selection-start-column="52" selection-end-line="173" selection-end-column="52" />
-          <folding>
-            <element signature="e#24#35#0" expanded="true" />
-            <marker date="1485188146191" expanded="true" signature="43474:45005" ph="..." />
-            <marker date="1485188146191" expanded="true" signature="44756:45005" ph="..." />
-            <marker date="1485188146191" expanded="true" signature="45775:52010" ph="..." />
+            <element signature="e#24#38#0" expanded="true" />
+            <element signature="e#3631#4764#0" expanded="false" />
+            <element signature="e#4810#4954#0" expanded="false" />
+            <element signature="e#5002#5749#0" expanded="false" />
+            <element signature="e#5803#5945#0" expanded="false" />
+            <element signature="e#5990#6021#0" expanded="false" />
+            <element signature="e#6064#6093#0" expanded="false" />
+            <element signature="e#6140#6173#0" expanded="false" />
+            <element signature="e#6214#6295#0" expanded="false" />
+            <element signature="e#6346#6383#0" expanded="false" />
+            <element signature="e#16223#20045#0" expanded="false" />
+            <element signature="e#20089#21603#0" expanded="false" />
+            <element signature="e#21638#23486#0" expanded="false" />
+            <element signature="e#23527#24838#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sceneRender.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="581">
-          <caret line="411" column="124" selection-start-line="411" selection-start-column="102" selection-end-line="411" selection-end-column="124" />
+        <state relative-caret-position="9707">
+          <caret line="578" column="0" selection-start-line="578" selection-start-column="0" selection-end-line="578" selection-end-column="0" />
+          <folding>
+            <marker date="1486478548190" expanded="true" signature="21020:21191" ph="'''...'''" />
+            <marker date="1486478548190" expanded="true" signature="30381:31273" ph="'''...'''" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/my_stylesheet.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding>
+            <marker date="1486480353468" expanded="true" signature="45371:46902" ph="..." />
+            <marker date="1486480353468" expanded="true" signature="46653:46902" ph="..." />
+            <marker date="1486480353468" expanded="true" signature="47697:54549" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

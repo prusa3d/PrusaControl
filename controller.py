@@ -51,6 +51,9 @@ class Controller:
     def __init__(self, app, local_path=''):
         logging.info('Local path: ' + local_path)
 
+        #this flag is only for development only, Development = True, Production = False
+        self.development_flag = False
+
         self.app_config = AppParameters(self, local_path)
         self.printing_parameters = PrintingParameters(self.app_config)
 
@@ -167,7 +170,7 @@ class Controller:
 
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
-        if self.printer_number_of_materials > 1:
+        if self.printer_number_of_materials > 1 and self.development_flag:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
         else:
             self.view.set_multimaterial_gui_off()
@@ -398,6 +401,7 @@ class Controller:
         self.view.close_gcode_view()
 
     def open_gcode_gui(self):
+        self.view.disable_editing()
         self.view.open_gcode_view()
 
     def close_gcode_gui(self):
@@ -806,7 +810,7 @@ class Controller:
 
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
-        if self.printer_number_of_materials>1:
+        if self.printer_number_of_materials>1 and self.development_flag:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
         else:
             self.view.set_multimaterial_gui_off()

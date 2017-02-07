@@ -540,7 +540,7 @@ class Model(object):
         self.filename = ""
         self.normalization_flag = False
 
-        self.recalculate_texture()
+        #self.recalculate_texture()
 
 
     def __deepcopy__(self, memodict={}):

@@ -496,7 +496,7 @@ class GLWidget(QGLWidget):
 
         glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
 
-        print("Camera position and Zoom and X Angle: " + str(self.camera_position[2]) + ';' + str(self.zoom) + ';' + str(self.xRot))
+        #print("Camera position and Zoom and X Angle: " + str(self.camera_position[2]) + ';' + str(self.zoom) + ';' + str(self.xRot))
 
         if self.xRot >= 0.:
             glDisable(GL_BLEND)
@@ -574,6 +574,7 @@ class GLWidget(QGLWidget):
             color = [13, 82, 78]
             for color_change in color_change_list:
                 self.draw_layer(color_change, color, printer)
+
                 #Add text note for ColorChange
 
 
@@ -819,6 +820,7 @@ class GLWidget(QGLWidget):
                 color = [ 255,158, 60]
             elif 'E-p' in p[2]:
                 color = [247, 108, 49]
+
             if 'E' in p[2]:
                 glColor3ub(color[0], color[1], color[2])
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
