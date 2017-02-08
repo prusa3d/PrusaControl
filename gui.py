@@ -917,6 +917,7 @@ class PrusaControlView(QMainWindow):
         self.place_on_zero.setObjectName("place_on_zero")
         self.place_on_zero.setToolTip(self.tr("Automatic placing of models\n on printing bed in Z axis"))
         #self.place_on_zero.setLayoutDirection(Qt.RightToLeft)
+        self.place_on_zero.stateChanged.connect(self.place_on_zero_changed)
 
         self.x_pos_l = QLabel('X')
         self.x_pos_l.setAlignment(Qt.AlignRight)
@@ -954,7 +955,7 @@ class PrusaControlView(QMainWindow):
         self.lock_scale_axes_l = QLabel(self.tr("Lock axes"))
         self.lock_scale_axes_l.setAlignment(Qt.AlignRight)
         self.lock_scale_axes_l.setObjectName("lock_scale_axes_l")
-        self.place_on_zero_l = QLabel(self.tr("Place on bad"))
+        self.place_on_zero_l = QLabel(self.tr("Place on bed"))
         self.place_on_zero_l.setObjectName("place_on_zero_l")
 
         self.advance_settings_b = QPushButton(self.tr("Advance Settings"))
@@ -1342,6 +1343,15 @@ class PrusaControlView(QMainWindow):
 
         return False
 
+    def place_on_zero_changed(self):
+        if self.place_on_zero.isChecked():
+            self.edit_pos_z.setDisabled(True)
+            model = self.controller.get_object_by_id(self.object_id)
+            model.place_on_zero()
+            self.update_position_widgets(self.object_id)
+            self.update_scene()
+        else:
+            self.edit_pos_z.setDisabled(False)
 
 
     def eventFilter(self, source, event):
@@ -1467,7 +1477,10 @@ class PrusaControlView(QMainWindow):
 
         self.edit_pos_z.setDisabled(True)
         self.edit_pos_z.setValue(mesh.pos[2] * 10)
-        self.edit_pos_z.setDisabled(False)
+        if self.place_on_zero.isChecked():
+            self.edit_pos_z.setDisabled(True)
+        else:
+            self.edit_pos_z.setDisabled(False)
 
 
     def update_rotate_widgets(self, object_id):
@@ -1534,7 +1547,8 @@ class PrusaControlView(QMainWindow):
 
         self.edit_pos_z.setDisabled(True)
         self.edit_pos_z.setValue(mesh.pos[2]*10)
-        self.edit_pos_z.setDisabled(False)
+        #default is disabled, after unticked of place_on_zero is enabled
+        #self.edit_pos_z.setDisabled(False)
 
         self.edit_rot_x.setDisabled(True)
         self.edit_rot_x.setValue(np.rad2deg(mesh.rot[0]))
@@ -1761,6 +1775,7 @@ class PrusaControlView(QMainWindow):
         self.z_pos_l.setFixedHeight(22)
         object_settings_layout.addWidget(self.edit_pos_z, 4, 2)
         self.edit_pos_z.setFixedHeight(22)
+        self.edit_pos_z.setDisabled(True)
         #5
         object_settings_layout.addWidget(self.rotation_l, 6, 0)
         self.rotation_l.setFixedHeight(22)
