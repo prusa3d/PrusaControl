@@ -266,7 +266,7 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("data/img/background.png")
-        #self.test_img = self.texture_from_png("data/img/test_5.png")
+        self.catching_point = self.texture_from_png("data/img/gui/slider_knob.png")
 
 
         #tools
@@ -902,7 +902,7 @@ class GLWidget(QGLWidget):
         if self.rotateTool.is_pressed():
         #if settings['toolButtons']['rotateButton']:
             #self.draw_rotation_circle(model, rotateColors, [i + o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
-            self.draw_rotation_circle(model, rotateColors, model.pos, model.boundingSphereSize, picking)
+            self.draw_rotation_circle(model, rotateColors, model.pos, model.max_bs, picking)
         if self.scaleTool.is_pressed():
         #elif settings['toolButtons']['scaleButton']:
             self.draw_scale_rect(model, scaleColors, model.pos, model.boundingSphereSize, picking)
@@ -1055,8 +1055,8 @@ class GLWidget(QGLWidget):
         if radius < 2.5:
             radius = 2.5
 
-        r0 = radius-0.4
-        r1 = radius-0.05
+        r0 = radius * 0.35
+        r1 = radius * 0.7
         r2 = radius
         r3 = radius+0.05
         r4 = radius+0.15
@@ -1065,28 +1065,28 @@ class GLWidget(QGLWidget):
         r7 = radius+1.0
 
         if picking:
-            list_of_segnments_6 = numpy.arange(0., 360., 1.)
-            circle7 = [[numpy.cos(numpy.radians(i)) * r7, numpy.sin(numpy.radians(i)) * r7] for i in list_of_segnments_6]
+            list_of_segments_6 = numpy.arange(0., 360., 1.)
+            circle7 = numpy.array([[numpy.cos(numpy.radians(i)) * r7, numpy.sin(numpy.radians(i)) * r7] for i in list_of_segments_6])
         else:
             #calculete points for circle 0 and 1
-            list_of_segnments_0_1 = numpy.arange(0, 360., 360./16.)
-            circle0 = [[numpy.cos(numpy.radians(i)) * r0, numpy.sin(numpy.radians(i)) * r0] for i in list_of_segnments_0_1]
-            circle1 = [[numpy.cos(numpy.radians(i)) * r1, numpy.sin(numpy.radians(i)) * r1] for i in list_of_segnments_0_1]
+            list_of_segments_0_1 = numpy.arange(0, 360., 360./8.)
+            circle0 = numpy.array([[numpy.cos(numpy.radians(i)) * r0, numpy.sin(numpy.radians(i)) * r0] for i in list_of_segments_0_1])
+            circle1 = numpy.array([[numpy.cos(numpy.radians(i)) * r1, numpy.sin(numpy.radians(i)) * r1] for i in list_of_segments_0_1])
 
             # calculete points for circle 2
-            list_of_segnments_2 = numpy.arange(0, 360., 360. / segments)
-            circle2 = [[numpy.cos(numpy.radians(i)) * r2, numpy.sin(numpy.radians(i)) * r2] for i in list_of_segnments_2]
+            list_of_segments_2 = numpy.arange(0, 360., 360. / segments)
+            circle2 = numpy.array([[numpy.cos(numpy.radians(i)) * r2, numpy.sin(numpy.radians(i)) * r2] for i in list_of_segments_2])
 
             # calculete points for circle 3, 4 and 5
-            list_of_segnments_3_4_5 = numpy.arange(0, 360., 360. / 72.)
-            circle3 = [[numpy.cos(numpy.radians(i)) * r3, numpy.sin(numpy.radians(i)) * r3] for i in list_of_segnments_3_4_5]
-            circle4 = [[numpy.cos(numpy.radians(i)) * r4, numpy.sin(numpy.radians(i)) * r4] for i in list_of_segnments_3_4_5]
-            circle5 = [[numpy.cos(numpy.radians(i)) * r5, numpy.sin(numpy.radians(i)) * r5] for i in list_of_segnments_3_4_5]
+            list_of_segments_3_4_5 = numpy.arange(0, 360., 360. / 72.)
+            circle3 = numpy.array([[numpy.cos(numpy.radians(i)) * r3, numpy.sin(numpy.radians(i)) * r3] for i in list_of_segments_3_4_5])
+            circle4 = numpy.array([[numpy.cos(numpy.radians(i)) * r4, numpy.sin(numpy.radians(i)) * r4] for i in list_of_segments_3_4_5])
+            circle5 = numpy.array([[numpy.cos(numpy.radians(i)) * r5, numpy.sin(numpy.radians(i)) * r5] for i in list_of_segments_3_4_5])
 
-            # calculete points for circle 6
-            list_of_segnments_6 = numpy.arange(0., 360., 1.)
-            circle6 = [[numpy.cos(numpy.radians(i)) * r6, numpy.sin(numpy.radians(i)) * r6] for i in list_of_segnments_6]
-            circle7 = [[numpy.cos(numpy.radians(i)) * r7, numpy.sin(numpy.radians(i)) * r7] for i in list_of_segnments_6]
+        # calculete points for circle 6
+        list_of_segments_6 = numpy.arange(0., 360., 1.)
+        circle6 = numpy.array([[numpy.cos(numpy.radians(i)) * r6, numpy.sin(numpy.radians(i)) * r6] for i in list_of_segments_6])
+        circle7 = numpy.array([[numpy.cos(numpy.radians(i)) * r7, numpy.sin(numpy.radians(i)) * r7] for i in list_of_segments_6])
 
         glPushMatrix()
         glTranslatef(position[0], position[1], 0.0)
@@ -1094,18 +1094,47 @@ class GLWidget(QGLWidget):
         glDisable(GL_DEPTH_TEST)
 
 
+        a = numpy.array([circle6[int(actual_angle)][0].copy(), circle6[int(actual_angle)][1].copy() * -1., 0.0])
+        c = numpy.array([circle7[int(actual_angle)][0].copy(), circle7[int(actual_angle)][1].copy() * -1., 0.0])
+        v_ac = c - a
+        v_ac_l = numpy.linalg.norm(v_ac)
+        v_ac /= v_ac_l
+        c -= v_ac *.1
+        b = numpy.cross(v_ac, np.array([0., 0., 1.]))
+        b /= numpy.linalg.norm(b)
+        b *= .25
+        b += a + v_ac * .25
+        d = numpy.cross(v_ac, np.array([0., 0., -1.]))
+        d /= numpy.linalg.norm(d)
+        d *= .25
+        d += a + v_ac * .25
+
         if picking:
             glColor3ubv(colors[2])
-            if picking:
-                glLineWidth(5)
-            else:
-                glLineWidth(2.5)
+            glLineWidth(7.5)
             glBegin(GL_LINES)
             glVertex3f(0., 0., 0.)
             glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1] * -1., 0.)
             glEnd()
 
+            glEnable(GL_TEXTURE_2D)
+            glEnable(GL_BLEND)
+
+            glBindTexture(GL_TEXTURE_2D, self.catching_point)
+            glColor3ubv(colors[2])
+            glBegin(GL_QUADS)
+            glTexCoord2f(0., 0.)
+            glVertex3f(a[0], a[1], 0.0)
+            glTexCoord2f(0., 1.)
+            glVertex3f(b[0], b[1], 0.0)
+            glTexCoord2f(1., 1.)
+            glVertex3f(c[0], c[1], 0.0)
+            glTexCoord2f(1., 0.)
+            glVertex3f(d[0], d[1], 0.0)
+            glEnd()
+
         else:
+            glLineWidth(2.5)
             glColor3ubv(colors[2])
             #inner lines
             glBegin(GL_LINES)
@@ -1140,7 +1169,7 @@ class GLWidget(QGLWidget):
                 glColor3ub(255, 255, 255)
             glBegin(GL_LINES)
             glVertex3f(0., 0., 0.)
-            glVertex3f(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0.)
+            glVertex3f(circle7[int(actual_angle)][0] - v_ac[0] *.3, (circle7[int(actual_angle)][1]*-1.) - v_ac[1] *.3, 0.)
             glEnd()
 
 
@@ -1154,6 +1183,25 @@ class GLWidget(QGLWidget):
                 #glVertex3f(self.hitPoint[0], self.hitPoint[1], self.hitPoint[2])
             glColor3ub(255, 255, 255)
             glVertex3f(0., 0., 0.)
+            glEnd()
+
+            glEnable(GL_TEXTURE_2D)
+            glEnable(GL_BLEND)
+
+            glBindTexture(GL_TEXTURE_2D, self.catching_point)
+            if model.rotationAxis == "Z":
+                glColor3ub(255, 97, 0)
+            else:
+                glColor3ub(255, 255, 255)
+            glBegin(GL_QUADS)
+            glTexCoord2f(0., 0.)
+            glVertex3f(a[0], a[1], 0.0)
+            glTexCoord2f(0., 1.)
+            glVertex3f(b[0], b[1], 0.0)
+            glTexCoord2f(1., 1.)
+            glVertex3f(c[0], c[1], 0.0)
+            glTexCoord2f(1., 0.)
+            glVertex3f(d[0], d[1], 0.0)
             glEnd()
 
             self.renderText(circle7[int(actual_angle)][0], circle7[int(actual_angle)][1]*-1., 0., "%.1f" % actual_angle )

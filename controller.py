@@ -237,7 +237,7 @@ class Controller:
     def convert_printing_time_from_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
-        return "%02d:%02d" % (h, m)
+        return "%02d hod %02d min" % (h, m)
 
 
     def clear_event_flag_status(self):
@@ -325,6 +325,7 @@ class Controller:
         self.set_progress_bar(100)
         self.status = 'generated'
         self.set_gcode_view()
+        self.show_message_on_status_bar(self.view.tr("GCode saved"))
 
 
     def set_gcode(self):
@@ -1359,10 +1360,11 @@ class Controller:
 
                             alpha = numpy.arctan2(sin_ang, cos_ang)
 
-                            radius = model.boundingSphereSize
+                            radius = model.max_bs
 
                             if radius < 2.5:
                                 radius = 2.5
+                            radius *=.7
 
                             if new_vect_leng >= radius:
                                 model.set_rot(model.rot[0], model.rot[1], alpha, False, False, False)

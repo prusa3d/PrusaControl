@@ -27,9 +27,13 @@ class Gcode_slider(QWidget):
         self.points = []
         self.init_points()
 
+        self.rangeMin = 0.
+        self.rangeMax = 0.
+
+
         self.max_label = QLabel(self)
         self.max_label.setObjectName("gcode_slider_max_label")
-        #self.max_label.set
+        #self.max_label.setFixedWidth(150)
         self.max_label.setText("Max")
         self.max_label.setAlignment(Qt.AlignCenter)
         self.min_label = QLabel(self)
@@ -49,8 +53,8 @@ class Gcode_slider(QWidget):
         self.value_label = QLabel(self)
         self.value_label.setObjectName("gcode_slider_value_label")
         self.value_label.setVisible(False)
-        self.value_label.setText(u"─  0.00")
-        self.value_label.setFixedWidth(50)
+        self.value_label.setText(u"─  0.00mm")
+        self.value_label.setFixedWidth(70)
 
         self.add_button = QPushButton("", self)
         self.add_button.setObjectName("gcode_slider_add_button")
@@ -134,9 +138,9 @@ class Gcode_slider(QWidget):
         self.points[number]['button'].move(10, myPoint.y() - 9)
         self.points[number]['button'].clicked.connect(lambda: self.delete_point(number))
 
-        self.points[number]['label'].setText(u"%s  ─" % layer_value)
+        self.points[number]['label'].setText(u"%smm ─" % layer_value)
         self.points[number]['label'].setVisible(True)
-        self.points[number]['label'].move(35, myPoint.y() - 9)
+        self.points[number]['label'].move(30, myPoint.y() - 9)
 
     def delete_point(self, number):
         self.points[number]['value'] = -1
@@ -154,7 +158,7 @@ class Gcode_slider(QWidget):
             layer_value = self.controller.gcode.data_keys[value]
         else:
             layer_value = "0.00"
-        self.value_label.setText(u"─  %s" % layer_value)
+        self.value_label.setText(u"─ %smm" % layer_value)
         self.value_label.move(self.slider.width() + 90, myPoint.y() - 9)
         self.add_button.move(self.slider.width() + 145, myPoint.y() - 9)
 
@@ -162,8 +166,11 @@ class Gcode_slider(QWidget):
         self.value_label.setVisible(True)
 
     def setRange(self, rangeMin, rangeMax):
-        self.max_label.setText("%3.2f" % rangeMax)
-        self.min_label.setText("%3.2f" % rangeMin)
+        self.rangeMin = rangeMin
+        self.rangeMax = rangeMax
+        self.max_label.setText("%3.2fmm" % rangeMax)
+        self.min_label.setText("%3.2fmm" % rangeMin)
+
         self.slider.setRange(rangeMin, rangeMax)
 
     def setSingleStep(self, step):
@@ -176,19 +183,22 @@ class Gcode_slider(QWidget):
         self.slider.setTickInterval(tick)
 
     def setValue(self, value):
-        self.value_label.setText(u"─  %3.2f" % value)
+        self.value_label.setText(u"─ %3.2fmm" % value)
+        self.max_label.setText("%3.2fmm" % self.rangeMax)
+        self.min_label.setText("%3.2fmm" % self.rangeMin)
+
         self.slider.setValue(value)
 
     def setTickPosition(self, position):
         self.slider.setTickPosition(position)
 
     def setMinimum(self, minimum):
-        #self.min_label.setText("%.2f" % minimum)
+        #self.min_label.setText("%.2fmm" % minimum)
         #print(str(minimum))
         self.slider.setMinimum(minimum)
 
     def setMaximum(self, maximum):
-        #self.max_label.setText("%.2f" % maximum)
+        #self.max_label.setText("%.2fmm" % maximum)
         #print(str(maximum))
         self.slider.setMaximum(maximum)
 

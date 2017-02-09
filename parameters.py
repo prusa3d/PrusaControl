@@ -15,9 +15,20 @@ from pprint import pprint
 import errno
 from shutil import copyfile, Error
 
+import time
 
 __author__ = 'Tibor Vavra'
 
+
+#Mesure
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        return ret
+    return wrap
 
 
 class PrintingParameters(object):
@@ -296,7 +307,7 @@ class AppParameters(object):
                     logging.debug('Error: %s' % e.strerror)
 
 
-
+    @timing
     def download_new_settings_files(self):
         printers_data = {}
         r = urllib2.urlopen(self.json_settings_url + self.printers_filename)

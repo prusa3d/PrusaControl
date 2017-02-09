@@ -526,6 +526,7 @@ class Model(object):
         self.zeroPoint = np.array([.0, .0, .0])
         self.min = [.0, .0, .0]
         self.max = [.0, .0, .0]
+        self.max_bs = np.array([0.])
         self.size = np.array([.0, .0, .0])
         self.size_origin = np.array([.0, .0, .0])
 
@@ -1608,6 +1609,8 @@ class ModelTypeStl(ModelTypeAbstract):
         #normalize position of object on 0
         if normalize:
             model.normalize_object()
+
+        model.max_bs = np.max(np.linalg.norm(model.mesh.vectors, axis=2))
 
         max_l = np.linalg.norm(mesh.max_)
         min_l = np.linalg.norm(mesh.min_)
