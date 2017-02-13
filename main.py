@@ -4,6 +4,7 @@ import atexit
 
 from PyQt4.QtGui import QApplication, QIcon
 #from tendo.singleton import SingleInstance
+from PyQt4 import QtGui
 
 from controller import Controller
 from sceneRender import *
@@ -16,7 +17,7 @@ import os
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = False
+DEBUG = True
 
 def log_exception(excType, excValue, traceback):
     logging.error("Logging an uncaught exception",
