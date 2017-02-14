@@ -17,7 +17,7 @@ import os
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = True
+DEBUG = False
 
 def log_exception(excType, excValue, traceback):
     logging.error("Logging an uncaught exception",
@@ -27,7 +27,6 @@ def log_exception(excType, excValue, traceback):
 
 def main():
     sys.excepthook = log_exception
-
 
 
     try:
