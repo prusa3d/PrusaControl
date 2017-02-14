@@ -5,6 +5,7 @@ import os
 from copy import deepcopy
 
 import numpy as np
+import time
 from OpenGL.GL import *
 from PyQt4.QtCore import QTextCodec
 
@@ -16,6 +17,15 @@ QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog
 
 import projectFile
 import sceneRender
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        return ret
+    return wrap
 
 class Gcode_slider(QWidget):
     def __init__(self, other, controller):
@@ -779,6 +789,9 @@ class PrusaControlView(QMainWindow):
         self.name_l = QLabel(self.tr("Name"))
         self.name_l.setObjectName("name_l")
 
+
+
+
         self.object_extruder_l = QLabel(self.tr("Extruder"))
         self.object_extruder_l.setObjectName("object_extruder_l")
         self.object_extruder_c = QComboBox()
@@ -990,6 +1003,9 @@ class PrusaControlView(QMainWindow):
         # Gcode view layout
         #self.gcode_view_layout = QtGui.QVBoxLayout()
 
+        self.color_change_l = QLabel("And color change")
+        self.color_change_l.setObjectName("color_change_l")
+
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
 
@@ -1113,6 +1129,12 @@ class PrusaControlView(QMainWindow):
         self.object_group_box.setObjectName('object_group_box')
         self.object_group_box.setLayout(self.create_object_settings_layout())
         self.object_group_box.setEnabled(False)
+        self.transformation_reset_b = QPushButton("", self.object_group_box)
+        self.transformation_reset_b.setObjectName("transformation_reset_b")
+        self.transformation_reset_b.setFixedHeight(19)
+        self.transformation_reset_b.setFixedWidth(19)
+        self.transformation_reset_b.move(221, 13)
+        self.transformation_reset_b.clicked.connect(lambda: self.reset_transformation_on_object(self.get_object_id()))
 
         self.object_variable_layer_box = QGroupBox(self.tr("Object advance settings"))
         self.object_variable_layer_box.setObjectName('object_variable_layer_box')
@@ -1266,6 +1288,12 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
 
+    def reset_transformation_on_object(self, object_id):
+        self.controller.reset_transformation_on_object(object_id)
+        self.update_position_widgets(object_id)
+        self.update_rotate_widgets(object_id)
+        self.update_scale_widgets(object_id)
+        self.update_scene()
 
     def show_exit_message_scene_not_saved(self):
         msgBox = QMessageBox(self)
@@ -1634,6 +1662,7 @@ class PrusaControlView(QMainWindow):
             model.set_move(np.array([x*.1, y*.1, z*.1]), False, place_on_zero)
             self.controller.view.update_scene()
 
+    @timing
     def set_rotation_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
             self.controller.scene_was_changed()
@@ -1848,9 +1877,13 @@ class PrusaControlView(QMainWindow):
     def create_gcode_view_layout(self):
 
         gcode_view_layout = QGridLayout()
-        gcode_view_layout.setRowMinimumHeight(2, 350)
+        gcode_view_layout.setRowMinimumHeight(3, 350)
+        gcode_view_layout.setRowStretch(1, 0)
+        gcode_view_layout.setRowStretch(2, 0)
+        gcode_view_layout.setRowStretch(3, 2)
 
-        gcode_view_layout.addWidget(self.gcode_slider, 1, 0, 3, 3)
+        gcode_view_layout.addWidget(self.color_change_l, 1, 0)
+        gcode_view_layout.addWidget(self.gcode_slider, 2, 0, 3, 3)
         #gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
 
         return gcode_view_layout

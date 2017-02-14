@@ -530,9 +530,6 @@ class Model(object):
         self.size = np.array([.0, .0, .0])
         self.size_origin = np.array([.0, .0, .0])
 
-        #self.color = [75./255., 119./255., 190./255.]
-        #self.color = [34./255., 167./255., 240./255.]
-
         #status of object
         self.is_changed = True
 
@@ -667,6 +664,24 @@ class Model(object):
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.texture_size, self.texture_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.variable_texture_data)
         glBindTexture(GL_TEXTURE_2D, 0)
+
+
+    def reset_transformation(self):
+        self.scale[0] = 1.
+        self.scale[1] = 1.
+        self.scale[2] = 1.
+
+        self.rot[0] = 0.
+        self.rot[1] = 0.
+        self.rot[2] = 0.
+
+        self.pos[0] = 0.
+        self.pos[1] = 0.
+
+        self.update_min_max()
+        self.place_on_zero()
+
+
 
 
     def calculate_normal_groups(self):
@@ -920,7 +935,6 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
 
-
     def place_on_zero(self):
         min = self.min_scene
         max = self.max_scene
@@ -938,6 +952,8 @@ class Model(object):
         self.min_scene = self.min + pos
         self.max_scene = self.max + pos
 
+
+    @timing
     def set_rot(self, x, y, z, add=False, update_min_max=True, place_on_zero=True):
         '''
         if x > (2*np.pi):
@@ -947,7 +963,7 @@ class Model(object):
         if z > (2*np.pi):
             z = divmod(z,2*np.pi)
         '''
-        print("uhel v set_rot: " + str(z))
+        #print("uhel v set_rot: " + str(z))
 
         if add:
             self.rot[0] += x
@@ -999,9 +1015,9 @@ class Model(object):
             self.pos[2]+=len
             self.update_min_max()
 
-    #@timing
+    @timing
     def update_min_max(self):
-        self.temp_mesh = deepcopy(self.mesh)
+        #self.temp_mesh = deepcopy(self.mesh)
 
         rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
         ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
@@ -1020,7 +1036,7 @@ class Model(object):
         for i in range(3):
             self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
 
-        self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
+        #self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
 
         self.temp_mesh.update_min()
         self.temp_mesh.update_max()

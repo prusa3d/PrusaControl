@@ -1587,6 +1587,12 @@ class Controller:
 
         return False
 
+    def reset_transformation_on_object(self, object_id):
+        object = self.get_object_by_id(object_id)
+        object.reset_transformation()
+
+
+
 #    @timing
     def get_id_under_cursor(self, event):
         return self.view.glWidget.get_id_under_cursor(event.x(), event.y())
