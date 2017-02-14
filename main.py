@@ -37,14 +37,42 @@ def main():
 
     #me = SingleInstance()
 
-
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("data/icon/favicon.ico"))
 
+    css = QFile('data/my_stylesheet.css')
+    css.open(QIODevice.ReadOnly)
+
+
+    splash_pix = QPixmap('data/img/splashscreen.png')
+    splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+    progressBar = QProgressBar(splash)
+    progressBar.setFixedWidth(splash.width())
+
+    if css.isOpen():
+        progressBar.setStyleSheet(QVariant(css.readAll()).toString())
+        css.close()
+
+    splash.setMask(splash_pix.mask())
+    splash.show()
+
+    progressBar.setValue(0)
+
+    '''
+    for i in range(0, 100):
+        progressBar.setValue(i)
+        t = time.time()
+        while time.time() < t + 0.1:
+            app.processEvents()
+    '''
+
+
     local_path = os.path.realpath(__file__)
 
-    controller = Controller(app, local_path)
+    controller = Controller(app, local_path, progressBar)
+    progressBar.setValue(100)
     window = controller.get_view()
+    splash.finish(window)
     app.installEventFilter(window)
     app.exec_()
     atexit.register(controller.write_config)

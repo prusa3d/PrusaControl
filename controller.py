@@ -48,14 +48,16 @@ def timing(f):
     return wrap
 
 class Controller:
-    def __init__(self, app, local_path=''):
+    def __init__(self, app, local_path='', progress_bar=None):
         logging.info('Local path: ' + local_path)
 
         #this flag is only for development only, Development = True, Production = False
         self.development_flag = False
+        progress_bar.setValue(10)
 
         self.app_config = AppParameters(self, local_path)
         self.printing_parameters = PrintingParameters(self.app_config)
+        progress_bar.setValue(30)
 
         self.analyzer = Analyzer(self)
         self.gcode = None
@@ -155,10 +157,15 @@ class Controller:
 
         self.translator = QTranslator()
         self.set_language(self.settings['language'])
+        progress_bar.setValue(40)
 
         self.scene = AppScene(self)
+        progress_bar.setValue(50)
         self.view = PrusaControlView(self)
+        progress_bar.setValue(60)
         self.slicer_manager = SlicerEngineManager(self)
+
+        progress_bar.setValue(70)
 
         self.analyze_result = []
 
@@ -167,6 +174,7 @@ class Controller:
         self.camera_move = False
         self.camera_rotate = False
         self.view.update_gui_for_material()
+        progress_bar.setValue(80)
 
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
@@ -175,13 +183,18 @@ class Controller:
         else:
             self.view.set_multimaterial_gui_off()
 
+        progress_bar.setValue(90)
+
 
         logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
 
+        print(str(type(self.app_parameters)))
         if len(self.app_parameters) >= 3:
             for file in self.app_parameters[2:]:
                 logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
+
+        progress_bar.setValue(95)
 
 
     def exit_event(self):
@@ -293,11 +306,11 @@ class Controller:
         self.view.gcode_slider_max_l.setText(str(max_l))
         '''
 
-        self.view.gcode_slider.setMinimum(min)
-        self.view.gcode_slider.setMaximum(max)
+        self.view.gcode_slider.setMinimum(min, min_l)
+        self.view.gcode_slider.setMaximum(max, max_l)
 
-        self.view.gcode_slider.min_label.setText(str(min_l))
-        self.view.gcode_slider.max_label.setText(str(max_l))
+        #self.view.gcode_slider.min_label.setText(str(min_l))
+        #self.view.gcode_slider.max_label.setText(str(max_l))
 
 
     def set_gcode_instance(self, gcode_instance):
@@ -311,6 +324,7 @@ class Controller:
 
 
     def read_gcode(self, filename = ''):
+        print("reading gcode")
         if filename:
             self.gcode = GCode(filename, self, self.set_gcode, self.set_saved_gcode)
         else:
@@ -390,7 +404,6 @@ class Controller:
     def set_gcode_view(self):
         self.unselect_objects()
         self.render_status = 'gcode_view'
-        #self.view.set_gcode_slider()
         self.open_gcode_gui()
 
     def set_model_edit_view(self):
@@ -759,6 +772,7 @@ class Controller:
 
     def import_model(self, path, one_model=False):
         self.view.statusBar().showMessage('Load file name: ' + path)
+        print(str(path))
         model = ModelTypeStl().load(path)
         model.parent = self.scene
         self.scene.models.append(model)
@@ -1756,6 +1770,8 @@ class Controller:
         '''
         function for resolve which file type will be loaded
         '''
+        print("Urls type: " + str(type(url)))
+
         if self.status in ['generating']:
             if not self.open_cancel_generating_dialog():
                 return
