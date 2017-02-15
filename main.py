@@ -45,9 +45,12 @@ def main():
 
 
     splash_pix = QPixmap('data/img/splashscreen.png')
-    splash = QSplashScreen(splash_pix, QtCore.Qt.WindowStaysOnTopHint)
+    splash = QSplashScreen(splash_pix, Qt.SplashScreen | Qt.FramelessWindowHint )
     progressBar = QProgressBar(splash)
-    progressBar.setFixedWidth(splash.width())
+    progressBar.setObjectName("splash_progressbar")
+    progressBar.setFixedWidth(195)
+    progressBar.setFixedHeight(7)
+    progressBar.move(82, 270)
 
     if css.isOpen():
         progressBar.setStyleSheet(QVariant(css.readAll()).toString())
@@ -57,6 +60,7 @@ def main():
     splash.show()
 
     progressBar.setValue(0)
+    app.processEvents()
 
     '''
     for i in range(0, 100):

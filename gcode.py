@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import time
 #from fastnumbers import fast_float
 from copy import deepcopy
@@ -23,6 +25,7 @@ class GCode(object):
         self.data = {}
         self.all_data = []
         self.data_keys = []
+        self.color_change_data = []
         self.actual_z = '0.0'
         self.speed = 0.0
         self.z_hop = False
@@ -31,14 +34,18 @@ class GCode(object):
 
         self.printing_time = 0.0
         self.filament_length = 0.0
-
+        print("Filename type: " + str(type(filename)))
+        print("Filename: " + filename)
+        #if type(filename)==:
+        #self.filename = u'c:\\models\\super mega testovací Jindřich šložka čěýáéůú\\anubis_PLA_OPTIMAL.gcode'
         self.filename = filename
+
         self.is_loaded = False
 
-        self.gcode_parser = GcodeParserRunner(controller, filename)
+        self.gcode_parser = GcodeParserRunner(controller, self.filename)
         self.gcode_parser_thread = QThread()
 
-        self.gcode_copy = GcodeCopyRunner(filename, "", color_change_lst=[])
+        self.gcode_copy = GcodeCopyRunner(self.filename, "", color_change_lst=self.color_change_data)
         self.gcode_copy_thread = QThread()
 
 
@@ -62,6 +69,7 @@ class GCode(object):
 
 
     def read_in_thread(self, update_progressbar_function, after_done_function):
+        print("reading in thread")
         self.gcode_parser.moveToThread(self.gcode_parser_thread)
         self.done_loading_callback = after_done_function
 
@@ -109,13 +117,17 @@ class GCode(object):
 
     def set_finished_copy(self):
         self.gcode_copy_thread.quit()
-        print(str(self.writing_done_callback))
+        #print(str(self.writing_done_callback))
         self.writing_done_callback()
+
+    def set_color_change_data(self, data):
+        self.color_change_data = data
 
 
     def write_with_changes_in_thread(self, filename_in, filename_out, update_function):
         self.gcode_copy.filename_in = filename_in
         self.gcode_copy.filename_out = filename_out
+        self.gcode_copy.color_change_lst = self.color_change_data
         self.gcode_copy.moveToThread(self.gcode_copy_thread)
 
         self.gcode_copy_thread.started.connect(self.gcode_copy.write_file)
@@ -144,15 +156,13 @@ class GcodeCopyRunner(QObject):
 
         if self.color_change_lst:
             #some color changes
-            pass
-
+            self.copy_file_with_progress_and_color_changes(self.filename_in, self.filename_out)
         else:
             self.copy_file_with_progress(self.filename_in, self.filename_out)
 
-
-    def copy_file_with_progress(self, filename_in, filename_out, length=16*1024):
-        fsrc = src_file = open(filename_in, 'r')
-        fdst = dst_file = open(filename_out, 'w')
+    def copy_file_with_progress_and_color_changes(self, filename_in, filename_out, length=16*1024):
+        fsrc = open(filename_in, 'r')
+        fdst = open(filename_out, 'w')
 
         fsrc_size = os.fstat(fsrc.fileno()).st_size
 
@@ -166,6 +176,25 @@ class GcodeCopyRunner(QObject):
             copied += len(buf)
             self.set_update_progress.emit((copied * 1. / fsrc_size * 1.)*100)
             #progress_callback((copied * 1. / fsrc_size * 1.))
+
+
+    def copy_file_with_progress(self, filename_in, filename_out, length=16*1024):
+        fsrc = open(filename_in, 'r')
+        fdst = open(filename_out, 'w')
+
+        fsrc_size = os.fstat(fsrc.fileno()).st_size
+
+        copied = 0
+        while self.is_running is True:
+            buf = fsrc.read(length)
+            if not buf:
+                self.finished.emit()
+                break
+            fdst.write(buf)
+            copied += len(buf)
+            self.set_update_progress.emit((copied * 1. / fsrc_size * 1.)*100)
+            #progress_callback((copied * 1. / fsrc_size * 1.))
+
 
 
 class GcodeParserRunner(QObject):
@@ -199,10 +228,12 @@ class GcodeParserRunner(QObject):
 
 
     def load_gcode_file(self):
-        file = QFile(self.filename)
+        print("Filename: " + str(type(self.filename)))
+        file = QFile(unicode(self.filename.encode("utf-8")))
         file.open(QIODevice.ReadOnly | QIODevice.Text)
         in_stream = QTextStream(file)
         file_size = file.size()
+        print("File size: " + str(file_size))
         counter = 0
         line = 0
         while not in_stream.atEnd() and self.is_running is True:

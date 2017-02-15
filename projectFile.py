@@ -4,11 +4,12 @@ from abc import ABCMeta, abstractmethod
 from cStringIO import StringIO
 from zipfile import ZipFile, ZIP_DEFLATED
 import xml.etree.cElementTree as ET
-
-import io
+import os
+#import io
 
 import numpy
-
+from io import BytesIO
+import stl
 
 from stl.mesh import Mesh
 
@@ -95,7 +96,13 @@ class Version_1_0(VersionAbstract):
             scene.models = []
             for m in models_data:
                 logging.debug("Jmeno souboru je: " + m['file_name'])
-                mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
+
+                #TODO:extract files to tmp folder
+                openedZipfile.extract(m['file_name'])
+                mesh = Mesh.from_file(filename=m['file_name'])
+                os.remove(m['file_name'])
+
+                #mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
                 model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
                 model.rotation_matrix = numpy.array(m['rotation'])
                 model.pos = numpy.array(m['position'])
@@ -107,7 +114,7 @@ class Version_1_0(VersionAbstract):
 
     def save(self, scene, filename):
         #create zipfile
-        with ZipFile(filename, 'w', ZIP_DEFLATED) as openedZipfile:
+        with ZipFile(filename, 'w', ZIP_DEFLATED) as zip_fh:
             #create xml file describing scene
             root = ET.Element("scene")
             ET.SubElement(root, "version").text=self.get_version()
@@ -126,24 +133,18 @@ class Version_1_0(VersionAbstract):
 
             #save xml file to new created zip file
             newXml = ET.tostring(root)
-            openedZipfile.writestr(self.xmlFilename, newXml)
+            zip_fh.writestr(self.xmlFilename, newXml)
 
             #write stl files to zip file
             for model in scene.models:
                 if model.isVisible:
                     #transform data to stl file
-                    #mesh = self._create_mesh_from_model(model)
-                    mesh = model.get_mesh(False, False)
+                    mesh= model.get_mesh(False, False)
 
-                    #generate ascii format of stl(bug in numpy-stl)
-                    #fileHandler = opened_zipfile.write(model.filename)
-                    fileLike = StringIO()
-                    #fileLike =
-                    mesh._write_ascii(fh=fileLike, name=model.filename)
-                    #mesh.save(model.filename, fh=fileLike, update_normals=False)
-
-                    openedZipfile.writestr(model.filename, fileLike.getvalue())
-                    fileLike.close()
+                    # TODO:save files to tmp folder
+                    mesh.save(model.filename, mode=stl.Mode.BINARY)
+                    zip_fh.write(model.filename)
+                    os.remove(model.filename)
 
         return True
 

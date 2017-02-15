@@ -270,9 +270,6 @@ class AppScene(object):
 
         alpha = np.arctan2(sin_ang, cos_ang)
 
-
-
-
     @staticmethod
     def is_length_in_z_bigger_then(triangle, minimal_z):
         max_z = max([i[2] for i in triangle])
@@ -291,7 +288,6 @@ class AppScene(object):
         #TODO: Add state to history
         self.clear_selected_models()
         self.controller.view.update_scene()
-
 
     def copy_selected_objects(self):
         self.place_offset = np.array([0.,0.,0.])
@@ -319,7 +315,6 @@ class AppScene(object):
                 if not model.is_in_printing_area:
                     messages.append(text00 % model.filename[:7])
         return messages
-
 
     def clear_scene(self):
         self.models = []
@@ -351,7 +346,6 @@ class AppScene(object):
             self.find_new_position(i, m)
 
         self.save_change(self.models)
-
 
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
@@ -757,11 +751,13 @@ class Model(object):
 
         if max[0] <= (printer['printing_space'][0]*.05) and min[0] >= (printer['printing_space'][0]*-.05):
                 if max[1] <= (printer['printing_space'][1]*.05) and min[1] >= (printer['printing_space'][1]*-.05):
-                    if max[2] <= printer['printing_space'][2] and min[2] >= -0.1:
+                    if max[2] <= printer['printing_space'][2]*0.1 and min[2] >= -0.1:
+                        #print("Max[2] " + str(max[2]))
+                        #print("Printing space[2] " + str(printer['printing_space'][2]))
                         self.is_in_printing_area = True
                         return True
                     else:
-                        #print("naruseni v Z")
+                        print("naruseni v Z")
                         self.is_in_printing_area = False
                         return False
                 else:

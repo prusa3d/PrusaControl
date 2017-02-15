@@ -106,7 +106,7 @@ class Gcode_slider(QWidget):
                 label = QLabel(self)
                 label.setObjectName("gcode_slider_point_label")
                 label.setVisible(False)
-                label.setFixedWidth(50)
+                label.setFixedWidth(60)
                 button = QPushButton('', self)
                 button.setObjectName("gcode_slider_point_button")
                 button.setVisible(False)
@@ -145,12 +145,12 @@ class Gcode_slider(QWidget):
         self.points[number]['value'] = layer_value
 
         self.points[number]['button'].setVisible(True)
-        self.points[number]['button'].move(10, myPoint.y() - 9)
+        self.points[number]['button'].move(2, myPoint.y() - 9)
         self.points[number]['button'].clicked.connect(lambda: self.delete_point(number))
 
         self.points[number]['label'].setText(u"%smm ─" % layer_value)
         self.points[number]['label'].setVisible(True)
-        self.points[number]['label'].move(30, myPoint.y() - 9)
+        self.points[number]['label'].move(20, myPoint.y() - 9)
 
     def delete_point(self, number):
         self.points[number]['value'] = -1
@@ -169,7 +169,7 @@ class Gcode_slider(QWidget):
         else:
             layer_value = "0.00"
         self.value_label.setText(u"─ %smm" % layer_value)
-        self.value_label.move(self.slider.width() + 90, myPoint.y() - 9)
+        self.value_label.move(self.slider.width() + 75, myPoint.y() - 9)
         self.add_button.move(self.slider.width() + 145, myPoint.y() - 9)
 
         self.add_button.setVisible(True)
@@ -178,8 +178,8 @@ class Gcode_slider(QWidget):
     def setRange(self, rangeMin, rangeMax):
         self.rangeMin = rangeMin
         self.rangeMax = rangeMax
-        self.max_label.setText("%3.2fmm" % rangeMax)
-        self.min_label.setText("%3.2fmm" % rangeMin)
+        self.max_label.setText("%.2fmm" % rangeMax)
+        self.min_label.setText("%.2fmm" % rangeMin)
 
         self.slider.setRange(rangeMin, rangeMax)
 
@@ -194,23 +194,31 @@ class Gcode_slider(QWidget):
 
     def setValue(self, value):
         self.value_label.setText(u"─ %3.2fmm" % value)
-        self.max_label.setText("%3.2fmm" % self.rangeMax)
-        self.min_label.setText("%3.2fmm" % self.rangeMin)
+        #self.max_label.setText("%3.2fmm" % self.rangeMax)
+        #self.min_label.setText("%3.2fmm" % self.rangeMin)
 
         self.slider.setValue(value)
 
     def setTickPosition(self, position):
         self.slider.setTickPosition(position)
 
-    def setMinimum(self, minimum):
-        #self.min_label.setText("%.2fmm" % minimum)
+    def setMinimum(self, minimum, minimum_label):
+        self.rangeMin = minimum_label
+        self.min_label.setText("%.2fmm" % self.rangeMin)
         #print(str(minimum))
         self.slider.setMinimum(minimum)
 
-    def setMaximum(self, maximum):
-        #self.max_label.setText("%.2fmm" % maximum)
+    def setMaximum(self, maximum, maximum_label):
+        self.rangeMax = maximum_label
+        self.max_label.setText("%.2fmm" % self.rangeMax)
         #print(str(maximum))
         self.slider.setMaximum(maximum)
+
+
+    def get_color_change_data(self):
+        return [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
+
+
 
 class Spline_editor(QWidget):
     def __init__(self, other, controller):
@@ -1992,7 +2000,14 @@ class PrusaControlView(QMainWindow):
                 #print(str())
                 self.statusBar().showMessage('Dropped file name is ' + str(url.toLocalFile().toLocal8Bit().data()))
                 #TODO: Add network files
+                #path = url.toLocalFile().toLocal8Bit().data()
                 path = url.toLocalFile().toLocal8Bit().data()
+
+                print(str(type(path)))
+                #if 'file:///' in path:
+                #    path = path[8:]
+                #print(str(path))
+                #path = unicode(url.toUtf8(), encoding="UTF-8")
                 #path = self.convert_file_path_to_unicode(url.path())
                 self.controller.open_file(path)
 

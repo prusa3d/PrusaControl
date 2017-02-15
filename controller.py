@@ -238,7 +238,7 @@ class Controller:
         filament_length = self.filament_use
 
         printing_time_str = self.convert_printing_time_from_seconds(printing_time)
-        filament_length_str = "%s" % (filament_length)
+        filament_length_str = self.convert_filament_length_units(filament_length)
 
         data = {'info_text': 'info total:',
                 'printing_time': printing_time_str,
@@ -252,6 +252,24 @@ class Controller:
         h, m = divmod(m, 60)
         return "%02d hod %02d min" % (h, m)
 
+    def convert_filament_length_units(self, filament_lenght_mm):
+        original_filament_lenght = float(filament_lenght_mm[:-2])
+        original_units = filament_lenght_mm[-2:]
+        if original_units == "mm":
+            if original_filament_lenght >= 1000.:
+                recalculated_filament_lenght = original_filament_lenght*0.001
+                recalculated_units = "m"
+            elif original_filament_lenght >= 10.:
+                recalculated_filament_lenght = original_filament_lenght * 0.1
+                recalculated_units = "cm"
+            elif original_filament_lenght >= 1.:
+                recalculated_filament_lenght = original_filament_lenght
+                recalculated_units = original_units
+
+            new_filament_format = "%.2f%s" %(recalculated_filament_lenght, recalculated_units)
+        else:
+            new_filament_format = "%s" %filament_lenght_mm
+        return new_filament_format
 
     def clear_event_flag_status(self):
         self.mouse_double_click_event_flag = False
@@ -362,10 +380,6 @@ class Controller:
         self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
 
         self.set_gcode_view()
-
-
-    #def save_gcode(self, filename = ''):
-    #    pass
 
 
     def set_variable_layer_cursor(self, double_value):
@@ -726,14 +740,18 @@ class Controller:
             data = self.view.open_project_file_dialog()
         #logging.debug('open project file %s' %data)
         self.import_project(data)
+        self.show_message_on_status_bar(self.view.tr("Project loaded"))
 
     def save_project_file(self):
         data = self.view.save_project_file_dialog()
         #logging.debug('save project file %s' %data)
         self.save_project(data)
+        self.show_message_on_status_bar(self.view.tr("Project was saved"))
+
 
     def save_gcode_file(self):
         suggested_filename = self.generate_gcode_filename()
+        color_change_data = self.view.gcode_slider.get_color_change_data()
         data = self.view.save_gcode_file_dialog(suggested_filename)
         filename = data.split('.')
         if filename[-1] in ['gcode', 'GCODE']:
@@ -744,6 +762,7 @@ class Controller:
             self.status = "saving_gcode"
             self.view.saving_gcode()
             #copyfile(self.app_config.tmp_place + "out.gcode", filename_out)
+            self.gcode.set_color_change_data(color_change_data)
             self.gcode.write_with_changes_in_thread(self.gcode.filename, filename_out, self.set_progress_bar)
 
         except Error as e:

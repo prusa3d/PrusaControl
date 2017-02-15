@@ -573,7 +573,7 @@ class GLWidget(QGLWidget):
 
             color = [13, 82, 78]
             for color_change in color_change_list:
-                self.draw_layer(color_change, color, printer)
+                self.draw_layer(color_change, color, printer, 1)
 
                 #Add text note for ColorChange
 
@@ -788,7 +788,7 @@ class GLWidget(QGLWidget):
 
             glMatrixMode(GL_MODELVIEW)
 
-    def draw_layer(self, layer, color, printer):
+    def draw_layer(self, layer, color, printer, color_change=0):
         printing_space = printer['printing_space']
         layer_data = self.controller.gcode.data[layer]
 
@@ -812,7 +812,9 @@ class GLWidget(QGLWidget):
         #for layer_data in layer_datas:
         #( brim, perimetry,  infill, support, colorchange)
         for p in layer_data:
-            if 'E-sk' in p[2]:
+            if color_change:
+                color = [255, 255, 255]
+            elif 'E-sk' in p[2]:
                 color = [255, 255, 255]
             elif 'E-su' in p[2]:
                 color = [88, 117, 69]
