@@ -216,7 +216,8 @@ class Gcode_slider(QWidget):
 
 
     def get_color_change_data(self):
-        return [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
+        #return [[i['value'], self.controller.gcode.data[i['value']][0][-1]] for i in self.parent.gcode_slider.points if not i['value'] == -1]
+        return [self.controller.gcode.data[i['value']][0][-1] for i in self.points if not i['value'] == -1]
 
 
 

@@ -156,41 +156,49 @@ class GcodeCopyRunner(QObject):
 
         if self.color_change_lst:
             #some color changes
+            print("Color change vetev")
             self.copy_file_with_progress_and_color_changes(self.filename_in, self.filename_out)
         else:
             self.copy_file_with_progress(self.filename_in, self.filename_out)
 
     def copy_file_with_progress_and_color_changes(self, filename_in, filename_out, length=16*1024):
-        fsrc = open(filename_in, 'r')
-        fdst = open(filename_out, 'w')
+        f_src = open(filename_in, 'r')
+        f_dst = open(filename_out, 'w')
 
-        fsrc_size = os.fstat(fsrc.fileno()).st_size
+        fsrc_size = os.fstat(f_src.fileno()).st_size
 
         copied = 0
+        line_number = 0
+        print("Color change list: " + str(self.color_change_lst))
         while self.is_running is True:
-            buf = fsrc.read(length)
+            buf = f_src.readline()
+            line_number += 1
             if not buf:
                 self.finished.emit()
                 break
-            fdst.write(buf)
+            if line_number in self.color_change_lst:
+                print("Zmena v: " + str(line_number))
+                f_dst.write("M600\n")
+            f_dst.write(buf)
             copied += len(buf)
             self.set_update_progress.emit((copied * 1. / fsrc_size * 1.)*100)
+
             #progress_callback((copied * 1. / fsrc_size * 1.))
 
 
     def copy_file_with_progress(self, filename_in, filename_out, length=16*1024):
-        fsrc = open(filename_in, 'r')
-        fdst = open(filename_out, 'w')
+        f_src = open(filename_in, 'r')
+        f_dst = open(filename_out, 'w')
 
-        fsrc_size = os.fstat(fsrc.fileno()).st_size
+        fsrc_size = os.fstat(f_src.fileno()).st_size
 
         copied = 0
         while self.is_running is True:
-            buf = fsrc.read(length)
+            buf = f_src.read(length)
             if not buf:
                 self.finished.emit()
                 break
-            fdst.write(buf)
+            f_dst.write(buf)
             copied += len(buf)
             self.set_update_progress.emit((copied * 1. / fsrc_size * 1.)*100)
             #progress_callback((copied * 1. / fsrc_size * 1.))
@@ -236,6 +244,7 @@ class GcodeParserRunner(QObject):
         print("File size: " + str(file_size))
         counter = 0
         line = 0
+        line_number = 0
         while not in_stream.atEnd() and self.is_running is True:
 
             counter+=1
@@ -251,11 +260,14 @@ class GcodeParserRunner(QObject):
             # self.process_line(line)
             bits = line.split(';', 1)
             if bits[0] == '':
+                line_number+=1
                 continue
             if 'G1' in bits[0]:
-                self.parse_g1_line(bits)
+                self.parse_g1_line(bits, line_number)
             else:
+                line_number += 1
                 continue
+            line_number += 1
 
         self.printing_time = self.calculate_time_of_print()
         self.filament_length = 0.0  # self.calculate_length_of_filament()
@@ -265,7 +277,7 @@ class GcodeParserRunner(QObject):
         for i in self.data:
             layer_flag = 'M'
             for l in self.data[i]:
-                _start, _end, flag, _speed, _extr = l
+                _start, _end, flag, _speed, _extr, _line = l
                 if flag in ['E', 'E-sk', 'E-su', 'E-i', 'E-p']:
                     layer_flag = 'E'
                     break
@@ -324,7 +336,7 @@ class GcodeParserRunner(QObject):
         print("Info: " + string)
 
     #only G1 lines
-    def parse_g1_line(self, data):
+    def parse_g1_line(self, data, line_number):
         if len(data)>1:
             text = data[0]
             comment = data[1]
@@ -354,7 +366,7 @@ class GcodeParserRunner(QObject):
                 # Move point
                 self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
                 if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]))
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]), line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -381,7 +393,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -407,7 +419,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion, line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -417,7 +429,7 @@ class GcodeParserRunner(QObject):
                 self.actual_point[1] = float(line[1][1:])
 
                 if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]))
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]), line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -438,7 +450,7 @@ class GcodeParserRunner(QObject):
                 # Move point
                 self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
                 if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]))
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]), line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -466,7 +478,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -493,7 +505,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion, line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
@@ -503,23 +515,23 @@ class GcodeParserRunner(QObject):
                 self.actual_point[1] = float(line[1][1:])
 
                 if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]))
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]), line_number=line_number)
                     self.last_point = deepcopy(self.actual_point)
                 else:
                     self.last_point = deepcopy(self.actual_point)
 
         return
 
-    def add_line(self, first_point, second_point, actual_z, type, speed=0., extrusion=0.):
+    def add_line(self, first_point, second_point, actual_z, type, speed=0., extrusion=0., line_number = -1):
         key = actual_z
         if key in self.data_keys:
-            self.data[key].append([first_point, second_point, type, speed, extrusion])
-            self.all_data.append([first_point, second_point, type, speed, extrusion])
+            self.data[key].append([first_point, second_point, type, speed, extrusion, line_number])
+            self.all_data.append([first_point, second_point, type, speed, extrusion, line_number])
         else:
             self.data_keys.append(key)
             self.data[key] = []
-            self.data[key].append([first_point, second_point, type, speed, extrusion])
-            self.all_data.append([first_point, second_point, type, speed, extrusion])
+            self.data[key].append([first_point, second_point, type, speed, extrusion, line_number])
+            self.all_data.append([first_point, second_point, type, speed, extrusion, line_number])
 
 
 
