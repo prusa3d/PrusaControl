@@ -34,8 +34,8 @@ class GCode(object):
 
         self.printing_time = 0.0
         self.filament_length = 0.0
-        print("Filename type: " + str(type(filename)))
-        print("Filename: " + filename)
+        #print("Filename type: " + str(type(filename)))
+        #print("Filename: " + filename)
         #if type(filename)==:
         #self.filename = u'c:\\models\\super mega testovací Jindřich šložka čěýáéůú\\anubis_PLA_OPTIMAL.gcode'
         self.filename = filename
@@ -65,6 +65,18 @@ class GCode(object):
         if self.gcode_copy and self.gcode_copy_thread and self.gcode_copy_thread.isRunning():
             self.gcode_copy.quit()
             self.gcode_copy_thread.wait()
+
+    def get_first_extruding_line_number_of_gcode_for_layers(self, layers_keys_lst):
+        lines_number = []
+        for i in layers_keys_lst:
+            line = self.data[i]
+            for o in line:
+                _a, _b, type, _speed, _extr, line_n = o
+                if 'E' in type:
+                    lines_number.append(line_n)
+                    break
+
+        return lines_number
 
 
 
@@ -155,8 +167,6 @@ class GcodeCopyRunner(QObject):
     def write_file(self):
 
         if self.color_change_lst:
-            #some color changes
-            print("Color change vetev")
             self.copy_file_with_progress_and_color_changes(self.filename_in, self.filename_out)
         else:
             self.copy_file_with_progress(self.filename_in, self.filename_out)
@@ -169,7 +179,6 @@ class GcodeCopyRunner(QObject):
 
         copied = 0
         line_number = 0
-        print("Color change list: " + str(self.color_change_lst))
         while self.is_running is True:
             buf = f_src.readline()
             line_number += 1
@@ -177,7 +186,6 @@ class GcodeCopyRunner(QObject):
                 self.finished.emit()
                 break
             if line_number in self.color_change_lst:
-                print("Zmena v: " + str(line_number))
                 f_dst.write("M600\n")
             f_dst.write(buf)
             copied += len(buf)
@@ -236,12 +244,10 @@ class GcodeParserRunner(QObject):
 
 
     def load_gcode_file(self):
-        print("Filename: " + str(type(self.filename)))
         file = QFile(unicode(self.filename.encode("utf-8")))
         file.open(QIODevice.ReadOnly | QIODevice.Text)
         in_stream = QTextStream(file)
         file_size = file.size()
-        print("File size: " + str(file_size))
         counter = 0
         line = 0
         line_number = 0
@@ -286,9 +292,6 @@ class GcodeParserRunner(QObject):
 
         for i in self.non_extruding_layers:
             self.data.pop(i, None)
-
-        #print("Data:")
-        #pprint(self.data)
 
         self.data_keys = []
         self.data_keys = self.data.keys()

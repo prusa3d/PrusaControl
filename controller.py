@@ -253,6 +253,8 @@ class Controller:
         return "%02d hod %02d min" % (h, m)
 
     def convert_filament_length_units(self, filament_lenght_mm):
+        if not filament_lenght_mm:
+            return ""
         original_filament_lenght = float(filament_lenght_mm[:-2])
         original_units = filament_lenght_mm[-2:]
         if original_units == "mm":
@@ -751,7 +753,8 @@ class Controller:
 
     def save_gcode_file(self):
         suggested_filename = self.generate_gcode_filename()
-        color_change_data = self.view.gcode_slider.get_color_change_data()
+        color_change_layers = self.view.gcode_slider.get_color_change_layers()
+        color_change_data = self.gcode.get_first_extruding_line_number_of_gcode_for_layers(color_change_layers)
         data = self.view.save_gcode_file_dialog(suggested_filename)
         filename = data.split('.')
         if filename[-1] in ['gcode', 'GCODE']:
