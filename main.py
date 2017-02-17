@@ -45,12 +45,14 @@ def main():
 
 
     splash_pix = QPixmap('data/img/splashscreen.png')
-    splash = QSplashScreen(splash_pix, Qt.SplashScreen | Qt.FramelessWindowHint )
+    splash = QSplashScreen(splash_pix, Qt.SplashScreen | Qt.WindowStaysOnTopHint)
+    #prusacontrol_label = QLabel("PrusaControl", splash)
     progressBar = QProgressBar(splash)
     progressBar.setObjectName("splash_progressbar")
-    progressBar.setFixedWidth(195)
-    progressBar.setFixedHeight(7)
-    progressBar.move(82, 270)
+    progressBar.setFormat("")
+    progressBar.setFixedWidth(209)
+    progressBar.setFixedHeight(6)
+    progressBar.move(208, 367)
 
     if css.isOpen():
         progressBar.setStyleSheet(QVariant(css.readAll()).toString())

@@ -517,6 +517,10 @@ QProgressBar::chunk {
     border-radius: 5px;
 }
 
+QProgressBar#splash_progressbar {
+    background-color: rgb(255, 255, 255);
+}
+
 QSpinBox,
 QDoubleSpinBox {
     font-family: 'Titillium Web';

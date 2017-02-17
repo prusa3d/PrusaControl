@@ -208,7 +208,6 @@ class AppParameters(object):
         self.printers_filename = "printers.json"
 
 
-
         if self.system_platform in ['Linux']:
             self.tmp_place = tempfile.gettempdir() + '/'
             self.data_folder = "data/"
@@ -254,6 +253,8 @@ class AppParameters(object):
         if self.internet_on() and self.config.getboolean('settings', 'automatic_update_parameters'):
             self.download_new_settings_files()
             self.check_versions()
+
+            #self.check_new_version_of_prusacontrol()
 
 
         #read from version.txt
@@ -307,7 +308,7 @@ class AppParameters(object):
                     logging.debug('Error: %s' % e.strerror)
 
 
-    @timing
+    #@timing
     def download_new_settings_files(self):
         printers_data = {}
         r = urllib2.urlopen(self.json_settings_url + self.printers_filename)
@@ -358,7 +359,14 @@ class AppParameters(object):
                     if new_material_version > old_material_version:
                         copyfile(self.tmp_place + i, self.user_folder + i)
 
-
+    def check_new_version_of_prusacontrol(self):
+        #download json file with actual version
+        r = urllib2.urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
+        data = r.read()
+        if data:
+            return data
+        else:
+            return None
 
 
     def get_printers_info(self, json_path):
