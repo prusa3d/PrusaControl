@@ -162,8 +162,6 @@ class Controller:
         progress_bar.setValue(50)
         self.slicer_manager = SlicerEngineManager(self)
 
-
-
         self.scene = AppScene(self)
         progress_bar.setValue(90)
         self.view = PrusaControlView(self)
