@@ -738,54 +738,9 @@ class PrusaControlView(QMainWindow):
         self.centralWidget = QWidget(self)
         self.object_settings_panel = None
 
-
         self.menubar = self.menuBar()
-        # file menu definition
-        self.file_menu = self.menubar.addMenu(self.tr('&File'))
-        self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
-        self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
-        self.file_menu.addSeparator()
-        self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
-        self.file_menu.addAction(self.tr('Save project'), self.controller.save_project_file)
-        self.file_menu.addSeparator()
-        self.file_menu.addAction(self.tr('Reset'), self.controller.reset)
-        self.file_menu.addSeparator()
-        self.file_menu.addAction(self.tr('Close'), self.controller.close)
-        # file menu definition
 
-        # edit menu definition
-        self.edit_menu = self.menubar.addMenu(self.tr('&Edit'))
-        self.edit_menu.addAction(self.tr('Undo\tCtrl+Z'), self.controller.undo_function)
-        self.edit_menu.addAction(self.tr('Do\tCtrl+Y'), self.controller.do_function)
-        self.edit_menu.addSeparator()
-        self.edit_menu.addAction(self.tr('Copy\tCtrl+C'), self.controller.copy_selected_objects)
-        self.edit_menu.addAction(self.tr('Paste\tCtrl+V'), self.controller.paste_selected_objects)
-        self.edit_menu.addAction(self.tr('Delete\tDel'), self.controller.delete_selected_objects)
-        # self.edit_menu.addSeparator()
-        # self.edit_menu.addAction(self.tr('Info'), self.controller.close)
-        # edit menu definition
-
-        # TODO:Uncoment after new function created/tested
-        # printer menu
-        # self.printer_menu = self.menubar.addMenu(self.tr('&Printer'))
-        # self.printer_menu.addAction(self.tr('Printer info'), self.controller.open_printer_info)
-        # self.printer_menu.addAction(self.tr('Update firmware'), self.controller.open_update_firmware)
-        # printer menu
-
-        # Settings menu
-        self.settings_menu = self.menubar.addMenu(self.tr('&Settings'))
-        self.settings_menu.addAction(self.tr('PrusaControl settings'), self.controller.open_settings)
-        # Settings menu
-
-        # Help menu
-        self.help_menu = self.menubar.addMenu(self.tr('&Help'))
-        self.help_menu.addAction('Help', self.controller.open_help)
-        self.help_menu.addAction(self.tr('Prusa Online'), self.controller.open_shop)
-        self.help_menu.addSeparator()
-        self.help_menu.addAction(self.tr("Send feedback"), self.controller.send_feedback)
-        self.help_menu.addSeparator()
-        self.help_menu.addAction(self.tr('About'), self.controller.open_about)
-        # Help menu
+        #self.create_menu()
 
         #self.prusa_control_widget = PrusaControlWidget(self)
 
@@ -795,13 +750,11 @@ class PrusaControlView(QMainWindow):
         #Object settings layout
         #self.object_groupbox_layout = QtGui.QFormLayout()
 
-        self.name_l = QLabel(self.tr("Name"))
+        self.name_l = QLabel()
         self.name_l.setObjectName("name_l")
 
 
-
-
-        self.object_extruder_l = QLabel(self.tr("Extruder"))
+        self.object_extruder_l = QLabel()
         self.object_extruder_l.setObjectName("object_extruder_l")
         self.object_extruder_c = QComboBox()
         self.object_extruder_c.setObjectName("object_extruder_c")
@@ -811,7 +764,7 @@ class PrusaControlView(QMainWindow):
 
         self.filename_label = QLabel("")
         self.filename_label.setObjectName("filename_label")
-        self.position_l = QLabel(self.tr("Position"))
+        self.position_l = QLabel()
         self.position_l.setObjectName("position_l")
         self.edit_pos_x = QSpinBox()
         self.edit_pos_x.setObjectName("edit_pos_x")
@@ -849,7 +802,7 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_pos_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.rotation_l = QLabel(self.tr("Rotation"))
+        self.rotation_l = QLabel()
         self.rotation_l.setObjectName("rotation_l")
         self.edit_rot_x = QSpinBox()
         self.edit_rot_x.setObjectName("edit_rot_x")
@@ -887,7 +840,7 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_rot_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.scale_l = QLabel(self.tr("Scale"))
+        self.scale_l = QLabel()
         self.scale_l.setObjectName("scale_l")
         self.edit_scale_x = QDoubleSpinBox()
         self.edit_scale_x.setObjectName("edit_scale_x")
@@ -933,22 +886,19 @@ class PrusaControlView(QMainWindow):
         self.combobox_scale_units = QComboBox()
         self.combobox_scale_units.setObjectName("combobox_scale_units")
         self.combobox_scale_units.addItems(["%", "mm"])
-        self.combobox_scale_units.setToolTip(self.tr("In what units you want to scale?"))
         self.combobox_scale_units.setCurrentIndex(0)
+
         self.scale_units = self.combobox_scale_units.currentText()
         self.combobox_scale_units.currentIndexChanged.connect(self.change_scale_units)
+
         self.lock_scale_axes_checkbox = QCheckBox("")
         self.lock_scale_axes_checkbox.setObjectName("lock_axis_checkbox")
         self.lock_scale_axes_checkbox.stateChanged.connect(self.lock_scale_axes_change)
         self.lock_scale_axes_checkbox.setChecked(True)
-        self.lock_scale_axes_checkbox.setToolTip(self.tr("Lock of scaling axis"))
 
-        #self.lock_scale_axes_checkbox.setLayoutDirection(Qt.RightToLeft)
         self.place_on_zero = QCheckBox("")
         self.place_on_zero.setChecked(True)
         self.place_on_zero.setObjectName("place_on_zero")
-        self.place_on_zero.setToolTip(self.tr("Automatic placing of models\n on printing bed in Z axis"))
-        #self.place_on_zero.setLayoutDirection(Qt.RightToLeft)
         self.place_on_zero.stateChanged.connect(self.place_on_zero_changed)
 
         self.x_pos_l = QLabel('X')
@@ -981,16 +931,16 @@ class PrusaControlView(QMainWindow):
         self.z_scale_l.setAlignment(Qt.AlignRight)
         self.z_scale_l.setObjectName("z_scale_l")
 
-        self.units_l = QLabel(self.tr('Units'))
+        self.units_l = QLabel()
         self.units_l.setAlignment(Qt.AlignRight)
         self.units_l.setObjectName("units_l")
-        self.lock_scale_axes_l = QLabel(self.tr("Lock axes"))
+        self.lock_scale_axes_l = QLabel()
         self.lock_scale_axes_l.setAlignment(Qt.AlignRight)
         self.lock_scale_axes_l.setObjectName("lock_scale_axes_l")
-        self.place_on_zero_l = QLabel(self.tr("Place on bed"))
+        self.place_on_zero_l = QLabel()
         self.place_on_zero_l.setObjectName("place_on_zero_l")
 
-        self.advance_settings_b = QPushButton(self.tr("Advance Settings"))
+        self.advance_settings_b = QPushButton()
         self.advance_settings_b.setObjectName("advance_settings_b")
         self.advance_settings_b.clicked.connect(self.controller.set_advance_settings)
         if self.controller.development_flag:
@@ -1004,7 +954,7 @@ class PrusaControlView(QMainWindow):
         self.variable_layer_widget.setObjectName("variable_layer_widget")
         self.variable_layer_widget.setFixedHeight(400)
         self.connect(self.variable_layer_widget.slider, SIGNAL("valueChanged(int)"), self.set_variable_layer_slider)
-        self.basic_settings_b = QPushButton(self.tr("Basic Settings"))
+        self.basic_settings_b = QPushButton()
         self.basic_settings_b.setObjectName("basic_settings_b")
         self.basic_settings_b.clicked.connect(self.controller.set_basic_settings)
         # Object variable layer widget
@@ -1012,13 +962,13 @@ class PrusaControlView(QMainWindow):
         # Gcode view layout
         #self.gcode_view_layout = QtGui.QVBoxLayout()
 
-        self.color_change_l = QLabel("And color change")
+        self.color_change_l = QLabel()
         self.color_change_l.setObjectName("color_change_l")
 
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
 
-        self.gcode_back_b = QPushButton(self.tr("Back"))
+        self.gcode_back_b = QPushButton()
         self.gcode_back_b.setObjectName("gcode_back_b")
         self.gcode_back_b.clicked.connect(self.controller.set_model_edit_view)
         self.gcode_back_b.setVisible(False)
@@ -1036,13 +986,11 @@ class PrusaControlView(QMainWindow):
         #QtGui.QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
         #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
 
-        self.material_tooltip = self.tr("Select material for printing")
-        self.printer_settings_l = QLabel(self.tr("Printer settings"))
+        self.printer_settings_l = QLabel()
         self.printer_settings_l.setObjectName('printer_settings_l')
         # print tab
-        self.materialLabel = QLabel(self.tr("Material"))
+        self.materialLabel = QLabel()
         self.materialLabel.setObjectName('materialLabel')
-        self.materialLabel.setToolTip(self.material_tooltip)
         self.materialCombo = QComboBox()
         self.materialCombo.setObjectName('materialCombo')
         material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
@@ -1050,18 +998,14 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
         self.materialCombo.setMaxVisibleItems(len(material_label_ls))
-        self.materialCombo.setToolTip(self.material_tooltip)
         #self.materialCombo.setV
         #view = self.materialCombo.view()
 
 
-        self.quality_tooltip = self.tr("Select quality for printing")
-        self.qualityLabel = QLabel(self.tr("Quality"))
+        self.qualityLabel = QLabel()
         self.qualityLabel.setObjectName('qualityLabel')
-        self.qualityLabel.setToolTip(self.quality_tooltip)
         self.qualityCombo = QComboBox()
         self.qualityCombo.setObjectName('qualityCombo')
-        self.qualityCombo.setToolTip(self.quality_tooltip)
 
         #self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
         #self.infillLabel.setObjectName('infillLabel')
@@ -1069,64 +1013,55 @@ class PrusaControlView(QMainWindow):
         #self.infillSlider = self.create_slider(self.set_infill, self.infillValue)
         #self.infillSlider.setObjectName('infillSlider')
 
-        self.infill_tooltip = self.tr("Select how much space inside of model have to be filled")
-        self.infillLabel = QLabel(self.tr("Infill"))
+        self.infillLabel = QLabel()
         self.infillLabel.setObjectName('infillLabel')
         self.infillLabel.setFixedWidth(75)
-        self.infillLabel.setToolTip(self.infill_tooltip)
         self.infillCombo = QComboBox()
         self.infillCombo.setObjectName('infillCombo')
         infill_ls, f = self.controller.get_infill_ls_and_index_of_default("0%")
         self.infillCombo.insertItems(len(infill_ls), infill_ls)
         self.infillCombo.setMaxVisibleItems(len(infill_ls))
-        self.infillCombo.setToolTip(self.infill_tooltip)
 
 
         #self.supportCheckBox = QtGui.QCheckBox(self.tr("Support material"))
-        self.support_tooltip = self.tr("Select what kind of supports do you need, if any")
-        self.supportLabel = QLabel(self.tr("Support"))
+        self.supportLabel = QLabel()
         self.supportLabel.setObjectName('supportLabel')
-        self.supportLabel.setToolTip(self.support_tooltip)
         self.supportCombo = QComboBox()
-        self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
+        self.supportCombo.addItems([self.trUtf8("None"), self.trUtf8("Build plate only"), self.trUtf8("Everywhere")])
         self.supportCombo.setObjectName('supportCombo')
         self.supportCombo.setMaxVisibleItems(10)
-        self.supportCombo.setToolTip(self.support_tooltip)
 
-        self.brim_tooltip = self.tr("Do you need better adhesive of model and printing bed?")
-        self.brim_label = QLabel(self.tr("Brim"))
+        self.brim_label = QLabel()
         self.brim_label.setObjectName('brim_label')
-        self.brim_label.setToolTip(self.brim_tooltip)
         self.brimCheckBox = QCheckBox("")
         self.brimCheckBox.setObjectName('brimCheckBox')
-        self.brimCheckBox.setToolTip(self.brim_tooltip)
 
         #multimaterial settings
-        self.materials_settings_l = QLabel(self.tr("Material Settings"))
+        self.materials_settings_l = QLabel()
         self.materials_settings_l.setObjectName("materials_settings_l")
 
-        self.extruder1_l = QLabel(self.tr("Extruder 1"))
+        self.extruder1_l = QLabel()
         self.extruder1_l.setObjectName("extruder1_l")
         self.extruder1_c = QComboBox()
         self.extruder1_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder1_c.setCurrentIndex(first)
         self.extruder1_c.setObjectName("extruder1_c")
 
-        self.extruder2_l = QLabel(self.tr("Extruder 2"))
+        self.extruder2_l = QLabel()
         self.extruder2_l.setObjectName("extruder2_l")
         self.extruder2_c = QComboBox()
         self.extruder2_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder2_c.setCurrentIndex(first)
         self.extruder2_c.setObjectName("extruder2_c")
 
-        self.extruder3_l = QLabel(self.tr("Extruder 3"))
+        self.extruder3_l = QLabel()
         self.extruder3_l.setObjectName("extruder3_l")
         self.extruder3_c = QComboBox()
         self.extruder3_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder3_c.setCurrentIndex(first)
         self.extruder3_c.setObjectName("extruder3_c")
 
-        self.extruder4_l = QLabel(self.tr("Extruder 4"))
+        self.extruder4_l = QLabel()
         self.extruder4_l.setObjectName("extruder4_l")
         self.extruder4_c = QComboBox()
         self.extruder4_c.insertItems(len(material_label_ls), material_label_ls)
@@ -1134,7 +1069,7 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c.setObjectName("extruder4_c")
         # multimaterial settings
 
-        self.object_group_box = QGroupBox(self.tr("Object settings"))
+        self.object_group_box = QGroupBox()
         self.object_group_box.setObjectName('object_group_box')
         self.object_group_box.setLayout(self.create_object_settings_layout())
         self.object_group_box.setEnabled(False)
@@ -1145,12 +1080,12 @@ class PrusaControlView(QMainWindow):
         self.transformation_reset_b.move(221, 13)
         self.transformation_reset_b.clicked.connect(lambda: self.reset_transformation_on_object(self.get_object_id()))
 
-        self.object_variable_layer_box = QGroupBox(self.tr("Object advance settings"))
+        self.object_variable_layer_box = QGroupBox()
         self.object_variable_layer_box.setObjectName('object_variable_layer_box')
         self.object_variable_layer_box.setLayout(self.create_object_advance_settings_layout())
         self.object_variable_layer_box.setVisible(False)
 
-        self.gcode_group_box = QGroupBox(self.tr("Gcode preview"))
+        self.gcode_group_box = QGroupBox()
         self.gcode_group_box.setObjectName('gcode_group_box')
         self.gcode_group_box.setLayout(self.create_gcode_view_layout())
         self.gcode_group_box.setVisible(False)
@@ -1163,11 +1098,11 @@ class PrusaControlView(QMainWindow):
         self.progressBar.setAlignment(Qt.AlignCenter)
         #self.progressBar.setFormat("Generovani GCodu %p%")
 
-        self.generateButton = QPushButton(self.tr("Generate"))
+        self.generateButton = QPushButton()
         self.generateButton.setObjectName('generateButton')
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
         self.generateButton.setEnabled(False)
-        self.generateButton.setToolTip(self.tr("Generate scene with actual options to gcode file"))
+
 
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
@@ -1230,7 +1165,9 @@ class PrusaControlView(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
         self.statusBar().showMessage('Ready')
-        self.setWindowTitle(self.tr("PrusaControl " + self.controller.app_config.version))
+        self.setWindowTitle("PrusaControl " + self.controller.app_config.version)
+
+        self.retranslateUI()
 
         self.setVisible(True)
 
@@ -1248,6 +1185,77 @@ class PrusaControlView(QMainWindow):
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
         self.show()
+
+
+    def retranslateUI(self):
+        self.name_l.setText(self.trUtf8("Name"))
+        self.object_extruder_l.setText(self.trUtf8("Extruder"))
+        self.position_l.setText(self.trUtf8("Position"))
+        self.rotation_l.setText(self.trUtf8("Rotation"))
+        self.scale_l.setText(self.trUtf8("Scale"))
+
+        self.combobox_scale_units.setToolTip(self.trUtf8("In what units you want to scale?"))
+
+        self.lock_scale_axes_l.setText(self.trUtf8("Lock axes"))
+        self.lock_scale_axes_checkbox.setToolTip(self.trUtf8("Lock of scaling axis"))
+
+        self.place_on_zero_l.setText(self.trUtf8("Place on bed"))
+        self.place_on_zero.setToolTip(self.trUtf8("Automatic placing of models\n on printing bed in Z axis"))
+
+        self.units_l.setText(self.trUtf8('Units'))
+
+        self.advance_settings_b.setText(self.trUtf8("Advance Settings"))
+        self.basic_settings_b.setText(self.trUtf8("Basic Settings"))
+
+        self.color_change_l.setText(self.trUtf8("And color change"))
+        self.gcode_back_b.setText(self.trUtf8("Back"))
+
+        self.printer_settings_l.setText(self.trUtf8("Printer settings"))
+
+        self.materialLabel.setText(self.trUtf8("Material"))
+        self.material_tooltip = self.trUtf8("Select material for printing")
+        self.materialLabel.setToolTip(self.material_tooltip)
+        self.materialCombo.setToolTip(self.material_tooltip)
+
+        self.qualityLabel.setText(self.trUtf8("Quality"))
+        self.quality_tooltip = self.trUtf8("Select quality for printing")
+        self.qualityLabel.setToolTip(self.quality_tooltip)
+        self.qualityCombo.setToolTip(self.quality_tooltip)
+
+        self.infillLabel.setText(self.trUtf8("Infill"))
+        self.infill_tooltip = self.trUtf8("Select how much space inside of model have to be filled")
+        self.infillLabel.setToolTip(self.infill_tooltip)
+        self.infillCombo.setToolTip(self.infill_tooltip)
+
+        self.supportLabel.setText(self.trUtf8("Support"))
+        self.support_tooltip = self.trUtf8("Select what kind of supports do you need, if any")
+        self.supportCombo.clear()
+        self.supportCombo.addItems([self.trUtf8("None"), self.trUtf8("Build plate only"), self.trUtf8("Everywhere")])
+        self.supportLabel.setToolTip(self.support_tooltip)
+        self.supportCombo.setToolTip(self.support_tooltip)
+
+        self.brim_tooltip = self.trUtf8("Do you need better adhesive of model and printing bed?")
+        self.brim_label.setText(self.trUtf8("Brim"))
+        self.brim_label.setToolTip(self.brim_tooltip)
+        self.brimCheckBox.setToolTip(self.brim_tooltip)
+
+        self.materials_settings_l.setText(self.trUtf8("Material Settings"))
+        self.extruder1_l.setText(self.trUtf8("Extruder 1"))
+        self.extruder2_l.setText(self.trUtf8("Extruder 2"))
+        self.extruder3_l.setText(self.trUtf8("Extruder 3"))
+        self.extruder4_l.setText(self.trUtf8("Extruder 4"))
+
+        self.object_group_box.setTitle(self.trUtf8("Object settings"))
+        self.object_variable_layer_box.setTitle(self.trUtf8("Object advance settings"))
+        self.gcode_group_box.setTitle(self.trUtf8("Gcode preview"))
+
+        self.generateButton.setText(self.trUtf8("Generate"))
+        self.generateButton.setToolTip(self.trUtf8("Generate scene with actual options to gcode file"))
+
+        self.create_menu()
+
+
+
 
     def set_multimaterial_gui_on(self, number_of_materials):
         self.materials_settings_l.setVisible(True)
@@ -1297,6 +1305,55 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
 
+    def create_menu(self):
+        self.menubar.clear()
+        # file menu definition
+        self.file_menu = self.menubar.addMenu(self.trUtf8('&File'))
+        self.file_menu.addAction(self.trUtf8('Import model file'), self.controller.open_model_file)
+        self.file_menu.addAction(self.trUtf8('Import multipart model file'), self.controller.open_multipart_model)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.trUtf8('Open project'), self.controller.open_project_file)
+        self.file_menu.addAction(self.trUtf8('Save project'), self.controller.save_project_file)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.trUtf8('Reset'), self.controller.reset)
+        self.file_menu.addSeparator()
+        self.file_menu.addAction(self.trUtf8('Close'), self.controller.close)
+        # file menu definition
+
+        # edit menu definition
+        self.edit_menu = self.menubar.addMenu(self.trUtf8('&Edit'))
+        self.edit_menu.addAction(self.trUtf8('Undo\tCtrl+Z'), self.controller.undo_function)
+        self.edit_menu.addAction(self.trUtf8('Do\tCtrl+Y'), self.controller.do_function)
+        self.edit_menu.addSeparator()
+        self.edit_menu.addAction(self.trUtf8('Copy\tCtrl+C'), self.controller.copy_selected_objects)
+        self.edit_menu.addAction(self.trUtf8('Paste\tCtrl+V'), self.controller.paste_selected_objects)
+        self.edit_menu.addAction(self.trUtf8('Delete\tDel'), self.controller.delete_selected_objects)
+        # self.edit_menu.addSeparator()
+        # self.edit_menu.addAction(self.tr('Info'), self.controller.close)
+        # edit menu definition
+
+        # TODO:Uncoment after new function created/tested
+        # printer menu
+        # self.printer_menu = self.menubar.addMenu(self.tr('&Printer'))
+        # self.printer_menu.addAction(self.tr('Printer info'), self.controller.open_printer_info)
+        # self.printer_menu.addAction(self.tr('Update firmware'), self.controller.open_update_firmware)
+        # printer menu
+
+        # Settings menu
+        self.settings_menu = self.menubar.addMenu(self.trUtf8('&Settings'))
+        self.settings_menu.addAction(self.trUtf8('PrusaControl settings'), self.controller.open_settings)
+        # Settings menu
+
+        # Help menu
+        self.help_menu = self.menubar.addMenu(self.trUtf8('&Help'))
+        self.help_menu.addAction(self.trUtf8('Help'), self.controller.open_help)
+        self.help_menu.addAction(self.trUtf8('Prusa Online'), self.controller.open_shop)
+        self.help_menu.addSeparator()
+        self.help_menu.addAction(self.trUtf8("Send feedback"), self.controller.send_feedback)
+        self.help_menu.addSeparator()
+        self.help_menu.addAction(self.trUtf8('About'), self.controller.open_about)
+        # Help menu
+
     def reset_transformation_on_object(self, object_id):
         self.controller.reset_transformation_on_object(object_id)
         self.update_position_widgets(object_id)
@@ -1307,9 +1364,9 @@ class PrusaControlView(QMainWindow):
     def show_exit_message_scene_not_saved(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("Save"))
-        msgBox.setText(self.tr("Scene is not saved."))
-        msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
+        msgBox.setWindowTitle(self.trUtf8("Save"))
+        msgBox.setText(self.trUtf8("Scene is not saved."))
+        msgBox.setInformativeText(self.trUtf8("Do you want to save your changes?"))
         msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
         msgBox.setDefaultButton(QMessageBox.Save)
 
@@ -1319,9 +1376,9 @@ class PrusaControlView(QMainWindow):
     def show_exit_message_generating_scene(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("Exit"))
-        msgBox.setText(self.tr("GCode is in generating process."))
-        msgBox.setInformativeText(self.tr("Do you want to cancel generating of GCode and exit?"))
+        msgBox.setWindowTitle(self.trUtf8("Exit"))
+        msgBox.setText(self.trUtf8("GCode is in generating process."))
+        msgBox.setInformativeText(self.trUtf8("Do you want to cancel generating of GCode and exit?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
 
@@ -1330,9 +1387,9 @@ class PrusaControlView(QMainWindow):
     def show_cancel_generating_dialog_and_load_file(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("Load file"))
-        msgBox.setText(self.tr("GCode is in generating process."))
-        msgBox.setInformativeText(self.tr("Do you want to cancel generating of GCode and load file?"))
+        msgBox.setWindowTitle(self.trUtf8("Load file"))
+        msgBox.setText(self.trUtf8("GCode is in generating process."))
+        msgBox.setInformativeText(self.trUtf8("Do you want to cancel generating of GCode and load file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
 
@@ -1341,9 +1398,9 @@ class PrusaControlView(QMainWindow):
     def show_cancel_generating_dialog_and_load_file(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("Load file"))
-        msgBox.setText(self.tr("GCode file is in loading process."))
-        msgBox.setInformativeText(self.tr("Do you want to cancel loading of GCode file and load this file?"))
+        msgBox.setWindowTitle(self.trUtf8("Load file"))
+        msgBox.setText(self.trUtf8("GCode file is in loading process."))
+        msgBox.setInformativeText(self.trUtf8("Do you want to cancel loading of GCode file and load this file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
 
@@ -1352,9 +1409,9 @@ class PrusaControlView(QMainWindow):
     def show_clear_scene_and_load_gcode_file_dialog(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("Scene not empty"))
-        msgBox.setText(self.tr("Some objects are in scene"))
-        msgBox.setInformativeText(self.tr("Do you want to clear scene and load GCode file?"))
+        msgBox.setWindowTitle(self.trUtf8("Scene not empty"))
+        msgBox.setText(self.trUtf8("Some objects are in scene"))
+        msgBox.setInformativeText(self.trUtf8("Do you want to clear scene and load GCode file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
         return msgBox.exec_()
@@ -1362,9 +1419,9 @@ class PrusaControlView(QMainWindow):
     def show_open_cancel_gcode_preview_dialog(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("GCode is generated"))
-        msgBox.setText(self.tr("Scene is generated to GCode"))
-        msgBox.setInformativeText(self.tr("Do you want to close GCode preview and import new file?"))
+        msgBox.setWindowTitle(self.trUtf8("GCode is generated"))
+        msgBox.setText(self.trUtf8("Scene is generated to GCode"))
+        msgBox.setInformativeText(self.trUtf8("Do you want to close GCode preview and import new file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
         return msgBox.exec_()
@@ -1373,9 +1430,9 @@ class PrusaControlView(QMainWindow):
     def open_project_asking_dialog(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
-        msgBox.setWindowTitle(self.tr("Open project file"))
-        msgBox.setText(self.tr("In scene are some objects"))
-        msgBox.setInformativeText(self.tr("Do you want to load project file in actual scene?"))
+        msgBox.setWindowTitle(self.trUtf8("Open project file"))
+        msgBox.setText(self.trUtf8("In scene are some objects"))
+        msgBox.setInformativeText(self.trUtf8("Do you want to load project file in actual scene?"))
         msgBox.setStandardButtons(QMessageBox.Accepted | QMessageBox.Open | QMessageBox.Cancel)
         msgBox.setDefaultButton(QMessageBox.Save)
         ret = msgBox.exec_()
@@ -1430,25 +1487,25 @@ class PrusaControlView(QMainWindow):
         #self.progressBar.setAlignment(Qt.AlignCenter)
 
     def set_save_gcode_button(self):
-        self.generateButton.setText(self.tr("Save G-Code"))
-        self.generateButton.setToolTip(self.tr("Save generated gcode file"))
+        self.generateButton.setText(self.trUtf8("Save G-Code"))
+        self.generateButton.setToolTip(self.trUtf8("Save generated gcode file"))
 
     def set_cancel_button(self):
-        self.generateButton.setText(self.tr("Cancel"))
-        self.generateButton.setToolTip(self.tr("Cancel of generating gcode file"))
+        self.generateButton.setText(self.trUtf8("Cancel"))
+        self.generateButton.setToolTip(self.trUtf8("Cancel of generating gcode file"))
 
     def set_cancel_saving_gcode_button(self):
-        self.generateButton.setText(self.tr("Cancel"))
-        self.generateButton.setToolTip(self.tr("Cancel of saving gcode file"))
+        self.generateButton.setText(self.trUtf8("Cancel"))
+        self.generateButton.setToolTip(self.trUtf8("Cancel of saving gcode file"))
 
     def set_generate_button(self):
-        self.generateButton.setText(self.tr("Generate"))
-        self.generateButton.setToolTip(self.tr("Generate scene with actual options to gcode file"))
+        self.generateButton.setText(self.trUtf8("Generate"))
+        self.generateButton.setToolTip(self.trUtf8("Generate scene with actual options to gcode file"))
 
     def set_cancel_of_loading_gcode_file(self):
         self.generateButton.setEnabled(True)
-        self.generateButton.setText(self.tr("Cancel file read"))
-        self.generateButton.setToolTip(self.tr("Cancel of reading file"))
+        self.generateButton.setText(self.trUtf8("Cancel file read"))
+        self.generateButton.setToolTip(self.trUtf8("Cancel of reading file"))
 
     def set_print_info_text(self, string):
         self.printing_filament_data.setText(string)
@@ -2134,7 +2191,7 @@ class PrusaControlView(QMainWindow):
     def set_infill(self, val):
         self.infillValue = val
         infill_value_str = "%2d" % val
-        self.infillLabel.setText(self.tr("Infill") + " " + infill_value_str + "%")
+        self.infillLabel.setText(self.trUtf8("Infill") + " " + infill_value_str + "%")
 
     def create_slider(self, setterSlot, defaultValue=0, rangeMin=0, rangeMax=100, orientation=Qt.Horizontal, base_class=QSlider):
         if base_class == Gcode_slider:
