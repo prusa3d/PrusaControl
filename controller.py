@@ -50,6 +50,7 @@ def timing(f):
 class Controller:
     def __init__(self, app, local_path='', progress_bar=None):
         logging.info('Local path: ' + local_path)
+        self.view = []
 
         #this flag is only for development only, Development = True, Production = False
         self.development_flag = False
@@ -445,6 +446,8 @@ class Controller:
     def translate_app(self, translation="translation/en_US.qm"):
         self.translator.load(translation)
         self.app.installTranslator(self.translator)
+        if self.view:
+            self.view.retranslateUI()
 
     def cancel_generation(self):
         self.slicer_manager.cancel()
@@ -573,10 +576,10 @@ class Controller:
 
     def open_cancel_generating_dialog(self):
         ret = self.view.show_cancel_generating_dialog_and_load_file()
-        if ret == QtGui.QMessageBox.Yes:
+        if ret == QMessageBox.Yes:
             self.cancel_generation()
             return True
-        elif ret == QtGui.QMessageBox.No:
+        elif ret == QMessageBox.No:
             return False
 
 
@@ -820,11 +823,6 @@ class Controller:
         project_file.save(path)
         self.scene_was_saved = True
 
-    '''
-    def open_asking_dialog(self, type):
-        if type=="project":
-    '''
-
     def update_scene(self):
         self.view.update_scene()
         if self.status in ['edit', 'canceled']:
@@ -844,7 +842,6 @@ class Controller:
         temp_settings = self.view.open_settings_dialog()
         if not temp_settings['language'] == self.settings['language']:
             self.set_language(temp_settings['language'])
-            self.show_message_on_status_bar(self.app.tr("Language change will take effect after application restart"))
 
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
@@ -884,25 +881,10 @@ class Controller:
         self.set_generate_button()
         self.set_progress_bar(0.0)
 
-    '''
-    def set_model_view_mode(self):
-        if self.status in ['generating']:
-            pass
-        elif self.status in ['loading_gcode']:
-            #set progressbar
-            self.set_progress_bar(0)
-            #set generate button
-            self.set_generate_button()
-
-        self.render_status == 'model_view'
-    '''
 
     def wheel_event(self, event):
         self.view.set_zoom(event.delta()/120)
-        #self.view.statusBar().showMessage("Zoom = %s" % self.view.get_zoom())
         self.update_scene()
-        #self.view.update_scene()
-
 
     def set_camera_move_function(self):
         self.camera_move=True
@@ -937,9 +919,6 @@ class Controller:
                 return model
         return None
 
-
-    #def get_active_tool(self):
-    #    return None
 
     def is_some_tool_helper_under_cursor(self, object_id):
         if object_id == 0:
@@ -1335,10 +1314,7 @@ class Controller:
                 if model.selected:
                     pos = deepcopy(model.pos)
                     pos[2] = 0.
-                    self.original_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
-                    self.original_scale = numpy.linalg.norm(self.original_scale_point - pos)
-                    self.last_l = self.original_scale.copy()
-
+                    self.original_scale = deepcopy(model.scale)
 
 
 
@@ -1416,7 +1392,6 @@ class Controller:
                 # print("scale function")
                 ray_start, ray_end = self.view.get_cursor_position(event)
                 # camera_pos, direction, _, _ = self.view.get_camera_direction(event)
-
                 for model in self.scene.models:
                     if model.selected:
                         pos = deepcopy(model.pos)
@@ -1427,19 +1402,28 @@ class Controller:
                         l = numpy.linalg.norm(new_scale_vect)
                         l -= .5
 
-                        if not self.last_l == l:
-                            origin_size = deepcopy(model.size_origin)
-                            origin_size[2] = 0.
-                            origin_size *= .5
+                        new_size = self.original_scale * model.size_origin
+                        new_size[2] = 0.
+                        new_size *= .5
 
-                            new_scale = l / numpy.linalg.norm(origin_size)
-                            # print("Nova velikost scalu: " + str(new_scale))
-                            scale_prop = model.scale / numpy.linalg.norm(model.scale)
-                            scale_prop *=new_scale
+                        origin_size = deepcopy(model.size_origin)
+                        origin_size[2] = 0.
+                        origin_size *= .5
 
-                            model.set_scale_abs(scale_prop[0], scale_prop[1], scale_prop[2])
-                            # model.set_scale(new_scale)
-                            self.last_l = new_scale
+                        if self.original_scale[0] == self.original_scale[1] == self.original_scale[2]:
+                            #same proportion
+                            v = l / numpy.linalg.norm(origin_size)
+                            new_scale = numpy.array([v, v, v])
+                        else:
+                            v = l / numpy.linalg.norm(new_size)
+                            new_scale = numpy.array([v*(self.original_scale * model.size_origin)[0],
+                                                v*(self.original_scale * model.size_origin)[1],
+                                                v*(self.original_scale * model.size_origin)[2]])
+
+                        new_scale = numpy.abs(new_scale)
+                        model.set_scale_abs(new_scale[0], new_scale[1], new_scale[2])
+
+                        #self.last_l = l
 
                         self.view.update_scale_widgets(model.id)
                         self.scene_was_changed()
