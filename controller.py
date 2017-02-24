@@ -1317,8 +1317,6 @@ class Controller:
                     self.original_scale = deepcopy(model.scale)
 
 
-
-
     def mouse_move_event(self, event):
         #print("Mouse move event")
         self.mouse_move_event_flag = True
@@ -1416,9 +1414,10 @@ class Controller:
                             new_scale = numpy.array([v, v, v])
                         else:
                             v = l / numpy.linalg.norm(new_size)
-                            new_scale = numpy.array([v*(self.original_scale * model.size_origin)[0],
-                                                v*(self.original_scale * model.size_origin)[1],
-                                                v*(self.original_scale * model.size_origin)[2]])
+                            new_scale = numpy.array([v*(self.original_scale)[0],
+                                                v*(self.original_scale)[1],
+                                                v*(self.original_scale)[2]])
+
 
                         new_scale = numpy.abs(new_scale)
                         model.set_scale_abs(new_scale[0], new_scale[1], new_scale[2])
