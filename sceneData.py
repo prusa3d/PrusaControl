@@ -785,16 +785,17 @@ class Model(object):
                                  [0., 1., 0.],
                                  [0., 0., 1.]]) * self.scale
 
+
         final_rotation = rotation_matrix
         final_scale = scale_matrix
-        final_matrix = np.dot(final_rotation, final_scale)
-
-        for i in range(3):
-            vectors[:, i] = vectors[:, i].dot(final_matrix)
-
+        #final_matrix = np.dot(final_rotation, final_scale)
+        final_matrix = np.dot(final_scale, final_rotation)
 
 
         if transform and generate_gcode:
+            for i in range(3):
+                vectors[:, i] = vectors[:, i].dot(final_matrix)
+
             printer = self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)
             #print("Printer: " + str(printer))
             vectors += self.pos + (np.array([printer['printing_space'][0]*0.5*.1,
@@ -1027,7 +1028,8 @@ class Model(object):
 
         final_rotation = rotation_matrix
         final_scale = scale_matrix
-        final_matrix = np.dot(final_rotation, final_scale)
+        #final_matrix = np.dot(final_rotation, final_scale)
+        final_matrix = np.dot(final_scale, final_rotation)
 
         for i in range(3):
             self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
@@ -1126,6 +1128,15 @@ class Model(object):
         final_matrix = np.dot(final_scale, final_rotation)
 
         glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
+
+        m = np.array([1.,0.,0.,0.,
+                  0.,1.,0.,0.,
+                  0.,0.,1.,0.,
+                  0.,0.,0.,1.0])
+        glGetFloatv(GL_MODELVIEW_MATRIX, m)
+        print(str(m))
+
+
 
         self.put_array_to_gl()
 

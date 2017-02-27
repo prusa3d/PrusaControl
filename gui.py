@@ -2005,7 +2005,7 @@ class PrusaControlView(QMainWindow):
         self.generateButton.setDisabled(False)
 
     def open_project_file_dialog(self):
-        filters = "Prus (*.prus *.PRUS)"
+        filters = "Prus (*.prusa *.PRUSA)"
         title = 'Open project file'
         open_at = "/home"
         data = QFileDialog.getOpenFileName(None, title, open_at, filters)
@@ -2023,7 +2023,7 @@ class PrusaControlView(QMainWindow):
         return filenames_list
 
     def save_project_file_dialog(self):
-        filters = "Prus (*.prus *.PRUS)"
+        filters = "Prus (*.prusa *.PRUSA)"
         title = 'Save project file'
         open_at = "/home"
         data = QFileDialog.getSaveFileName(None, title, open_at, filters)

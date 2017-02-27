@@ -1807,7 +1807,7 @@ class Controller:
         if fileEnd in ['stl', 'STL', 'Stl']:
             #print('import model')
             self.import_model(url)
-        elif fileEnd in ['prus', 'PRUS']:
+        elif fileEnd in ['prusa', 'PRUSA']:
             #print('open project')
 
             self.open_project_file(url)

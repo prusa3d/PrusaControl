@@ -15,7 +15,7 @@ from stl.mesh import Mesh
 
 from sceneData import ModelTypeStl
 
-fileExtension = 'prus'
+fileExtension = 'prusa'
 
 
 class ProjectFile(object):
@@ -104,9 +104,9 @@ class Version_1_0(VersionAbstract):
 
                 #mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
                 model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
-                model.rotation_matrix = numpy.array(m['rotation'])
+                model.rot = numpy.array(m['rotation'])
                 model.pos = numpy.array(m['position'])
-                model.scale_matrix = numpy.array(m['scale'])
+                model.scale = numpy.array(m['scale'])
                 model.update_min_max()
                 model.parent = scene
 
@@ -125,10 +125,9 @@ class Version_1_0(VersionAbstract):
                     model_element = ET.SubElement(models_tag, "model", name=model.filename)
                     ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
                     ET.SubElement(model_element, "position").text=str(model.pos.tolist())
-                    ET.SubElement(model_element, "rotation").text=str(model.rotation_matrix.tolist())
-                    ET.SubElement(model_element, "scale").text=str(model.scale_matrix.tolist())
-                    #ET.SubElement(model_element, "rotation").text=str([.0, .0, .0])
-                    #ET.SubElement(model_element, "scale").text=str([1., 1., 1.])
+                    ET.SubElement(model_element, "rotation").text=str(model.rot.tolist())
+                    ET.SubElement(model_element, "scale").text=str(model.scale.tolist())
+
 
 
             #save xml file to new created zip file
