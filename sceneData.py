@@ -1129,12 +1129,12 @@ class Model(object):
 
         glMultMatrixf(self.matrix3_to_matrix4(final_matrix))
 
-        m = np.array([1.,0.,0.,0.,
-                  0.,1.,0.,0.,
-                  0.,0.,1.,0.,
-                  0.,0.,0.,1.0])
-        glGetFloatv(GL_MODELVIEW_MATRIX, m)
-        print(str(m))
+        #m = np.array([1.,0.,0.,0.,
+        #          0.,1.,0.,0.,
+        #          0.,0.,1.,0.,
+        #          0.,0.,0.,1.0])
+        #glGetFloatv(GL_MODELVIEW_MATRIX, m)
+        #print(str(m))
 
 
 
