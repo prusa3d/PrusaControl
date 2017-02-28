@@ -207,6 +207,9 @@ class AppParameters(object):
         self.json_settings_url = "https://raw.githubusercontent.com/prusa3d/PrusaControl-settings/master/"
         self.printers_filename = "printers.json"
 
+        self.prusacontrol_url = "http://tbor.pythonanywhere.com/"
+        self.prusacontrol_version_file = "prusacontrol_actual.info"
+
 
         if self.system_platform in ['Linux']:
             self.tmp_place = tempfile.gettempdir() + '/'

@@ -1189,7 +1189,7 @@ class Model(object):
             glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
             glColor3ub(255, 97, 0)
-            self.parent.controller.view.glWidget.renderText(0., 0., 0., "!", font)
+            self.parent.controller.view.glWidget.renderText(0., 0., 0., u"!", font)
         if blending:
             glCullFace(GL_BACK)
             glDisable(GL_CULL_FACE)

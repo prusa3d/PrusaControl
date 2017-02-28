@@ -54,11 +54,11 @@ class Controller:
 
         #this flag is only for development only, Development = True, Production = False
         self.development_flag = False
-        progress_bar.setValue(10)
+        #progress_bar.setValue(10)
 
         self.app_config = AppParameters(self, local_path)
         self.printing_parameters = PrintingParameters(self.app_config)
-        progress_bar.setValue(30)
+        #progress_bar.setValue(30)
 
         self.analyzer = Analyzer(self)
         self.gcode = None
@@ -158,16 +158,16 @@ class Controller:
 
         self.translator = QTranslator()
         self.set_language(self.settings['language'])
-        progress_bar.setValue(40)
+        #progress_bar.setValue(40)
 
-        progress_bar.setValue(50)
+        #progress_bar.setValue(50)
         self.slicer_manager = SlicerEngineManager(self)
 
         self.scene = AppScene(self)
-        progress_bar.setValue(90)
+        #progress_bar.setValue(90)
         self.view = PrusaControlView(self)
 
-        progress_bar.setValue(92)
+        #progress_bar.setValue(92)
 
         self.analyze_result = []
 
@@ -176,7 +176,7 @@ class Controller:
         self.camera_move = False
         self.camera_rotate = False
         self.view.update_gui_for_material()
-        progress_bar.setValue(95)
+        #progress_bar.setValue(95)
 
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
@@ -185,7 +185,7 @@ class Controller:
         else:
             self.view.set_multimaterial_gui_off()
 
-        progress_bar.setValue(97)
+        #progress_bar.setValue(97)
 
 
         logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
@@ -196,7 +196,8 @@ class Controller:
                 logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
                 self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
 
-        progress_bar.setValue(99)
+        #progress_bar.setValue(99)
+
 
 
     def exit_event(self):

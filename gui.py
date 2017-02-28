@@ -706,21 +706,24 @@ class PrusaControlView(QMainWindow):
         self.controller = c
         super(PrusaControlView, self).__init__()
 
+        print("initialization of PrusaControlView")
         self.settings = QSettings("Prusa Research", "PrusaControl")
         self.restoreGeometry(self.settings.value("geometry", "").toByteArray())
         self.restoreState(self.settings.value("windowState", "").toByteArray())
 
+        print("font load of PrusaControlView")
         font_id = QFontDatabase.addApplicationFont("data/font/TitilliumWeb-Light.ttf")
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.setFont(self.font)
 
-
+        print("enable of Drop")
         self.setAcceptDrops(True)
 
         self.is_setting_panel_opened = True
         #self.setStyleSheet()
 
+        print("basic settings of PrusaControlView")
         self.setObjectName('PrusaControlView')
         css = QFile('data/my_stylesheet.css')
         css.open(QIODevice.ReadOnly)
@@ -728,17 +731,21 @@ class PrusaControlView(QMainWindow):
             self.setStyleSheet(QVariant(css.readAll()).toString())
             css.close()
 
+        print("some constants")
+
         self.infillValue = 20
         self.changable_widgets = {}
 
         self.object_id = 0
 
         self.setVisible(False)
+        print("creating of widgets")
 
         self.centralWidget = QWidget(self)
         self.object_settings_panel = None
 
         self.menubar = self.menuBar()
+        print("menu bar")
 
         #self.create_menu()
 
@@ -746,10 +753,12 @@ class PrusaControlView(QMainWindow):
 
         self.glWidget = sceneRender.GLWidget(self)
         self.glWidget.setObjectName('glWidget')
+        print("GL widgets")
 
         #Object settings layout
         #self.object_groupbox_layout = QtGui.QFormLayout()
 
+        print("right menu")
         self.name_l = QLabel()
         self.name_l.setObjectName("name_l")
 
@@ -1069,6 +1078,8 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c.setObjectName("extruder4_c")
         # multimaterial settings
 
+        print("multimaterial settings done")
+
         self.object_group_box = QGroupBox()
         self.object_group_box.setObjectName('object_group_box')
         self.object_group_box.setLayout(self.create_object_settings_layout())
@@ -1148,7 +1159,7 @@ class PrusaControlView(QMainWindow):
         self.right_panel.setLayout(self.right_panel_layout)
         self.right_panel.setFixedWidth(250)
 
-
+        print("create gcode panel")
         self.gcode_panel = QWidget()
         self.gcode_label = QLabel("0")
         self.gcode_label.setMaximumWidth(40)
@@ -1164,9 +1175,11 @@ class PrusaControlView(QMainWindow):
         self.centralWidget.setLayout(mainLayout)
         self.setCentralWidget(self.centralWidget)
 
-        self.statusBar().showMessage('Ready')
+        #self.statusBar().showMessage('Ready')
         self.setWindowTitle("PrusaControl " + self.controller.app_config.version)
+        print("Set window title")
 
+        print("Retranslate UI")
         self.retranslateUI()
 
         self.setVisible(True)
@@ -1182,8 +1195,11 @@ class PrusaControlView(QMainWindow):
         self.supportCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
+        print("created all widgets")
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
+        print("set strong focus for GL")
 
+        print("Show all")
         self.show()
 
 
@@ -1248,6 +1264,8 @@ class PrusaControlView(QMainWindow):
         self.object_group_box.setTitle(self.trUtf8("Object settings"))
         self.object_variable_layer_box.setTitle(self.trUtf8("Object advance settings"))
         self.gcode_group_box.setTitle(self.trUtf8("Gcode preview"))
+
+        self.transformation_reset_b.setToolTip(self.trUtf8("Reset transformations"))
 
         self.generateButton.setText(self.trUtf8("Generate"))
         self.generateButton.setToolTip(self.trUtf8("Generate scene with actual options to gcode file"))
@@ -1426,7 +1444,6 @@ class PrusaControlView(QMainWindow):
         msgBox.setDefaultButton(QMessageBox.No)
         return msgBox.exec_()
 
-
     def open_project_asking_dialog(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
@@ -1446,6 +1463,7 @@ class PrusaControlView(QMainWindow):
             return False
 
         return False
+
 
     def place_on_zero_changed(self):
         if self.place_on_zero.isChecked():
