@@ -202,7 +202,18 @@ class AppParameters(object):
         self.controller = controller
         self.system_platform = platform.system()
 
+        self.is_version_actual = True
+
         self.config = ConfigParser()
+
+        # read from version.txt
+        try:
+            with open("v.txt", 'r') as version_file:
+                self.version_full = version_file.read()
+                self.version = self.strip_version_string(self.version_full)
+        except Exception:
+            self.version_full = "0.1-1001"
+            self.version = "0.1"
 
         self.json_settings_url = "https://raw.githubusercontent.com/prusa3d/PrusaControl-settings/master/"
         self.printers_filename = "printers.json"
@@ -257,19 +268,16 @@ class AppParameters(object):
             self.download_new_settings_files()
             self.check_versions()
 
-            #self.check_new_version_of_prusacontrol()
+            self.check_new_version_of_prusacontrol()
 
 
-        #read from version.txt
-        try:
-            with open("v.txt", 'r') as version_file:
-                self.version_full = version_file.read()
-                self.version = self.version_full.split('-')
-                self.version = self.version[:2]
-                self.version = "_".join(self.version)[1:]
-        except Exception:
-            self.version_full = "0.1-1001"
-            self.version = "0.1"
+
+
+    def strip_version_string(self, string_in):
+        string_out = string_in.split('-')
+        string_out = string_out[:2]
+        string_out = "_".join(string_out)[1:]
+        return string_out
 
     def internet_on(self):
         try:
@@ -367,7 +375,10 @@ class AppParameters(object):
         r = urllib2.urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
         data = r.read()
         if data:
-            return data
+            if self.is_higher(self.strip_version_string(data)):
+                self.is_version_actual = False
+            else:
+                self.is_version_actual = True
         else:
             return None
 
@@ -388,6 +399,30 @@ class AppParameters(object):
             printers_data = json.load(in_file)
             return printers_data['info']['version']
         return None
+
+
+    def is_higher(self, version_from_internet):
+        splitted_version_from_internet = version_from_internet.split("_")
+        splitted_local_version = self.version.split("_")
+
+        print("Local version: " + str(splitted_local_version))
+        print("Internet version: " + str(splitted_version_from_internet))
+
+        version_from_internet_lst = splitted_version_from_internet[0].split(".")
+        local_version_lst = splitted_local_version[0].split(".")
+
+        if len(version_from_internet_lst) == len(local_version_lst):
+            for i, o in zip(version_from_internet_lst, local_version_lst):
+                if int(i) > int(o):
+                    return True
+            if int(splitted_version_from_internet[1]) > int(splitted_local_version[1]):
+                return True
+            else:
+                return False
+        else:
+            return True
+
+        return False
 
 
 

@@ -40,7 +40,6 @@ class EventLoopRunner(QObject):
 
         self.splash_pix = QPixmap('data/img/splashscreen.png')
         self.splash = QSplashScreen(self.splash_pix, Qt.SplashScreen | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground)
-        # prusacontrol_label = QLabel("PrusaControl", splash)
         self.progressBar = QProgressBar(self.splash)
         self.progressBar.setObjectName("splash_progressbar")
         self.progressBar.setFormat("")
@@ -62,7 +61,7 @@ class EventLoopRunner(QObject):
             self.app.processEvents()
 
         #self.finished.emit()
-        print("Konec event smycky")
+        #print("Konec event smycky")
 
 
 def log_exception(excType, excValue, traceback):
@@ -108,6 +107,7 @@ def main():
     event_loop_runner_thread.wait()
     event_loop_runner.splash.finish(window)
 
+    controller.check_version()
     app.installEventFilter(window)
     app.exec_()
     atexit.register(controller.write_config)
