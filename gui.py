@@ -1817,41 +1817,47 @@ class PrusaControlView(QMainWindow):
                     #print("Vstupni parametry pro mm: %s %s %s" % (str(x), str(y), str(z)))
 
                     if active_axis == 'x':
-                        x_recalc = x
-                        x_ration = x / (model.scale[0] * 100.)
+                        x_ration = x/model.size_origin[0]
 
-                        y_recalc = (model.scale[1] * 100.) * x_ration
                         self.edit_scale_y.setDisabled(True)
-                        self.edit_scale_y.setValue(y_recalc)
+                        self.edit_scale_y.setValue(model.size_origin[1] * x_ration)
                         self.edit_scale_y.setDisabled(False)
-                        z_recalc = (model.scale[2] * 100.) * x_ration
                         self.edit_scale_z.setDisabled(True)
-                        self.edit_scale_z.setValue(z_recalc)
+                        self.edit_scale_z.setValue(model.size_origin[2] * x_ration)
                         self.edit_scale_z.setDisabled(False)
+
+                        x_recalc = x_ration
+                        y_recalc = x_ration
+                        z_recalc = x_ration
+
                     elif active_axis == 'y':
-                        y_recalc = y
-                        y_ration = y / (model.scale[1] * 100.)
+                        y_ration = y / model.size_origin[1]
 
-                        x_recalc = (model.scale[0] * 100.) * y_ration
                         self.edit_scale_x.setDisabled(True)
-                        self.edit_scale_x.setValue(x_recalc)
+                        self.edit_scale_x.setValue(model.size_origin[0] * y_ration)
                         self.edit_scale_x.setDisabled(False)
-                        z_recalc = (model.scale[2] * 100.) * y_ration
                         self.edit_scale_z.setDisabled(True)
-                        self.edit_scale_z.setValue(z_recalc)
+                        self.edit_scale_z.setValue(model.size_origin[2] * y_ration)
                         self.edit_scale_z.setDisabled(False)
-                    elif active_axis == 'z':
-                        z_recalc = z
-                        z_ration = z / (model.scale[2] * 100.)
 
-                        x_recalc = (model.scale[0] * 100.) * z_ration
+                        y_recalc = y_ration
+                        x_recalc = y_ration
+                        z_recalc = y_ration
+
+                    elif active_axis == 'z':
+                        z_ration = z / model.size_origin[2]
+
                         self.edit_scale_x.setDisabled(True)
-                        self.edit_scale_x.setValue(x_recalc)
+                        self.edit_scale_x.setValue(model.size_origin[0] * z_ration)
                         self.edit_scale_x.setDisabled(False)
-                        y_recalc = (model.scale[1] * 100.) * z_ration
                         self.edit_scale_y.setDisabled(True)
-                        self.edit_scale_y.setValue(y_recalc)
+                        self.edit_scale_y.setValue(model.size_origin[1] * z_ration)
                         self.edit_scale_y.setDisabled(False)
+
+                        z_recalc = z_ration
+                        x_recalc = z_ration
+                        y_recalc = z_ration
+
 
                     x_recalc *= .1
                     y_recalc *= .1
