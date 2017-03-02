@@ -205,7 +205,7 @@ class Controller:
         if not self.app_config.is_version_actual:
             ret = self.view.show_new_version_message()
             if ret == QMessageBox.Yes:
-                self.open_web_browser("http://www.prusa3d.com")
+                self.open_web_browser(self.app_config.prusacontrol_webpage)
 
 
     def exit_event(self):
@@ -711,15 +711,15 @@ class Controller:
 
     def send_feedback(self):
         if self.settings['language'] == 'cs_CZ':
-            self.open_web_browser("http://goo.gl/forms/7jFBgXjOoqMbQ1wl1")
+            self.open_web_browser(self.app_config.prusacontrol_questionnaire_cz)
         else:
-            self.open_web_browser("http://goo.gl/forms/nhKwtXvrtaZey0B02")
+            self.open_web_browser(self.app_config.prusacontrol_questionnaire_en)
 
     def open_help(self):
-        self.open_web_browser("http://www.prusa3d.com")
+        self.open_web_browser(self.app_config.prusacontrol_help_page)
 
     def open_shop(self):
-        self.open_web_browser("http://shop.prusa3d.com")
+        self.open_web_browser(self.app_config.prusa_eshop_page)
 
     def set_save_gcode_button(self):
         self.view.set_save_gcode_button()

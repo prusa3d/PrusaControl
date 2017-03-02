@@ -221,6 +221,15 @@ class AppParameters(object):
         self.prusacontrol_url = "http://tbor.pythonanywhere.com/"
         self.prusacontrol_version_file = "prusacontrol_actual.info"
 
+        self.prusacontrol_webpage = "http://tbor.pythonanywhere.com/"
+
+        self.prusacontrol_questionnaire_cz = "http://goo.gl/forms/7jFBgXjOoqMbQ1wl1"
+        self.prusacontrol_questionnaire_en = "http://goo.gl/forms/nhKwtXvrtaZey0B02"
+
+        self.prusacontrol_help_page = "http://www.prusa3d.com"
+        self.prusa_eshop_page = "http://shop.prusa3d.com"
+
+
 
         if self.system_platform in ['Linux']:
             self.tmp_place = tempfile.gettempdir() + '/'
@@ -263,11 +272,15 @@ class AppParameters(object):
 
         self.first_run()
 
-        #Check connections and update flag
-        if self.internet_on() and self.config.getboolean('settings', 'automatic_update_parameters'):
+
+        is_internet_on = self.internet_on()
+
+        # Check connections and update flag
+        if is_internet_on and self.config.getboolean('settings', 'automatic_update_parameters'):
             self.download_new_settings_files()
             self.check_versions()
 
+        if is_internet_on:
             self.check_new_version_of_prusacontrol()
 
 
