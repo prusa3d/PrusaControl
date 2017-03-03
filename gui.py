@@ -70,7 +70,7 @@ class Gcode_slider(QWidget):
         self.add_button.setObjectName("gcode_slider_add_button")
         self.add_button.setVisible(False)
         self.add_button.setFixedWidth(20)
-        self.add_button.setToolTip(self.tr("Add color change point"))
+        self.add_button.setToolTip(self.trUtf8("Add color change point"))
 
         self.add_button.clicked.connect(self.add_point)
 
@@ -111,7 +111,7 @@ class Gcode_slider(QWidget):
                 button.setObjectName("gcode_slider_point_button")
                 button.setVisible(False)
                 button.setFixedWidth(20)
-                button.setToolTip(self.tr("Delete color change point"))
+                button.setToolTip(self.trUtf8("Delete color change point"))
 
                 self.points.append({'value': -1,
                                     'label': label,
@@ -504,33 +504,33 @@ class SettingsDialog(QDialog):
         layout = QVBoxLayout(self)
 
         # nice widget for editing the date
-        self.language_label = QLabel(self.tr("Language"))
+        self.language_label = QLabel(self.trUtf8("Language"))
         self.language_combo = QComboBox()
         #set enumeration
         self.language_combo.addItems(self.controller.enumeration['language'].values())
         self.language_combo.setCurrentIndex(self.controller.enumeration['language'].keys().index(self.controller.settings['language']))
 
-        self.printer_label = QLabel(self.tr("Printer model"))
+        self.printer_label = QLabel(self.trUtf8("Printer model"))
         self.printer_combo = QComboBox()
         self.printer_combo.addItems(self.controller.get_printers_labels_ls())
         self.printer_combo.setCurrentIndex(self.controller.get_printers_names_ls().index(self.controller.settings['printer']))
 
-        self.printer_type_label = QLabel(self.tr("Printer variation"))
+        self.printer_type_label = QLabel(self.trUtf8("Printer variation"))
         self.printer_type_combo = QComboBox()
         self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
         print("Aktualni list: " + str(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer)))
         self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
 
-        self.debug_checkbox = QCheckBox(self.tr("Debug"))
+        self.debug_checkbox = QCheckBox(self.trUtf8("Debug"))
         self.debug_checkbox.setChecked(self.controller.settings['debug'])
 
-        self.automatic_placing_checkbox = QCheckBox(self.tr("Automatic placing"))
+        self.automatic_placing_checkbox = QCheckBox(self.trUtf8("Automatic placing"))
         self.automatic_placing_checkbox.setChecked(self.controller.settings['automatic_placing'])
 
-        self.analyze_checkbox = QCheckBox(self.tr("Analyzer"))
+        self.analyze_checkbox = QCheckBox(self.trUtf8("Analyzer"))
         self.analyze_checkbox.setChecked(self.controller.settings['analyze'])
 
-        self.update_parameters_checkbox = QCheckBox(self.tr("Auto update parameters"))
+        self.update_parameters_checkbox = QCheckBox(self.trUtf8("Auto update parameters"))
         self.update_parameters_checkbox.setChecked(self.controller.settings['automatic_update_parameters'])
 
         layout.addWidget(self.language_label)
@@ -587,9 +587,9 @@ class FirmwareUpdateDialog(QDialog):
         #self.actualVersionLabel = QtGui.QLabel("Actual version of firmware is %s" % self.actualVersion)
         #self.yourVersionLabel = QtGui.QLabel("Your version of firmware is %s" % self.yourVersion)
 
-        self.open_file_button = QPushButton(self.tr("Open file"))
+        self.open_file_button = QPushButton(self.trUtf8("Open file"))
 
-        self.update_button = QPushButton(self.tr("Update"))
+        self.update_button = QPushButton(self.trUtf8("Update"))
         #TODO:Doplnit
         #self.updateButton.clicked.connect(self.controller.updateFirmware)
         #self.updateButton.setEnabled(self.differentVersion)
@@ -630,10 +630,10 @@ class AboutDialog(QDialog):
         self.prusa_control_label = QLabel("PrusaControl")
         self.prusa_control_label.setAlignment(Qt.AlignCenter)
 
-        self.prusa_control_text = QLabel("Created by Tibor Vavra for Prusa Research s.r.o.")
+        self.prusa_control_text = QLabel(controller.view.trUtf8("Created by Tibor Vavra for Prusa Research s.r.o."))
 
-        self.local_version_label = QLabel(self.tr("PrusaControl version is ") + str(self.your_version))
-        self.slic3r_engine_version_label = QLabel(self.tr("Slic3r engine version is ") + str(self.slic3r_version))
+        self.local_version_label = QLabel(controller.view.trUtf8("PrusaControl version is ") + str(self.your_version))
+        self.slic3r_engine_version_label = QLabel(controller.view.trUtf8("Slic3r engine version is ") + str(self.slic3r_version))
 
 
         #self.check_version_button = QtGui.QPushButton(self.tr("Check version"))
@@ -658,7 +658,7 @@ class AboutDialog(QDialog):
     @staticmethod
     def get_about_dialog(controller, parent = None):
         dialog = AboutDialog(controller, parent)
-        dialog.setWindowTitle("About")
+        dialog.setWindowTitle(controller.view.trUtf8("About"))
         result = dialog.exec_()
         data = {'msg':'Update is complete. New version is ....'}
         return (data, result == QDialog.Accepted)
@@ -674,9 +674,9 @@ class PrinterInfoDialog(QDialog):
 
         layout = QVBoxLayout(self)
 
-        self.printerNameLabel = QLabel(self.tr("Your printer is") + " %s" % self.printer_name)
+        self.printerNameLabel = QLabel(controller.view.trUtf8("Your printer is") + " %s" % self.printer_name)
 
-        self.printerFirmwareText = QLabel(self.tr("Version of firmware is") + " %s" % self.your_firmware_version)
+        self.printerFirmwareText = QLabel(controller.view.trUtf8("Version of firmware is") + " %s" % self.your_firmware_version)
 
 
         #TODO:Doplnit
@@ -1341,7 +1341,7 @@ class PrusaControlView(QMainWindow):
         # edit menu definition
         self.edit_menu = self.menubar.addMenu(self.trUtf8('&Edit'))
         self.edit_menu.addAction(self.trUtf8('Undo\tCtrl+Z'), self.controller.undo_function)
-        self.edit_menu.addAction(self.trUtf8('Do\tCtrl+Y'), self.controller.do_function)
+        self.edit_menu.addAction(self.trUtf8('Redo\tCtrl+Y'), self.controller.do_function)
         self.edit_menu.addSeparator()
         self.edit_menu.addAction(self.trUtf8('Copy\tCtrl+C'), self.controller.copy_selected_objects)
         self.edit_menu.addAction(self.trUtf8('Paste\tCtrl+V'), self.controller.paste_selected_objects)

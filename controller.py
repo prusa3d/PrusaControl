@@ -370,7 +370,7 @@ class Controller:
         self.set_progress_bar(100)
         self.status = 'generated'
         self.set_gcode_view()
-        self.show_message_on_status_bar(self.view.tr("GCode saved"))
+        self.show_message_on_status_bar(self.view.trUtf8("GCode saved"))
 
 
     def set_gcode(self):
@@ -755,13 +755,13 @@ class Controller:
             data = self.view.open_project_file_dialog()
         #logging.debug('open project file %s' %data)
         self.import_project(data)
-        self.show_message_on_status_bar(self.view.tr("Project loaded"))
+        self.show_message_on_status_bar(self.view.trUtf8("Project loaded"))
 
     def save_project_file(self):
         data = self.view.save_project_file_dialog()
         #logging.debug('save project file %s' %data)
         self.save_project(data)
-        self.show_message_on_status_bar(self.view.tr("Project was saved"))
+        self.show_message_on_status_bar(self.view.trUtf8("Project was saved"))
 
 
     def save_gcode_file(self):
@@ -1742,13 +1742,13 @@ class Controller:
     def slicing_message(self, string_in):
         #Translation of messages from slicing engine
 
-        translation_table = {'Generating perimeters': self.view.tr('Generating perimeters'),
-                             'Processing triangulated mesh': self.view.tr('Processing triangulated mesh'),
-                             'Infilling layers': self.view.tr('Infilling layers'),
-                             'Preparing infill': self.view.tr('Preparing infill'),
-                             'Generating skirt': self.view.tr('Generating skirt'),
-                             'Exporting G-code to': self.view.tr('Exporting G-code to'),
-                             'Done. Process took': self.view.tr('Done. Process took')
+        translation_table = {'Generating perimeters': self.view.trUtf8('Generating perimeters'),
+                             'Processing triangulated mesh': self.view.trUtf8('Processing triangulated mesh'),
+                             'Infilling layers': self.view.trUtf8('Infilling layers'),
+                             'Preparing infill': self.view.trUtf8('Preparing infill'),
+                             'Generating skirt': self.view.trUtf8('Generating skirt'),
+                             'Exporting G-code to': self.view.trUtf8('Exporting G-code to'),
+                             'Done. Process took': self.view.trUtf8('Done. Process took')
                              }
 
         string_in_str = str(string_in)

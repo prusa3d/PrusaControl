@@ -278,40 +278,40 @@ class GLWidget(QGLWidget):
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
         #                          [40., 40.], [10., -200.], False,
                                   [40., 40.], [10., -245.], False,
-                                  self.tr("Scale tool"),'scale')
+                                  self.trUtf8("Scale tool"),'scale')
 
         self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/gui/PlaceOnFace_Off.png"),
                                         self.texture_from_png("data/img/gui/PlaceOnFace_On.png"),
                                         self.texture_from_png("data/img/gui/PlaceOnFace_Hover.png"),
                                         self.texture_from_png("data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -245.], False,
-                                        self.tr("Place on face tool"), 'placeonface')
+                                        self.trUtf8("Place on face tool"), 'placeonface')
 
         self.rotateTool = GlButton(self.texture_from_png("data/img/gui/Rotate_Off.png"),
                                    self.texture_from_png("data/img/gui/Rotate_On.png"),
                                    self.texture_from_png("data/img/gui/Rotate_Hover.png"),
                                    self.texture_from_png("data/img/gui/tool_mask.png"),
                                    [40., 40.], [10., -290.], False,
-                                   self.tr("Rotate tool"), 'rotate')
+                                   self.trUtf8("Rotate tool"), 'rotate')
         self.organize_tool = GlButton(self.texture_from_png("data/img/gui/Organize_Off.png"),
                                         self.texture_from_png("data/img/gui/Organize_On.png"),
                                         self.texture_from_png("data/img/gui/Organize_Hover.png"),
                                         self.texture_from_png("data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -335.], True,
-                                      self.tr("Arrange tool"), 'organize')
+                                      self.trUtf8("Arrange tool"), 'organize')
         self.multiply_tool = GlButton(self.texture_from_png("data/img/gui/Multi_Off.png"),
                                       self.texture_from_png("data/img/gui/Multi_On.png"),
                                       self.texture_from_png("data/img/gui/Multi_Hover.png"),
                                       self.texture_from_png("data/img/gui/tool_mask.png"),
                                       [40., 40.], [10., -380.], False,
-                                      self.tr("Multiplication tool"), 'multi')
+                                      self.trUtf8("Multiplication tool"), 'multi')
 
         self.support_tool = GlButton(self.texture_from_png("data/img/gui/Support_Off.png"),
                                       self.texture_from_png("data/img/gui/Support_On.png"),
                                       self.texture_from_png("data/img/gui/Support_Hover.png"),
                                       self.texture_from_png("data/img/gui/tool_mask.png"),
                                       [40., 40.], [10., -425.], False,
-                                      self.tr("Support tool"), 'support')
+                                      self.trUtf8("Support tool"), 'support')
 
 
 
@@ -321,13 +321,13 @@ class GLWidget(QGLWidget):
                                     self.texture_from_png("data/img/gui/BackArrow_Hover.png"),
                                     self.texture_from_png("data/img/gui/tool_mask.png"),
                                     [40., 40.], [10, -50], True,
-                                    self.tr("Undo"), "undo")
+                                    self.trUtf8("Undo"), "undo")
         self.do_button = GlButton(self.texture_from_png("data/img/gui/ForwardArrow_Off.png"),
                                   self.texture_from_png("data/img/gui/ForwardArrow_On.png"),
                                   self.texture_from_png("data/img/gui/ForwardArrow_Hover.png"),
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
                                   [40., 40.], [60, -50], True,
-                                  self.tr("Do"), "do")
+                                  self.trUtf8("Redo"), "redo")
 
 
         #self.selectTool.set_callback(self.parent.controller.select_button_pressed)
@@ -770,8 +770,8 @@ class GLWidget(QGLWidget):
             #print(text)
             glColor3f(.5,.5,.5)
             #self.renderText(position_x + 8, sH - position_y - size_h + 63, header, font)
-            self.renderText(position_x + 108, sH - position_y - size_h + 63, self.tr("estimate time:"), font)
-            self.renderText(position_x + 208, sH - position_y - size_h + 63, self.tr("filament:"), font)
+            self.renderText(position_x + 108, sH - position_y - size_h + 63, self.trUtf8("estimate time:"), font)
+            self.renderText(position_x + 208, sH - position_y - size_h + 63, self.trUtf8("filament:"), font)
             glColor3f(1., 1., 1.)
             #self.renderText(position_x + 8, sH - position_y - size_h + 65 + 15, text, font)
             self.renderText(position_x + 10, sH - position_y - size_h + 65 + 15, messages['info_text'], font)
