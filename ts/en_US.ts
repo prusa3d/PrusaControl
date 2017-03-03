@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="en_US" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -17,8 +18,8 @@
     <name>AppScene</name>
     <message>
         <location filename="sceneData.py" line="312"/>
-        <source>&#xe2;&#x80;&#xa2; Object %s... is out of printable area!</source>
-        <translation type="unfinished"></translation>
+        <source>â¢ Object %s... is out of printable area!</source>
+        <translation type="obsolete">â¢ Object %s... is out of printable area!</translation>
     </message>
 </context>
 <context>
@@ -99,12 +100,12 @@
     <message>
         <location filename="sceneRender.py" line="690"/>
         <source>WARNING</source>
-        <translation type="unfinished"></translation>
+        <translation>WARNING</translation>
     </message>
     <message>
         <location filename="sceneRender.py" line="763"/>
         <source>PRINT INFO</source>
-        <translation type="unfinished"></translation>
+        <translation>PRINT INFO</translation>
     </message>
 </context>
 <context>
@@ -443,27 +444,27 @@
     </message>
     <message>
         <location filename="gui.py" line="1343"/>
-        <source>Undo<byte value="x9"/>Ctrl+Z</source>
+        <source>Undo	Ctrl+Z</source>
         <translation>Undo</translation>
     </message>
     <message>
         <location filename="gui.py" line="1344"/>
-        <source>Redo<byte value="x9"/>Ctrl+Y</source>
+        <source>Redo	Ctrl+Y</source>
         <translation>Redo</translation>
     </message>
     <message>
         <location filename="gui.py" line="1346"/>
-        <source>Copy<byte value="x9"/>Ctrl+C</source>
+        <source>Copy	Ctrl+C</source>
         <translation>Copy</translation>
     </message>
     <message>
         <location filename="gui.py" line="1347"/>
-        <source>Paste<byte value="x9"/>Ctrl+V</source>
+        <source>Paste	Ctrl+V</source>
         <translation>Paste</translation>
     </message>
     <message>
         <location filename="gui.py" line="1348"/>
-        <source>Delete<byte value="x9"/>Del</source>
+        <source>Delete	Del</source>
         <translation>Delete</translation>
     </message>
     <message>
@@ -674,6 +675,19 @@
         <location filename="controller.py" line="666"/>
         <source>Language change will take effect after application restart</source>
         <translation type="obsolete">Language change will take effect after restart of PrusaControl</translation>
+    </message>
+</context>
+<context>
+    <name>self.controller.view</name>
+    <message>
+        <location filename="sceneData.py" line="312"/>
+        <source>Object </source>
+        <translation>Object</translation>
+    </message>
+    <message>
+        <location filename="sceneData.py" line="313"/>
+        <source> is out of printable area!</source>
+        <translation> is out of printable area!</translation>
     </message>
 </context>
 <context>
