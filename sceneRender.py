@@ -687,7 +687,7 @@ class GLWidget(QGLWidget):
             glColor4f(1.,1.,1.,1.)
             font = self.controller.view.font
             font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
-            self.renderText(115, sH - 153, u"WARNING", font)
+            self.renderText(115, sH - 153, self.tr("WARNING"), font)
 
             font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
             for n, message in enumerate(messages):
@@ -760,7 +760,7 @@ class GLWidget(QGLWidget):
             glColor4f(1., 1., 1., 1.)
             font = self.controller.view.font
             font.setPointSize(17 *self.controller.dpi_coef - self.controller.dpi_scale)
-            self.renderText(position_x + 8, sH - position_y - size_h + 30, u"PRINT INFO", font)
+            self.renderText(position_x + 8, sH - position_y - size_h + 30, self.tr("PRINT INFO"), font)
 
             font.setPointSize(9 *self.controller.dpi_coef - self.controller.dpi_scale)
 

@@ -309,7 +309,7 @@ class AppScene(object):
     #TODO:Add brim and support message
     def get_warnings(self):
         messages = []
-        text00 = u"• Object %s... is out of printable area!"
+        text00 = self.tr("• Object %s... is out of printable area!")
         for model in self.models:
             if model.isVisible:
                 if not model.is_in_printing_area:
