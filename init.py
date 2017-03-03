@@ -3,7 +3,7 @@
 
 import vcversioner
 
-version = release = vcversioner.find_version(root='.', version_file='%(root)s/v.txt').version
+version = release = vcversioner.find_version(root='.', version_file='%(root)s/data/v.txt').version
 version_lst = version.split('.')
 major_version = int(version_lst[0])
 minor_version = int(version_lst[1])
