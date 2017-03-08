@@ -776,7 +776,7 @@ class GLWidget(QGLWidget):
             self.renderText(position_x + 208, sH - position_y - size_h + 63, self.tr("filament:"), font)
             glColor3f(1., 1., 1.)
             #self.renderText(position_x + 8, sH - position_y - size_h + 65 + 15, text, font)
-            self.renderText(position_x + 10, sH - position_y - size_h + 65 + 15, messages['info_text'], font)
+            self.renderText(position_x + 10, sH - position_y - size_h + 65 + 15, self.tr("total info:"), font)
             self.renderText(position_x + 108, sH - position_y - size_h + 65 + 15, messages['printing_time'], font)
             self.renderText(position_x + 208, sH - position_y - size_h + 65 + 15, messages['filament_lenght'], font)
 
