@@ -23,6 +23,44 @@
     </message>
 </context>
 <context>
+    <name>Controller</name>
+    <message>
+        <location filename="controller.py" line="1759"/>
+        <source>Generating perimeters</source>
+        <translation>Generuji perimetry</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1760"/>
+        <source>Processing triangulated mesh</source>
+        <translation>Zpracovávám objekty</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1761"/>
+        <source>Infilling layers</source>
+        <translation>Vyplňuji vrstvy</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1762"/>
+        <source>Preparing infill</source>
+        <translation>Připravuji výplň </translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1763"/>
+        <source>Generating skirt</source>
+        <translation>Vytvářím lem</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1764"/>
+        <source>Exporting G-code to</source>
+        <translation>Vytvářím GCode</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1765"/>
+        <source>Done. Process took</source>
+        <translation>Hotovo. Generování trvalo </translation>
+    </message>
+</context>
+<context>
     <name>FirmwareUpdateDialog</name>
     <message>
         <location filename="gui.py" line="590"/>
@@ -38,32 +76,32 @@
 <context>
     <name>GLWidget</name>
     <message>
-        <location filename="sceneRender.py" line="275"/>
+        <location filename="sceneRender.py" line="277"/>
         <source>Scale tool</source>
         <translation>Nástroj pro změnu měřítka</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="283"/>
+        <location filename="sceneRender.py" line="285"/>
         <source>Place on face tool</source>
         <translation>Pokládání na plochu</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="290"/>
+        <location filename="sceneRender.py" line="292"/>
         <source>Rotate tool</source>
         <translation>Rotační nástroj</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="296"/>
+        <location filename="sceneRender.py" line="298"/>
         <source>Arrange tool</source>
         <translation>Rozmístění objektů</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="302"/>
+        <location filename="sceneRender.py" line="304"/>
         <source>Multiplication tool</source>
         <translation>Duplikátor objektů</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="319"/>
+        <location filename="sceneRender.py" line="321"/>
         <source>Undo</source>
         <translation>Zpět</translation>
     </message>
@@ -78,32 +116,32 @@
         <translation type="obsolete">čas:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="774"/>
+        <location filename="sceneRender.py" line="776"/>
         <source>filament:</source>
         <translation>filamentu:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="309"/>
+        <location filename="sceneRender.py" line="311"/>
         <source>Support tool</source>
         <translation>Ruční podpory</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="325"/>
+        <location filename="sceneRender.py" line="327"/>
         <source>Redo</source>
         <translation>Dopředu</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="773"/>
+        <location filename="sceneRender.py" line="775"/>
         <source>estimate time:</source>
         <translation>odhadovaný čas:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="690"/>
+        <location filename="sceneRender.py" line="692"/>
         <source>WARNING</source>
         <translation>Upozornění</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="763"/>
+        <location filename="sceneRender.py" line="765"/>
         <source>PRINT INFO</source>
         <translation>Tiskové informace</translation>
     </message>
@@ -682,65 +720,65 @@
     <message>
         <location filename="sceneData.py" line="312"/>
         <source>Object </source>
-        <translation>Objekt</translation>
+        <translation type="obsolete">Objekt</translation>
     </message>
     <message>
         <location filename="sceneData.py" line="313"/>
         <source> is out of printable area!</source>
-        <translation> je mimo tiskovou plochu!</translation>
+        <translation type="obsolete"> je mimo tiskovou plochu!</translation>
     </message>
 </context>
 <context>
     <name>self.view</name>
     <message>
-        <location filename="controller.py" line="376"/>
+        <location filename="controller.py" line="379"/>
         <source>GCode saved</source>
         <translation>GCode uložen</translation>
     </message>
     <message>
-        <location filename="controller.py" line="764"/>
+        <location filename="controller.py" line="767"/>
         <source>Project loaded</source>
         <translation>Projekt načten</translation>
     </message>
     <message>
-        <location filename="controller.py" line="770"/>
+        <location filename="controller.py" line="773"/>
         <source>Project was saved</source>
         <translation>Projekt byl uložen</translation>
     </message>
     <message>
         <location filename="controller.py" line="1756"/>
         <source>Generating perimeters</source>
-        <translation>Generuji perimetry</translation>
+        <translation type="obsolete">Generuji perimetry</translation>
     </message>
     <message>
         <location filename="controller.py" line="1757"/>
         <source>Processing triangulated mesh</source>
-        <translation>Zpracovávám objekty</translation>
+        <translation type="obsolete">Zpracovávám objekty</translation>
     </message>
     <message>
         <location filename="controller.py" line="1758"/>
         <source>Infilling layers</source>
-        <translation>Vyplňuji vrstvy</translation>
+        <translation type="obsolete">Vyplňuji vrstvy</translation>
     </message>
     <message>
         <location filename="controller.py" line="1759"/>
         <source>Preparing infill</source>
-        <translation>Připravuji výplň </translation>
+        <translation type="obsolete">Připravuji výplň </translation>
     </message>
     <message>
         <location filename="controller.py" line="1760"/>
         <source>Generating skirt</source>
-        <translation>Vytvářím lem</translation>
+        <translation type="obsolete">Vytvářím lem</translation>
     </message>
     <message>
         <location filename="controller.py" line="1761"/>
         <source>Exporting G-code to</source>
-        <translation>Vytvářím GCode</translation>
+        <translation type="obsolete">Vytvářím GCode</translation>
     </message>
     <message>
         <location filename="controller.py" line="1762"/>
         <source>Done. Process took</source>
-        <translation>Hotovo. Generování trvalo </translation>
+        <translation type="obsolete">Hotovo. Generování trvalo </translation>
     </message>
 </context>
 </TS>

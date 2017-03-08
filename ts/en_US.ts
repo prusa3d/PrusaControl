@@ -23,6 +23,44 @@
     </message>
 </context>
 <context>
+    <name>Controller</name>
+    <message>
+        <location filename="controller.py" line="1759"/>
+        <source>Generating perimeters</source>
+        <translation>Generating perimeters</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1760"/>
+        <source>Processing triangulated mesh</source>
+        <translation>Processing triangulated mesh</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1761"/>
+        <source>Infilling layers</source>
+        <translation>Infilling layers</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1762"/>
+        <source>Preparing infill</source>
+        <translation>Preparing infill</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1763"/>
+        <source>Generating skirt</source>
+        <translation>Generating skirt</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1764"/>
+        <source>Exporting G-code to</source>
+        <translation>Exporting GCode to</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1765"/>
+        <source>Done. Process took</source>
+        <translation>Done. Process took</translation>
+    </message>
+</context>
+<context>
     <name>FirmwareUpdateDialog</name>
     <message>
         <location filename="gui.py" line="590"/>
@@ -38,32 +76,32 @@
 <context>
     <name>GLWidget</name>
     <message>
-        <location filename="sceneRender.py" line="275"/>
+        <location filename="sceneRender.py" line="277"/>
         <source>Scale tool</source>
         <translation>Scale tool</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="283"/>
+        <location filename="sceneRender.py" line="285"/>
         <source>Place on face tool</source>
         <translation>Place on face tool</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="290"/>
+        <location filename="sceneRender.py" line="292"/>
         <source>Rotate tool</source>
         <translation>Rotate tool</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="296"/>
+        <location filename="sceneRender.py" line="298"/>
         <source>Arrange tool</source>
         <translation>Auto arrange</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="302"/>
+        <location filename="sceneRender.py" line="304"/>
         <source>Multiplication tool</source>
         <translation>Multiplication tool</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="319"/>
+        <location filename="sceneRender.py" line="321"/>
         <source>Undo</source>
         <translation>Undo</translation>
     </message>
@@ -78,32 +116,32 @@
         <translation type="obsolete">time:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="774"/>
+        <location filename="sceneRender.py" line="776"/>
         <source>filament:</source>
         <translation>filament:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="309"/>
+        <location filename="sceneRender.py" line="311"/>
         <source>Support tool</source>
         <translation>Support tool</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="325"/>
+        <location filename="sceneRender.py" line="327"/>
         <source>Redo</source>
         <translation>Redo</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="773"/>
+        <location filename="sceneRender.py" line="775"/>
         <source>estimate time:</source>
         <translation>estimate time:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="690"/>
+        <location filename="sceneRender.py" line="692"/>
         <source>WARNING</source>
         <translation>WARNING</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="763"/>
+        <location filename="sceneRender.py" line="765"/>
         <source>PRINT INFO</source>
         <translation>PRINT INFO</translation>
     </message>
@@ -682,65 +720,65 @@
     <message>
         <location filename="sceneData.py" line="312"/>
         <source>Object </source>
-        <translation>Object</translation>
+        <translation type="obsolete">Object</translation>
     </message>
     <message>
         <location filename="sceneData.py" line="313"/>
         <source> is out of printable area!</source>
-        <translation> is out of printable area!</translation>
+        <translation type="obsolete"> is out of printable area!</translation>
     </message>
 </context>
 <context>
     <name>self.view</name>
     <message>
-        <location filename="controller.py" line="376"/>
+        <location filename="controller.py" line="379"/>
         <source>GCode saved</source>
         <translation>GCode saved</translation>
     </message>
     <message>
-        <location filename="controller.py" line="764"/>
+        <location filename="controller.py" line="767"/>
         <source>Project loaded</source>
         <translation>Project loaded</translation>
     </message>
     <message>
-        <location filename="controller.py" line="770"/>
+        <location filename="controller.py" line="773"/>
         <source>Project was saved</source>
         <translation>Project was saved</translation>
     </message>
     <message>
         <location filename="controller.py" line="1756"/>
         <source>Generating perimeters</source>
-        <translation>Generating perimeters</translation>
+        <translation type="obsolete">Generating perimeters</translation>
     </message>
     <message>
         <location filename="controller.py" line="1757"/>
         <source>Processing triangulated mesh</source>
-        <translation>Processing triangulated mesh</translation>
+        <translation type="obsolete">Processing triangulated mesh</translation>
     </message>
     <message>
         <location filename="controller.py" line="1758"/>
         <source>Infilling layers</source>
-        <translation>Infilling layers</translation>
+        <translation type="obsolete">Infilling layers</translation>
     </message>
     <message>
         <location filename="controller.py" line="1759"/>
         <source>Preparing infill</source>
-        <translation>Preparing infill</translation>
+        <translation type="obsolete">Preparing infill</translation>
     </message>
     <message>
         <location filename="controller.py" line="1760"/>
         <source>Generating skirt</source>
-        <translation>Generating skirt</translation>
+        <translation type="obsolete">Generating skirt</translation>
     </message>
     <message>
         <location filename="controller.py" line="1761"/>
         <source>Exporting G-code to</source>
-        <translation>Exporting GCode to</translation>
+        <translation type="obsolete">Exporting GCode to</translation>
     </message>
     <message>
         <location filename="controller.py" line="1762"/>
         <source>Done. Process took</source>
-        <translation>Done. Process took</translation>
+        <translation type="obsolete">Done. Process took</translation>
     </message>
 </context>
 </TS>
