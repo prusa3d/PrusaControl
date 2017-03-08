@@ -203,6 +203,9 @@ class Controller(QObject):
         progress_bar.setValue(99)
 
 
+        self.message_object00 = self.tr("Object ")
+        self.message_object01 = self.tr(" is out of printable area!")
+
 
     def check_version(self):
         if not self.app_config.is_version_actual:
@@ -1744,7 +1747,6 @@ class Controller(QObject):
 
     def slicing_message(self, string_in):
         #Translation of messages from slicing engine
-
         translation_table = {'Generating perimeters': self.tr('Generating perimeters'),
                              'Processing triangulated mesh': self.tr('Processing triangulated mesh'),
                              'Infilling layers': self.tr('Infilling layers'),
@@ -1754,12 +1756,9 @@ class Controller(QObject):
                              'Done. Process took': self.tr('Done. Process took')
                              }
 
-        #pprint(translation_table)
-
         string_in_str = str(string_in)
         if string_in_str in translation_table:
             string_out = translation_table[string_in_str]
-            print("preklad hlasky " + string_in + " na " + string_out)
         else:
             string_out = string_in
 

@@ -758,24 +758,34 @@ class PrusaControlView(QMainWindow):
         #Object settings layout
         #self.object_groupbox_layout = QtGui.QFormLayout()
 
+        self.object_group_box = QGroupBox()
+        self.object_group_box.setObjectName('object_group_box')
+
+        self.object_variable_layer_box = QGroupBox()
+        self.object_variable_layer_box.setObjectName('object_variable_layer_box')
+
+        self.gcode_group_box = QGroupBox()
+        self.gcode_group_box.setObjectName('gcode_group_box')
+
+
         #print("right menu")
-        self.name_l = QLabel()
+        self.name_l = QLabel(self.object_group_box)
         self.name_l.setObjectName("name_l")
 
 
-        self.object_extruder_l = QLabel()
+        self.object_extruder_l = QLabel("", self.object_group_box)
         self.object_extruder_l.setObjectName("object_extruder_l")
-        self.object_extruder_c = QComboBox()
+        self.object_extruder_c = QComboBox(self.object_group_box)
         self.object_extruder_c.setObjectName("object_extruder_c")
         self.object_extruder_c.insertItems(4, ['Extruder 1', 'Extruder 2', 'Extruder 3', 'Extruder 4'])
         self.object_extruder_c.setCurrentIndex(0)
 
 
-        self.filename_label = QLabel("")
+        self.filename_label = QLabel("", self.object_group_box)
         self.filename_label.setObjectName("filename_label")
-        self.position_l = QLabel()
+        self.position_l = QLabel("", self.object_group_box)
         self.position_l.setObjectName("position_l")
-        self.edit_pos_x = QSpinBox()
+        self.edit_pos_x = QSpinBox(self.object_group_box)
         self.edit_pos_x.setObjectName("edit_pos_x")
         self.edit_pos_x.setMaximum(200)
         self.edit_pos_x.setMinimum(-200)
@@ -787,7 +797,7 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_pos_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.edit_pos_y = QSpinBox()
+        self.edit_pos_y = QSpinBox(self.object_group_box)
         self.edit_pos_y.setObjectName("edit_pos_y")
         self.edit_pos_y.setMaximum(200)
         self.edit_pos_y.setMinimum(-200)
@@ -799,7 +809,7 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_pos_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.edit_pos_z = QSpinBox()
+        self.edit_pos_z = QSpinBox(self.object_group_box)
         self.edit_pos_z.setObjectName("edit_pos_z")
         self.edit_pos_z.setMaximum(300)
         self.edit_pos_z.setMinimum(-50)
@@ -811,9 +821,9 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_pos_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.rotation_l = QLabel()
+        self.rotation_l = QLabel("", self.object_group_box)
         self.rotation_l.setObjectName("rotation_l")
-        self.edit_rot_x = QSpinBox()
+        self.edit_rot_x = QSpinBox(self.object_group_box)
         self.edit_rot_x.setObjectName("edit_rot_x")
         self.edit_rot_x.setMaximum(360)
         self.edit_rot_x.setMinimum(-360)
@@ -825,7 +835,7 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_rot_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.edit_rot_y = QSpinBox()
+        self.edit_rot_y = QSpinBox(self.object_group_box)
         self.edit_rot_y.setObjectName("edit_rot_y")
         self.edit_rot_y.setMaximum(360)
         self.edit_rot_y.setMinimum(-360)
@@ -837,7 +847,7 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_rot_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.edit_rot_z = QSpinBox()
+        self.edit_rot_z = QSpinBox(self.object_group_box)
         self.edit_rot_z.setObjectName("edit_rot_z")
         self.edit_rot_z.setMaximum(360)
         self.edit_rot_z.setMinimum(-360)
@@ -849,9 +859,9 @@ class PrusaControlView(QMainWindow):
                                                                                  self.edit_rot_z.value(),
                                                                                  self.place_on_zero.isChecked()))
 
-        self.scale_l = QLabel()
+        self.scale_l = QLabel("", self.object_group_box)
         self.scale_l.setObjectName("scale_l")
-        self.edit_scale_x = QDoubleSpinBox()
+        self.edit_scale_x = QDoubleSpinBox(self.object_group_box)
         self.edit_scale_x.setObjectName("edit_scale_x")
         self.edit_scale_x.setMaximum(9999)
         self.edit_scale_x.setMinimum(-999)
@@ -865,7 +875,7 @@ class PrusaControlView(QMainWindow):
                                                                                 self.edit_scale_z.value(),
                                                                                 self.place_on_zero.isChecked()))
 
-        self.edit_scale_y = QDoubleSpinBox()
+        self.edit_scale_y = QDoubleSpinBox(self.object_group_box)
         self.edit_scale_y.setObjectName("edit_scale_y")
         self.edit_scale_y.setMaximum(9999)
         self.edit_scale_y.setMinimum(-999)
@@ -879,7 +889,7 @@ class PrusaControlView(QMainWindow):
                                                                                 self.edit_scale_z.value(),
                                                                                 self.place_on_zero.isChecked()))
 
-        self.edit_scale_z = QDoubleSpinBox()
+        self.edit_scale_z = QDoubleSpinBox(self.object_group_box)
         self.edit_scale_z.setObjectName("edit_scale_z")
         self.edit_scale_z.setMaximum(9999)
         self.edit_scale_z.setMinimum(-999)
@@ -892,7 +902,7 @@ class PrusaControlView(QMainWindow):
                                                                                 self.edit_scale_y.value(),
                                                                                 self.edit_scale_z.value(),
                                                                                 self.place_on_zero.isChecked()))
-        self.combobox_scale_units = QComboBox()
+        self.combobox_scale_units = QComboBox(self.object_group_box)
         self.combobox_scale_units.setObjectName("combobox_scale_units")
         self.combobox_scale_units.addItems(["%", "mm"])
         self.combobox_scale_units.setCurrentIndex(0)
@@ -905,51 +915,51 @@ class PrusaControlView(QMainWindow):
         self.lock_scale_axes_checkbox.stateChanged.connect(self.lock_scale_axes_change)
         self.lock_scale_axes_checkbox.setChecked(True)
 
-        self.place_on_zero = QCheckBox("")
+        self.place_on_zero = QCheckBox("", self.object_group_box)
         self.place_on_zero.setChecked(True)
         self.place_on_zero.setObjectName("place_on_zero")
         self.place_on_zero.stateChanged.connect(self.place_on_zero_changed)
 
-        self.x_pos_l = QLabel('X')
+        self.x_pos_l = QLabel('X', self.object_group_box)
         self.x_pos_l.setAlignment(Qt.AlignRight)
         self.x_pos_l.setObjectName("x_pos_l")
-        self.y_pos_l = QLabel('Y')
+        self.y_pos_l = QLabel('Y', self.object_group_box)
         self.y_pos_l.setAlignment(Qt.AlignRight)
         self.y_pos_l.setObjectName("y_pos_l")
-        self.z_pos_l = QLabel('Z')
+        self.z_pos_l = QLabel('Z', self.object_group_box)
         self.z_pos_l.setAlignment(Qt.AlignRight)
         self.z_pos_l.setObjectName("z_pos_l")
 
-        self.x_rot_l = QLabel('X')
+        self.x_rot_l = QLabel('X', self.object_group_box)
         self.x_rot_l.setAlignment(Qt.AlignRight)
         self.x_rot_l.setObjectName("x_rot_l")
-        self.y_rot_l = QLabel('Y')
+        self.y_rot_l = QLabel('Y', self.object_group_box)
         self.y_rot_l.setAlignment(Qt.AlignRight)
         self.y_rot_l.setObjectName("y_rot_l")
-        self.z_rot_l = QLabel('Z')
+        self.z_rot_l = QLabel('Z', self.object_group_box)
         self.z_rot_l.setAlignment(Qt.AlignRight)
         self.z_rot_l.setObjectName("z_rot_l")
 
-        self.x_scale_l = QLabel('X')
+        self.x_scale_l = QLabel('X', self.object_group_box)
         self.x_scale_l.setAlignment(Qt.AlignRight)
         self.x_scale_l.setObjectName("x_scale_l")
-        self.y_scale_l = QLabel('Y')
+        self.y_scale_l = QLabel('Y', self.object_group_box)
         self.y_scale_l.setAlignment(Qt.AlignRight)
         self.y_scale_l.setObjectName("y_scale_l")
-        self.z_scale_l = QLabel('Z')
+        self.z_scale_l = QLabel('Z', self.object_group_box)
         self.z_scale_l.setAlignment(Qt.AlignRight)
         self.z_scale_l.setObjectName("z_scale_l")
 
-        self.units_l = QLabel()
+        self.units_l = QLabel("", self.object_group_box)
         self.units_l.setAlignment(Qt.AlignRight)
         self.units_l.setObjectName("units_l")
         self.lock_scale_axes_l = QLabel()
         self.lock_scale_axes_l.setAlignment(Qt.AlignRight)
         self.lock_scale_axes_l.setObjectName("lock_scale_axes_l")
-        self.place_on_zero_l = QLabel()
+        self.place_on_zero_l = QLabel("", self.object_group_box)
         self.place_on_zero_l.setObjectName("place_on_zero_l")
 
-        self.advance_settings_b = QPushButton()
+        self.advance_settings_b = QPushButton("", self.object_group_box)
         self.advance_settings_b.setObjectName("advance_settings_b")
         self.advance_settings_b.clicked.connect(self.controller.set_advance_settings)
         if self.controller.development_flag:
@@ -1080,8 +1090,7 @@ class PrusaControlView(QMainWindow):
 
         #print("multimaterial settings done")
 
-        self.object_group_box = QGroupBox()
-        self.object_group_box.setObjectName('object_group_box')
+
         self.object_group_box.setLayout(self.create_object_settings_layout())
         self.object_group_box.setEnabled(False)
         self.transformation_reset_b = QPushButton("", self.object_group_box)
@@ -1091,13 +1100,11 @@ class PrusaControlView(QMainWindow):
         self.transformation_reset_b.move(221, 13)
         self.transformation_reset_b.clicked.connect(lambda: self.reset_transformation_on_object(self.get_object_id()))
 
-        self.object_variable_layer_box = QGroupBox()
-        self.object_variable_layer_box.setObjectName('object_variable_layer_box')
+
         self.object_variable_layer_box.setLayout(self.create_object_advance_settings_layout())
         self.object_variable_layer_box.setVisible(False)
 
-        self.gcode_group_box = QGroupBox()
-        self.gcode_group_box.setObjectName('gcode_group_box')
+
         self.gcode_group_box.setLayout(self.create_gcode_view_layout())
         self.gcode_group_box.setVisible(False)
 
@@ -1386,6 +1393,8 @@ class PrusaControlView(QMainWindow):
         msgBox.setText(self.tr("New version is out!"))
         msgBox.setInformativeText(self.tr("Do you want to download new version?"))
         msgBox.setStandardButtons(QMessageBox.Yes |  QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
         msgBox.setDefaultButton(QMessageBox.Yes)
 
         return msgBox.exec_()
@@ -1399,6 +1408,10 @@ class PrusaControlView(QMainWindow):
         msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
         msgBox.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
         msgBox.setDefaultButton(QMessageBox.Save)
+        msgBox.button(msgBox.Save).setText(self.tr("Save"))
+        msgBox.button(msgBox.Discard).setText(self.tr("Discard"))
+        msgBox.button(msgBox.Cancel).setText(self.tr("Cancel"))
+
 
         return msgBox.exec_()
 
@@ -1411,6 +1424,8 @@ class PrusaControlView(QMainWindow):
         msgBox.setInformativeText(self.tr("Do you want to cancel generating of GCode and exit?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
 
         return msgBox.exec_()
 
@@ -1422,6 +1437,8 @@ class PrusaControlView(QMainWindow):
         msgBox.setInformativeText(self.tr("Do you want to cancel generating of GCode and load file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
 
         return msgBox.exec_()
 
@@ -1433,6 +1450,8 @@ class PrusaControlView(QMainWindow):
         msgBox.setInformativeText(self.tr("Do you want to cancel loading of GCode file and load this file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
 
         return msgBox.exec_()
 
@@ -1444,6 +1463,9 @@ class PrusaControlView(QMainWindow):
         msgBox.setInformativeText(self.tr("Do you want to clear scene and load GCode file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
+
         return msgBox.exec_()
 
     def show_open_cancel_gcode_preview_dialog(self):
@@ -1454,6 +1476,9 @@ class PrusaControlView(QMainWindow):
         msgBox.setInformativeText(self.tr("Do you want to close GCode preview and import new file?"))
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
+
         return msgBox.exec_()
 
     def open_project_asking_dialog(self):

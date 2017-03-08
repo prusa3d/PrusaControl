@@ -309,8 +309,9 @@ class AppScene(object):
     #TODO:Add brim and support message
     def get_warnings(self):
         messages = []
-        text00 = self.controller.view.tr("Object ")
-        text01 = self.controller.view.tr(" is out of printable area!")
+        text00 = self.controller.message_object00
+        text01 = self.controller.message_object01
+
         for model in self.models:
             if model.isVisible:
                 if not model.is_in_printing_area:
@@ -318,8 +319,8 @@ class AppScene(object):
                         filename = model.filename[:7] + "..."
                     else:
                         filename = model.filename
-                    #messages.append(u"• " + text00 + filename + text01)
-                    messages.append(text00 + filename + text01)
+                    messages.append(u"• " + text00 + filename + text01)
+                    #messages.append(text00 + filename + text01)
         return messages
 
     def clear_scene(self):
