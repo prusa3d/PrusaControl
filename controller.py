@@ -9,11 +9,13 @@ import time
 import webbrowser
 #from pprint import pprint
 from ConfigParser import RawConfigParser
+from pprint import pprint
 
 from shutil import copyfile, Error
 
 import numpy
 #import pyrr
+from PyQt4.QtCore import QObject
 from PyQt4.QtCore import QTranslator, Qt, QPoint
 #from PyQt4 import QtGui
 from PyQt4.QtGui import QApplication
@@ -47,13 +49,14 @@ def timing(f):
         return ret
     return wrap
 
-class Controller:
+class Controller(QObject):
     def __init__(self, app, local_path='', progress_bar=None):
+        super(Controller, self).__init__()
         logging.info('Local path: ' + local_path)
         self.view = []
 
         #this flag is only for development only, Development = True, Production = False
-        self.development_flag = False
+        self.development_flag = True
         progress_bar.setValue(10)
 
         self.app_config = AppParameters(self, local_path)
@@ -1742,18 +1745,21 @@ class Controller:
     def slicing_message(self, string_in):
         #Translation of messages from slicing engine
 
-        translation_table = {'Generating perimeters': self.view.tr('Generating perimeters'),
-                             'Processing triangulated mesh': self.view.tr('Processing triangulated mesh'),
-                             'Infilling layers': self.view.tr('Infilling layers'),
-                             'Preparing infill': self.view.tr('Preparing infill'),
-                             'Generating skirt': self.view.tr('Generating skirt'),
-                             'Exporting G-code to': self.view.tr('Exporting G-code to'),
-                             'Done. Process took': self.view.tr('Done. Process took')
+        translation_table = {'Generating perimeters': self.tr('Generating perimeters'),
+                             'Processing triangulated mesh': self.tr('Processing triangulated mesh'),
+                             'Infilling layers': self.tr('Infilling layers'),
+                             'Preparing infill': self.tr('Preparing infill'),
+                             'Generating skirt': self.tr('Generating skirt'),
+                             'Exporting G-code to': self.tr('Exporting G-code to'),
+                             'Done. Process took': self.tr('Done. Process took')
                              }
+
+        #pprint(translation_table)
 
         string_in_str = str(string_in)
         if string_in_str in translation_table:
             string_out = translation_table[string_in_str]
+            print("preklad hlasky " + string_in + " na " + string_out)
         else:
             string_out = string_in
 
