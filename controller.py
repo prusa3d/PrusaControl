@@ -202,7 +202,13 @@ class Controller(QObject):
 
         progress_bar.setValue(99)
 
+        self.message_object00 = ""
+        self.message_object01 = ""
 
+        self.create_messages()
+
+
+    def create_messages(self):
         self.message_object00 = self.tr("Object ")
         self.message_object01 = self.tr(" is out of printable area!")
 

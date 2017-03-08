@@ -1279,6 +1279,8 @@ class PrusaControlView(QMainWindow):
 
         self.create_menu()
 
+        self.controller.create_messages()
+
 
 
 
