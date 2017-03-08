@@ -175,6 +175,7 @@ class Slic3rEngineRunner(QObject):
                 self.send_message.emit("Generating G-code preview")
                 self.gcode.read_in_realtime()
                 self.send_gcodedata.emit(self.gcode)
+                self.send_message.emit("")
             elif 'Filament' in parsed_line[0] and 'required:' in parsed_line[1]:
                 filament_str = str(parsed_line[2] + ' ' + parsed_line[3])
                 print(filament_str)

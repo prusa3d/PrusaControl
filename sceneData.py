@@ -318,7 +318,8 @@ class AppScene(object):
                         filename = model.filename[:7] + "..."
                     else:
                         filename = model.filename
-                    messages.append("• " + text00 + filename + text01)
+                    #messages.append(u"• " + text00 + filename + text01)
+                    messages.append(text00 + filename + text01)
         return messages
 
     def clear_scene(self):

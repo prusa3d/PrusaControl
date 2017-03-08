@@ -175,7 +175,8 @@ class GLWidget(QGLWidget):
 
 
     def mouseDoubleClickEvent(self, event):
-        self.controller.mouse_double_click(event)
+        pass
+        #self.controller.mouse_double_click(event)
 
     def mouseReleaseEvent(self, event):
         self.controller.mouse_release_event(event)
@@ -194,7 +195,8 @@ class GLWidget(QGLWidget):
         #self.updateGL()
         self.update()
 
-
+    def contentsMouseDoubleClickEvent(self, event):
+        pass
 
     #TODO:All this function will be changed to control camera instance
     def set_zoom(self, diff):
@@ -266,7 +268,7 @@ class GLWidget(QGLWidget):
     def initializeGL(self):
         #load textures
         self.image_background = self.texture_from_png("data/img/background.png")
-        self.catching_point = self.texture_from_png("data/img/gui/slider_knob.png")
+        self.catching_point = self.texture_from_png("data/img/gui/slider_knob_2.png")
 
 
         #tools
