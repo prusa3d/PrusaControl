@@ -25,39 +25,49 @@
 <context>
     <name>Controller</name>
     <message>
-        <location filename="controller.py" line="1759"/>
+        <location filename="controller.py" line="1761"/>
         <source>Generating perimeters</source>
         <translation>Generuji perimetry</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1760"/>
+        <location filename="controller.py" line="1762"/>
         <source>Processing triangulated mesh</source>
         <translation>Zpracovávám objekty</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1761"/>
+        <location filename="controller.py" line="1763"/>
         <source>Infilling layers</source>
         <translation>Vyplňuji vrstvy</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1762"/>
+        <location filename="controller.py" line="1764"/>
         <source>Preparing infill</source>
         <translation>Připravuji výplň </translation>
     </message>
     <message>
-        <location filename="controller.py" line="1763"/>
+        <location filename="controller.py" line="1765"/>
         <source>Generating skirt</source>
         <translation>Vytvářím lem</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1764"/>
+        <location filename="controller.py" line="1766"/>
         <source>Exporting G-code to</source>
         <translation>Vytvářím GCode</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1765"/>
+        <location filename="controller.py" line="1767"/>
         <source>Done. Process took</source>
         <translation>Hotovo. Generování trvalo </translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="208"/>
+        <source>Object </source>
+        <translation>Objekt</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="209"/>
+        <source> is out of printable area!</source>
+        <translation> je mimo tiskovou plochu!</translation>
     </message>
 </context>
 <context>
@@ -175,108 +185,108 @@
 <context>
     <name>PrusaControlView</name>
     <message>
-        <location filename="gui.py" line="1329"/>
+        <location filename="gui.py" line="1336"/>
         <source>&amp;File</source>
         <translation>&amp;Soubor</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1330"/>
+        <location filename="gui.py" line="1337"/>
         <source>Import model file</source>
         <translation>Otevřít model</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1333"/>
+        <location filename="gui.py" line="1340"/>
         <source>Open project</source>
         <translation>Otevřít projekt</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1334"/>
+        <location filename="gui.py" line="1341"/>
         <source>Save project</source>
         <translation>Uložit projekt</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1336"/>
+        <location filename="gui.py" line="1343"/>
         <source>Reset</source>
         <translation>Restartovat</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1338"/>
+        <location filename="gui.py" line="1345"/>
         <source>Close</source>
         <translation>Zavřít</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1361"/>
+        <location filename="gui.py" line="1368"/>
         <source>&amp;Settings</source>
         <translation>&amp;Nastavení</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1362"/>
+        <location filename="gui.py" line="1369"/>
         <source>PrusaControl settings</source>
         <translation>Nastavení PrusaControl</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1366"/>
+        <location filename="gui.py" line="1373"/>
         <source>&amp;Help</source>
         <translation>&amp;Nápověda</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1368"/>
+        <location filename="gui.py" line="1375"/>
         <source>Prusa Online</source>
         <translation>Průša Online</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1370"/>
+        <location filename="gui.py" line="1377"/>
         <source>Send feedback</source>
         <translation>Poslat zpětnou vazbu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1372"/>
+        <location filename="gui.py" line="1379"/>
         <source>About</source>
         <translation>O programu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1207"/>
+        <location filename="gui.py" line="1214"/>
         <source>Name</source>
         <translation>Jméno</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1209"/>
+        <location filename="gui.py" line="1216"/>
         <source>Position</source>
         <translation>Pozice</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1210"/>
+        <location filename="gui.py" line="1217"/>
         <source>Rotation</source>
         <translation>Rotace</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1211"/>
+        <location filename="gui.py" line="1218"/>
         <source>Scale</source>
         <translation>Měřítko</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1213"/>
+        <location filename="gui.py" line="1220"/>
         <source>In what units you want to scale?</source>
         <translation>V jakých jednotkách chcete měnit měřítko?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1216"/>
+        <location filename="gui.py" line="1223"/>
         <source>Lock of scaling axis</source>
         <translation>Zachování proporcí objektu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1219"/>
+        <location filename="gui.py" line="1226"/>
         <source>Automatic placing of models
  on printing bed in Z axis</source>
         <translation>Automatické pokládání objektu na podložku</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1221"/>
+        <location filename="gui.py" line="1228"/>
         <source>Units</source>
         <translation>Jednotky</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1215"/>
+        <location filename="gui.py" line="1222"/>
         <source>Lock axes</source>
         <translation>V poměru</translation>
     </message>
@@ -286,97 +296,97 @@
         <translation type="obsolete">Pokládat na podložku</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1223"/>
+        <location filename="gui.py" line="1230"/>
         <source>Advance Settings</source>
         <translation>Rozšířené nastavení</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1224"/>
+        <location filename="gui.py" line="1231"/>
         <source>Basic Settings</source>
         <translation>Obecné nastavení</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1227"/>
+        <location filename="gui.py" line="1234"/>
         <source>Back</source>
         <translation>Zpět</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1229"/>
+        <location filename="gui.py" line="1236"/>
         <source>Printer settings</source>
         <translation>Nastavení tisku</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1231"/>
+        <location filename="gui.py" line="1238"/>
         <source>Material</source>
         <translation>Materiál</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1232"/>
+        <location filename="gui.py" line="1239"/>
         <source>Select material for printing</source>
         <translation>Vyberte materiál ze kterého chcete tisknout.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1236"/>
+        <location filename="gui.py" line="1243"/>
         <source>Quality</source>
         <translation>Kvalita</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1237"/>
+        <location filename="gui.py" line="1244"/>
         <source>Select quality for printing</source>
         <translation>Vyberte jakou chcete kvalitu výsledného výtisku, čím vyšší kvalita tisku tím i delší doba.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="2235"/>
+        <location filename="gui.py" line="2260"/>
         <source>Infill</source>
         <translation>Výplň</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1242"/>
+        <location filename="gui.py" line="1249"/>
         <source>Select how much space inside of model have to be filled</source>
         <translation>Vyberte kolik objemu objektů má být vyplněno. (infill) </translation>
     </message>
     <message>
-        <location filename="gui.py" line="1246"/>
+        <location filename="gui.py" line="1253"/>
         <source>Support</source>
         <translation>Podpory</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1249"/>
+        <location filename="gui.py" line="1256"/>
         <source>None</source>
         <translation>Žádné</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1249"/>
+        <location filename="gui.py" line="1256"/>
         <source>Build plate only</source>
         <translation>Jenom od podložky</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1249"/>
+        <location filename="gui.py" line="1256"/>
         <source>Everywhere</source>
         <translation>Všude</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1247"/>
+        <location filename="gui.py" line="1254"/>
         <source>Select what kind of supports do you need, if any</source>
         <translation>Vyberte jaký typ podpor budete potřebovat (Support)</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1254"/>
+        <location filename="gui.py" line="1261"/>
         <source>Brim</source>
         <translation>Límec</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1253"/>
+        <location filename="gui.py" line="1260"/>
         <source>Do you need better adhesive of model and printing bed?</source>
         <translation>Potřebujete zvýšit přilnavost mezi modelem a tiskovou plochou? (Brim)</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1264"/>
+        <location filename="gui.py" line="1271"/>
         <source>Object settings</source>
         <translation>Nastavení objektu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1265"/>
+        <location filename="gui.py" line="1272"/>
         <source>Object advance settings</source>
         <translation>Rozšířené nastavení</translation>
     </message>
@@ -386,12 +396,12 @@
         <translation type="obsolete">Náhled</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1532"/>
+        <location filename="gui.py" line="1557"/>
         <source>Generate</source>
         <translation>Generovat</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1533"/>
+        <location filename="gui.py" line="1558"/>
         <source>Generate scene with actual options to gcode file</source>
         <translation>Vygenerovat scénu s aktuálním nastavením do gcode souboru</translation>
     </message>
@@ -401,239 +411,254 @@
         <translation type="obsolete">PrusaControl</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1520"/>
+        <location filename="gui.py" line="1545"/>
         <source>Save G-Code</source>
         <translation>Uložit G-Code</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1521"/>
+        <location filename="gui.py" line="1546"/>
         <source>Save generated gcode file</source>
         <translation>Uložit vygenerovaný gcode soubor</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1528"/>
+        <location filename="gui.py" line="1553"/>
         <source>Cancel</source>
         <translation>Přerušit</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1525"/>
+        <location filename="gui.py" line="1550"/>
         <source>Cancel of generating gcode file</source>
         <translation>Přerušit generovaní gcode souboru</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1208"/>
+        <location filename="gui.py" line="1215"/>
         <source>Extruder</source>
         <translation>Extruder</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1218"/>
+        <location filename="gui.py" line="1225"/>
         <source>Place on bed</source>
         <translation>Položit na podložku</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1226"/>
+        <location filename="gui.py" line="1233"/>
         <source>And color change</source>
         <translation>změna barev</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1258"/>
+        <location filename="gui.py" line="1265"/>
         <source>Material Settings</source>
         <translation>Nastavení materiálů</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1259"/>
+        <location filename="gui.py" line="1266"/>
         <source>Extruder 1</source>
         <translation>Extruder 1</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1260"/>
+        <location filename="gui.py" line="1267"/>
         <source>Extruder 2</source>
         <translation>Extruder 2</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1261"/>
+        <location filename="gui.py" line="1268"/>
         <source>Extruder 3</source>
         <translation>Extruder 3</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1262"/>
+        <location filename="gui.py" line="1269"/>
         <source>Extruder 4</source>
         <translation>Extruder 4</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1266"/>
+        <location filename="gui.py" line="1273"/>
         <source>Gcode preview</source>
         <translation>Náhled tisku</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1268"/>
+        <location filename="gui.py" line="1275"/>
         <source>Reset transformations</source>
         <translation>Resetovat transformace</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1331"/>
+        <location filename="gui.py" line="1338"/>
         <source>Import multipart model file</source>
         <translation>Otevřít model o více dílech</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1342"/>
+        <location filename="gui.py" line="1349"/>
         <source>&amp;Edit</source>
         <translation>Ú&amp;pravy</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1343"/>
+        <location filename="gui.py" line="1350"/>
         <source>Undo	Ctrl+Z</source>
         <translation>Zpět</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1344"/>
+        <location filename="gui.py" line="1351"/>
         <source>Redo	Ctrl+Y</source>
         <translation>Dopředu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1346"/>
+        <location filename="gui.py" line="1353"/>
         <source>Copy	Ctrl+C</source>
         <translation>Kopírovat</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1347"/>
+        <location filename="gui.py" line="1354"/>
         <source>Paste	Ctrl+V</source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1348"/>
+        <location filename="gui.py" line="1355"/>
         <source>Delete	Del</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1367"/>
+        <location filename="gui.py" line="1374"/>
         <source>Help</source>
         <translation>Pomoc</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1385"/>
+        <location filename="gui.py" line="1392"/>
         <source>New version</source>
         <translation>Nová verze</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1386"/>
+        <location filename="gui.py" line="1393"/>
         <source>New version is out!</source>
         <translation>Je dostupná nová verze!</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1387"/>
+        <location filename="gui.py" line="1394"/>
         <source>Do you want to download new version?</source>
         <translation>Chcete stáhnout novou verzi PrusaControl?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1397"/>
+        <location filename="gui.py" line="1411"/>
         <source>Save</source>
         <translation>Uložit</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1398"/>
+        <location filename="gui.py" line="1407"/>
         <source>Scene is not saved.</source>
         <translation>Scéna není uložena.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1399"/>
+        <location filename="gui.py" line="1408"/>
         <source>Do you want to save your changes?</source>
         <translation>Chcete uložit změny?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1409"/>
+        <location filename="gui.py" line="1422"/>
         <source>Exit</source>
         <translation>Zavřít</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1421"/>
+        <location filename="gui.py" line="1436"/>
         <source>GCode is in generating process.</source>
         <translation>Generuje se GCode.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1411"/>
+        <location filename="gui.py" line="1424"/>
         <source>Do you want to cancel generating of GCode and exit?</source>
         <translation>Chcete ukončit generování GCodu a ukončit PrusaControl?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1431"/>
+        <location filename="gui.py" line="1448"/>
         <source>Load file</source>
         <translation>Načíst soubor</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1422"/>
+        <location filename="gui.py" line="1437"/>
         <source>Do you want to cancel generating of GCode and load file?</source>
         <translation>Chcete ukončit generování GCodu a načíst soubor?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1432"/>
+        <location filename="gui.py" line="1449"/>
         <source>GCode file is in loading process.</source>
         <translation>Načítá se GCode soubor.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1433"/>
+        <location filename="gui.py" line="1450"/>
         <source>Do you want to cancel loading of GCode file and load this file?</source>
         <translation>Chcete ukončit načítání GCode souboru a načíst tento soubor?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1442"/>
+        <location filename="gui.py" line="1461"/>
         <source>Scene not empty</source>
         <translation>Scéna není prázdná</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1443"/>
+        <location filename="gui.py" line="1462"/>
         <source>Some objects are in scene</source>
         <translation>Ve scéně jsou objekty</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1444"/>
+        <location filename="gui.py" line="1463"/>
         <source>Do you want to clear scene and load GCode file?</source>
         <translation>Chcete vymazat scénu a načíst GCode soubor?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1452"/>
+        <location filename="gui.py" line="1474"/>
         <source>GCode is generated</source>
         <translation>GCode byl vygenerován</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1453"/>
+        <location filename="gui.py" line="1475"/>
         <source>Scene is generated to GCode</source>
         <translation>Scéna byla vygenerována do GCodu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1454"/>
+        <location filename="gui.py" line="1476"/>
         <source>Do you want to close GCode preview and import new file?</source>
         <translation>Chcete zavřít náhled Gcodu a načíst nový soubor?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1462"/>
+        <location filename="gui.py" line="1487"/>
         <source>Open project file</source>
         <translation>Otevřít projektový soubor</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1463"/>
+        <location filename="gui.py" line="1488"/>
         <source>In scene are some objects</source>
         <translation>Scéna není prázdná</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1464"/>
+        <location filename="gui.py" line="1489"/>
         <source>Do you want to load project file in actual scene?</source>
         <translation>Chcete načíst projektový soubor do stávající scény?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1529"/>
+        <location filename="gui.py" line="1554"/>
         <source>Cancel of saving gcode file</source>
         <translation>Zrušit ukládání GCode souboru</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1537"/>
+        <location filename="gui.py" line="1562"/>
         <source>Cancel file read</source>
         <translation>Zrušit nahrávání souboru</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1538"/>
+        <location filename="gui.py" line="1563"/>
         <source>Cancel of reading file</source>
         <translation>Zrušit načítání souboru</translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1479"/>
+        <source>Yes</source>
+        <translation>Ano</translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1480"/>
+        <source>No</source>
+        <translation>Ne</translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1412"/>
+        <source>Discard</source>
+        <translation>Zahodit</translation>
     </message>
 </context>
 <context>
@@ -731,17 +756,17 @@
 <context>
     <name>self.view</name>
     <message>
-        <location filename="controller.py" line="379"/>
+        <location filename="controller.py" line="382"/>
         <source>GCode saved</source>
         <translation>GCode uložen</translation>
     </message>
     <message>
-        <location filename="controller.py" line="767"/>
+        <location filename="controller.py" line="770"/>
         <source>Project loaded</source>
         <translation>Projekt načten</translation>
     </message>
     <message>
-        <location filename="controller.py" line="773"/>
+        <location filename="controller.py" line="776"/>
         <source>Project was saved</source>
         <translation>Projekt byl uložen</translation>
     </message>
