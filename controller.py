@@ -801,8 +801,9 @@ class Controller(QObject):
 
     def open_model_file(self):
         data = self.view.open_model_file_dialog()
-        #logging.debug('open model file %s' %data)
+        #logging.debug('open model#  file %s' %data)
         for path in data:
+            #print("File path type: " + str(type(path)))
             self.import_model(path)
 
     def open_multipart_model(self):
@@ -819,7 +820,6 @@ class Controller(QObject):
 
     def import_model(self, path, one_model=False):
         self.view.statusBar().showMessage('Load file name: ' + path)
-        print(str(path))
         model = ModelTypeStl().load(path)
         model.parent = self.scene
         self.scene.models.append(model)
