@@ -234,8 +234,8 @@ class AppParameters(object):
         if self.system_platform in ['Linux']:
             self.tmp_place = tempfile.gettempdir() + '/'
             self.data_folder = "data/"
-            self.config_path = os.path.expanduser("~/.prusacontrol")
-            self.user_folder = os.path.expanduser("~/.prusacontrol/")
+            self.config_path = os.path.expanduser("~/.prusacontrol/prusacontrol.cfg")
+            self.user_folder = os.path.expanduser("~/.prusacontrol/data/")
             self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
             self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data/defaults.cfg'))
