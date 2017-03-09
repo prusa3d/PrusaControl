@@ -1,7 +1,7 @@
 import ast
 import logging
 from abc import ABCMeta, abstractmethod
-from cStringIO import StringIO
+from io import StringIO
 from zipfile import ZipFile, ZIP_DEFLATED
 import xml.etree.cElementTree as ET
 import os

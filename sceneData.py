@@ -418,7 +418,7 @@ class Model(object):
     '''
     this is reprezentation of model data
     '''
-    newid = itertools.count().next
+    newid = next(itertools.count())
     def __init__(self):
         #IDs
         self.id = Model.newid()+1

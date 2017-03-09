@@ -8,7 +8,7 @@ import logging
 import time
 import webbrowser
 #from pprint import pprint
-from ConfigParser import RawConfigParser
+from configparser import RawConfigParser
 from pprint import pprint
 
 from shutil import copyfile, Error

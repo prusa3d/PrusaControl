@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from abc import ABCMeta, abstractmethod
 
 
@@ -9,7 +9,7 @@ import platform
 import subprocess
 from copy import deepcopy
 
-import cStringIO
+from io import StringIO
 
 import signal
 from PyQt4.QtCore import QObject, QThread, pyqtSignal

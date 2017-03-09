@@ -6,9 +6,10 @@ import os
 import platform
 import tempfile
 import sys
-import urllib2
+from urllib.request import urlopen
+from urllib.error import URLError
 
-from ConfigParser import ConfigParser, RawConfigParser
+from configparser import ConfigParser, RawConfigParser
 from copy import deepcopy
 from pprint import pprint
 
@@ -178,7 +179,7 @@ class PrintingParameters(object):
     def read_printers_parameters(self, filename):
         printers = {}
         with open(filename, 'rb') as json_file:
-            printers = json.load(json_file)
+            printers = json.load(json_file.read().decode('utf8'))
         return printers
 
 
@@ -287,16 +288,16 @@ class AppParameters(object):
 
 
     def strip_version_string(self, string_in):
-        string_out = string_in.split('-')
+        string_out = string_in.decode('utf8').split('-')
         string_out = string_out[:2]
         string_out = "_".join(string_out)[1:]
         return string_out
 
     def internet_on(self):
         try:
-            urllib2.urlopen('http://google.com', timeout=1)
+            urlopen('http://google.com', timeout=1)
             return True
-        except urllib2.URLError as err:
+        except URLError as err:
             return False
 
     def first_run(self):
@@ -335,7 +336,7 @@ class AppParameters(object):
     #@timing
     def download_new_settings_files(self):
         printers_data = {}
-        r = urllib2.urlopen(self.json_settings_url + self.printers_filename)
+        r = urlopen(self.json_settings_url + self.printers_filename)
         with open(self.tmp_place+self.printers_filename, 'wb') as out_file:
             #shutil.copyfileobj(r, out_file)
             out_file.write(r.read())
@@ -350,7 +351,7 @@ class AppParameters(object):
             return
 
         for i in materials_files_list:
-            r = urllib2.urlopen(self.json_settings_url + i)
+            r = urlopen(self.json_settings_url + i)
             with open(self.tmp_place+i, 'wb') as out_file:
                 out_file.write(r.read())
 
@@ -385,7 +386,7 @@ class AppParameters(object):
 
     def check_new_version_of_prusacontrol(self):
         #download json file with actual version
-        r = urllib2.urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
+        r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
         data = r.read()
         if data:
             if self.is_higher(self.strip_version_string(data)):
