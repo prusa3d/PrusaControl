@@ -47,9 +47,9 @@ class EventLoopRunner(QObject):
         self.progressBar.setFixedHeight(6)
         self.progressBar.move(208, 367)
 
-        if self.css.isOpen():
-            self.progressBar.setStyleSheet(QVariant(self.css.readAll()).toString())
-            self.css.close()
+        #if self.css.isOpen():
+        #    self.progressBar.setStyleSheet(QVariant(self.css.readAll()).toString())
+        #    self.css.close()
 
         self.splash.setMask(self.splash_pix.mask())
         self.splash.show()
