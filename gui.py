@@ -7,13 +7,14 @@ from copy import deepcopy
 import numpy as np
 import time
 from OpenGL.GL import *
-from PyQt4.QtCore import QTextCodec
+from PyQt5.QtCore import QTextCodec
 
-from PyQt4.QtCore import Qt, SIGNAL, QSettings, QFile, QIODevice, QVariant, QEvent
-from PyQt4.QtGui import QFont, QFontDatabase, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow, \
-QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, \
-QPainter, QPainterPath, QPen, QSlider, QStyleOptionSlider, QDialog, QDialogButtonBox, \
-QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog
+from PyQt5.QtCore import Qt, pyqtSignal, QSettings, QFile, QIODevice, QVariant, QEvent
+from PyQt5.QtGui import QFont, QFontDatabase, QPainter, QPainterPath, QPen
+from PyQt5.QtWidgets import QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow, \
+QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget,\
+QSlider, QStyleOptionSlider, QDialog, QDialogButtonBox, QComboBox, QCheckBox, QApplication,\
+QSpinBox, QDoubleSpinBox, QFileDialog
 
 import projectFile
 import sceneRender
@@ -57,7 +58,9 @@ class Gcode_slider(QWidget):
         self.slider = QSlider()
         self.slider.setOrientation(Qt.Vertical)
         #self.slider.setFixedWidth(144)
-        self.connect(self.slider, SIGNAL("valueChanged(int)"), self.set_value_label)
+        #self.connect(self.slider, SIGNAL("valueChanged(int)"), self.set_value_label)
+        self.slider.valueChanged.connect(self.set_value_label)
+
         self.slider.setTickInterval(1)
 
         self.value_label = QLabel(self)
@@ -102,7 +105,7 @@ class Gcode_slider(QWidget):
                 point['button'].setVisible(False)
 
         else:
-            for i in xrange(0, 20):
+            for i in range(0, 20):
                 label = QLabel(self)
                 label.setObjectName("gcode_slider_point_label")
                 label.setVisible(False)
@@ -274,14 +277,15 @@ class Spline_editor(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
         #main_layout.setSpacing(2)
-        main_layout.setMargin(2)
+        #main_layout.setMargin(2)
 
         self.slider = QSlider(parent=self)
         self.slider.setOrientation(Qt.Vertical)
         self.slider.setObjectName("spline_slider")
         self.slider.setFixedHeight(350)
 
-        self.connect(self.slider, SIGNAL("valueChanged(int)"), self.set_value_label)
+        #self.connect(self.slider, pyqtSignal("valueChanged(int)"), self.set_value_label)
+        self.slider.valueChanged.connect(self.set_value_label)
 
         self.value_label = QLabel(parent=self)
         self.value_label.setObjectName("spline_slider_value_label")
@@ -708,8 +712,8 @@ class PrusaControlView(QMainWindow):
 
         #print("initialization of PrusaControlView")
         self.settings = QSettings("Prusa Research", "PrusaControl")
-        self.restoreGeometry(self.settings.value("geometry", "").toByteArray())
-        self.restoreState(self.settings.value("windowState", "").toByteArray())
+        self.restoreGeometry(self.settings.value("geometry", ""))
+        self.restoreState(self.settings.value("windowState", ""))
 
         #print("font load of PrusaControlView")
         font_id = QFontDatabase.addApplicationFont("data/font/TitilliumWeb-Light.ttf")
@@ -727,9 +731,10 @@ class PrusaControlView(QMainWindow):
         self.setObjectName('PrusaControlView')
         css = QFile('data/my_stylesheet.css')
         css.open(QIODevice.ReadOnly)
-        if css.isOpen():
-            self.setStyleSheet(QVariant(css.readAll()).toString())
-            css.close()
+
+        #if css.isOpen():
+        #    self.setStyleSheet(QVariant(css.readAll()).toString())
+        #    css.close()
 
         #print("some constants")
 
@@ -972,7 +977,9 @@ class PrusaControlView(QMainWindow):
         self.variable_layer_widget = Spline_editor(self, self.controller)
         self.variable_layer_widget.setObjectName("variable_layer_widget")
         self.variable_layer_widget.setFixedHeight(400)
-        self.connect(self.variable_layer_widget.slider, SIGNAL("valueChanged(int)"), self.set_variable_layer_slider)
+        #self.connect(self.variable_layer_widget.slider, SIGNAL("valueChanged(int)"), self.set_variable_layer_slider)
+        self.variable_layer_widget.slider.valueChanged.connect(self.set_variable_layer_slider)
+
         self.basic_settings_b = QPushButton()
         self.basic_settings_b.setObjectName("basic_settings_b")
         self.basic_settings_b.clicked.connect(self.controller.set_basic_settings)
@@ -999,7 +1006,7 @@ class PrusaControlView(QMainWindow):
         self.right_panel_layout = QVBoxLayout()
         self.right_panel_layout.setObjectName('right_panel_layout')
         self.right_panel_layout.setSpacing(5)
-        self.right_panel_layout.setMargin(0)
+        #self.right_panel_layout.setMargin(0)
         self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
 
         #QtGui.QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
@@ -1174,7 +1181,7 @@ class PrusaControlView(QMainWindow):
 
         mainLayout = QHBoxLayout()
         mainLayout.setSpacing(0)
-        mainLayout.setMargin(0)
+        #mainLayout.setMargin(0)
         #mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.addWidget(self.glWidget)
         mainLayout.addWidget(self.right_panel)
@@ -2275,7 +2282,9 @@ class PrusaControlView(QMainWindow):
         slider.setTickPosition(QSlider.TicksRight)
 
         if base_class == Gcode_slider:
-            self.connect(slider.slider, SIGNAL("valueChanged(int)"), setterSlot)
+            #self.connect(slider.slider, SIGNAL("valueChanged(int)"), setterSlot)
+            slider.slider.valueChanged.connect(setterSlot)
         else:
-            self.connect(slider, SIGNAL("valueChanged(int)"), setterSlot)
+            #self.connect(slider, SIGNAL("valueChanged(int)"), setterSlot)
+            slider.valueChanged.connect(setterSlot)
         return slider

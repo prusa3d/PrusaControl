@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 import atexit
 
-from PyQt4.QtGui import QApplication, QIcon
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon, QPixmap
 #from tendo.singleton import SingleInstance
-from PyQt4 import QtGui
+#from PyQt5 import QtWidgets
 
 from controller import Controller
 from sceneRender import *

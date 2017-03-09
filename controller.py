@@ -15,10 +15,10 @@ from shutil import copyfile, Error
 
 import numpy
 #import pyrr
-from PyQt4.QtCore import QObject
-from PyQt4.QtCore import QTranslator, Qt, QPoint
+from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QTranslator, Qt, QPoint
 #from PyQt4 import QtGui
-from PyQt4.QtGui import QApplication
+from PyQt5.QtWidgets import QApplication
 
 import sceneData
 from analyzer import Analyzer
@@ -192,13 +192,14 @@ class Controller(QObject):
         progress_bar.setValue(97)
 
 
-        logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
+        #logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
 
         #print(str(type(self.app_parameters)))
         if len(self.app_parameters) >= 3:
             for file in self.app_parameters[2:]:
-                logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
-                self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
+                #logging.info('%s' %unicode(file.toUtf8(), encoding="UTF-8"))
+                #self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
+                self.open_file(file)
 
         progress_bar.setValue(99)
 

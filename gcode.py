@@ -7,12 +7,12 @@ from pprint import pprint
 import os
 
 import numpy as np
-from PyQt4.QtCore import QFile
-from PyQt4.QtCore import QIODevice
-from PyQt4.QtCore import QObject
-from PyQt4.QtCore import QTextStream
-from PyQt4.QtCore import QThread
-from PyQt4.QtCore import pyqtSignal
+from PyQt5.QtCore import QFile
+from PyQt5.QtCore import QIODevice
+from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QTextStream
+from PyQt5.QtCore import QThread
+from PyQt5.QtCore import pyqtSignal
 
 
 

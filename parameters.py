@@ -179,7 +179,7 @@ class PrintingParameters(object):
     def read_printers_parameters(self, filename):
         printers = {}
         with open(filename, 'rb') as json_file:
-            printers = json.load(json_file.read().decode('utf8'))
+            printers = json.loads(json_file.read().decode('utf8'))
         return printers
 
 
@@ -189,8 +189,9 @@ class PrintingParameters(object):
             return None
 
         material_config = []
-        with open(printer_config_file, 'rb') as json_file:
-            material_config = json.load(json_file)
+        with open(printer_config_file, 'r') as json_file:
+            text = json_file.read()
+            material_config = json.loads(text)
 
         return material_config
 
@@ -250,11 +251,11 @@ class AppParameters(object):
             self.config.readfp(open('data/defaults.cfg'))
         elif self.system_platform in ['Windows']:
             self.data_folder = "data\\"
-            self.tmp_place = tempfile.gettempdir() + '\\'
+            self.tmp_place = tempfile.gettempdir() + "\\"
 
             self.config_path = os.path.expanduser("~\\prusacontrol.cfg")
-            #self.user_folder = os.path.expanduser("~\\.prusacontrol\\")
-            self.user_folder = self.tmp_place.split("\\appdata")[0] + "\\.prusacontrol\\"
+            self.user_folder = os.path.expanduser("~\\.prusacontrol\\")
+            #self.user_folder = self.tmp_place.split("\\appdata")[0] + "\\.prusacontrol\\"
 
             self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
             self.printers_parameters_file = self.user_folder + self.printers_filename
@@ -268,6 +269,13 @@ class AppParameters(object):
             self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
             self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data/defaults.cfg'))
+
+        print(self.user_folder)
+        print(self.tmp_place)
+        print(self.default_printers_parameters_file)
+        print(self.printers_parameters_file)
+        print(self.config_path)
+
 
         self.config.read(self.config_path)
 
@@ -320,7 +328,7 @@ class AppParameters(object):
             except IOError as e:
                 logging.debug('Error: %s' % e.strerror)
 
-            printers_data = json.load(open(self.user_folder + self.printers_filename, 'rb'))
+            printers_data = json.loads(open(self.user_folder + self.printers_filename, 'rb'))
             materials_files_list = [printers_data['printers'][i]['material_parameters_file'] for i in
                                     printers_data['printers'] if i not in ['default']]
 
@@ -358,6 +366,8 @@ class AppParameters(object):
     def check_versions(self):
         old = self.user_folder + self.printers_filename
         new = self.tmp_place + self.printers_filename
+        print(old)
+        print(new)
         #out = self.get_actual_version(old, new)
 
         res_old = self.get_printers_info(old)

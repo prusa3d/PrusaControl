@@ -6,6 +6,7 @@ from pprint import pprint
 
 import OpenGL
 import numpy as np
+from PyQt5.QtGui import QOpenGLShaderProgram
 
 from sceneData import ModelTypeStl, ModelTypeObj
 
@@ -22,10 +23,10 @@ import time
 
 #from PyQt4.QtCore import QTimer
 #from PyQt4.QtGui import QColor, QCursor
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtOpenGL import *
-from PyQt4 import QtCore
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtOpenGL import *
+from PyQt5 import QtCore
 
 from PIL.Image import *
 
@@ -47,6 +48,7 @@ def timing(f):
 class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         #QGLWidget.__init__(self, parent)
+        '''
         if hasattr(QGLFormat, 'setVersion'):
             f = QGLFormat()
             f.setVersion(2, 1)
@@ -59,6 +61,8 @@ class GLWidget(QGLWidget):
             QGLWidget.__init__(self, c, parent)
         else:
             QGLWidget.__init__(self, parent)
+        '''
+        QGLWidget.__init__(self, parent)
 
         self.setMouseTracking(True)
 
@@ -75,8 +79,8 @@ class GLWidget(QGLWidget):
         self.hitPoint = numpy.array([0.,0.,0.])
         self.oldHitPoint = numpy.array([0.,0.,0.])
 
-        self.lightning_shader_program = QGLShaderProgram()
-        self.variable_layer_shader_program = QGLShaderProgram()
+        self.lightning_shader_program = QOpenGLShaderProgram()
+        self.variable_layer_shader_program = QOpenGLShaderProgram()
 
         #properties definition
         self.xRot = 0
