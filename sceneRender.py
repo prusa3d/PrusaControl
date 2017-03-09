@@ -319,14 +319,14 @@ class GLWidget(QGLWidget):
 
         #back, forward buttons
         self.undo_button = GlButton(self.texture_from_png("data/img/gui/backarrow_off.png"),
-                                    self.texture_from_png("data/img/gui/backArrow_on.png"),
-                                    self.texture_from_png("data/img/gui/backArrow_hover.png"),
+                                    self.texture_from_png("data/img/gui/backarrow_on.png"),
+                                    self.texture_from_png("data/img/gui/backarrow_hover.png"),
                                     self.texture_from_png("data/img/gui/tool_mask.png"),
                                     [40., 40.], [10, -50], True,
                                     self.tr("Undo"), "undo")
         self.do_button = GlButton(self.texture_from_png("data/img/gui/forwardarrow_off.png"),
-                                  self.texture_from_png("data/img/gui/forwardArrow_on.png"),
-                                  self.texture_from_png("data/img/gui/forwardArrow_hover.png"),
+                                  self.texture_from_png("data/img/gui/forwardarrow_on.png"),
+                                  self.texture_from_png("data/img/gui/forwardarrow_hover.png"),
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
                                   [40., 40.], [60, -50], True,
                                   self.tr("Redo"), "redo")
