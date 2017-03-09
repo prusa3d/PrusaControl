@@ -110,13 +110,13 @@ QComboBox::drop-down:disabled {
 }
 
 QComboBox::down-arrow {
-    image: url(data/img/gui/Arrow_DropDownMenu.png);
+    image: url(data/img/gui/arrow_dropdownmenu.png);
     width: 13px;
     height: 13px;
 }
 
 QComboBox::down-arrow:disabled {
-    image: url(data/img/gui/Arrow_DropDownMenu.png);
+    image: url(data/img/gui/arrow_dropdownmenu.png);
     width: 13px;
     height: 13px;
     color: rgb(112, 112, 112);
@@ -218,7 +218,7 @@ QComboBox#object_extruder_c::drop-down:disabled, QComboBox#combobox_scale_units:
 }
 
 QComboBox#object_extruder_c::down-arrow, QComboBox#combobox_scale_units::down-arrow {
-    image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
+    image: url(data/img/gui/arrow_dropdownmenu_bright.png);
     width: 13px;
     height: 13px;
 }
@@ -226,7 +226,7 @@ QComboBox#object_extruder_c::down-arrow, QComboBox#combobox_scale_units::down-ar
 QComboBox#object_extruder_c::down-arrow:disabled, QComboBox#combobox_scale_units::down-arrow:disabled  {
     color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
-    image: url(data/img/gui/Arrow_DropDownMenu_bright.png);
+    image: url(data/img/gui/arrow_dropdownmenu_bright.png);
     width: 13px;
     height: 13px;
 }
@@ -380,7 +380,7 @@ QPushButton#variable_hight_plus_button:pressed,
 QPushButton#variable_hight_plus_button:flat
 {
     /*image: url(data/img/gui/plusButton.png);*/
-    image: url(data/img/gui/ColorChange_ADD_OFF.png);
+    image: url(data/img/gui/colorchange_add_off.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
@@ -391,7 +391,7 @@ QPushButton#variable_hight_minus_button,
 QPushButton#variable_hight_minus_button:pressed,
 QPushButton#variable_hight_minus_button:flat
 {
-    image: url(data/img/gui/remove_OFF.png);
+    image: url(data/img/gui/remove_off.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
@@ -400,7 +400,7 @@ QPushButton#variable_hight_minus_button:flat
 
 QPushButton#variable_hight_minus_button:hover
 {
-    image: url(data/img/gui/remove_ON.png);
+    image: url(data/img/gui/remove_on.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
@@ -410,7 +410,7 @@ QPushButton#variable_hight_minus_button:hover
 QPushButton#gcode_slider_add_button:hover,
 QPushButton#variable_hight_plus_button:hover
 {
-    image: url(data/img/gui/ColorChange_ADD_ON.png);
+    image: url(data/img/gui/colorchange_add_on.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
@@ -421,7 +421,7 @@ QPushButton#transformation_reset_b,
 QPushButton#transformation_reset_b:flat
 {
     /*image: url(data/img/gui/plusButton.png);*/
-    image: url(data/img/gui/Reset_Light_normal_s.png);
+    image: url(data/img/gui/reset_light_normal_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
@@ -434,7 +434,7 @@ QPushButton#transformation_reset_b:flat
 
 QPushButton#transformation_reset_b:pressed
 {
-    image: url(data/img/gui/Reset_Light_on_s.png);
+    image: url(data/img/gui/reset_light_on_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
@@ -446,7 +446,7 @@ QPushButton#transformation_reset_b:pressed
 QPushButton#transformation_reset_b:hover
 {
     /*image: url(data/img/gui/plusButton.png);*/
-    image: url(data/img/gui/Reset_Light_hover_s.png);
+    image: url(data/img/gui/reset_light_hover_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
@@ -460,7 +460,7 @@ QPushButton#transformation_reset_b:hover
 QPushButton#transformation_reset_b:disabled
 {
     /*image: url(data/img/gui/plusButton.png);*/
-    image: url(data/img/gui/Reset_Light_dissabled_s.png);
+    image: url(data/img/gui/reset_light_dissabled_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
@@ -477,7 +477,7 @@ QPushButton#gcode_slider_point_button,
 QPushButton#gcode_slider_point_button:pressed,
 QPushButton#gcode_slider_point_button:flat
 {
-    image: url(data/img/gui/ColorChange_DELETE_OFF.png);
+    image: url(data/img/gui/colorchange_delete_off.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
@@ -486,7 +486,7 @@ QPushButton#gcode_slider_point_button:flat
 
 QPushButton#gcode_slider_point_button:hover
 {
-    image: url(data/img/gui/ColorChange_DELETE_ON.png);
+    image: url(data/img/gui/colorchange_delete_on.png);
     background-color: transparent;
     height: 19px;
     width: 19px;
@@ -540,32 +540,32 @@ QDoubleSpinBox:disabled {
 
 QSpinBox::up-button,
 QDoubleSpinBox::up-button{
-    image: url(data/img/gui/Arrow_Up_ObjectAdjust_OFF.png);
+    image: url(data/img/gui/arrow_up_objectadjust_off.png);
 }
 
 QSpinBox::up-button:hover,
 QDoubleSpinBox::up-button:hover{
-    image: url(data/img/gui/Arrow_Up_ObjectAdjust_Hover.png);
+    image: url(data/img/gui/arrow_up_objectadjust_hover.png);
 }
 
 QSpinBox::up-button:pressed,
 QDoubleSpinBox::up-button:pressed{
-    image: url(data/img/gui/Arrow_Up_ObjectAdjust_ON.png);
+    image: url(data/img/gui/arrow_up_objectadjust_on.png);
 }
 
 QSpinBox::down-button,
 QDoubleSpinBox::down-button{
-    image: url(data/img/gui/Arrow_Down_ObjectAdjust_OFF.png);
+    image: url(data/img/gui/arrow_down_objectadjust_off.png);
 }
 
 QSpinBox::down-button:hover,
 QDoubleSpinBox::down-button:hover{
-    image: url(data/img/gui/Arrow_Down_ObjectAdjust_Hover.png);
+    image: url(data/img/gui/arrow_down_objectadjust_hover.png);
 }
 
 QSpinBox::down-button:pressed,
 QDoubleSpinBox::down-button:pressed{
-    image: url(data/img/gui/Arrow_Down_ObjectAdjust_ON.png);
+    image: url(data/img/gui/arrow_down_objectadjust_on.png);
 }
 
 
@@ -580,46 +580,46 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:checked:hover {
-    image: url(data/img/gui/checkbox_On_hover.png);
+    image: url(data/img/gui/checkbox_on_hover.png);
 }
 
 QCheckBox#brimCheckBox::indicator:unchecked {
-    image: url(data/img/gui/checkbox_dark_Off.png);
+    image: url(data/img/gui/checkbox_dark_off.png);
 }
 
 
 QCheckBox#brimCheckBox::indicator:unchecked:hover {
-    image: url(data/img/gui/checkbox_dark_Off_hover.png);
+    image: url(data/img/gui/checkbox_dark_off_hover.png);
 }
 
 QCheckBox::indicator:unchecked {
-    image: url(data/img/gui/checkbox_Off.png);
+    image: url(data/img/gui/checkbox_off.png);
     color: rgb(0,0,0);
 }
 
 QCheckBox::indicator:checked {
-    image: url(data/img/gui/checkbox_On.png);
+    image: url(data/img/gui/checkbox_on.png);
 }
 
 QCheckBox::indicator:checked:disabled {
     /*image: url(data/img/gui/Disable_checkbox_On.png);*/
-    image: url(data/img/gui/checkbox_On_disabled.png);
+    image: url(data/img/gui/checkbox_on_disabled.png);
     color: rgb(0,0,0);
     background-color: transparent;
 }
 
 QCheckBox::indicator:unchecked:disabled {
-    image: url(data/img/gui/Disable_checkbox_Off.png);
+    image: url(data/img/gui/disable_checkbox_off.png);
     color: rgb(0,0,0);
     background-color: transparent;
 }
 
 QCheckBox::indicator:unchecked:hover {
-    image: url(data/img/gui/checkbox_Off_hover.png);
+    image: url(data/img/gui/checkbox_off_hover.png);
 }
 
 QCheckBox#brimCheckBox::indicator:unchecked:disabled {
-    image: url(data/img/gui/checkbox_dark_Off_disabled.png);
+    image: url(data/img/gui/checkbox_dark_off_disabled.png);
 }
 
 
@@ -634,25 +634,25 @@ QCheckBox#lock_axis_checkbox::indicator {
 }
 
 QCheckBox#lock_axis_checkbox::indicator:checked {
-    image: url(data/img/gui/ScaleLock_On.png);
+    image: url(data/img/gui/scalelock_on.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked {
-    image: url(data/img/gui/ScaleLock_Off.png);
+    image: url(data/img/gui/scalelock_off.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:checked:hover {
-    image: url(data/img/gui/ScaleLock_On_hover.png);
+    image: url(data/img/gui/scalelock_on_hover.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked:hover {
-    image: url(data/img/gui/ScaleLock_Off_hover.png);
+    image: url(data/img/gui/scalelock_off_hover.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:checked:disabled {
-    image: url(data/img/gui/ScaleLock_On_disabled.png);
+    image: url(data/img/gui/scalelock_on_disabled.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked:disabled {
-    image: url(data/img/gui/ScaleLock_Off_disabled.png);
+    image: url(data/img/gui/scalelock_off_disabled.png);
 }
