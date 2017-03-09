@@ -274,43 +274,43 @@ class GLWidget(QGLWidget):
         #tools
         #self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
         #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/gui/Scale_Off.png"),
-                                  self.texture_from_png("data/img/gui/Scale_On.png"),
-                                  self.texture_from_png("data/img/gui/Scale_Hover.png"),
+        self.scaleTool = GlButton(self.texture_from_png("data/img/gui/scale_off.png"),
+                                  self.texture_from_png("data/img/gui/scale_on.png"),
+                                  self.texture_from_png("data/img/gui/scale_hover.png"),
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
         #                          [40., 40.], [10., -200.], False,
                                   [40., 40.], [10., -245.], False,
                                   self.tr("Scale tool"),'scale')
 
-        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/gui/PlaceOnFace_Off.png"),
-                                        self.texture_from_png("data/img/gui/PlaceOnFace_On.png"),
-                                        self.texture_from_png("data/img/gui/PlaceOnFace_Hover.png"),
+        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/gui/placeonface_off.png"),
+                                        self.texture_from_png("data/img/gui/placeonface_on.png"),
+                                        self.texture_from_png("data/img/gui/placeonface_hover.png"),
                                         self.texture_from_png("data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -245.], False,
                                         self.tr("Place on face tool"), 'placeonface')
 
-        self.rotateTool = GlButton(self.texture_from_png("data/img/gui/Rotate_Off.png"),
-                                   self.texture_from_png("data/img/gui/Rotate_On.png"),
-                                   self.texture_from_png("data/img/gui/Rotate_Hover.png"),
+        self.rotateTool = GlButton(self.texture_from_png("data/img/gui/rotate_off.png"),
+                                   self.texture_from_png("data/img/gui/rotate_on.png"),
+                                   self.texture_from_png("data/img/gui/rotate_hover.png"),
                                    self.texture_from_png("data/img/gui/tool_mask.png"),
                                    [40., 40.], [10., -290.], False,
                                    self.tr("Rotate tool"), 'rotate')
-        self.organize_tool = GlButton(self.texture_from_png("data/img/gui/Organize_Off.png"),
-                                        self.texture_from_png("data/img/gui/Organize_On.png"),
-                                        self.texture_from_png("data/img/gui/Organize_Hover.png"),
+        self.organize_tool = GlButton(self.texture_from_png("data/img/gui/organize_off.png"),
+                                        self.texture_from_png("data/img/gui/organize_on.png"),
+                                        self.texture_from_png("data/img/gui/organize_hover.png"),
                                         self.texture_from_png("data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -335.], True,
                                       self.tr("Arrange tool"), 'organize')
-        self.multiply_tool = GlButton(self.texture_from_png("data/img/gui/Multi_Off.png"),
-                                      self.texture_from_png("data/img/gui/Multi_On.png"),
-                                      self.texture_from_png("data/img/gui/Multi_Hover.png"),
+        self.multiply_tool = GlButton(self.texture_from_png("data/img/gui/multi_off.png"),
+                                      self.texture_from_png("data/img/gui/multi_on.png"),
+                                      self.texture_from_png("data/img/gui/multi_hover.png"),
                                       self.texture_from_png("data/img/gui/tool_mask.png"),
                                       [40., 40.], [10., -380.], False,
                                       self.tr("Multiplication tool"), 'multi')
 
-        self.support_tool = GlButton(self.texture_from_png("data/img/gui/Support_Off.png"),
-                                      self.texture_from_png("data/img/gui/Support_On.png"),
-                                      self.texture_from_png("data/img/gui/Support_Hover.png"),
+        self.support_tool = GlButton(self.texture_from_png("data/img/gui/support_off.png"),
+                                      self.texture_from_png("data/img/gui/support_on.png"),
+                                      self.texture_from_png("data/img/gui/support_hover.png"),
                                       self.texture_from_png("data/img/gui/tool_mask.png"),
                                       [40., 40.], [10., -425.], False,
                                       self.tr("Support tool"), 'support')
@@ -318,15 +318,15 @@ class GLWidget(QGLWidget):
 
 
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/gui/BackArrow_Off.png"),
-                                    self.texture_from_png("data/img/gui/BackArrow_On.png"),
-                                    self.texture_from_png("data/img/gui/BackArrow_Hover.png"),
+        self.undo_button = GlButton(self.texture_from_png("data/img/gui/backarrow_off.png"),
+                                    self.texture_from_png("data/img/gui/backArrow_on.png"),
+                                    self.texture_from_png("data/img/gui/backArrow_hover.png"),
                                     self.texture_from_png("data/img/gui/tool_mask.png"),
                                     [40., 40.], [10, -50], True,
                                     self.tr("Undo"), "undo")
-        self.do_button = GlButton(self.texture_from_png("data/img/gui/ForwardArrow_Off.png"),
-                                  self.texture_from_png("data/img/gui/ForwardArrow_On.png"),
-                                  self.texture_from_png("data/img/gui/ForwardArrow_Hover.png"),
+        self.do_button = GlButton(self.texture_from_png("data/img/gui/forwardarrow_off.png"),
+                                  self.texture_from_png("data/img/gui/forwardArrow_on.png"),
+                                  self.texture_from_png("data/img/gui/forwardArrow_hover.png"),
                                   self.texture_from_png("data/img/gui/tool_mask.png"),
                                   [40., 40.], [60, -50], True,
                                   self.tr("Redo"), "redo")
