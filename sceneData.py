@@ -185,7 +185,7 @@ class AppScene(object):
 
         return area
 
-    @timing
+    #@timing
     def get_contact_faces_with_area_smaller_than(self, area_size, whole_scene):
         #whole_scene = self.get_whole_scene_in_one_mesh()
 
@@ -234,7 +234,7 @@ class AppScene(object):
 
         return brim
 
-    @timing
+    #@timing
     def get_faces_by_smaller_angel_normal_and_vector(self, vector, angle, whole_scene):
         #calculate angel between normal vector and given vector
         #return list of faces with smaller
@@ -366,8 +366,8 @@ class AppScene(object):
         scene_tmp = self.models[:index]
         if index > 0:
             while model.intersection_model_list_model_(scene_tmp):
-                #for angle in xrange(0, 360, 20):
-                for angle in xrange(0, 360, 45):
+                #for angle in range(0, 360, 20):
+                for angle in range(0, 360, 45):
                     model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
 
@@ -378,7 +378,7 @@ class AppScene(object):
                     if not model.intersection_model_list_model_(scene_tmp):
                         return
 
-                for angle in xrange(0, 360, 5):
+                for angle in range(0, 360, 5):
                     #this angels are tried
                     if angle in [0, 45, 90, 135, 180, 225, 270, 315, 360]:
                         continue
@@ -418,10 +418,10 @@ class Model(object):
     '''
     this is reprezentation of model data
     '''
-    newid = next(itertools.count())
+    newid = itertools.count(1)
     def __init__(self):
         #IDs
-        self.id = Model.newid()+1
+        self.id = next(self.newid)
 
         self.isVisible = True
         self.is_in_printing_area = True
@@ -592,8 +592,8 @@ class Model(object):
     def recalculate_texture(self):
         #TODO:
         #coef = (self.texture_size*self.texture_size)/11.
-        #coef = [int(np.floor(((self.texture_size * self.texture_size*4.) / 11.) * i)) for i in xrange(0, 11)]
-        #interpolate = [i for i in xrange(0, self.texture_size * self.texture_size)]
+        #coef = [int(np.floor(((self.texture_size * self.texture_size*4.) / 11.) * i)) for i in range(0, 11)]
+        #interpolate = [i for i in range(0, self.texture_size * self.texture_size)]
         #self.variable_layer_height_data
         #print("Coef: " + str(coef))
 
@@ -601,7 +601,7 @@ class Model(object):
         pprint(self.variable_layer_height_data)
 
         interpolated_vector = np.array([])
-        for i in xrange(0, 10, 1):
+        for i in range(0, 10, 1):
             interpolated_vector = np.append(interpolated_vector,
                 np.linspace(self.variable_layer_height_data[i],
                             self.variable_layer_height_data[i+1],
@@ -614,7 +614,7 @@ class Model(object):
 
         '''
         n = 0
-        for i in xrange(0, self.texture_size*self.texture_size*4, 4):
+        for i in range(0, self.texture_size*self.texture_size*4, 4):
             change = 0.0
             if i in coef:
                 print(i)
@@ -630,7 +630,7 @@ class Model(object):
         #self.variable_texture_data = np.array([], dtype=np.int)
 
 
-        for n in xrange(0, self.texture_size*self.texture_size, 1):
+        for n in range(0, self.texture_size*self.texture_size, 1):
             if n in interpolated_vector:
                 i = interpolated_vector[n*-1]
             else:
@@ -957,7 +957,7 @@ class Model(object):
         self.max_scene = self.max + pos
 
 
-    @timing
+    #@timing
     def set_rot(self, x, y, z, add=False, update_min_max=True, place_on_zero=True):
         '''
         if x > (2*np.pi):
@@ -1019,7 +1019,7 @@ class Model(object):
             self.pos[2]+=len
             self.update_min_max()
 
-    @timing
+    #@timing
     def update_min_max(self):
         #self.temp_mesh = deepcopy(self.mesh)
 
@@ -1266,7 +1266,7 @@ class Model(object):
                     return True
         return False
 
-    @timing
+    #@timing
     def intersectionRayModel(self, rayStart, rayEnd):
         ray = rayEnd - rayStart
         ray /= np.linalg.norm(ray)
@@ -1311,7 +1311,7 @@ class Model(object):
                 continue
         return False, None
 
-    @timing
+    #@timing
     def intersectionRayModel2(self, rayStart, rayEnd):
         ray = rayEnd - rayStart
         ray /= np.linalg.norm(ray)
@@ -1384,7 +1384,7 @@ class Model(object):
                 continue
         return False
 
-    @timing
+    #@timing
     def intersectionRayModel3(self, rayStart, rayEnd):
         ray = rayEnd - rayStart
         ray /= np.linalg.norm(ray)
@@ -1519,17 +1519,19 @@ class ModelTypeObj(ModelTypeAbstract):
             values = line.split()
             if not values: continue
             if values[0] == 'v':
-                v = map(float, values[1:4])
+                #print(values[1:4])
+                v = list(map(float, values[1:4]))
                 if swapyz:
                     v = v[0], v[2], v[1]
                 vertices.append(v)
             elif values[0] == 'vn':
-                v = map(float, values[1:4])
+                v = list(map(float, values[1:4]))
                 if swapyz:
                     v = v[0], v[2], v[1]
                 normals.append(v)
             elif values[0] == 'vt':
-                texcoords_array.append(map(float, values[1:3]))
+                m = list(map(float, values[1:3]))
+                texcoords_array.append(m)
             #elif values[0] in ('usemtl', 'usemat'):
             #    material = values[1]
             #elif values[0] == 'mtllib':

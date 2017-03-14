@@ -331,7 +331,7 @@ class Spline_editor(QWidget):
                 #TODO: set for other objects on scene
                 pass
         else:
-            for i in xrange(0, self.number_of_ticks+1):
+            for i in range(0, self.number_of_ticks+1):
                 #first and last layer
                 '''
                 if i == 0:
@@ -512,17 +512,19 @@ class SettingsDialog(QDialog):
         self.language_combo = QComboBox()
         #set enumeration
         self.language_combo.addItems(self.controller.enumeration['language'].values())
-        self.language_combo.setCurrentIndex(self.controller.enumeration['language'].keys().index(self.controller.settings['language']))
+        l = list(self.controller.enumeration['language'])
+        self.language_combo.setCurrentIndex(l.index(self.controller.settings['language']))
 
         self.printer_label = QLabel(self.tr("Printer model"))
         self.printer_combo = QComboBox()
         self.printer_combo.addItems(self.controller.get_printers_labels_ls())
+        #print(self.controller.get_printers_names_ls())
+        #print(self.controller.settings['printer'])
         self.printer_combo.setCurrentIndex(self.controller.get_printers_names_ls().index(self.controller.settings['printer']))
 
         self.printer_type_label = QLabel(self.tr("Printer variation"))
         self.printer_type_combo = QComboBox()
         self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
-        print("Aktualni list: " + str(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer)))
         self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
 
         self.debug_checkbox = QCheckBox(self.tr("Debug"))
@@ -565,7 +567,7 @@ class SettingsDialog(QDialog):
         dialog = SettingsDialog(controller, parent)
         dialog.setWindowTitle("Settings")
         result = dialog.exec_()
-        data['language'] = controller.enumeration['language'].keys()[dialog.language_combo.currentIndex()]
+        data['language'] = list(controller.enumeration['language'])[dialog.language_combo.currentIndex()]
         data['printer'] = controller.get_printers_names_ls()[dialog.printer_combo.currentIndex()]
         data['printer_type'] = controller.get_printer_variations_names_ls(data['printer'])[dialog.printer_type_combo.currentIndex()]
         controller.set_printer(data['printer'])
@@ -729,8 +731,8 @@ class PrusaControlView(QMainWindow):
 
         #print("basic settings of PrusaControlView")
         self.setObjectName('PrusaControlView')
-        css = QFile('data/my_stylesheet.css')
-        css.open(QIODevice.ReadOnly)
+        #css = QFile('data/my_stylesheet.css')
+        #css.open(QIODevice.ReadOnly)
 
         #if css.isOpen():
         #    self.setStyleSheet(QVariant(css.readAll()).toString())
@@ -1006,8 +1008,9 @@ class PrusaControlView(QMainWindow):
         self.right_panel_layout = QVBoxLayout()
         self.right_panel_layout.setObjectName('right_panel_layout')
         self.right_panel_layout.setSpacing(5)
-        #self.right_panel_layout.setMargin(0)
         self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
+        #self.right_panel_layout.setMargin(0)
+        #self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
 
         #QtGui.QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
         #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
@@ -1181,6 +1184,8 @@ class PrusaControlView(QMainWindow):
 
         mainLayout = QHBoxLayout()
         mainLayout.setSpacing(0)
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        #mainLayout.setContentsMargin(0, 0, 0, 0)
         #mainLayout.setMargin(0)
         #mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.addWidget(self.glWidget)
@@ -1797,7 +1802,7 @@ class PrusaControlView(QMainWindow):
             model.set_move(np.array([x*.1, y*.1, z*.1]), False, place_on_zero)
             self.controller.view.update_scene()
 
-    @timing
+    #@timing
     def set_rotation_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
             self.controller.scene_was_changed()
@@ -2131,12 +2136,12 @@ class PrusaControlView(QMainWindow):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 #print(str())
-                self.statusBar().showMessage('Dropped file name is ' + str(url.toLocalFile().toLocal8Bit().data()))
+                self.statusBar().showMessage('Dropped file name is ' + url.toLocalFile())
                 #TODO: Add network files
                 #path = url.toLocalFile().toLocal8Bit().data()
-                path = url.toLocalFile().toLocal8Bit().data()
+                path = url.toLocalFile()
 
-                print(str(type(path)))
+                print(path)
                 #if 'file:///' in path:
                 #    path = path[8:]
                 #print(str(path))
@@ -2149,8 +2154,7 @@ class PrusaControlView(QMainWindow):
             super(PrusaControlView, self).dropEvent(event)
 
     def convert_file_path_to_unicode(self, path):
-        codec = QTextCodec.codecForName("UTF-16")
-        converted_path = unicode(codec.fromUnicode(path), 'UTF-16')
+        converted_path = path
         return converted_path
 
 

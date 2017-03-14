@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+import io
 import logging
 import os
-from configparser import ConfigParser
+import configparser
 from abc import ABCMeta, abstractmethod
 
 
@@ -135,14 +136,15 @@ class Slic3rEngineRunner(QObject):
         material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'])
         #print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
-        new_config = ConfigParser()
+        new_config = configparser.RawConfigParser()
         new_config.add_section('settings')
+        #new_config.set('settings', i, new_parameters)
         for i in new_parameters:
             new_config.set('settings', i, new_parameters[i])
 
         #write ini file
         with open(filename, 'w') as ini_file:
-            fake_file = cStringIO.StringIO()
+            fake_file = io.StringIO()
             new_config.write(fake_file)
             ini_file.write(fake_file.getvalue()[11:])
 
@@ -166,7 +168,7 @@ class Slic3rEngineRunner(QObject):
             if self.process.returncode == -signal.SIGSEGV:
                 self.send_message.emit("Slic3r engine crash")
                 break
-            line = self.process.stdout.readline()
+            line = str(self.process.stdout.readline(), 'utf-8')
             parsed_line = line.rsplit()
             if not line:
                 continue

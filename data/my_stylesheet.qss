@@ -5,7 +5,6 @@
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
     font-family: 'Titillium Web';
-    font-size: 12px;
 }
 
 QScrollBar {width:0px;}
@@ -20,21 +19,18 @@ QWidget {
     font-family: 'Titillium Web';
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
-    font-size: 12px;
 }
 
 QMessageBox#msgBox{
     font-family: 'Titillium Web';
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
-    font-size: 12px;
 }
 
 QToolTip {
     font-family: 'Titillium Web';
     background-color: rgb(132, 132, 132);
     color:rgb(255, 255, 255);
-    font-size: 12px;
     border: none;
     text-align:center;
 }
@@ -42,8 +38,8 @@ QToolTip {
 QLabel#printer_settings_l, QLabel#materials_settings_l {
     margin: 13px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
-    font-size: 16px;
     font-weight: bold;
+    height: 26px;
 }
 
 QLabel#infillLabel,
@@ -57,7 +53,7 @@ QLabel#extruder3_l,
 QLabel#extruder4_l{
     margin: 0px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
-    font-size: 12px;
+    height: 12px;
 }
 
 QLabel#printer_settings_l:disabled,
@@ -79,7 +75,6 @@ QLabel#extruder4_l:disabled
 QComboBox {
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 1px 3px;
-    font-size: 12px;
     height: 22px;
     background-color:rgb(77, 77, 77);
     border: 1px solid rgb(77, 77, 77);
@@ -164,7 +159,6 @@ QComboBox#extruder4_c QAbstractItemView
 
 /*TEST*/
 QComboBox#object_extruder_c, QComboBox#combobox_scale_units {
-    font-size: 12px;
     height: 22px;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 1px 3px;
@@ -258,7 +252,7 @@ QGraphicsView#spline_edit
     border-radius: 5px;
     background-color:rgb(77, 77, 77);
     font-family: 'Titillium Web';
-    font-size: 16px;
+    height: 16px;
     font-weight: bold;
 }
 
@@ -313,7 +307,7 @@ QLabel#color_change_l{
     color: rgb(255, 255, 255);
     background-color:rgb(77, 77, 77);
     font-family: 'Titillium Web';
-    font-size: 16px;
+    height: 16px;
     font-weight: bold;
 }
 
@@ -321,7 +315,7 @@ QLabel#color_change_l{
 QGLWidget{
     font-family: 'Titillium Web';
     font-weight: bold;
-    font-size: 18px;
+    height: 18px;
 }
 
 QSlider#infillSlider{
@@ -360,7 +354,6 @@ QPushButton#gcode_back_b,
 QPushButton#basic_settings_b,
 QPushButton#advance_settings_b{
     font-family: 'Titillium Web';
-    font-size: 12px;
     font-weight: bold;
     height: 27px;
     background-color:rgb(255, 97, 0);
@@ -503,7 +496,6 @@ QPushButton#advance_settings_b:disabled{
 
 QProgressBar {
     font-family: 'Titillium Web';
-    font-size: 12px;
     height: 27px;
     margin: 0px 10px 0px 30px;
     border-radius: 5px;
@@ -524,7 +516,6 @@ QProgressBar#splash_progressbar {
 QSpinBox,
 QDoubleSpinBox {
     font-family: 'Titillium Web';
-    font-size: 12px;
     height: 22px;
     color: rgb(255, 255, 255);
     border-radius: 5px;
@@ -571,7 +562,6 @@ QDoubleSpinBox::down-button:pressed{
 
 QCheckBox {
     spacing: 5px;
-    font-size: 12px;
 }
 
 QCheckBox::indicator {
@@ -625,7 +615,6 @@ QCheckBox#brimCheckBox::indicator:unchecked:disabled {
 
 QCheckBox#lock_axis_checkbox{
     spacing: 5px;
-    font-size: 12px;
 }
 
 QCheckBox#lock_axis_checkbox::indicator {

@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import atexit
+import inspect
+from msilib.schema import File
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5 import Qt
 #from tendo.singleton import SingleInstance
 #from PyQt5 import QtWidgets
 
@@ -74,6 +77,9 @@ def log_exception(excType, excValue, traceback):
 def main():
     sys.excepthook = log_exception
 
+    vers = ['%s = %s' % (k, v) for k, v in vars(Qt).items() if k.lower().find('version') >= 0 and not inspect.isbuiltin(v)]
+    print('\n'.join(sorted(vers)))
+
     try:
         if sys.frozen or sys.importers:
             SCRIPT_ROOT = os.path.dirname(sys.executable)
@@ -81,10 +87,14 @@ def main():
         SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
     #me = SingleInstance()
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("data/icon/favicon.ico"))
-
+    file = QFile("data/my_stylesheet.qss")
+    file.open(QFile.ReadOnly)
+    StyleSheet = str(file.readAll(), 'utf-8')
+    app.setStyleSheet(StyleSheet)
 
 
     event_loop_runner = EventLoopRunner(app)

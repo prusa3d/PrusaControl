@@ -244,7 +244,7 @@ class GcodeParserRunner(QObject):
 
 
     def load_gcode_file(self):
-        file = QFile(unicode(self.filename.encode("utf-8")))
+        file = QFile(self.filename)
         file.open(QIODevice.ReadOnly | QIODevice.Text)
         in_stream = QTextStream(file)
         file_size = file.size()
@@ -261,7 +261,7 @@ class GcodeParserRunner(QObject):
                 counter=0
             # print("ctu")
 
-            line = unicode(in_stream.readLine().toUtf8(), encoding="UTF-8")
+            line = in_stream.readLine()
             # print(line)
             # self.process_line(line)
             bits = line.split(';', 1)
@@ -294,7 +294,7 @@ class GcodeParserRunner(QObject):
             self.data.pop(i, None)
 
         self.data_keys = []
-        self.data_keys = self.data.keys()
+        self.data_keys = list(self.data)
         self.data_keys.sort(key=lambda x: float(x))
 
 
@@ -348,11 +348,11 @@ class GcodeParserRunner(QObject):
             comment = ""
 
         line = text.split(' ')
-        line = filter(None, line)
+        line = list(filter(None, line))
 
         #print(comment)
         comment_line = comment.split(' ')
-        comment_line = filter(None, comment_line)
+        comment_line = list(filter(None, comment_line))
         if len(comment_line)==0:
             if 'Z' in line[1]:
                 # Set of Z axis

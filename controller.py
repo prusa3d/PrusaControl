@@ -274,7 +274,7 @@ class Controller(QObject):
     def convert_printing_time_from_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
-        return "%02d hod %02d min" % (h, m)
+        return "{0:.2f} hod {0:.2f} min".format(h, m)
 
     def convert_filament_length_units(self, filament_lenght_mm):
         if not filament_lenght_mm:
@@ -292,9 +292,9 @@ class Controller(QObject):
                 recalculated_filament_lenght = original_filament_lenght
                 recalculated_units = original_units
 
-            new_filament_format = "%.2f%s" %(recalculated_filament_lenght, recalculated_units)
+            new_filament_format = "{0:.2f} {}".format(recalculated_filament_lenght, recalculated_units)
         else:
-            new_filament_format = "%s" %filament_lenght_mm
+            new_filament_format = "{}".format(filament_lenght_mm)
         return new_filament_format
 
     def clear_event_flag_status(self):
@@ -325,7 +325,7 @@ class Controller(QObject):
         config.set('settings', 'automatic_update_parameters', self.settings['automatic_update_parameters'])
 
 
-        with open(self.app_config.config_path, 'wb') as configfile:
+        with open(self.app_config.config_path, 'w') as configfile:
             config.write(configfile)
 
     def set_basic_settings(self):
@@ -499,7 +499,7 @@ class Controller(QObject):
 
     def get_printer_variations_names_ls(self, printer_name):
         printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
-        return printer_settings["printer_type"].keys()
+        return list(printer_settings["printer_type"])
 
     def get_printer_materials_names_ls(self, printer_name):
         #return self.printing_settings['materials']
@@ -781,12 +781,12 @@ class Controller(QObject):
         suggested_filename = self.generate_gcode_filename()
         color_change_layers = self.view.gcode_slider.get_color_change_layers()
         color_change_data = self.gcode.get_first_extruding_line_number_of_gcode_for_layers(color_change_layers)
-        data = self.view.save_gcode_file_dialog(suggested_filename)
-        filename = data.split('.')
+        path, file_type = self.view.save_gcode_file_dialog(suggested_filename)
+        filename = path.split('.')
         if filename[-1] in ['gcode', 'GCODE']:
-            filename_out = data
+            filename_out = path
         else:
-            filename_out = data + '.gcode'
+            filename_out = path + '.gcode'
         try:
             self.status = "saving_gcode"
             self.view.saving_gcode()
@@ -905,7 +905,17 @@ class Controller(QObject):
 
 
     def wheel_event(self, event):
-        self.view.set_zoom(event.delta()/120)
+        numPixels = event.pixelDelta()
+        numDegrees = event.angleDelta() / 8
+
+        if not numPixels.isNull():
+            self.view.set_zoom(numPixels.y())
+        elif not numDegrees.isNull():
+            numSteps = numDegrees / 15
+            print(numSteps.y())
+            self.view.set_zoom(numSteps.y())
+
+        event.accept()
         self.update_scene()
 
     def set_camera_move_function(self):

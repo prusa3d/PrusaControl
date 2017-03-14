@@ -5,6 +5,7 @@ from copy import deepcopy
 from pprint import pprint
 
 import OpenGL
+import PyQt5
 import numpy as np
 from PyQt5.QtGui import QOpenGLShaderProgram
 
@@ -410,16 +411,16 @@ class GLWidget(QGLWidget):
 
 
 
-        if self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/lightning.vert") \
-                and self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/lightning.frag"):
+        if self.lightning_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Vertex, "data/shaders/lightning.vert") \
+                and self.lightning_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Fragment, "data/shaders/lightning.frag"):
             self.lightning_shader_program.link()
             if not self.lightning_shader_program.log():
                 self.lightning_shader_ok = True
             self.lightning_shader_program.release()
 
 
-        if self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/variable_height_slic3r.vert") \
-                and self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/variable_height_slic3r.frag"):
+        if self.variable_layer_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Vertex, "data/shaders/variable_height_slic3r.vert") \
+                and self.variable_layer_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Fragment, "data/shaders/variable_height_slic3r.frag"):
             self.variable_layer_shader_program.link()
             if not self.variable_layer_shader_program.log():
                 self.variable_layer_shader_ok = True
@@ -465,7 +466,7 @@ class GLWidget(QGLWidget):
         self.picking_render()
         viewport = glGetIntegerv(GL_VIEWPORT)
         color = glReadPixels(x, viewport[3] - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE)
-        return ord(color[0])+(256*ord(color[1]))+(256*256*ord(color[2]))
+        return int(color[0])+(256*int(color[1]))+(256*256*int(color[2]))
 
 
 
@@ -1152,7 +1153,7 @@ class GLWidget(QGLWidget):
             glEnd()
 
             #outer lines
-            bigger_index = list(xrange(0,72,3))
+            bigger_index = list(range(0, 72, 3))
             glBegin(GL_LINES)
             for n, (i0, i1, i2) in enumerate(zip(circle3, circle4, circle5)):
                 glVertex3f(i0[0], i0[1], 0.)
@@ -1334,7 +1335,7 @@ class GLWidget(QGLWidget):
         #glColor4f(.4, .4, .4, .75)
         glColor4f(1., 1., 1., 1.)
         glBegin(GL_TRIANGLES)
-        for i in xrange(0, len(Model.v0)):
+        for i in range(0, len(Model.v0)):
             #print(str(Model.v0[i]))
             glTexCoord2f(Model.t0[i][0], Model.t0[i][1])
             glNormal3f(Model.n0[i][0], Model.n0[i][1], Model.n0[i][2])
