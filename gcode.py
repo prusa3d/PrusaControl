@@ -244,51 +244,60 @@ class GcodeParserRunner(QObject):
 
 
     def load_gcode_file(self):
-        file = QFile(self.filename)
-        file.open(QIODevice.ReadOnly | QIODevice.Text)
-        in_stream = QTextStream(file)
-        file_size = file.size()
-        counter = 0
-        line = 0
-        line_number = 0
-        while not in_stream.atEnd() and self.is_running is True:
+        #file = QFile(self.filename)
+        #file.open(QIODevice.ReadOnly | QIODevice.Text)
+        #in_stream = QTextStream(file)
+        #file_size = file.size()
+        with open(self.filename, "r") as file_in:
+            file_size = os.fstat(file_in.fileno()).st_size
 
-            counter+=1
-            if self.set_update_progress and counter==10000:
-                #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
-                progress = (in_stream.pos()*1./file_size*1.) * 100.
-                self.set_update_progress.emit(int(progress))
-                counter=0
-            # print("ctu")
+            counter = 0
+            line = 0
+            line_number = 0
+            buff = 0
+            while self.is_running is True:
+                counter+=1
+                if self.set_update_progress and counter==10000:
+                    #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
+                    progress = (buff*1./file_size*1.) * 100.
+                    self.set_update_progress.emit(int(progress))
+                    counter=0
+                # print("ctu")
 
-            line = in_stream.readLine()
-            # print(line)
-            # self.process_line(line)
-            bits = line.split(';', 1)
-            if bits[0] == '':
-                line_number+=1
-                continue
-            if 'G1' in bits[0]:
-                self.parse_g1_line(bits, line_number)
-            else:
-                line_number += 1
-                continue
-            line_number += 1
 
-        self.printing_time = self.calculate_time_of_print()
-        self.filament_length = 0.0  # self.calculate_length_of_filament()
-
-        ###
-        self.non_extruding_layers = []
-        for i in self.data:
-            layer_flag = 'M'
-            for l in self.data[i]:
-                _start, _end, flag, _speed, _extr, _line = l
-                if flag in ['E', 'E-sk', 'E-su', 'E-i', 'E-p']:
-                    layer_flag = 'E'
+                line = file_in.readline()
+                buff += len(line)
+                if not line:
                     break
-            if layer_flag == 'M':
-                self.non_extruding_layers.append(i)
+                #time.sleep(0.05)
+
+                # print(line)
+                # self.process_line(line)
+                bits = line.split(';', 1)
+                if bits[0] == '':
+                    line_number+=1
+                    continue
+                if 'G1' in bits[0]:
+                    self.parse_g1_line(bits, line_number)
+                else:
+                    line_number += 1
+                    continue
+                line_number += 1
+
+            self.printing_time = self.calculate_time_of_print()
+            self.filament_length = 0.0  # self.calculate_length_of_filament()
+
+            ###
+            self.non_extruding_layers = []
+            for i in self.data:
+                layer_flag = 'M'
+                for l in self.data[i]:
+                    _start, _end, flag, _speed, _extr, _line = l
+                    if flag in ['E', 'E-sk', 'E-su', 'E-i', 'E-p']:
+                        layer_flag = 'E'
+                        break
+                if layer_flag == 'M':
+                    self.non_extruding_layers.append(i)
 
         for i in self.non_extruding_layers:
             self.data.pop(i, None)

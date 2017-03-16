@@ -272,11 +272,11 @@ class AppParameters(object):
             self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open('data/defaults.cfg'))
 
-        print(self.user_folder)
-        print(self.tmp_place)
-        print(self.default_printers_parameters_file)
-        print(self.printers_parameters_file)
-        print(self.config_path)
+        #print(self.user_folder)
+        #print(self.tmp_place)
+        #print(self.default_printers_parameters_file)
+        #print(self.printers_parameters_file)
+        #print(self.config_path)
 
 
         self.config.read(self.config_path)
@@ -293,6 +293,7 @@ class AppParameters(object):
 
         if is_internet_on:
             self.check_new_version_of_prusacontrol()
+
 
 
     def strip_version_string(self, string_in):

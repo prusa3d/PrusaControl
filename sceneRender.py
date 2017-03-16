@@ -693,10 +693,12 @@ class GLWidget(QGLWidget):
 
             glColor4f(1.,1.,1.,1.)
             font = self.controller.view.font
-            font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
+            #font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
+            font.setPointSize(25)
             self.renderText(115, sH - 153, self.tr("WARNING"), font)
 
-            font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
+            #font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
+            font.setPointSize(8)
             for n, message in enumerate(messages):
                 #Maximum of massages in warning box
                 if n > 5:

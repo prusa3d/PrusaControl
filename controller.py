@@ -206,6 +206,7 @@ class Controller(QObject):
         self.message_object00 = ""
         self.message_object01 = ""
 
+        self.show_message_on_status_bar("Ready")
         self.create_messages()
 
 
@@ -274,7 +275,11 @@ class Controller(QObject):
     def convert_printing_time_from_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
-        return "{0:.2f} hod {0:.2f} min".format(h, m)
+
+        if h == 0:
+            return "{:2.0f}min".format(m)
+        else:
+            return "{:2.0f}h {:2.0f}min".format(h, m)
 
     def convert_filament_length_units(self, filament_lenght_mm):
         if not filament_lenght_mm:
@@ -292,7 +297,10 @@ class Controller(QObject):
                 recalculated_filament_lenght = original_filament_lenght
                 recalculated_units = original_units
 
-            new_filament_format = "{0:.2f} {}".format(recalculated_filament_lenght, recalculated_units)
+            recalculated_filament_lenght_str = "{:.1f}".format(recalculated_filament_lenght)
+            recalculated_filament_lenght_str = recalculated_filament_lenght_str.rstrip("0")
+            recalculated_filament_lenght_str = recalculated_filament_lenght_str.rstrip(".")
+            new_filament_format = "{}{}".format(recalculated_filament_lenght_str, recalculated_units)
         else:
             new_filament_format = "{}".format(filament_lenght_mm)
         return new_filament_format
