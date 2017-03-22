@@ -5,9 +5,7 @@ from copy import deepcopy
 from pprint import pprint
 
 import OpenGL
-import PyQt5
 import numpy as np
-from PyQt5.QtGui import QOpenGLShaderProgram
 
 from sceneData import ModelTypeStl, ModelTypeObj
 
@@ -24,10 +22,10 @@ import time
 
 #from PyQt4.QtCore import QTimer
 #from PyQt4.QtGui import QColor, QCursor
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtOpenGL import *
-from PyQt5 import QtCore
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4.QtOpenGL import *
+from PyQt4 import QtCore
 
 from PIL.Image import *
 
@@ -49,7 +47,6 @@ def timing(f):
 class GLWidget(QGLWidget):
     def __init__(self, parent=None):
         #QGLWidget.__init__(self, parent)
-        '''
         if hasattr(QGLFormat, 'setVersion'):
             f = QGLFormat()
             f.setVersion(2, 1)
@@ -62,8 +59,6 @@ class GLWidget(QGLWidget):
             QGLWidget.__init__(self, c, parent)
         else:
             QGLWidget.__init__(self, parent)
-        '''
-        QGLWidget.__init__(self, parent)
 
         self.setMouseTracking(True)
 
@@ -80,8 +75,8 @@ class GLWidget(QGLWidget):
         self.hitPoint = numpy.array([0.,0.,0.])
         self.oldHitPoint = numpy.array([0.,0.,0.])
 
-        self.lightning_shader_program = QOpenGLShaderProgram()
-        self.variable_layer_shader_program = QOpenGLShaderProgram()
+        self.lightning_shader_program = QGLShaderProgram()
+        self.variable_layer_shader_program = QGLShaderProgram()
 
         #properties definition
         self.xRot = 0
@@ -411,16 +406,16 @@ class GLWidget(QGLWidget):
 
 
 
-        if self.lightning_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Vertex, "data/shaders/lightning.vert") \
-                and self.lightning_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Fragment, "data/shaders/lightning.frag"):
+        if self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/lightning.vert") \
+                and self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/lightning.frag"):
             self.lightning_shader_program.link()
             if not self.lightning_shader_program.log():
                 self.lightning_shader_ok = True
             self.lightning_shader_program.release()
 
 
-        if self.variable_layer_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Vertex, "data/shaders/variable_height_slic3r.vert") \
-                and self.variable_layer_shader_program.addShaderFromSourceFile(PyQt5.QtGui.QOpenGLShader.Fragment, "data/shaders/variable_height_slic3r.frag"):
+        if self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/variable_height_slic3r.vert") \
+                and self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/variable_height_slic3r.frag"):
             self.variable_layer_shader_program.link()
             if not self.variable_layer_shader_program.log():
                 self.variable_layer_shader_ok = True

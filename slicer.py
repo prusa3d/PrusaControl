@@ -13,7 +13,7 @@ from copy import deepcopy
 from io import StringIO
 
 import signal
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt4.QtCore import QObject, QThread, pyqtSignal
 
 from gcode import GCode
 

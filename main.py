@@ -4,11 +4,9 @@ import atexit
 import inspect
 from msilib.schema import File
 
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5 import Qt
+from PyQt4.QtGui import QApplication, QIcon
+from PyQt4 import QtGui
 #from tendo.singleton import SingleInstance
-#from PyQt5 import QtWidgets
 
 from controller import Controller
 from sceneRender import *
@@ -87,8 +85,8 @@ def main():
     #    SCRIPT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
     #me = SingleInstance()
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+    #QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("data/icon/favicon.ico"))

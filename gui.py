@@ -6,16 +6,14 @@ from copy import deepcopy
 
 import numpy as np
 import time
-from OpenGL.GL import *
-from PyQt5.QtCore import QTextCodec
+#from OpenGL.GL import *
+from PyQt4.QtCore import QTextCodec
 
-from PyQt5.QtCore import Qt, pyqtSignal, QSettings, QFile, QIODevice, QVariant, QEvent
-from PyQt5.QtGui import QFont, QFontDatabase, QPainter, QPainterPath, QPen
-from PyQt5.QtWidgets import QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow, \
-QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget,\
-QSlider, QStyleOptionSlider, QDialog, QDialogButtonBox, QComboBox, QCheckBox, QApplication,\
-QSpinBox, QDoubleSpinBox, QFileDialog
-
+from PyQt4.QtCore import Qt, SIGNAL, QSettings, QFile, QIODevice, QVariant, QEvent
+from PyQt4.QtGui import QFont, QFontDatabase, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow, \
+QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, \
+QPainter, QPainterPath, QPen, QSlider, QStyleOptionSlider, QDialog, QDialogButtonBox, \
+QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog
 import projectFile
 import sceneRender
 
@@ -511,7 +509,7 @@ class SettingsDialog(QDialog):
         self.language_label = QLabel(self.tr("Language"))
         self.language_combo = QComboBox()
         #set enumeration
-        self.language_combo.addItems(self.controller.enumeration['language'].values())
+        self.language_combo.addItems(list(self.controller.enumeration['language'].values()))
         l = list(self.controller.enumeration['language'])
         self.language_combo.setCurrentIndex(l.index(self.controller.settings['language']))
 

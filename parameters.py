@@ -43,7 +43,7 @@ class PrintingParameters(object):
         self.materials_quality_parameters = {}
 
         #read printers json file
-        print(self.application_parameters.printers_parameters_file)
+        #print(self.application_parameters.printers_parameters_file)
         self.all_printers_parameters = self.read_printers_parameters(self.application_parameters.printers_parameters_file)['printers']
 
         #apply default printer type settings
@@ -371,8 +371,8 @@ class AppParameters(object):
     def check_versions(self):
         old = self.user_folder + self.printers_filename
         new = self.tmp_place + self.printers_filename
-        print(old)
-        print(new)
+        #print(old)
+        #print(new)
         #out = self.get_actual_version(old, new)
 
         res_old = self.get_printers_info(old)
@@ -434,8 +434,8 @@ class AppParameters(object):
         splitted_version_from_internet = version_from_internet.split("_")
         splitted_local_version = self.version.split("_")
 
-        print("Local version: " + str(splitted_local_version))
-        print("Internet version: " + str(splitted_version_from_internet))
+        #print("Local version: " + str(splitted_local_version))
+        #print("Internet version: " + str(splitted_version_from_internet))
 
         version_from_internet_lst = splitted_version_from_internet[0].split(".")
         local_version_lst = splitted_local_version[0].split(".")

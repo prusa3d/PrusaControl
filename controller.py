@@ -15,10 +15,10 @@ from shutil import copyfile, Error
 
 import numpy
 #import pyrr
-from PyQt5.QtCore import QObject
-from PyQt5.QtCore import QTranslator, Qt, QPoint
+from PyQt4.QtCore import QObject
+from PyQt4.QtCore import QTranslator, Qt, QPoint
 #from PyQt4 import QtGui
-from PyQt5.QtWidgets import QApplication
+from PyQt4.QtGui import QApplication
 
 import sceneData
 from analyzer import Analyzer
@@ -56,7 +56,7 @@ class Controller(QObject):
         self.view = []
 
         #this flag is only for development only, Development = True, Production = False
-        self.development_flag = True
+        self.development_flag = False
         progress_bar.setValue(10)
 
         self.app_config = AppParameters(self, local_path)
@@ -911,17 +911,8 @@ class Controller(QObject):
         self.set_generate_button()
         self.set_progress_bar(0.0)
 
-
     def wheel_event(self, event):
-        numPixels = event.pixelDelta()
-        numDegrees = event.angleDelta() / 8
-
-        if not numPixels.isNull():
-            self.view.set_zoom(numPixels.y())
-        elif not numDegrees.isNull():
-            numSteps = numDegrees / 15
-            print(numSteps.y())
-            self.view.set_zoom(numSteps.y())
+        self.view.set_zoom(event.delta() / 120)
 
         event.accept()
         self.update_scene()
@@ -1169,10 +1160,12 @@ class Controller(QObject):
             self.invert_selection()
             self.update_scene()
 
+        event.accept()
 
 
     def mouse_double_click(self, event):
-        pass
+        event.accept()
+
 
     def select_all(self):
         for m in self.scene.models:
@@ -1302,6 +1295,7 @@ class Controller(QObject):
                 self.set_camera_rotation_function()
         self.update_scene()
         #self.view.update_scene()
+        event.accept()
 
 
     def is_some_tool_active(self):
@@ -1513,6 +1507,7 @@ class Controller(QObject):
                     self.view.glWidget.setToolTip("")
                     for tool in self.tools:
                         tool.mouse_is_over(False)
+        event.accept()
 
 
         self.last_pos = QPoint(event.pos())
@@ -1576,6 +1571,7 @@ class Controller(QObject):
             self.clear_event_flag_status()
             self.unselect_objects()
         self.update_scene()
+        event.accept()
 
     def open_object_settings(self, object_id):
         self.set_basic_settings()
@@ -1815,7 +1811,7 @@ class Controller(QObject):
         '''
         function for resolve which file type will be loaded
         '''
-        print("Urls type: " + str(type(url)))
+        #print("Urls type: " + str(type(url)))
 
         if self.status in ['generating']:
             if not self.open_cancel_generating_dialog():

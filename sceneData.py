@@ -8,9 +8,9 @@ from abc import ABCMeta, abstractmethod
 from os.path import basename
 
 import time
-from PyQt5.QtCore import QObject
-from PyQt5.QtGui import QFont
-#from PyQt5.QtOpenGL import QGLBuffer
+from PyQt4.QtCore import QObject
+from PyQt4.QtGui import QFont
+from PyQt4.QtOpenGL import QGLBuffer
 #from stl import Mode
 from stl.mesh import Mesh
 
