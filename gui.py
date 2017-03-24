@@ -499,7 +499,7 @@ class Spline_editor(QWidget):
 
 class SettingsDialog(QDialog):
     def __init__(self, controller, parent = None):
-        super(SettingsDialog, self).__init__(parent)
+        super(SettingsDialog, self).__init__(controller.view)
 
         self.controller = controller
 
@@ -1347,7 +1347,8 @@ class PrusaControlView(QMainWindow):
         # file menu definition
         self.file_menu = self.menubar.addMenu(self.tr('&File'))
         self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
-        self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
+        if self.controller.development_flag:
+            self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
         self.file_menu.addAction(self.tr('Save project'), self.controller.save_project_file)

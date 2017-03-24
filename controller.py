@@ -157,8 +157,8 @@ class Controller(QObject):
 
         self.app = app
         self.app_parameters = app.arguments()
-        self.dpi_coef = app.desktop().logicalDpiX()/96.
-        self.dpi_scale = 0 if self.dpi_coef==1.0 else 2
+        self.dpi_coef = app.desktop().logicalDpiX() / 96.
+        self.dpi_scale = 0 if self.dpi_coef == 1.0 else 2
 
         self.translator = QTranslator()
         self.set_language(self.settings['language'])
@@ -660,9 +660,11 @@ class Controller(QObject):
         self.gcode.cancel_parsing_gcode()
         self.gcode = None
         self.status = 'canceled'
+        #self.set_progress_bar(0)
         self.disable_generate_button()
         self.set_generate_button()
-        self.set_progress_bar(0)
+        print("Cancel gcode loading end")
+
 
 
     def make_reaction_on_analyzation_result(self, result):

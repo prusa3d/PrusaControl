@@ -89,8 +89,14 @@ def main():
     #QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
+    dpi = app.desktop().logicalDpiX()
+    print(dpi)
+
     app.setWindowIcon(QIcon("data/icon/favicon.ico"))
-    file = QFile("data/my_stylesheet_zaloha.qss")
+    if dpi==96:
+        file = QFile("data/my_stylesheet.qss")
+    else:
+        file = QFile("data/my_stylesheet_without_f.qss")
     file.open(QFile.ReadOnly)
     StyleSheet = str(file.readAll(), 'utf-8')
     app.setStyleSheet(StyleSheet)

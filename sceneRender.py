@@ -587,6 +587,7 @@ class GLWidget(QGLWidget):
         self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
 
         if self.xRot < 0:
+
             glEnable(GL_BLEND)
             glDisable(GL_DEPTH_TEST)
             glCallList(heat_bed[1])
@@ -658,6 +659,7 @@ class GLWidget(QGLWidget):
             sH = viewport[3] * 1.0
 
             glLoadIdentity()
+            glEnable(GL_BLEND)
             glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
             glEnable(GL_TEXTURE_2D)
@@ -665,8 +667,8 @@ class GLWidget(QGLWidget):
             #draw frame for warning messages
             position_x = 25
             position_y = 25
-            size_w = 325
-            size_h = 180
+            size_w = 325*self.controller.dpi_coef
+            size_h = 180*self.controller.dpi_coef
 
             coef_sH = size_h
             coef_sW = size_w
@@ -688,19 +690,20 @@ class GLWidget(QGLWidget):
 
             glColor4f(1.,1.,1.,1.)
             font = self.controller.view.font
-            #font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
-            font.setPointSize(25)
-            self.renderText(115, sH - 153, self.tr("WARNING"), font)
+            font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
+            #font.setPointSize(25)
+            self.renderText(115*self.controller.dpi_coef, sH - 153*self.controller.dpi_coef, self.tr("WARNING"), font)
 
-            #font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
-            font.setPointSize(8)
+            font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
+            #font.setPointSize(8)
             for n, message in enumerate(messages):
                 #Maximum of massages in warning box
                 if n > 5:
                     break
-                self.renderText(57, sH-122+15*n,  message, font)
+                self.renderText(57, sH-122*self.controller.dpi_coef+15*n,  message, font)
 
             glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
 
             glPopMatrix()
 
@@ -727,6 +730,7 @@ class GLWidget(QGLWidget):
             sH = viewport[3] * 1.0
 
             glLoadIdentity()
+            glEnable(GL_BLEND)
             glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
             glEnable(GL_TEXTURE_2D)
@@ -734,14 +738,14 @@ class GLWidget(QGLWidget):
             # draw frame for information messages
             position = [-325, 25]
 
-            position_x = sW - abs(position[0]) if position[0] < 0 else position[0]
-            position_y = sH - abs(position[1]) if position[1] < 0 else position[1]
+            position_x = sW - abs(position[0]*self.controller.dpi_coef) if position[0]*self.controller.dpi_coef < 0 else position[0]*self.controller.dpi_coef
+            position_y = sH - abs(position[1]*self.controller.dpi_coef) if position[1]*self.controller.dpi_coef < 0 else position[1]*self.controller.dpi_coef
 
             #position_x = 25
             #position_y = 25
 
-            size_w = 300
-            size_h = 100
+            size_w = 300*self.controller.dpi_coef
+            size_h = 100*self.controller.dpi_coef
 
             coef_sH = size_h
             coef_sW = size_w
@@ -774,16 +778,17 @@ class GLWidget(QGLWidget):
             #print(text)
             glColor3f(.5,.5,.5)
             #self.renderText(position_x + 8, sH - position_y - size_h + 63, header, font)
-            self.renderText(position_x + 108, sH - position_y - size_h + 63, self.tr("estimate time:"), font)
-            self.renderText(position_x + 208, sH - position_y - size_h + 63, self.tr("filament:"), font)
+            self.renderText(position_x + 108*self.controller.dpi_coef, sH - position_y - size_h + 63*self.controller.dpi_coef, self.tr("estimate time:"), font)
+            self.renderText(position_x + 208*self.controller.dpi_coef, sH - position_y - size_h + 63*self.controller.dpi_coef, self.tr("filament:"), font)
             glColor3f(1., 1., 1.)
             #self.renderText(position_x + 8, sH - position_y - size_h + 65 + 15, text, font)
-            self.renderText(position_x + 10, sH - position_y - size_h + 65 + 15, self.tr("total info:"), font)
-            self.renderText(position_x + 108, sH - position_y - size_h + 65 + 15, messages['printing_time'], font)
-            self.renderText(position_x + 208, sH - position_y - size_h + 65 + 15, messages['filament_lenght'], font)
+            self.renderText(position_x + 10*self.controller.dpi_coef, sH - position_y - size_h + 65*self.controller.dpi_coef + 15, self.tr("total info:"), font)
+            self.renderText(position_x + 108*self.controller.dpi_coef, sH - position_y - size_h + 65*self.controller.dpi_coef + 15, messages['printing_time'], font)
+            self.renderText(position_x + 208*self.controller.dpi_coef, sH - position_y - size_h + 65*self.controller.dpi_coef + 15, messages['filament_lenght'], font)
 
 
             glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
 
             glPopMatrix()
 

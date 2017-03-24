@@ -69,7 +69,7 @@ class Slic3rEngineRunner(QObject):
 
         #print(self.slicer_place)
 
-        self.step_max = 8
+        self.step_max = 9
         self.step = 0
 
 
@@ -170,6 +170,7 @@ class Slic3rEngineRunner(QObject):
                 break
             line = str(self.process.stdout.readline(), 'utf-8')
             parsed_line = line.rsplit()
+            print(parsed_line)
             if not line:
                 continue
             if 'Done.' in parsed_line[0]:
@@ -183,14 +184,14 @@ class Slic3rEngineRunner(QObject):
                 print(filament_str)
                 self.filament_info.emit(filament_str)
                 self.finished.emit()
-                self.step_increased.emit(100)
+                #self.step_increased.emit(100)
                 break
             else:
                 text = line.rsplit()[1:]
                 if text[0] == 'Exporting':
                     text = text[:2]
                 self.send_message.emit(" ".join(text))
-            self.step_increased.emit(int((self.step / 11.) * 100))
+            self.step_increased.emit(int((self.step / 12.) * 100))
 
     def end(self):
         self.end_callback()

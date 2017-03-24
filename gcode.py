@@ -60,6 +60,7 @@ class GCode(object):
             self.data = {}
             self.all_data = []
             self.data_keys = []
+        self.controller.set_progress_bar(0)
 
     def cancel_writing_gcode(self):
         print("Cancel writing gcode")
