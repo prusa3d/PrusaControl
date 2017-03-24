@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\projects\\prusacontrol_new'],
-             binaries=None,
-             datas=None,
+             pathex=['C:\\projects\\slave\\PrusaControl_Windows\\build'],
+             binaries=[],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -22,12 +22,12 @@ exe = EXE(pyz,
           name='PrusaControl',
           debug=False,
           strip=False,
-          upx=False,
+          upx=True,
           console=False , icon='data\\icon\\favicon.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
-               upx=False,
+               upx=True,
                name='PrusaControl')
