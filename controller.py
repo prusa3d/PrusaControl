@@ -791,7 +791,7 @@ class Controller(QObject):
         suggested_filename = self.generate_gcode_filename()
         color_change_layers = self.view.gcode_slider.get_color_change_layers()
         color_change_data = self.gcode.get_first_extruding_line_number_of_gcode_for_layers(color_change_layers)
-        path, file_type = self.view.save_gcode_file_dialog(suggested_filename)
+        path = self.view.save_gcode_file_dialog(suggested_filename)
         filename = path.split('.')
         if filename[-1] in ['gcode', 'GCODE']:
             filename_out = path
