@@ -1,7 +1,7 @@
 
 
 
-.QWidget {
+.QWidget, .SettingsDialog, .AboutDialog {
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
     font-family: 'Titillium Web';
@@ -142,7 +142,8 @@ QComboBox#infillCombo QAbstractItemView,
 QComboBox#extruder1_c QAbstractItemView,
 QComboBox#extruder2_c QAbstractItemView,
 QComboBox#extruder3_c QAbstractItemView,
-QComboBox#extruder4_c QAbstractItemView
+QComboBox#extruder4_c QAbstractItemView,
+SettingsDialog QComboBox QAbstractItemView
 {
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 0px 0px;
@@ -352,7 +353,11 @@ QSlider#spline_slider::groove:vertical{
 QPushButton#generateButton,
 QPushButton#gcode_back_b,
 QPushButton#basic_settings_b,
-QPushButton#advance_settings_b{
+QPushButton#advance_settings_b,
+SettingsDialog QPushButton,
+AboutDialog QPushButton,
+QMessageBox#msgBox QPushButton
+{
     font-family: 'Titillium Web';
     font-weight: bold;
     height: 27px;
@@ -362,6 +367,7 @@ QPushButton#advance_settings_b{
     color:rgb(255, 255, 255);
     border-radius: 5px;
     text-align:center;
+    min-width: 75px;
 }
 
 
