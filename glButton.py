@@ -5,7 +5,7 @@ import logging
 class GlButton(object):
 
     newid = itertools.count(1)
-    def __init__(self, texture_off=None, texture_on=None, texture_hover=None, texture_background=None, size=[10., 10.], position=[0.0, 0.0], auto_release=False, tool_tip='', tool_name=''):
+    def __init__(self, texture_off=None, texture_on=None, texture_hover=None, texture_background=None, size=[10., 10.], position=[0.0, 0.0], auto_release=False, tool_tip='', tool_name='', dpi_coef = 1.0):
         self.id = next(self.newid) * 7013
         self.color_id = [(self.id & 0x000000FF) >> 0, (self.id & 0x0000FF00) >> 8, (self.id & 0x00FF0000) >> 16]
 
@@ -14,8 +14,8 @@ class GlButton(object):
         self.texture_hover = texture_hover
         self.texture_background = texture_background
 
-        self.size = size
-        self.position=position
+        self.size = [size[0] * dpi_coef, size[1] * dpi_coef]
+        self.position = [position[0] * dpi_coef, position[1] * dpi_coef]
 
         self.pressed = False
         self.mouse_over = False

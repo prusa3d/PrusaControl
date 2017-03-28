@@ -157,6 +157,7 @@ class Controller(QObject):
 
         self.app = app
         self.app_parameters = app.arguments()
+        #calculate dpi coeficient for scale of widgets
         self.dpi_coef = app.desktop().logicalDpiX() / 96.
         self.dpi_scale = 0 if self.dpi_coef == 1.0 else 2
 
@@ -714,13 +715,16 @@ class Controller(QObject):
                 filename = m.filename
                 break
 
-        suggest_filename = filename.split(".")
-        suggest_filename = suggest_filename[0]
-        data = self.get_actual_printing_data()
-        material_name = data['material']
-        quality_name = data['quality']
+        if filename == '' and self.gcode:
+            suggest_filename = self.gcode.filename
+        else:
+            suggest_filename = filename.split(".")
+            suggest_filename = suggest_filename[0]
+            data = self.get_actual_printing_data()
+            material_name = data['material']
+            quality_name = data['quality']
 
-        suggest_filename += "_" + material_name.upper() + "_" + quality_name.upper()
+            suggest_filename += "_" + material_name.upper() + "_" + quality_name.upper()
 
         return suggest_filename
 
@@ -782,6 +786,8 @@ class Controller(QObject):
 
     def save_project_file(self):
         data = self.view.save_project_file_dialog()
+        if data == '':
+            return
         #logging.debug('save project file %s' %data)
         self.save_project(data)
         self.show_message_on_status_bar(self.view.tr("Project was saved"))
@@ -792,6 +798,8 @@ class Controller(QObject):
         color_change_layers = self.view.gcode_slider.get_color_change_layers()
         color_change_data = self.gcode.get_first_extruding_line_number_of_gcode_for_layers(color_change_layers)
         path = self.view.save_gcode_file_dialog(suggested_filename)
+        if path == '':
+            return
         filename = path.split('.')
         if filename[-1] in ['gcode', 'GCODE']:
             filename_out = path

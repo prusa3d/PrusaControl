@@ -99,6 +99,7 @@ def main():
         file = QFile("data/my_stylesheet_without_f.qss")
     file.open(QFile.ReadOnly)
     StyleSheet = str(file.readAll(), 'utf-8')
+
     app.setStyleSheet(StyleSheet)
 
 

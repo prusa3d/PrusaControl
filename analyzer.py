@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import numpy as np
+from PyQt4.QtCore import QObject
+from PyQt4.QtCore import QThread
+from PyQt4.QtCore import pyqtSignal
 
 __author__ = 'Tibor Vavra'
 
@@ -8,7 +11,31 @@ __author__ = 'Tibor Vavra'
 class Analyzer(object):
     def __init__(self, controller):
         self.controller = controller
+        self.analyzer_runner = AnalyzerRunner(controller)
+        self.analyzer_runner_thread = QThread()
 
+    def make_analyze_in_thread(self, whole_scene):
+        self.analyzer_runner.moveToThread(self.analyzer_runner_thread)
+        self.analyzer_runner_thread.started.connect(self.analyzer_runner.start_analyze)
+
+        self.analyzer_runner.finished.connect(self.set_finished_read)
+        self.analyzer_runner.send_result.connect(self.set_result)
+
+
+    def cancel_analyz(self):
+        self.analyzer_runner.is_running = False
+        self.gcode_parser_thread.quit()
+        self.gcode_parser_thread.wait()
+
+    def set_finished_read(self):
+        print("analyze done")
+
+    def set_result(self, result):
+        pass
+
+
+
+    '''
     def make_analyze(self, whole_scene):
         #Some initialization
         result = []
@@ -54,6 +81,35 @@ class Analyzer(object):
         #detect small area on printing surface, it is need to generate brim
         #something returned? problematic printing without brim, recommended to turn it on
         return self.controller.scene.get_contact_faces_with_area_smaller_than(2., scene)
+    '''
+
+
+class AnalyzerRunner(QObject):
+    finished = pyqtSignal()
+    send_result = pyqtSignal(dict)
+
+    def __init__(self, controller, whole_scene = None):
+        super(AnalyzerRunner, self).__init__()
+        self.is_running = True
+        self.controller = controller
+        self.whole_scene = whole_scene
+
+    def start_analyze(self):
+        result = {}
+        if self.is_running:
+            if self.is_support_needed(self.whole_scene):
+                result['support'] = True
+            else:
+                result['support'] = False
+        if self.is_running:
+            if self.is_brim_needed(self.whole_scene):
+                result['brim'] = True
+            else:
+                result['brim'] = False
+        self.send_result.emit(result)
+
+        self.finished.emit()
+
 
 
 
