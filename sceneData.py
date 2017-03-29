@@ -69,6 +69,19 @@ class AppScene(object):
 
         self.analyze_result_data_tmp = []
 
+    def set_no_changes(self):
+        for m in self.models:
+            m.is_changed = False
+
+    def was_changed(self):
+        print("scene was changed?")
+        for m in self.models:
+            if m.is_changed:
+                print("True")
+                return True
+        print("False")
+        return False
+
     def save_actual_support(self):
         self.supports.append(self.actual_support)
         self.actual_support = []
@@ -959,6 +972,7 @@ class Model(object):
 
     #@timing
     def set_rot(self, x, y, z, add=False, update_min_max=True, place_on_zero=True):
+        self.is_changed = True
         '''
         if x > (2*np.pi):
             x = divmod(x,2*np.pi)

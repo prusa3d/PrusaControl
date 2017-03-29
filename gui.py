@@ -1066,6 +1066,7 @@ class PrusaControlView(QMainWindow):
         self.brimCheckBox = QCheckBox("")
         self.brimCheckBox.setObjectName('brimCheckBox')
 
+
         #multimaterial settings
         self.materials_settings_l = QLabel()
         self.materials_settings_l.setObjectName("materials_settings_l")
@@ -1830,6 +1831,7 @@ class PrusaControlView(QMainWindow):
                 return
             model.set_rot(np.deg2rad(x), np.deg2rad(y), np.deg2rad(z), False, True, place_on_zero)
             self.controller.view.update_scene()
+            self.controller.make_analyze()
 
     def set_scale_on_object(self, widget, active_axis, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
@@ -2104,7 +2106,7 @@ class PrusaControlView(QMainWindow):
         self.generateButton.setDisabled(False)
 
     def open_project_file_dialog(self):
-        filters = "Prus (*.prusa *.PRUSA)"
+        filters = "Prusa (*.prusa *.PRUSA)"
         title = 'Open project file'
         open_at = "/home"
         data = QFileDialog.getOpenFileName(None, title, open_at, filters)
@@ -2122,15 +2124,12 @@ class PrusaControlView(QMainWindow):
         return filenames_list
 
     def save_project_file_dialog(self):
-        filters = "Prus (*.prusa *.PRUSA)"
+        filters = "Prusa (*.prusa *.PRUSA)"
         title = 'Save project file'
         open_at = "/home"
         data = QFileDialog.getSaveFileName(None, title, open_at, filters)
         if data == '':
             return data
-        data = self.convert_file_path_to_unicode(data)
-        if not data[-4:] == projectFile.fileExtension:
-            data = data + '.' + projectFile.fileExtension
 
         return data
 

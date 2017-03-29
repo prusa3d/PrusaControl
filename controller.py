@@ -174,7 +174,7 @@ class Controller(QObject):
 
         progress_bar.setValue(92)
 
-        self.analyze_result = []
+        self.analyze_result = {}
 
         self.tools = self.view.get_tool_buttons()
         self.tool = ''
@@ -206,14 +206,38 @@ class Controller(QObject):
 
         self.message_object00 = ""
         self.message_object01 = ""
+        self.message_object02 = ""
+        self.message_object03 = ""
 
         self.show_message_on_status_bar("Ready")
         self.create_messages()
 
 
+    def set_analyze_result_messages(self, result):
+        self.analyze_result = result
+
+    def filtrate_warning_msgs(self):
+        print("make warning messages")
+        self.warning_message_buffer = []
+        if self.analyze_result:
+            if self.analyze_result['support'] and self.view.supportCombo.currentIndex() == 0:
+                self.warning_message_buffer.append(u"• " + self.message_object02)
+
+            if self.analyze_result['brim'] and self.view.brimCheckBox.isChecked() == False:
+                self.warning_message_buffer.append(u"• " + self.message_object03)
+
+    def get_warnings(self):
+        messages = self.scene.get_warnings()
+        self.filtrate_warning_msgs()
+        print(messages + self.warning_message_buffer)
+        return messages + self.warning_message_buffer
+
+
     def create_messages(self):
         self.message_object00 = self.tr("Object ")
         self.message_object01 = self.tr(" is out of printable area!")
+        self.message_object02 = self.tr("Scene is hard to print without support.")
+        self.message_object03 = self.tr("For better adhesion turn Brim parametr on.")
 
 
     def check_version(self):
@@ -244,6 +268,7 @@ class Controller(QObject):
             elif ret == QMessageBox.Cancel:
                 return False
         else:
+            self.analyzer.cancel_analyz()
             return True
 
 
@@ -351,19 +376,8 @@ class Controller(QObject):
         self.update_scene()
 
     def set_gcode_slider(self, min, max, min_l, max_l):
-        '''
-        self.view.gcode_slider.setMinimum(min)
-        self.view.gcode_slider.setMaximum(max)
-
-        self.view.gcode_slider_min_l.setText(str(min_l))
-        self.view.gcode_slider_max_l.setText(str(max_l))
-        '''
-
         self.view.gcode_slider.setMinimum(min, min_l)
         self.view.gcode_slider.setMaximum(max, max_l)
-
-        #self.view.gcode_slider.min_label.setText(str(min_l))
-        #self.view.gcode_slider.max_label.setText(str(max_l))
 
 
     def set_gcode_instance(self, gcode_instance):
@@ -625,13 +639,10 @@ class Controller(QObject):
     def generate_button_pressed(self):
         if self.status in ['edit', 'canceled']:
             self.clear_tool_button_states()
-            whole_scene = self.scene.get_whole_scene_in_one_mesh()
+
             #prepared to be g-code generated
             self.canceled = False
             self.close_object_settings()
-            if self.settings['analyze']:
-                self.analyze_result = self.analyzer.make_analyze(whole_scene)
-                self.make_reaction_on_analyzation_result(self.analyze_result)
             self.view.disable_editing()
 
             if not self.canceled:
@@ -667,7 +678,7 @@ class Controller(QObject):
         print("Cancel gcode loading end")
 
 
-
+    '''
     def make_reaction_on_analyzation_result(self, result):
         result_text = [i['message'] for i in result if i['result']==True]
         if result_text:
@@ -694,6 +705,7 @@ class Controller(QObject):
                     widget.setChecked(True)
         elif i.text() == 'Cancel':
             self.canceled = True
+    '''
 
     #TODO:Better way
     def generate_gcode_filename(self):
@@ -785,11 +797,16 @@ class Controller(QObject):
         self.show_message_on_status_bar(self.view.tr("Project loaded"))
 
     def save_project_file(self):
-        data = self.view.save_project_file_dialog()
-        if data == '':
+        path = self.view.save_project_file_dialog()
+        if path == '':
             return
-        #logging.debug('save project file %s' %data)
-        self.save_project(data)
+        filename = path.split('.')
+        if filename[-1] in ['prusa', 'PRUSA']:
+            filename_out = path
+        else:
+            filename_out = path + '.prusa'
+
+        self.save_project(filename_out)
         self.show_message_on_status_bar(self.view.tr("Project was saved"))
 
 
@@ -1582,6 +1599,22 @@ class Controller(QObject):
             self.unselect_objects()
         self.update_scene()
         event.accept()
+
+        self.make_analyze()
+
+
+    def make_analyze(self):
+        if self.scene.was_changed() and self.settings['analyze']:
+            print("save whole scene")
+            whole_scene = self.scene.get_whole_scene_in_one_mesh()
+            #make analyze
+            print("making analyze")
+            self.analyzer.make_analyze(whole_scene, self.analyze_done, self.set_analyze_result_messages)
+
+
+    def analyze_done(self):
+        self.scene.set_no_changes()
+
 
     def open_object_settings(self, object_id):
         self.set_basic_settings()

@@ -645,7 +645,7 @@ class GLWidget(QGLWidget):
 
     def draw_warning_window(self):
         #set camera view
-        messages = self.controller.scene.get_warnings()
+        messages = self.controller.get_warnings()
         if len(messages) > 0:
             glMatrixMode(GL_PROJECTION)
             glPushMatrix()

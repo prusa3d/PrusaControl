@@ -13,25 +13,46 @@ class Analyzer(object):
         self.controller = controller
         self.analyzer_runner = AnalyzerRunner(controller)
         self.analyzer_runner_thread = QThread()
+        self.finish_function = None
+        self.send_result_function = None
 
-    def make_analyze_in_thread(self, whole_scene):
+    def make_analyze(self, whole_scene, finish_function, result_function):
+        self.finish_function = finish_function
+        self.send_result_function = result_function
+        if self.analyzer_runner.is_running:
+            print("cancel old analyze")
+            self.cancel_analyz()
+
+        print("start new analyze")
+        self.analyzer_runner.whole_scene = whole_scene
         self.analyzer_runner.moveToThread(self.analyzer_runner_thread)
         self.analyzer_runner_thread.started.connect(self.analyzer_runner.start_analyze)
 
         self.analyzer_runner.finished.connect(self.set_finished_read)
         self.analyzer_runner.send_result.connect(self.set_result)
 
+        self.analyzer_runner.is_running = True
+        self.analyzer_runner_thread.start()
+
 
     def cancel_analyz(self):
         self.analyzer_runner.is_running = False
-        self.gcode_parser_thread.quit()
-        self.gcode_parser_thread.wait()
+        self.analyzer_runner_thread.quit()
+        self.analyzer_runner_thread.wait()
+
+        self.analyzer_runner_thread = QThread()
+        self.analyzer_runner = AnalyzerRunner(self.controller)
+
 
     def set_finished_read(self):
         print("analyze done")
+        if self.finish_function:
+            self.finish_function()
 
     def set_result(self, result):
-        pass
+        print(result)
+        if self.send_result_function:
+            self.send_result_function(result)
 
 
 
@@ -90,11 +111,12 @@ class AnalyzerRunner(QObject):
 
     def __init__(self, controller, whole_scene = None):
         super(AnalyzerRunner, self).__init__()
-        self.is_running = True
+        self.is_running = False
         self.controller = controller
         self.whole_scene = whole_scene
 
     def start_analyze(self):
+        print("analyze started")
         result = {}
         if self.is_running:
             if self.is_support_needed(self.whole_scene):
@@ -106,10 +128,27 @@ class AnalyzerRunner(QObject):
                 result['brim'] = True
             else:
                 result['brim'] = False
+        self.is_running = False
         self.send_result.emit(result)
 
         self.finished.emit()
 
+
+    def is_support_needed(self, scene):
+        # detect angles between normal vector of face and normal of printing surface
+        # angel bigger than something is problem
+        data = self.controller.scene.get_faces_by_smaller_angel_normal_and_vector(np.array([0., 0., -1.]), 35., scene)
+        # something returned? problematic printing without support, recommended to turn it on
+        if len(data) == 0:
+            return False
+        else:
+            return True
+        return True
+
+    def is_brim_needed(self, scene):
+        # detect small area on printing surface, it is need to generate brim
+        # something returned? problematic printing without brim, recommended to turn it on
+        return self.controller.scene.get_contact_faces_with_area_smaller_than(2., scene)
 
 
 
