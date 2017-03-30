@@ -106,6 +106,7 @@ class Version_1_0(VersionAbstract):
                 model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
                 model.rot = numpy.array(m['rotation'])
                 model.pos = numpy.array(m['position'])
+                model.pos *=0.1
                 model.scale = numpy.array(m['scale'])
                 model.update_min_max()
                 model.parent = scene
@@ -113,22 +114,28 @@ class Version_1_0(VersionAbstract):
                 scene.models.append(model)
 
     def save(self, scene, filename):
+        printing_space =  scene.controller.printing_parameters.get_printer_parameters(scene.controller.actual_printer)
+        zero = numpy.array(printing_space['printing_space'], dtype=float)
+        zero *= -0.5
+        zero[2] = 0.
+        #print(str(zero))
         #create zipfile
         with ZipFile(filename, 'w', ZIP_DEFLATED) as zip_fh:
             #create xml file describing scene
             root = ET.Element("scene")
             ET.SubElement(root, "version").text=self.get_version()
+            ET.SubElement(root, "zero").text = str(zero.tolist())
             models_tag = ET.SubElement(root, "models")
+
 
             for model in scene.models:
                 if model.isVisible:
+                    pos = model.pos*10.
                     model_element = ET.SubElement(models_tag, "model", name=model.filename)
                     ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
-                    ET.SubElement(model_element, "position").text=str(model.pos.tolist())
+                    ET.SubElement(model_element, "position").text=str(pos.tolist())
                     ET.SubElement(model_element, "rotation").text=str(model.rot.tolist())
                     ET.SubElement(model_element, "scale").text=str(model.scale.tolist())
-
-
 
             #save xml file to new created zip file
             newXml = ET.tostring(root)

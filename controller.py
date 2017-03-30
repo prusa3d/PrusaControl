@@ -217,7 +217,7 @@ class Controller(QObject):
         self.analyze_result = result
 
     def filtrate_warning_msgs(self):
-        print("make warning messages")
+        #print("make warning messages")
         self.warning_message_buffer = []
         if self.analyze_result:
             if self.analyze_result['support'] and self.view.supportCombo.currentIndex() == 0:
@@ -229,7 +229,7 @@ class Controller(QObject):
     def get_warnings(self):
         messages = self.scene.get_warnings()
         self.filtrate_warning_msgs()
-        print(messages + self.warning_message_buffer)
+        #print(messages + self.warning_message_buffer)
         return messages + self.warning_message_buffer
 
 
@@ -249,9 +249,11 @@ class Controller(QObject):
 
     def exit_event(self):
         if self.status in ['loading_gcode']:
+            self.analyzer.cancel_analyz()
             self.gcode.cancel_parsing_gcode()
             return True
         elif self.status in ['generating']:
+            self.analyzer.cancel_analyz()
             ret = self.view.show_exit_message_generating_scene()
             if ret == QMessageBox.Yes:
                 self.cancel_generation()
@@ -259,6 +261,7 @@ class Controller(QObject):
             elif ret == QMessageBox.No:
                 return False
         elif self.is_something_to_save() and not self.scene_was_saved:
+            self.analyzer.cancel_analyz()
             ret = self.view.show_exit_message_scene_not_saved()
             if ret == QMessageBox.Save:
                 self.save_project_file()
@@ -297,7 +300,6 @@ class Controller(QObject):
 
         return data
 
-    #TODO:Add some human readable form of printing time
     def convert_printing_time_from_seconds(self, seconds):
         m, s = divmod(seconds, 60)
         h, m = divmod(m, 60)
@@ -1605,11 +1607,11 @@ class Controller(QObject):
 
     def make_analyze(self):
         if self.scene.was_changed() and self.settings['analyze']:
-            print("save whole scene")
-            whole_scene = self.scene.get_whole_scene_in_one_mesh()
+            #print("save whole scene")
+            #whole_scene = self.scene.get_whole_scene_in_one_mesh()
             #make analyze
-            print("making analyze")
-            self.analyzer.make_analyze(whole_scene, self.analyze_done, self.set_analyze_result_messages)
+            #print("making analyze")
+            self.analyzer.make_analyze(self.analyze_done, self.set_analyze_result_messages)
 
 
     def analyze_done(self):

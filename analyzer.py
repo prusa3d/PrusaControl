@@ -16,7 +16,7 @@ class Analyzer(object):
         self.finish_function = None
         self.send_result_function = None
 
-    def make_analyze(self, whole_scene, finish_function, result_function):
+    def make_analyze(self, finish_function, result_function):
         self.finish_function = finish_function
         self.send_result_function = result_function
         if self.analyzer_runner.is_running:
@@ -24,7 +24,7 @@ class Analyzer(object):
             self.cancel_analyz()
 
         print("start new analyze")
-        self.analyzer_runner.whole_scene = whole_scene
+        #self.analyzer_runner.whole_scene = whole_scene
         self.analyzer_runner.moveToThread(self.analyzer_runner_thread)
         self.analyzer_runner_thread.started.connect(self.analyzer_runner.start_analyze)
 
@@ -109,13 +109,15 @@ class AnalyzerRunner(QObject):
     finished = pyqtSignal()
     send_result = pyqtSignal(dict)
 
-    def __init__(self, controller, whole_scene = None):
+    def __init__(self, controller):
         super(AnalyzerRunner, self).__init__()
         self.is_running = False
         self.controller = controller
-        self.whole_scene = whole_scene
+        self.whole_scene = None
 
     def start_analyze(self):
+        print("get whole scene")
+        self.whole_scene = self.controller.scene.get_whole_scene_in_one_mesh()
         print("analyze started")
         result = {}
         if self.is_running:
@@ -123,11 +125,15 @@ class AnalyzerRunner(QObject):
                 result['support'] = True
             else:
                 result['support'] = False
+        else:
+            result = {}
         if self.is_running:
             if self.is_brim_needed(self.whole_scene):
                 result['brim'] = True
             else:
                 result['brim'] = False
+        else:
+            result = {}
         self.is_running = False
         self.send_result.emit(result)
 

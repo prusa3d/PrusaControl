@@ -175,7 +175,7 @@ class GLWidget(QGLWidget):
 
 
     def mouseDoubleClickEvent(self, event):
-        pass
+        self.controller.mouse_press_event(event)
         #self.controller.mouse_double_click(event)
 
     def mouseReleaseEvent(self, event):

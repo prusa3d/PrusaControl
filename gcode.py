@@ -270,7 +270,7 @@ class GcodeParserRunner(QObject):
             if bits[0] == '':
                 line_number+=1
                 continue
-            if 'G1' in bits[0]:
+            if 'G1 ' in bits[0]:
                 self.parse_g1_line(bits, line_number)
             else:
                 line_number += 1
