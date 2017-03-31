@@ -261,7 +261,6 @@ class GcodeParserRunner(QObject):
                 progress = (in_stream.pos()*1./file_size*1.) * 100.
                 self.set_update_progress.emit(int(progress))
                 counter=0
-            # print("ctu")
 
             line = in_stream.readLine()
             # print(line)
@@ -276,6 +275,9 @@ class GcodeParserRunner(QObject):
                 line_number += 1
                 continue
             line_number += 1
+
+        if self.is_running == False:
+            self.set_update_progress.emit(0)
 
         self.printing_time = self.calculate_time_of_print()
         self.filament_length = 0.0  # self.calculate_length_of_filament()

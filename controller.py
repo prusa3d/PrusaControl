@@ -401,6 +401,7 @@ class Controller(QObject):
 
         self.view.set_cancel_of_loading_gcode_file()
         self.status = 'loading_gcode'
+        self.view.disable_editing()
         self.gcode.read_in_thread(self.set_progress_bar, self.set_gcode)
 
 
@@ -478,6 +479,7 @@ class Controller(QObject):
         self.status = 'edit'
         #self.editable = editable
         self.view.close_gcode_view()
+        self.show_message_on_status_bar("")
 
     def open_gcode_gui(self):
         self.view.disable_editing()
@@ -665,6 +667,7 @@ class Controller(QObject):
 
         elif self.status == 'loading_gcode':
             self.cancel_gcode_loading()
+            self.show_message_on_status_bar("")
         elif self.status == 'generated':
             #already generated
             self.save_gcode_file()
@@ -674,9 +677,9 @@ class Controller(QObject):
         self.gcode.cancel_parsing_gcode()
         self.gcode = None
         self.status = 'canceled'
-        #self.set_progress_bar(0)
         self.disable_generate_button()
         self.set_generate_button()
+        self.set_progress_bar(0)
         print("Cancel gcode loading end")
 
 
@@ -790,6 +793,15 @@ class Controller(QObject):
         self.view.open_firmware_dialog()
 
     def open_project_file(self, url=None):
+        if self.is_something_to_save():
+            ret = self.view.open_project_asking_dialog()
+            if ret == False:
+                return
+            elif ret == 'Open':
+                self.scene.clear_scene()
+            elif ret == 'Insert':
+                print("Nic nebudu mazat scena zustane stejna")
+
         if url:
             data = url
         else:
@@ -836,6 +848,9 @@ class Controller(QObject):
         except IOError as e:
             logging.debug('Error: %s' % e.strerror)
 
+    def open_gcode_file(self):
+        path = self.view.open_gcode_file_dialog()
+        self.open_file(path)
 
     def open_model_file(self):
         data = self.view.open_model_file_dialog()
@@ -882,8 +897,8 @@ class Controller(QObject):
         project_file.save(path)
         self.scene_was_saved = True
 
-    def update_scene(self):
-        self.view.update_scene()
+    def update_scene(self, reset=False):
+        self.view.update_scene(reset)
         if self.status in ['edit', 'canceled']:
             if self.scene.is_scene_printable():
                 self.enable_generate_button()
@@ -924,7 +939,8 @@ class Controller(QObject):
         self.view.enable_save_gcode_button()
 
     def close(self):
-        exit()
+        self.analyzer.cancel_analyz()
+        self.app.exit()
 
     def set_print_info_text(self, string):
         #print("Nejaky text ze Sliceru: " + string)
@@ -1125,6 +1141,7 @@ class Controller(QObject):
 
     def delete_selected_objects(self):
         self.scene.delete_selected_models()
+        self.view.close_object_settings_panel()
 
     def do_function(self):
         self.view.glWidget.do_button.press_button()
@@ -1175,7 +1192,7 @@ class Controller(QObject):
                 self.unselect_tool_buttons()
                 self.view.glWidget.scaleTool.press_button()
             self.update_scene()
-        elif key in [Qt.Key_A] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+        elif key in [Qt.Key_A] and self.is_ctrl_pressed() and self.render_status == 'model_view' and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
             #print("A and ctrl pressed")
             self.select_all()
             self.update_scene()
@@ -1184,7 +1201,7 @@ class Controller(QObject):
             self.unselect_tool_buttons()
             self.scene.automatic_models_position()
             self.update_scene()
-        elif key in [Qt.Key_I] and self.is_ctrl_pressed() and self.render_status == 'model_view':
+        elif key in [Qt.Key_I] and self.is_ctrl_pressed() and self.render_status == 'model_view' and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
             #print("I and ctrl pressed ")
             self.invert_selection()
             self.update_scene()
@@ -1725,7 +1742,7 @@ class Controller(QObject):
 
     def reset_scene(self):
         self.scene.clear_scene()
-        self.update_scene()
+        self.update_scene(True)
         self.is_model_loaded = False
         #self.view.update_scene(True)
 
@@ -1868,13 +1885,6 @@ class Controller(QObject):
             if not self.open_cancel_gcode_preview_dialog():
                 return
 
-
-
-        #self.view.statusBar().showMessage('Load file name: ')
-
-        #TODO:Why?
-        #if url[0] == '/' and self.app_config.system_platform in ['Windows']:
-        #    url = url[1:]
 
         urlSplited = url.split('.')
         if len(urlSplited)==2:

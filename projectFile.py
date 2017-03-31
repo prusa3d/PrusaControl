@@ -93,7 +93,7 @@ class Version_1_0(VersionAbstract):
                 model_data['scale'] = ast.literal_eval(model.find('scale').text)
                 models_data.append(model_data)
 
-            scene.models = []
+            #scene.models = []
             for m in models_data:
                 logging.debug("Jmeno souboru je: " + m['file_name'])
 

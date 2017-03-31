@@ -74,12 +74,12 @@ class AppScene(object):
             m.is_changed = False
 
     def was_changed(self):
-        print("scene was changed?")
+        #print("scene was changed?")
         for m in self.models:
             if m.is_changed:
-                print("True")
+                #print("True")
                 return True
-        print("False")
+        #print("False")
         return False
 
     def save_actual_support(self):
@@ -337,8 +337,10 @@ class AppScene(object):
         return messages
 
     def clear_scene(self):
-        self.models = []
+        del self.transformation_list
         self.transformation_list = []
+        del self.models
+        self.models = []
         self.actual_list_position = 0
 
     def clear_selected_models(self):
@@ -777,7 +779,7 @@ class Model(object):
                         self.is_in_printing_area = True
                         return True
                     else:
-                        print("naruseni v Z")
+                        #print("naruseni v Z")
                         self.is_in_printing_area = False
                         return False
                 else:

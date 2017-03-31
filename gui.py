@@ -1370,6 +1370,7 @@ class PrusaControlView(QMainWindow):
         self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
         if self.controller.development_flag:
             self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
+        self.file_menu.addAction(self.tr('Import gcode file'), self.controller.open_gcode_file)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
         self.file_menu.addAction(self.tr('Save project'), self.controller.save_project_file)
@@ -1520,18 +1521,19 @@ class PrusaControlView(QMainWindow):
         msgBox.setObjectName("msgBox")
         msgBox.setWindowTitle(self.tr("Open project file"))
         msgBox.setText(self.tr("In scene are some objects"))
-        msgBox.setInformativeText(self.tr("Do you want to load project file in actual scene?"))
-        msgBox.setStandardButtons(QMessageBox.Accepted | QMessageBox.Open | QMessageBox.Cancel)
-        msgBox.setDefaultButton(QMessageBox.Save)
+        msgBox.setInformativeText(self.tr("Do you want to open project file and clear actual scene?"))
+        butt_open = msgBox.addButton(self.tr("Open"), QMessageBox.YesRole)
+        butt_insert = msgBox.addButton(self.tr("Insert"), QMessageBox.YesRole)
+        msgBox.addButton(QMessageBox.Cancel)
+        msgBox.setDefaultButton(butt_open)
         ret = msgBox.exec_()
 
-        if ret == QMessageBox.Accepted:
-            self.controller.save_project_file()
-            return True
-        elif ret == QMessageBox.Discard:
-            return True
+        if msgBox.clickedButton() == butt_open:
+            return "Open"
         elif ret == QMessageBox.Cancel:
             return False
+        elif msgBox.clickedButton() == butt_insert:
+            return "Insert"
 
         return False
 
@@ -1570,6 +1572,7 @@ class PrusaControlView(QMainWindow):
 
     def reinit(self):
         self.update_gui_for_material()
+        self.gcode_slider.init_points()
 
     def set_progress_bar(self, value):
         self.progressBar.setValue(value)
@@ -1805,10 +1808,26 @@ class PrusaControlView(QMainWindow):
         #if self.lock_scale_axis:
             #self.scale_ration = [1.,.5,.5]
 
+    def clear_object_settings_panel(self):
+        self.filename_label.setText("")
+
+        self.edit_pos_x.setValue(0.0)
+        self.edit_pos_y.setValue(0.0)
+        self.edit_pos_z.setValue(0.0)
+
+        self.edit_rot_x.setValue(0)
+        self.edit_rot_y.setValue(0)
+        self.edit_rot_z.setValue(0)
+
+        self.edit_scale_x.setValue(100)
+        self.edit_scale_y.setValue(100)
+        self.edit_scale_z.setValue(100)
+
 
     def close_object_settings_panel(self):
         self.is_setting_panel_opened = False
         self.object_group_box.setDisabled(True)
+        self.clear_object_settings_panel()
         self.object_id = 0
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
@@ -2112,6 +2131,13 @@ class PrusaControlView(QMainWindow):
         data = QFileDialog.getOpenFileName(None, title, open_at, filters)
         data = self.convert_file_path_to_unicode(data)
         return data
+
+    def open_gcode_file_dialog(self):
+        filters = "GCODE (*.gcode *.GCODE *.Gcode)"
+        title = "Import gcode file"
+        open_at = "/home"
+        path = QFileDialog.getOpenFileName(None, title, open_at, filters)
+        return path
 
     def open_model_file_dialog(self):
         filters = "STL (*.stl *.STL)"

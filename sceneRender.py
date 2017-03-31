@@ -155,7 +155,6 @@ class GLWidget(QGLWidget):
         self.w = 0
         self.h = 0
 
-        #self.sceneFrameBuffer = []
         #self.tools = []
 
 
