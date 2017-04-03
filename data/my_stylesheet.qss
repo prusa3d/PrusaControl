@@ -1,6 +1,4 @@
 
-
-
 .QWidget, .SettingsDialog, .AboutDialog {
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
@@ -255,7 +253,9 @@ QGraphicsView#spline_edit
     color: rgb(255, 255, 255);
     margin: 8px 0px 0px 29px;
     padding: 20px 0px 0px 0px;
+    /*
     width: 221px;
+    */
     border-radius: 5px;
     background-color:rgb(77, 77, 77);
     font-family: 'Titillium Web';
