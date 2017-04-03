@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import atexit
-import inspect
-from msilib.schema import File
+#import inspect
+#from msilib.schema import File
 
-from PyQt4.QtGui import QApplication, QIcon
-from PyQt4 import QtGui
+#from PyQt4.QtGui import QApplication, QIcon
+#from PyQt4 import QtGui
 #from tendo.singleton import SingleInstance
 
 from controller import Controller
+from parameters import AppParameters
 from sceneRender import *
 #from sceneData import *
 import logging
@@ -27,6 +28,13 @@ class EventLoopRunner(QObject):
     def __init__(self, app):
         super(EventLoopRunner, self).__init__()
         self.app = app
+        self.version = ""
+
+        with __builtins__.open("data/v.txt", 'r') as version_file:
+            self.version_full = version_file.read()
+            self.version = AppParameters.strip_version_string(self.version_full)
+
+        #print("Version: " + self.version)
 
         self.is_running = True
         self.css = []
@@ -42,6 +50,11 @@ class EventLoopRunner(QObject):
 
         self.splash_pix = QPixmap('data/img/splashscreen.png')
         self.splash = QSplashScreen(self.splash_pix, Qt.SplashScreen | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.WA_TranslucentBackground)
+
+        #painter = QPainter(self.splash_pix)
+        #painter.setPen(Qt.white)
+        #painter.drawText(QPoint(100, 100), self.version)
+
         self.progressBar = QProgressBar(self.splash)
         self.progressBar.setObjectName("splash_progressbar")
         self.progressBar.setFormat("")
@@ -90,7 +103,7 @@ def main():
 
     app = QApplication(sys.argv)
     dpi = app.desktop().logicalDpiX()
-    print(dpi)
+    #print(dpi)
 
     app.setWindowIcon(QIcon("data/icon/favicon.ico"))
     if dpi==96:

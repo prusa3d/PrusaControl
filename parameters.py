@@ -295,8 +295,8 @@ class AppParameters(object):
             self.check_new_version_of_prusacontrol()
 
 
-
-    def strip_version_string(self, string_in):
+    @staticmethod
+    def strip_version_string(string_in):
         if type(string_in) is str:
             string_out = string_in
         else:

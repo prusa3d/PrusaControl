@@ -1178,7 +1178,7 @@ class PrusaControlView(QMainWindow):
         self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
         self.right_panel.setMaximumWidth((int)(275 * self.controller.dpi_coef))
 
-        print("Sirka praveho panelu: " + str(self.right_panel.width()))
+        #print("Sirka praveho panelu: " + str(self.right_panel.width()))
         self.transformation_reset_b.move((int)((self.right_panel.width() - 3) * self.controller.dpi_coef),
                                          (int)(13 * self.controller.dpi_coef))
 
