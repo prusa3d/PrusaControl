@@ -1109,7 +1109,6 @@ class PrusaControlView(QMainWindow):
         self.transformation_reset_b.setObjectName("transformation_reset_b")
         self.transformation_reset_b.setFixedHeight((int)(19*self.controller.dpi_coef))
         self.transformation_reset_b.setFixedWidth((int)(19*self.controller.dpi_coef))
-        self.transformation_reset_b.move((int)(221*self.controller.dpi_coef), (int)(13*self.controller.dpi_coef))
         self.transformation_reset_b.clicked.connect(lambda: self.reset_transformation_on_object(self.get_object_id()))
 
 
@@ -1176,7 +1175,12 @@ class PrusaControlView(QMainWindow):
         self.right_panel_layout.addSpacerItem(QSpacerItem(0, 5, QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.right_panel.setLayout(self.right_panel_layout)
-        self.right_panel.setFixedWidth((int)(250*self.controller.dpi_coef))
+        self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
+        self.right_panel.setMaximumWidth((int)(275 * self.controller.dpi_coef))
+
+        print("Sirka praveho panelu: " + str(self.right_panel.width()))
+        self.transformation_reset_b.move((int)((self.right_panel.width() - 3) * self.controller.dpi_coef),
+                                         (int)(13 * self.controller.dpi_coef))
 
         #print("create gcode panel")
         self.gcode_panel = QWidget()
@@ -1205,9 +1209,9 @@ class PrusaControlView(QMainWindow):
 
         self.setVisible(True)
 
-        self.changable_widgets['brimCheckBox'] = self.brimCheckBox
+        #self.changable_widgets['brimCheckBox'] = self.brimCheckBox
         #self.changable_widgets['supportCheckBox'] = self.supportCheckBox
-        self.changable_widgets['supportCombo'] = self.supportCombo
+        #self.changable_widgets['supportCombo'] = self.supportCombo
 
 
         self.qualityCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
@@ -1239,6 +1243,19 @@ class PrusaControlView(QMainWindow):
                 print(scale* widget.maximumWidth())
                 print(scale * widget.maximumHeight())
                 widget.setFixedSize((int)(scale * widget.maximumWidth()), (int)(scale * widget.maximumHeight()))
+
+
+    def set_default(self):
+        _, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+        self.materialCombo.setCurrentIndex(first)
+
+        self.extruder1_c.setCurrentIndex(first)
+        self.extruder2_c.setCurrentIndex(first)
+        self.extruder3_c.setCurrentIndex(first)
+        self.extruder4_c.setCurrentIndex(first)
+
+        self.brimCheckBox.setChecked(False)
+        self.supportCombo.setCurrentIndex(0)
 
 
     def retranslateUI(self):
@@ -1382,12 +1399,12 @@ class PrusaControlView(QMainWindow):
 
         # edit menu definition
         self.edit_menu = self.menubar.addMenu(self.tr('&Edit'))
-        self.edit_menu.addAction(self.tr('Undo\tCtrl+Z'), self.controller.undo_function)
-        self.edit_menu.addAction(self.tr('Redo\tCtrl+Y'), self.controller.do_function)
+        self.edit_menu.addAction(self.tr('Undo') + '\tCtrl+Z', self.controller.undo_function)
+        self.edit_menu.addAction(self.tr('Redo') + '\tCtrl+Y', self.controller.do_function)
         self.edit_menu.addSeparator()
-        self.edit_menu.addAction(self.tr('Copy\tCtrl+C'), self.controller.copy_selected_objects)
-        self.edit_menu.addAction(self.tr('Paste\tCtrl+V'), self.controller.paste_selected_objects)
-        self.edit_menu.addAction(self.tr('Delete\tDel'), self.controller.delete_selected_objects)
+        self.edit_menu.addAction(self.tr('Copy') +'\tCtrl+C', self.controller.copy_selected_objects)
+        self.edit_menu.addAction(self.tr('Paste') + '\tCtrl+V', self.controller.paste_selected_objects)
+        self.edit_menu.addAction(self.tr('Delete') + '\tDel', self.controller.delete_selected_objects)
         # self.edit_menu.addSeparator()
         # self.edit_menu.addAction(self.tr('Info'), self.controller.close)
         # edit menu definition
@@ -1571,6 +1588,7 @@ class PrusaControlView(QMainWindow):
 
 
     def reinit(self):
+        self.set_default()
         self.update_gui_for_material()
         self.gcode_slider.init_points()
 

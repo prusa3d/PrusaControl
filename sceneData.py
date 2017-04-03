@@ -309,11 +309,17 @@ class AppScene(object):
             if m.selected and m.isVisible:
                 self.copied_models.append(m)
 
+    def unselect_all_models(self):
+        for m in self.models:
+            m.selected = False
+
     def paste_selected_objects(self):
         self.place_offset += np.array([0.5, 0.5, 0.])
+        self.unselect_all_models()
         for i in self.copied_models:
             m = deepcopy(i)
             m.set_move(self.place_offset, True, False)
+            m.selected = True
             self.models.append(m)
 
         self.controller.update_scene()

@@ -1758,6 +1758,7 @@ class Controller(QObject):
         #reset gui
         self.clear_gui()
         self.reset_scene()
+        self.analyze_result = {}
 
     def import_image(self, path):
         #TODO:Add importing of image(just plane with texture?)
