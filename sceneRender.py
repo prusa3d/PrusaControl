@@ -499,15 +499,19 @@ class GLWidget(QGLWidget):
 
         #print("Camera position and Zoom and X Angle: " + str(self.camera_position[2]) + ';' + str(self.zoom) + ';' + str(self.xRot))
 
+
+
         if self.xRot >= 0.:
             glDisable(GL_BLEND)
             glCallList(heat_bed[0])
 
 
 
+
         glEnable(GL_DEPTH_TEST)
 
         if model_view:
+
             #render solid objects, possible to edit transformation, select objects
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
@@ -540,6 +544,7 @@ class GLWidget(QGLWidget):
                             self.lightning_shader_program.release()
 
 
+
             if not self.controller.advance_settings:
                 for support in self.parent.controller.scene.supports:
                     self.draw_support(support)
@@ -560,7 +565,15 @@ class GLWidget(QGLWidget):
 
         elif not model_view:
             #render blended objects and layers of gcode to inspect it
-            #glEnable(GL_LIGHTING)
+
+            #uncomment for enable clipping(be sure to uncomment glDisable(GL_CLIP_PLANE0) too)
+            #TODO:add cliping by shaders, this clipping is function only for no shaders drawing
+            '''
+            eqn = np.array([0.0, 0.0, -1.0, float(self.controller.gcode_layer)*.1])
+            glClipPlane(GL_CLIP_PLANE0, eqn)
+            glEnable(GL_CLIP_PLANE0)
+            '''
+
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
                     if self.lightning_shader_ok:
@@ -568,7 +581,9 @@ class GLWidget(QGLWidget):
                     model.render(picking=False, blending=not model_view)
                     if self.lightning_shader_ok:
                         self.lightning_shader_program.release()
-            #glDisable(GL_LIGHTING)
+            '''
+            glDisable(GL_CLIP_PLANE0)
+            '''
 
             color_change_list = [i['value'] for i in self.parent.gcode_slider.points if not i['value'] == -1]
 
@@ -582,6 +597,9 @@ class GLWidget(QGLWidget):
             color = [255, 97, 0]
             self.draw_layer(self.controller.gcode_layer, color, printer)
             glCallList(printing_space)
+
+
+
 
         self.draw_axis(self.parent.controller.printing_parameters.get_printer_parameters(self.controller.settings['printer'])['printing_space'])
 
@@ -646,6 +664,7 @@ class GLWidget(QGLWidget):
         #set camera view
         messages = self.controller.get_warnings()
         if len(messages) > 0:
+            mes_max_len = max([len(m) for m in messages])
             glMatrixMode(GL_PROJECTION)
             glPushMatrix()
             glLoadIdentity()
@@ -666,7 +685,11 @@ class GLWidget(QGLWidget):
             #draw frame for warning messages
             position_x = 25
             position_y = 25
-            size_w = 325*self.controller.dpi_coef
+
+            if mes_max_len>51:
+                size_w = 400*self.controller.dpi_coef
+            else:
+                size_w = 350 * self.controller.dpi_coef
             size_h = 180*self.controller.dpi_coef
 
             coef_sH = size_h

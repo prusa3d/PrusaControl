@@ -320,6 +320,7 @@ class AppScene(object):
             m = deepcopy(i)
             m.set_move(self.place_offset, True, False)
             m.selected = True
+            self.last_selected_object = m.id
             self.models.append(m)
 
         self.controller.update_scene()
@@ -1164,7 +1165,6 @@ class Model(object):
         #          0.,0.,0.,1.0])
         #glGetFloatv(GL_MODELVIEW_MATRIX, m)
         #print(str(m))
-
 
 
         self.put_array_to_gl()

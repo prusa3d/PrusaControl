@@ -1153,7 +1153,12 @@ class Controller(QObject):
 
     def key_press_event(self, event):
         key = event.key()
-        if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view':
+
+        if self.status in ['generating', 'loading_gcode']:
+            event.accept()
+            return
+
+        if key in [Qt.Key_Delete, Qt.Key_Backspace] and self.render_status == 'model_view' and not self.is_ctrl_pressed():
             self.delete_selected_objects()
             self.update_scene()
         elif key in [Qt.Key_C] and self.is_ctrl_pressed() and self.render_status == 'model_view':
@@ -1176,7 +1181,7 @@ class Controller(QObject):
             self.do_function()
             #self.do_button_pressed()
             self.update_scene()
-        elif key in [Qt.Key_R] and self.render_status == 'model_view':
+        elif key in [Qt.Key_R] and self.render_status == 'model_view' and not self.is_ctrl_pressed():
             #print("R pressed ")
             if self.view.glWidget.rotateTool.is_pressed():
                 self.unselect_tool_buttons()
@@ -1184,7 +1189,7 @@ class Controller(QObject):
                 self.unselect_tool_buttons()
                 self.view.glWidget.rotateTool.press_button()
             self.update_scene()
-        elif key in [Qt.Key_S] and self.render_status == 'model_view':
+        elif key in [Qt.Key_S] and self.render_status == 'model_view' and not self.is_ctrl_pressed():
             #print("S pressed ")
             if self.view.glWidget.scaleTool.is_pressed():
                 self.unselect_tool_buttons()
@@ -1192,19 +1197,21 @@ class Controller(QObject):
                 self.unselect_tool_buttons()
                 self.view.glWidget.scaleTool.press_button()
             self.update_scene()
-        elif key in [Qt.Key_A] and self.is_ctrl_pressed() and self.render_status == 'model_view' and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
-            #print("A and ctrl pressed")
-            self.select_all()
-            self.update_scene()
         elif key in [Qt.Key_A] and self.render_status == 'model_view':
-            #print("A pressed")
-            self.unselect_tool_buttons()
-            self.scene.automatic_models_position()
-            self.update_scene()
-        elif key in [Qt.Key_I] and self.is_ctrl_pressed() and self.render_status == 'model_view' and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
-            #print("I and ctrl pressed ")
-            self.invert_selection()
-            self.update_scene()
+            if self.is_ctrl_pressed() and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
+                #print("A and ctrl pressed")
+                self.select_all()
+                self.update_scene()
+            elif not self.is_ctrl_pressed() and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
+                #print("just A pressed")
+                self.unselect_tool_buttons()
+                self.scene.automatic_models_position()
+                self.update_scene()
+        elif key in [Qt.Key_I] and self.render_status == 'model_view' and not self.settings['toolButtons']['rotateButton'] and not self.settings['toolButtons']['scaleButton']:
+            if self.is_ctrl_pressed():
+                #print("I and ctrl pressed ")
+                self.invert_selection()
+                self.update_scene()
 
         event.accept()
 
