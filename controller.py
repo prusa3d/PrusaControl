@@ -217,7 +217,6 @@ class Controller(QObject):
         self.analyze_result = result
 
     def filtrate_warning_msgs(self):
-        #print("make warning messages")
         self.warning_message_buffer = []
         if self.analyze_result:
             if self.analyze_result['support'] and self.view.supportCombo.currentIndex() == 0:
@@ -229,7 +228,6 @@ class Controller(QObject):
     def get_warnings(self):
         messages = self.scene.get_warnings()
         self.filtrate_warning_msgs()
-        #print(messages + self.warning_message_buffer)
         return messages + self.warning_message_buffer
 
 
@@ -285,7 +283,6 @@ class Controller(QObject):
 
     def get_informations(self):
         if not self.gcode:
-            print("Neni gcode instance")
             return
 
         printing_time = self.gcode.printing_time
@@ -625,6 +622,9 @@ class Controller(QObject):
                 break
 
         return infill_ls, first
+
+    def get_infill_values_ls(self):
+        return [0, 10, 15, 20, 30, 50, 70]
 
     def get_actual_printing_data(self):
         return self.view.get_actual_printing_data()
@@ -1638,10 +1638,7 @@ class Controller(QObject):
 
     def make_analyze(self):
         if self.scene.was_changed() and self.settings['analyze']:
-            #print("save whole scene")
-            #whole_scene = self.scene.get_whole_scene_in_one_mesh()
-            #make analyze
-            #print("making analyze")
+            self.scene.set_no_changes()
             self.analyzer.make_analyze(self.analyze_done, self.set_analyze_result_messages)
 
 

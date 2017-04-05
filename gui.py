@@ -2268,12 +2268,10 @@ class PrusaControlView(QMainWindow):
         quality_label = self.qualityCombo.currentText()
         quality_name = self.controller.get_material_quality_name_by_quality_label(material_name, quality_label)
 
-        #infill_value = self.infillSlider.value()
-        infill_value_text = self.infillCombo.currentText()
-        infill_value_text = infill_value_text[0:-1]
-        infill_value = int(infill_value_text)
+        infill_index = self.infillCombo.currentIndex()
+        infill_value_ls = self.controller.get_infill_values_ls()
+        infill_value = infill_value_ls[infill_index]
         brim = self.brimCheckBox.isChecked()
-        #support = self.supportCheckBox.isChecked()
         support = self.supportCombo.currentIndex()
 
         data = {'material': material_name,

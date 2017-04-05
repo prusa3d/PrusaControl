@@ -97,16 +97,18 @@ class Version_1_0(VersionAbstract):
             for m in models_data:
                 logging.debug("Jmeno souboru je: " + m['file_name'])
 
-                #TODO:extract files to tmp folder
-                openedZipfile.extract(m['file_name'])
-                mesh = Mesh.from_file(filename=m['file_name'])
-                os.remove(m['file_name'])
+                tmp = scene.controller.app_config.tmp_place
+                model_filename = tmp + m['file_name']
+                openedZipfile.extract(m['file_name'], tmp)
+
+                mesh = Mesh.from_file(filename=model_filename)
+                os.remove(model_filename)
 
                 #mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
                 model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
                 model.rot = numpy.array(m['rotation'])
                 model.pos = numpy.array(m['position'])
-                model.pos *=0.1
+                model.pos *= 0.1
                 model.scale = numpy.array(m['scale'])
                 model.update_min_max()
                 model.parent = scene
@@ -147,10 +149,10 @@ class Version_1_0(VersionAbstract):
                     #transform data to stl file
                     mesh= model.get_mesh(False, False)
 
-                    # TODO:save files to tmp folder
-                    mesh.save(model.filename, mode=stl.Mode.BINARY)
-                    zip_fh.write(model.filename)
-                    os.remove(model.filename)
+                    model_filename = scene.controller.app_config.tmp_place + model.filename
+                    mesh.save(model_filename, mode=stl.Mode.BINARY)
+                    zip_fh.write(model_filename, model.filename)
+                    os.remove(model_filename)
 
         return True
 
