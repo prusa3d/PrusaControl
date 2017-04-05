@@ -611,9 +611,16 @@ class Controller(QObject):
 
     def get_infill_ls_and_index_of_default(self, default):
         first = 0
-        infill_ls = ["0%", "10%", "15%", "20%", "25%", "30%", "50%", "70%"]
+        #infill_ls = ["0%", "10%", "15%", "20%", "30%", "50%", "70%"]
+        infill_ls = [self.tr("Hollow/Shell - ") + "0%",
+                     self.tr("Sparse - ") + "10%",
+                     self.tr("Light - ") + "15%",
+                     self.tr("Standard - ") + "20%",
+                     self.tr("Dense - ") + "30%",
+                     self.tr("Denser - ") + "50%",
+                     self.tr("Solid - ") + "70%"]
         for i, data in enumerate(infill_ls):
-            if data == default:
+            if default in data:
                 first = i
                 break
 
