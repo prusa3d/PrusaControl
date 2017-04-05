@@ -198,7 +198,7 @@ class Slic3rEngineRunner(QObject):
 
     def get_version(self):
         version_process = subprocess.Popen(self.slicer_place + ["--version"], stdout=subprocess.PIPE)
-        version_info = version_process.stdout.readline()
+        version_info = str(version_process.stdout.readline(), 'utf-8')
         return version_info
 
 class CuraEngine(SlicerEngineAbstract):
