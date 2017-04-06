@@ -21,6 +21,10 @@ QWidget {
     color:rgb(255, 255, 255);
 }
 
+QLabel#version_label{
+    background-color: rgb(79, 79, 79);
+}
+
 QMessageBox#msgBox{
     font-family: 'Titillium Web';
     background-color:rgb(103, 103, 103);
@@ -517,6 +521,7 @@ QProgressBar::chunk {
 
 QProgressBar#splash_progressbar {
     background-color: rgb(255, 255, 255);
+    color: rgb();
 }
 
 QSpinBox,

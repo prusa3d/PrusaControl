@@ -165,11 +165,11 @@ class Controller(QObject):
         self.set_language(self.settings['language'])
         progress_bar.setValue(40)
 
-        progress_bar.setValue(50)
+        progress_bar.setValue(85)
         self.slicer_manager = SlicerEngineManager(self)
 
         self.scene = AppScene(self)
-        #progress_bar.setValue(90)
+        progress_bar.setValue(90)
         self.view = PrusaControlView(self)
 
         progress_bar.setValue(92)

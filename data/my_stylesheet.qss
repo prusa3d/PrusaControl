@@ -21,6 +21,10 @@ QWidget {
     font-size: 12px;
 }
 
+QLabel#version_label{
+    background-color: rgb(79, 79, 79);
+}
+
 QMessageBox#msgBox{
     font-family: 'Titillium Web';
     background-color:rgb(103, 103, 103);
