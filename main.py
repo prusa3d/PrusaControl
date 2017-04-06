@@ -46,7 +46,7 @@ class EventLoopRunner(QObject):
         self.css = QFile('data/my_stylesheet.css')
         self.css.open(QIODevice.ReadOnly)
 
-        self.splash_pix = QPixmap('data/img/SplashScreen03.png')
+        self.splash_pix = QPixmap('data/img/splashscreen.png')
         self.splash = QSplashScreen(self.splash_pix, Qt.SplashScreen | Qt.WindowStaysOnTopHint)
 
         self.progressBar = QProgressBar(self.splash)
@@ -56,7 +56,7 @@ class EventLoopRunner(QObject):
         self.progressBar.setFixedHeight(6)
         self.progressBar.move(245, 453)
 
-        self.version_label = QLabel(self.version_full, self.splash)
+        self.version_label = QLabel(self.version, self.splash)
         self.version_label.setObjectName("version_label")
         self.version_label.move(620, 647)
 

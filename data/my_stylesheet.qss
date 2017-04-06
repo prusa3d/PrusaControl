@@ -23,6 +23,7 @@ QWidget {
 
 QLabel#version_label{
     background-color: rgb(79, 79, 79);
+    color: rgb(225, 225, 225);
 }
 
 QMessageBox#msgBox{
