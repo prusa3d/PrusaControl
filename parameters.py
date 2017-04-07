@@ -222,13 +222,13 @@ class AppParameters(object):
         self.json_settings_url = "https://raw.githubusercontent.com/prusa3d/PrusaControl-settings/master/"
         self.printers_filename = "printers.json"
 
-        self.prusacontrol_url = "http://tbor.pythonanywhere.com/"
+        self.prusacontrol_url = "http://www.pc.prusa3d.com/"
         self.prusacontrol_version_file = "prusacontrol_actual.info"
 
-        self.prusacontrol_webpage = "http://tbor.pythonanywhere.com/"
+        self.prusacontrol_webpage = "http://www.pc.prusa3d.com/"
 
-        self.prusacontrol_questionnaire_cz = "http://goo.gl/forms/7jFBgXjOoqMbQ1wl1"
-        self.prusacontrol_questionnaire_en = "http://goo.gl/forms/nhKwtXvrtaZey0B02"
+        self.prusacontrol_questionnaire_cz = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
+        self.prusacontrol_questionnaire_en = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
 
         self.prusacontrol_help_page = "http://www.prusa3d.com"
         self.prusa_eshop_page = "http://shop.prusa3d.com"
@@ -318,9 +318,11 @@ class AppParameters(object):
         printer_file_config = self.user_folder + self.printers_filename
         # if yes no first run
         if os.path.exists(printer_file_config):
+            #print("printers.json is existing ")
             return
         # else copy from data folder to user folder
         else:
+            #print("printers.json is not existing, first run ")
             try:
                 os.makedirs(self.user_folder)
             except OSError as exception:
@@ -333,7 +335,7 @@ class AppParameters(object):
             except IOError as e:
                 logging.debug('Error: %s' % e.strerror)
 
-            printers_data = json.loads(open(self.user_folder + self.printers_filename, 'rb'))
+            printers_data = json.load(open(self.user_folder + self.printers_filename, 'r'))
             materials_files_list = [printers_data['printers'][i]['material_parameters_file'] for i in
                                     printers_data['printers'] if i not in ['default']]
 

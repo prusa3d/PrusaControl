@@ -1,6 +1,6 @@
 {
   "info": {
-    "version": 1.0
+    "version": 2.3
   },
   "printers": {
     "i3_mk2": {
@@ -13,26 +13,30 @@
         0.0
       ],
       "texture": "data/img/PrintBed04.png",
+      "texture_from_below": "data/img/PrintBed04_GRID.png",
       "printing_space": [
         250,
         210,
         200
       ],
       "material_parameters_file": "materials_i3_mk2.json",
+      "sort": 0,
       "parameters": {
-        "retract_lift": 0.15
+        "retract_lift": 0.6
       }
     },
     "default": {
       "name": "default",
       "label": "",
       "model": "data/models/mk2_heatbed.stl",
+      "multimaterial": 1,
       "model_offset": [
         0.0,
         1.1,
         -0.21
       ],
       "texture": "data/img/checker.png",
+      "texture_from_below": "data/img/checker.png",
       "printing_space": [
         200,
         200,
@@ -54,7 +58,7 @@
         "retract_layer_change": 1,
         "retract_length": 0.8,
         "retract_length_toolchange": 3,
-        "retract_lift": 0.15,
+        "retract_lift": 0.6,
         "retract_lift_above": 1,
         "retract_lift_below": 199,
         "retract_restart_extra": 0,
@@ -72,6 +76,7 @@
         "threads": 4
       },
       "material_parameters_file": "",
+      "sort": 99,
       "printer_type": {
         "0.4mm": {
           "name": "0.4mm",
@@ -84,7 +89,37 @@
           "name": "0.25mm",
           "label": "Nozzle 0.25mm",
           "parameters": {
-            "nozzle_diameter": 0.25
+            "nozzle_diameter": 0.25,
+            "retract_length": 0.8,
+            "retract_speed": 50,
+            "external_perimeter_extrusion_width": 0.25,
+            "extrusion_width": 0.25,
+            "infill_extrusion_width": 0.25,
+            "perimeter_extrusion_width": 0.25,
+            "solid_infill_extrusion_width": 0.25,
+            "first_layer_extrusion_width" : 0.25,
+            "top_infill_extrusion_width": 0.25,
+            "support_material_extrusion_width" : 0.18
+          }
+        },
+        "0.6mm": {
+          "name": "0.6mm",
+          "label": "Nozzle 0.6mm",
+          "parameters": {
+            "nozzle_diameter": 0.6,
+            "layer_height": 0.3,
+            "perimeters" : 2,
+            "top_solid_layers" : 3,
+            "bottom_solid_layers": 3,
+            "external_perimeter_extrusion_width": 0.61,
+            "extrusion_width": 0.67,
+            "perimeter_extrusion_width": 0.65,
+            "infill_extrusion_width": 0.75,
+            "solid_infill_extrusion_width": 0.65,
+            "top_infill_extrusion_width": 0.60,
+            "first_layer_extrusion_width" : 0.65,
+            "infill_overlap" : "15%",
+            "extrusion_multiplier": 1.1            
           }
         },
         "default": {
