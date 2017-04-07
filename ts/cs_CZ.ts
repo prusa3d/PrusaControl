@@ -25,59 +25,94 @@
 <context>
     <name>Controller</name>
     <message>
-        <location filename="controller.py" line="1849"/>
+        <location filename="controller.py" line="1860"/>
         <source>Generating perimeters</source>
         <translation>Generuji perimetry</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1850"/>
+        <location filename="controller.py" line="1861"/>
         <source>Processing triangulated mesh</source>
         <translation>Zpracovávám objekty</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1851"/>
+        <location filename="controller.py" line="1862"/>
         <source>Infilling layers</source>
         <translation>Vyplňuji vrstvy</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1852"/>
+        <location filename="controller.py" line="1863"/>
         <source>Preparing infill</source>
         <translation>Připravuji výplň </translation>
     </message>
     <message>
-        <location filename="controller.py" line="1853"/>
+        <location filename="controller.py" line="1864"/>
         <source>Generating skirt</source>
         <translation>Vytvářím lem</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1854"/>
+        <location filename="controller.py" line="1865"/>
         <source>Exporting G-code to</source>
         <translation>Vytvářím GCode</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1855"/>
+        <location filename="controller.py" line="1866"/>
         <source>Done. Process took</source>
         <translation>Hotovo. Generování trvalo </translation>
     </message>
     <message>
-        <location filename="controller.py" line="243"/>
+        <location filename="controller.py" line="241"/>
         <source>Object </source>
         <translation>Objekt</translation>
     </message>
     <message>
-        <location filename="controller.py" line="244"/>
+        <location filename="controller.py" line="242"/>
         <source> is out of printable area!</source>
         <translation> je mimo tiskovou plochu!</translation>
     </message>
     <message>
-        <location filename="controller.py" line="245"/>
+        <location filename="controller.py" line="243"/>
         <source>Scene is hard to print without support.</source>
         <translation>Scénu je obtížné vytisknout bez zapnutých podpor.</translation>
     </message>
     <message>
-        <location filename="controller.py" line="246"/>
+        <location filename="controller.py" line="244"/>
         <source>For better adhesion turn Brim parametr on.</source>
         <translation>Pro lepší přilnavost objektu k podložce zapněte parametr límec.</translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="620"/>
+        <source>Hollow/Shell - </source>
+        <translation>Dutý - </translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="621"/>
+        <source>Sparse - </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="622"/>
+        <source>Light - </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="623"/>
+        <source>Standard - </source>
+        <translation>Standartní - </translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="624"/>
+        <source>Dense - </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="625"/>
+        <source>Denser - </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="626"/>
+        <source>Solid - </source>
+        <translation>Plný - </translation>
     </message>
 </context>
 <context>
@@ -136,7 +171,7 @@
         <translation type="obsolete">čas:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="781"/>
+        <location filename="sceneRender.py" line="804"/>
         <source>filament:</source>
         <translation>filamentu:</translation>
     </message>
@@ -151,22 +186,22 @@
         <translation>Dopředu</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="780"/>
+        <location filename="sceneRender.py" line="803"/>
         <source>estimate time:</source>
         <translation>odhadovaný čas:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="694"/>
+        <location filename="sceneRender.py" line="717"/>
         <source>WARNING</source>
         <translation>Upozornění</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="770"/>
+        <location filename="sceneRender.py" line="793"/>
         <source>PRINT INFO</source>
         <translation>Tiskové informace</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="784"/>
+        <location filename="sceneRender.py" line="807"/>
         <source>total info:</source>
         <translation>Celkový přehled:</translation>
     </message>
@@ -247,12 +282,12 @@
     <message>
         <location filename="gui.py" line="1427"/>
         <source>Prusa Online</source>
-        <translation>Průša Online</translation>
+        <translation>Průša Shop</translation>
     </message>
     <message>
         <location filename="gui.py" line="1429"/>
         <source>Send feedback</source>
-        <translation>Poslat zpětnou vazbu</translation>
+        <translation>Nahlásit chybu</translation>
     </message>
     <message>
         <location filename="gui.py" line="1431"/>
@@ -351,7 +386,7 @@
         <translation>Vyberte jakou chcete kvalitu výsledného výtisku, čím vyšší kvalita tisku tím i delší doba.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="2337"/>
+        <location filename="gui.py" line="2335"/>
         <source>Infill</source>
         <translation>Výplň</translation>
     </message>
@@ -816,17 +851,17 @@
 <context>
     <name>self.view</name>
     <message>
-        <location filename="controller.py" line="419"/>
+        <location filename="controller.py" line="416"/>
         <source>GCode saved</source>
         <translation>GCode uložen</translation>
     </message>
     <message>
-        <location filename="controller.py" line="821"/>
+        <location filename="controller.py" line="828"/>
         <source>Project loaded</source>
         <translation>Projekt načten</translation>
     </message>
     <message>
-        <location filename="controller.py" line="834"/>
+        <location filename="controller.py" line="841"/>
         <source>Project was saved</source>
         <translation>Projekt byl uložen</translation>
     </message>
