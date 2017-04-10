@@ -7,7 +7,7 @@ import platform
 import tempfile
 import sys
 from urllib.request import urlopen
-from urllib.error import URLError
+from urllib.error import URLError, HTTPError
 
 from configparser import ConfigParser, RawConfigParser
 from copy import deepcopy
@@ -403,15 +403,21 @@ class AppParameters(object):
 
     def check_new_version_of_prusacontrol(self):
         #download json file with actual version
-        r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
-        data = r.read()
-        if data:
-            if self.is_higher(self.strip_version_string(data)):
-                self.is_version_actual = False
-            else:
-                self.is_version_actual = True
-        else:
+        try:
+            r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
+        except HTTPError as e:
             return None
+        except URLError as e:
+            return None
+        else:
+            data = r.read()
+            if data:
+                if self.is_higher(self.strip_version_string(data)):
+                    self.is_version_actual = False
+                else:
+                    self.is_version_actual = True
+            else:
+                return None
 
 
     def get_printers_info(self, json_path):
