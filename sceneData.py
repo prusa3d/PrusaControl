@@ -1195,13 +1195,13 @@ class Model(object):
                 glColor4ub(175, 175, 175, 150)
                 #glColor4f(.4, .4, .4, .75)
             else:
-                if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
-                    if self.selected:
-                        glColor4ubv(self.select_color)
-                    else:
-                        glColor4ubv(self.color)
+                if self.selected:
+                    glColor4ubv(self.select_color)
                 else:
-                    glColor4f(0.25, 0.25, 0.25, 1.)
+                    if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
+                        glColor4ubv(self.color)
+                    else:
+                        glColor4f(0.25, 0.25, 0.25, 1.)
 
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)

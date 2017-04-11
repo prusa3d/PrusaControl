@@ -222,10 +222,10 @@ class AppParameters(object):
         self.json_settings_url = "https://raw.githubusercontent.com/prusa3d/PrusaControl-settings/master/"
         self.printers_filename = "printers.json"
 
-        self.prusacontrol_url = "http://www.pc.prusa3d.com/"
-        self.prusacontrol_version_file = "prusacontrol_actual.info"
+        self.prusacontrol_url = "http://www.prusacontrol.org/"
+        self.prusacontrol_version_file = "version.info"
 
-        self.prusacontrol_webpage = "http://www.pc.prusa3d.com/"
+        self.prusacontrol_webpage = "http://www.prusacontrol.org/"
 
         self.prusacontrol_questionnaire_cz = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
         self.prusacontrol_questionnaire_en = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
@@ -406,8 +406,10 @@ class AppParameters(object):
         try:
             r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
         except HTTPError as e:
+            print("HTTP error")
             return None
         except URLError as e:
+            print("URL error")
             return None
         else:
             data = r.read()
