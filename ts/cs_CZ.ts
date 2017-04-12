@@ -25,37 +25,37 @@
 <context>
     <name>Controller</name>
     <message>
-        <location filename="controller.py" line="1860"/>
+        <location filename="controller.py" line="1832"/>
         <source>Generating perimeters</source>
         <translation>Generuji perimetry</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1861"/>
+        <location filename="controller.py" line="1833"/>
         <source>Processing triangulated mesh</source>
         <translation>Zpracovávám objekty</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1862"/>
+        <location filename="controller.py" line="1834"/>
         <source>Infilling layers</source>
         <translation>Vyplňuji vrstvy</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1863"/>
+        <location filename="controller.py" line="1835"/>
         <source>Preparing infill</source>
         <translation>Připravuji výplň </translation>
     </message>
     <message>
-        <location filename="controller.py" line="1864"/>
+        <location filename="controller.py" line="1836"/>
         <source>Generating skirt</source>
         <translation>Vytvářím lem</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1865"/>
+        <location filename="controller.py" line="1837"/>
         <source>Exporting G-code to</source>
         <translation>Vytvářím GCode</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1866"/>
+        <location filename="controller.py" line="1838"/>
         <source>Done. Process took</source>
         <translation>Hotovo. Generování trvalo </translation>
     </message>
@@ -82,32 +82,32 @@
     <message>
         <location filename="controller.py" line="620"/>
         <source>Hollow/Shell - </source>
-        <translation>Dutý - </translation>
+        <translation>Žádná - </translation>
     </message>
     <message>
         <location filename="controller.py" line="621"/>
         <source>Sparse - </source>
-        <translation type="unfinished"></translation>
+        <translation>Řídká - </translation>
     </message>
     <message>
         <location filename="controller.py" line="622"/>
         <source>Light - </source>
-        <translation type="unfinished"></translation>
+        <translation>Lehká - </translation>
     </message>
     <message>
         <location filename="controller.py" line="623"/>
         <source>Standard - </source>
-        <translation>Standartní - </translation>
+        <translation>Standardní - </translation>
     </message>
     <message>
         <location filename="controller.py" line="624"/>
         <source>Dense - </source>
-        <translation type="unfinished"></translation>
+        <translation>Hustý - </translation>
     </message>
     <message>
         <location filename="controller.py" line="625"/>
         <source>Denser - </source>
-        <translation type="unfinished"></translation>
+        <translation>Hustší - </translation>
     </message>
     <message>
         <location filename="controller.py" line="626"/>
@@ -287,7 +287,7 @@
     <message>
         <location filename="gui.py" line="1429"/>
         <source>Send feedback</source>
-        <translation>Nahlásit chybu</translation>
+        <translation>Odeslat zpětnou vazbu</translation>
     </message>
     <message>
         <location filename="gui.py" line="1431"/>
@@ -856,12 +856,12 @@
         <translation>GCode uložen</translation>
     </message>
     <message>
-        <location filename="controller.py" line="828"/>
+        <location filename="controller.py" line="800"/>
         <source>Project loaded</source>
         <translation>Projekt načten</translation>
     </message>
     <message>
-        <location filename="controller.py" line="841"/>
+        <location filename="controller.py" line="813"/>
         <source>Project was saved</source>
         <translation>Projekt byl uložen</translation>
     </message>
