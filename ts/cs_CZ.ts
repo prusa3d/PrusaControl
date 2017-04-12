@@ -102,7 +102,7 @@
     <message>
         <location filename="controller.py" line="624"/>
         <source>Dense - </source>
-        <translation>Hustý - </translation>
+        <translation>Hustá - </translation>
     </message>
     <message>
         <location filename="controller.py" line="625"/>
@@ -112,7 +112,7 @@
     <message>
         <location filename="controller.py" line="626"/>
         <source>Solid - </source>
-        <translation>Plný - </translation>
+        <translation>Plná - </translation>
     </message>
 </context>
 <context>
