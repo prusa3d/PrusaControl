@@ -226,6 +226,7 @@ class AppParameters(object):
         self.prusacontrol_version_file = "version.info"
 
         self.prusacontrol_webpage = "http://www.prusacontrol.org/"
+        self.prusacontrol_update_page = "http://www.prusacontrol.org/update"
 
         self.prusacontrol_questionnaire_cz = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
         self.prusacontrol_questionnaire_en = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
@@ -297,13 +298,17 @@ class AppParameters(object):
 
     @staticmethod
     def strip_version_string(string_in):
-        if type(string_in) is str:
-            string_out = string_in
-        else:
-            string_out = str(string_in, "utf8")
-        string_out = string_out.split('-')
-        string_out = string_out[:2]
-        string_out = "{}_{}".format(string_out[0], string_out[1])[1:]
+        try:
+            if type(string_in) is str:
+                string_out = string_in
+            else:
+                string_out = str(string_in, "utf8")
+            string_out = string_out.split('-')
+            string_out = string_out[:2]
+            string_out = "{}_{}".format(string_out[0], string_out[1])[1:]
+        except IndexError as e:
+            string_out = "0.0.1"
+
         return string_out
 
     def internet_on(self):
@@ -446,20 +451,22 @@ class AppParameters(object):
 
         #print("Local version: " + str(splitted_local_version))
         #print("Internet version: " + str(splitted_version_from_internet))
+        try:
+            version_from_internet_lst = splitted_version_from_internet[0].split(".")
+            local_version_lst = splitted_local_version[0].split(".")
 
-        version_from_internet_lst = splitted_version_from_internet[0].split(".")
-        local_version_lst = splitted_local_version[0].split(".")
-
-        if len(version_from_internet_lst) == len(local_version_lst):
-            for i, o in zip(version_from_internet_lst, local_version_lst):
-                if int(i) > int(o):
+            if len(version_from_internet_lst) == len(local_version_lst):
+                for i, o in zip(version_from_internet_lst, local_version_lst):
+                    if int(i) > int(o):
+                        return True
+                if int(splitted_version_from_internet[1]) > int(splitted_local_version[1]):
                     return True
-            if int(splitted_version_from_internet[1]) > int(splitted_local_version[1]):
-                return True
+                else:
+                    return False
             else:
-                return False
-        else:
-            return True
+                return True
+        except IndexError as e:
+            return False
 
         return False
 

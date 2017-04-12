@@ -242,7 +242,7 @@ class Controller(QObject):
         if not self.app_config.is_version_actual:
             ret = self.view.show_new_version_message()
             if ret == QMessageBox.Yes:
-                self.open_web_browser(self.app_config.prusacontrol_webpage)
+                self.open_web_browser(self.app_config.prusacontrol_update_page)
 
 
     def exit_event(self):
@@ -690,35 +690,6 @@ class Controller(QObject):
         print("Cancel gcode loading end")
 
 
-    '''
-    def make_reaction_on_analyzation_result(self, result):
-        result_text = [i['message'] for i in result if i['result']==True]
-        if result_text:
-            result_text = "\n".join(result_text)
-
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-
-            msg.setText("Do you want to apply recommended settings?")
-            msg.setInformativeText("PrusaControl make analyze of printing scene, recommending different printing settings")
-            msg.setWindowTitle("Analyze of printing scene")
-            msg.setDetailedText(result_text)
-            msg.setStandardButtons(QMessageBox.Ignore | QMessageBox.Apply | QMessageBox.Cancel)
-            msg.buttonClicked.connect(self.reaction_button_pressed)
-
-            retval = msg.exec_()
-
-    def reaction_button_pressed(self, i):
-        if i.text() == 'Apply':
-            for res in self.analyze_result:
-                if res['result']:
-                    widget_list = self.view.get_changable_widgets()
-                    widget = widget_list[res['gui_name']]
-                    widget.setChecked(True)
-        elif i.text() == 'Cancel':
-            self.canceled = True
-    '''
-
     #TODO:Better way
     def generate_gcode_filename(self):
         suggest_filename = ""
@@ -749,6 +720,7 @@ class Controller(QObject):
             quality_name = data['quality']
 
             suggest_filename += "_" + material_name.upper() + "_" + quality_name.upper()
+            print(suggest_filename)
 
         return suggest_filename
 
