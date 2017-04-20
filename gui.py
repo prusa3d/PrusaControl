@@ -7,6 +7,7 @@ from copy import deepcopy
 import numpy as np
 import time
 #from OpenGL.GL import *
+from PyQt4.QtCore import QFileInfo
 from PyQt4.QtCore import QPropertyAnimation
 from PyQt4.QtCore import QTextCodec
 
@@ -2097,7 +2098,6 @@ class PrusaControlView(QMainWindow):
         self.progressBar.setVisible(True)
         self.gcode_back_b.setVisible(False)
 
-    #TODO:Debug new design
     def open_gcode_view(self):
         self.set_save_gcode_button()
         self.object_group_box.setVisible(False)
@@ -2110,7 +2110,6 @@ class PrusaControlView(QMainWindow):
     #def set_gcode_slider(self, number_of_layers=0, maximal_value=0):
     #    self.gcode_slider.setTickInterval(0)
 
-    # TODO:Debug new design
     def close_gcode_view(self):
         self.gcode_group_box.setVisible(False)
         self.gcode_back_b.setVisible(False)
@@ -2145,23 +2144,28 @@ class PrusaControlView(QMainWindow):
     def open_project_file_dialog(self):
         filters = "Prusa (*.prusa *.PRUSA)"
         title = 'Open project file'
-        open_at = "/home"
+        open_at = self.settings.value("project_path", "")
         data = QFileDialog.getOpenFileName(None, title, open_at, filters)
-        data = self.convert_file_path_to_unicode(data)
+        if data:
+            self.settings.setValue("project_path", QFileInfo(data).absolutePath())
         return data
 
     def open_gcode_file_dialog(self):
         filters = "GCODE (*.gcode *.GCODE *.Gcode)"
         title = "Import gcode file"
-        open_at = "/home"
-        path = QFileDialog.getOpenFileName(None, title, open_at, filters)
-        return path
+        open_at = self.settings.value("gcode_path", "")
+        data = QFileDialog.getOpenFileName(None, title, open_at, filters)
+        if data:
+            self.settings.setValue("gcode_path", QFileInfo(data).absolutePath())
+        return data
 
     def open_model_file_dialog(self):
         filters = "STL (*.stl *.STL)"
         title = "Import model file"
-        open_at = "/home"
+        open_at = self.settings.value("model_path", "")
         data = QFileDialog.getOpenFileNames(None, title, open_at, filters)
+        if data:
+            self.settings.setValue("model_path", QFileInfo(data[0]).absolutePath())
         filenames_list = []
         for path in data:
             filenames_list.append(self.convert_file_path_to_unicode(path))
@@ -2170,8 +2174,10 @@ class PrusaControlView(QMainWindow):
     def save_project_file_dialog(self):
         filters = "Prusa (*.prusa *.PRUSA)"
         title = 'Save project file'
-        open_at = "/home"
+        open_at = self.settings.value("project_path", "")
         data = QFileDialog.getSaveFileName(None, title, open_at, filters)
+        if data:
+            self.settings.setValue("project_path", QFileInfo(data).absolutePath())
         if data == '':
             return data
 
@@ -2180,10 +2186,12 @@ class PrusaControlView(QMainWindow):
     def save_gcode_file_dialog(self, filename = "sliced_model"):
         filters = "gcode (*.gcode *.GCODE)"
         title = 'Save G-Code file'
-        #open_at = "/home"
-        open_at = "/" + filename
+        open_at = self.settings.value("gcode_path", "")
+        filename_list = filename.split('/')
+        open_at += '/' + filename_list[-1]
         data = QFileDialog.getSaveFileName(None, title, open_at, filters)
-        data = self.convert_file_path_to_unicode(data)
+        if data:
+            self.settings.setValue("gcode_path", QFileInfo(data).absolutePath())
         return data
 
     #TODO:Move to controller class
