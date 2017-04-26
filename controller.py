@@ -1444,9 +1444,11 @@ class Controller(QObject):
                             radius *=.7
 
                             if new_vect_leng >= radius:
-                                model.set_rot(model.rot[0], model.rot[1], alpha, False, False, False)
+                                if numpy.abs(alpha - numpy.pi) <= 0.05:
+                                    alpha = numpy.pi
+                                model.set_rot(model.rot[0], model.rot[1], numpy.around(alpha, decimals=3), False, False, False)
                             else:
-                                alpha_new = numpy.degrees(alpha) // 45
+                                alpha_new = numpy.degrees(alpha) // 45.
                                 model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
 
                             #self.view.update_object_settings(model.id)
