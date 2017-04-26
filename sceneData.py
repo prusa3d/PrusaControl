@@ -883,68 +883,6 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
 
-    '''
-    def apply_all_transformation(self):
-        rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
-        ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
-        rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.rot[2])
-
-        rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
-
-        scale_matrix = np.array([[1., 0., 0.],
-                                 [0., 1., 0.],
-                                 [0., 0., 1.]]) * self.scale
-
-        final_rotation = rotation_matrix
-        final_scale = scale_matrix
-        final_matrix = np.dot(final_rotation, final_scale)
-
-        for i in range(3):
-            self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
-
-        self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
-        self.make_normals()
-
-        self.temp_mesh.update_min()
-        self.temp_mesh.update_max()
-
-        self.min = self.temp_mesh.min_
-        self.max = self.temp_mesh.max_
-        self.min_scene = self.min + self.pos
-        self.max_scene = self.max + self.pos
-
-        #self.place_on_zero()
-
-        self.is_changed = False
-    '''
-
-    '''
-    def start_edit(self):
-        self.rot_hist = deepcopy(self.rot)
-        self.scale_hist = deepcopy(self.scale)
-        self.pos_hist = deepcopy(self.pos)
-        self.is_changed = True
-
-    def apply_changes(self):
-        #print("Apply changes")
-        self.pos_hist = np.array([.0, .0, .0])
-        self.rot_hist = np.array([.0, .0, .0])
-        self.scale_hist = np.array([1., 1., 1.])
-
-        self.update_min_max()
-
-        self.is_changed = False
-
-    def discard_changes(self):
-        #print("Discard changes")
-        self.pos = deepcopy(self.pos_hist)
-        self.scale = deepcopy(self.scale_hist)
-        self.rot = deepcopy(self.rot_hist)
-        #self.apply_all_transformation()
-        self.is_changed = False
-
-    '''
-
     def set_scale(self, value):
         printing_space = self.parent.controller.actual_printer['printing_space']
         new_size = np.dot(self.size_origin, self.scale_matrix*value)
@@ -953,7 +891,6 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]]) * value
             self.is_changed = True
-
 
     def apply_scale(self):
         self.scale_matrix = np.dot(self.scale_matrix, self.temp_scale)
