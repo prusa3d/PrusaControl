@@ -294,7 +294,7 @@ class AppScene(object):
             return False
 
     def delete_selected_models(self):
-        for m in self.models:
+        for m in self.get_models():
             if m.selected and m.isVisible:
                 m.isVisible = False
 
@@ -305,12 +305,12 @@ class AppScene(object):
     def copy_selected_objects(self):
         self.place_offset = np.array([0.,0.,0.])
         self.copied_models = []
-        for m in self.models:
+        for m in self.get_models():
             if m.selected and m.isVisible:
                 self.copied_models.append(m)
 
     def unselect_all_models(self):
-        for m in self.models:
+        for m in self.get_models():
             m.selected = False
 
     def paste_selected_objects(self):
@@ -332,7 +332,7 @@ class AppScene(object):
         text00 = self.controller.message_object00
         text01 = self.controller.message_object01
 
-        for model in self.models:
+        for model in self.get_models():
             if model.isVisible:
                 if not model.is_in_printing_area:
                     if len(model.filename)>7:
@@ -354,14 +354,19 @@ class AppScene(object):
         for m in self.models:
             m.selected = False
 
+    def get_models(self):
+        return [m for m in self.models if m.isVisible]
+
     def automatic_models_position(self):
+        if not len(self.get_models()) > 1:
+            return
         #sort objects over size of bounding sphere
 
         #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
         self.models = sorted(self.models, key=lambda k: np.sqrt(k.size.dot(k.size)), reverse=True)
 
         #null position of all objects
-        for m in self.models:
+        for m in self.get_models():
             zer = np.array([.0, .0, .0])
             m.pos[0] = zer[0]
             m.pos[1] = zer[1]
@@ -371,21 +376,59 @@ class AppScene(object):
 
         #place biggest object(first one) on center
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
-        for i, m in enumerate(self.models):
-            self.find_new_position(i, m)
+        if self.models_are_same():
+            #grid placing algoritm
+            self.place_objects_in_grid()
+        else:
+            for i, m in enumerate(self.get_models()):
+                self.find_new_position(i, m)
 
         self.save_change(self.models)
+
+    def place_objects_in_grid(self):
+        number_x = np.floor(np.sqrt(len(self.get_models())))
+        #real_x = real_y = np.sqrt(len(self.get_models()))
+        m_0 = self.get_models()[0]
+        min = deepcopy(m_0.pos)
+        max = deepcopy(m_0.pos)
+        size = deepcopy(m_0.size) #deepcopy(m_0.max - m_0.min)
+        all_pos = np.array([])
+
+
+        for i, m in enumerate(self.get_models()):
+            x = i // number_x
+            y = i - (x * number_x)
+
+            m.pos[0] = ((size[0] + self.model_position_offset) * x) - self.model_position_offset
+            m.pos[1] = ((size[1] + self.model_position_offset) * y) - self.model_position_offset
+
+
+        all_pos = np.array([m.pos for m in self.get_models()])
+
+        min = np.min(all_pos, axis=0)
+        max = np.max(all_pos, axis=0)
+
+        x_center = (max[0] - min[0]) * .5
+        y_center = (max[1] - min[1]) * .5
+
+        for m in self.get_models():
+            m.pos[0] -= x_center
+            m.pos[1] -= y_center
+            m.update_min_max()
+
+
+
 
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
-            self.models[0].pos[0] = position_vector[0]
-            self.models[0].pos[1] = position_vector[1]
+            self.get_models()[0].pos[0] = position_vector[0]
+            self.get_models()[0].pos[1] = position_vector[1]
 
-            self.models[0].max_scene = self.models[0].max + self.models[0].pos
-            self.models[0].min_scene = self.models[0].min + self.models[0].pos
+            self.get_models()[0].max_scene = self.get_models()[0].max + self.get_models()[0].pos
+            self.get_models()[0].min_scene = self.get_models()[0].min + self.get_models()[0].pos
             return
-        scene_tmp = self.models[:index]
+        scene_tmp = self.get_models()[:index]
         if index > 0:
             while model.intersection_model_list_model_(scene_tmp):
                 #for angle in range(0, 360, 20):
@@ -416,6 +459,33 @@ class AppScene(object):
 
                 position_vector[0] += model.boundingSphereSize*.1
                 position_vector[1] += model.boundingSphereSize*.1
+
+
+    #TODO:test models names, datas, scale, rotate...
+    def models_are_same(self):
+        default_filename = self.get_models()[0].filename
+        default_scale = self.get_models()[0].scale
+        default_rot = self.get_models()[0].rot
+
+        for m in self.get_models():
+            if not(default_filename == m.filename):
+                print("Neni stejny nazev")
+                print("Filename 0: " + str(default_filename))
+                print("Filename: " + str(m.filename))
+                return False
+            if not(np.array_equal(default_scale, m.scale)):
+                print("Neni stejny scale")
+                print("Scale 0: " + str(default_scale))
+                print("Scale: " + str(m.scale))
+                return False
+            if not(np.array_equal(default_rot, m.rot)):
+                print("Neni stejna rotace")
+                print("Rotation 0: " + str(default_rot))
+                print("Rotation: " + str(m.rot))
+                return False
+
+
+        return True
 
     def get_whole_scene_in_one_mesh(self, gcode_generate=False):
         return Mesh(np.concatenate([i.get_mesh(True, gcode_generate).data for i in self.models if i.isVisible]))

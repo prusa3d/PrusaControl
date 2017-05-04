@@ -228,8 +228,8 @@ class AppParameters(object):
         self.prusacontrol_webpage = "http://www.prusacontrol.org/"
         self.prusacontrol_update_page = "http://www.prusacontrol.org/update"
 
-        self.prusacontrol_questionnaire_cz = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
-        self.prusacontrol_questionnaire_en = "https://goo.gl/forms/9YlPkEGDSlvuXaR93"
+        self.prusacontrol_questionnaire_cz = "https://goo.gl/forms/5rJPSUMrZJIcBsL12"
+        self.prusacontrol_questionnaire_en = "https://goo.gl/forms/R7rRNPgiIq87WA4R2"
 
         self.prusacontrol_help_page = "http://www.prusa3d.com"
         self.prusa_eshop_page = "http://shop.prusa3d.com"

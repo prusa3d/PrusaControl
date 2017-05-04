@@ -80,6 +80,10 @@ def main():
     sys.excepthook = log_exception
 
     app = QApplication(sys.argv)
+    app.setApplicationName("PrusaControl")
+    app.setOrganizationName("Prusa Research")
+    app.setOrganizationDomain("prusa3d.com")
+
     dpi = app.desktop().logicalDpiX()
 
     app.setWindowIcon(QIcon("data/icon/favicon.ico"))

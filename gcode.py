@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-
+import cProfile
 import time
 #from fastnumbers import fast_float
+from collections import defaultdict
+from collections import deque
 from copy import deepcopy
 from pprint import pprint
 import os
@@ -15,7 +17,15 @@ from PyQt4.QtCore import QThread
 from PyQt4.QtCore import pyqtSignal
 
 
-
+#Mesure
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('%s function took %0.3f ms' % (f.__name__, (time2-time1)*1000.0))
+        return ret
+    return wrap
 
 class GCode(object):
 
@@ -25,12 +35,12 @@ class GCode(object):
         self.writing_done_callback = done_writing_callback
         self.data = {}
         self.all_data = []
-        self.data_keys = []
+        self.data_keys = set()
         self.color_change_data = []
         self.actual_z = '0.0'
         self.speed = 0.0
         self.z_hop = False
-        self.last_point = [0.0, 0.0, 0.0]
+        self.last_point = np.array([0.0, 0.0, 0.0])
         self.actual_point = [0.0, 0.0, 0.0]
 
         self.printing_time = 0.0
@@ -51,7 +61,7 @@ class GCode(object):
 
 
     def cancel_parsing_gcode(self):
-        print("Cancel presset")
+        #print("Cancel presset")
         if self.gcode_parser and self.gcode_parser_thread and self.gcode_parser_thread.isRunning():
             self.gcode_parser.is_running = False
             self.gcode_parser_thread.quit()
@@ -63,7 +73,7 @@ class GCode(object):
         self.controller.set_progress_bar(0)
 
     def cancel_writing_gcode(self):
-        print("Cancel writing gcode")
+        #print("Cancel writing gcode")
         if self.gcode_copy and self.gcode_copy_thread and self.gcode_copy_thread.isRunning():
             self.gcode_copy.quit()
             self.gcode_copy_thread.wait()
@@ -74,21 +84,20 @@ class GCode(object):
             line = self.data[i]
             for o in line:
                 _a, _b, type, _speed, _extr, line_n = o
-                if 'E' in type:
+                if 'E' in self.line_type(type):
                     lines_number.append(line_n)
                     break
 
         return lines_number
 
-
-
     def read_in_thread(self, update_progressbar_function, after_done_function):
-        print("reading in thread")
+        #print("reading in thread")
         self.gcode_parser.moveToThread(self.gcode_parser_thread)
         self.done_loading_callback = after_done_function
 
         # connect all signals to thread class
         self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file)
+        #self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file_with_profile)
         # connect all signals to parser class
         self.gcode_parser.finished.connect(self.set_finished_read)
         self.gcode_parser.set_update_progress.connect(update_progressbar_function)
@@ -150,7 +159,6 @@ class GCode(object):
         self.gcode_copy.set_update_progress.connect(update_function)
 
         self.gcode_copy_thread.start()
-
 
 
 
@@ -230,40 +238,49 @@ class GcodeParserRunner(QObject):
         self.controller = controller
         self.filename = filename
 
-        self.data = {}
+        self.data = defaultdict(list)
         self.all_data = []
-        self.data_keys = []
+        self.data_keys = set()
         self.actual_z = '0.0'
         self.speed = 0.0
         self.extrusion = 0.0
         self.z_hop = False
-        self.last_point = [0.0, 0.0, 0.0]
-        self.actual_point = [0.0, 0.0, 0.0]
+        self.last_point = np.array([0.0, 0.0, 0.0])
+        self.actual_point = np.array([0.0, 0.0, 0.0])
 
         self.printing_time = 0.0
         self.filament_length = 0.0
 
+    def load_gcode_file_with_profile(self):
+        cProfile.runctx('self.load_gcode_file()', globals(), locals(), 'gcode_parser.profile')
 
-
+    @timing
     def load_gcode_file(self):
         file = QFile(self.filename)
         file.open(QIODevice.ReadOnly | QIODevice.Text)
         in_stream = QTextStream(file)
-        file_size = file.size()
+        file_size = np.array([file.size()])
+        counter_size = int(file_size/800.)
+        #print(counter_size)
         counter = 0
         line = 0
         line_number = 0
-        while not in_stream.atEnd() and self.is_running is True:
+
+        while in_stream.atEnd() is False and self.is_running is True:
+        #for line in in_stream.readAll():
+            if self.is_running is False:
+                break
 
             counter+=1
-            if self.set_update_progress and counter==10000:
+            if self.set_update_progress and counter==counter_size:
                 #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
-                progress = (in_stream.pos()*1./file_size*1.) * 100.
+                progress = (in_stream.pos()*1./file_size) * 100.
                 self.set_update_progress.emit(int(progress))
                 counter=0
 
             line = in_stream.readLine()
-            # print(line)
+
+            #print(line)
             # self.process_line(line)
             bits = line.split(';', 1)
             if bits[0] == '':
@@ -273,13 +290,12 @@ class GcodeParserRunner(QObject):
                 self.parse_g1_line(bits, line_number)
             else:
                 line_number += 1
-                continue
-            line_number += 1
 
         if self.is_running == False:
             self.set_update_progress.emit(0)
 
         self.printing_time = self.calculate_time_of_print()
+        #self.printing_time = 0.
         self.filament_length = 0.0  # self.calculate_length_of_filament()
 
         ###
@@ -297,9 +313,10 @@ class GcodeParserRunner(QObject):
         for i in self.non_extruding_layers:
             self.data.pop(i, None)
 
-        self.data_keys = []
-        self.data_keys = list(self.data)
-        self.data_keys.sort(key=lambda x: float(x))
+        self.data_keys = set()
+        self.data_keys = set(self.data)
+        self.data_keys = sorted(self.data_keys, key=float)
+        #self.data_keys.sort(key=lambda x: float(x))
 
 
         self.set_data_keys.emit(self.data_keys)
@@ -309,17 +326,20 @@ class GcodeParserRunner(QObject):
 
         self.finished.emit()
 
-
+    #@timing
     def calculate_time_of_print(self):
         time_of_print = 0.0
-        for line in self.all_data:
-            a = np.array(line[0])
-            b = np.array(line[1])
-            speed = line[3] #mm/min
-            vect = b-a
-            leng = np.linalg.norm(vect)
-            time = np.divide(leng, speed)
-            time_of_print += time
+        all_data = self.all_data
+
+        #vectorization speed up
+        a_vect = np.array([i[0] for i in all_data])
+        b_vect = np.array([i[1] for i in all_data])
+        speed_vect = np.array([i[3] for i in all_data])
+
+        vect_vect = b_vect - a_vect
+        leng_vect = np.linalg.norm(vect_vect, axis=1)
+        time_vect = np.divide(leng_vect, speed_vect)
+        time_of_print = np.sum(time_vect)
 
         #Magic constant :-)
         time_of_print *=1.1
@@ -353,6 +373,7 @@ class GcodeParserRunner(QObject):
 
         line = text.split(' ')
         line = list(filter(None, line))
+        #print(line)
 
         #print(comment)
         comment_line = comment.split(' ')
@@ -371,19 +392,19 @@ class GcodeParserRunner(QObject):
             elif 'X' in line[1] and 'Y' in line[2] and not ('E' in line[3]) and 'F' in line[3]:
                 # elif 'X' in line[1] and 'Y' in line[2] and not ('E' in line[3]) and 'F' in line[3]:
                 # Move point
-                self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
-                if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]), line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
+                if self.last_point.any():
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[3][1:]), line_number=line_number)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
             elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # Extrusion point
-                self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
-                self.extrusion = float(line[3][1:])
-                if self.last_point:
-                    if float(line[3][1:]) > 0.:
+                self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
+                self.extrusion = np.float(line[3][1:])
+                if self.last_point.any():
+                    if np.float(line[3][1:]) > 0.:
                         if len(comment_line) > 0:
                             if 'infill' in comment_line[0]:
                                 type = 'E-i'
@@ -401,16 +422,16 @@ class GcodeParserRunner(QObject):
                         type = 'M'
 
                     self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
             elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # Extrusion point
-                self.actual_point[0] = float(line[1][1:])
-                self.extrusion = float(line[2][1:])
-                if self.last_point:
-                    if float(line[2][1:]) > 0.:
+                self.actual_point[0] = np.float(line[1][1:])
+                self.extrusion = np.float(line[2][1:])
+                if self.last_point.any():
+                    if np.float(line[2][1:]) > 0.:
                         if len(comment_line) > 0:
                             if 'infill' in comment_line[0]:
                                 type = 'E-i'
@@ -426,49 +447,49 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion, line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, np.float(line[3][1:]), self.extrusion, line_number=line_number)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
             elif 'Y' in line[1] and 'F' in line[2]:
                 # elif 'Y' in line[1] and 'F' in line[2]:
                 # Move point
-                self.actual_point[1] = float(line[1][1:])
+                self.actual_point[1] = np.float(line[1][1:])
 
                 if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]), line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[2][1:]), line_number=line_number)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
         else:
             if 'Z' in line[1]:
                 # Set of Z axis
-                new_z = float(line[1][1:])
+                new_z = np.float(line[1][1:])
                 self.actual_z = "%.2f" % new_z
                 self.last_point[2] = new_z
                 return
             elif 'F' in line[1]:
-                self.speed = float(line[1][1:])
+                self.speed = np.float(line[1][1:])
             elif len(line) < 4:
                 return
             elif 'X' in line[1] and 'Y' in line[2] and not ('E' in line[3]) and 'F' in line[3] and not (
                     'intro' in comment_line[0] and 'line' in comment_line[1]):
                 # elif 'X' in line[1] and 'Y' in line[2] and not ('E' in line[3]) and 'F' in line[3]:
                 # Move point
-                self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
-                if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[3][1:]), line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
+                if self.last_point.any():
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[3][1:]), line_number=line_number)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
             elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3] and not (
                     'intro' in comment_line[0] and 'line' in comment_line[1]):
                 # elif 'X' in line[1] and 'Y' in line[2] and 'E' in line[3]:
                 # Extrusion point
-                self.actual_point = [float(line[1][1:]), float(line[2][1:]), float(self.actual_z)]
-                self.extrusion = float(line[3][1:])
-                if self.last_point:
-                    if float(line[3][1:]) > 0.:
+                self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
+                self.extrusion = np.float(line[3][1:])
+                if self.last_point.any():
+                    if np.float(line[3][1:]) > 0.:
                         if len(comment_line) > 0:
                             if 'infill' in comment_line[0]:
                                 type = 'E-i'
@@ -486,17 +507,17 @@ class GcodeParserRunner(QObject):
                         type = 'M'
 
                     self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
             elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3] and not (
                     'intro' in comment_line[0] and 'line' in comment_line[1]):
                 # elif 'X' in line[1] and 'E' in line[2] and 'F' in line[3]:
                 # Extrusion point
-                self.actual_point[0] = float(line[1][1:])
-                self.extrusion = float(line[2][1:])
-                if self.last_point:
-                    if float(line[2][1:]) > 0.:
+                self.actual_point[0] = np.float(line[1][1:])
+                self.extrusion = np.float(line[2][1:])
+                if self.last_point.any():
+                    if np.float(line[2][1:]) > 0.:
                         if len(comment_line) > 0:
                             if 'infill' in comment_line[0]:
                                 type = 'E-i'
@@ -512,20 +533,20 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, float(line[3][1:]), self.extrusion, line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, np.float(line[3][1:]), self.extrusion, line_number=line_number)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
             elif 'Y' in line[1] and 'F' in line[2] and not ('go' in comment_line[0] and 'outside' in comment_line[1]):
                 # elif 'Y' in line[1] and 'F' in line[2]:
                 # Move point
-                self.actual_point[1] = float(line[1][1:])
+                self.actual_point[1] = np.float(line[1][1:])
 
-                if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', float(line[2][1:]), line_number=line_number)
-                    self.last_point = deepcopy(self.actual_point)
+                if self.last_point.any():
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[2][1:]), line_number=line_number)
+                    self.last_point = np.array(self.actual_point)
                 else:
-                    self.last_point = deepcopy(self.actual_point)
+                    self.last_point = np.array(self.actual_point)
 
         return
 
@@ -535,20 +556,23 @@ class GcodeParserRunner(QObject):
             self.data[key].append([first_point, second_point, type, speed, extrusion, line_number])
             self.all_data.append([first_point, second_point, type, speed, extrusion, line_number])
         else:
-            self.data_keys.append(key)
+            self.data_keys.add(key)
             self.data[key] = []
             self.data[key].append([first_point, second_point, type, speed, extrusion, line_number])
             self.all_data.append([first_point, second_point, type, speed, extrusion, line_number])
 
 
 
+
+    '''
     def add_point(self, x, y, z, actual_z):
         key = actual_z
         if key in self.data_keys:
             self.data[key].append([x, y, z])
             self.all_data.append([x, y, z])
         else:
-            self.data_keys.append(key)
+            self.data_keys.add(key)
             self.data[key] = []
             self.data[key].append([x, y, z])
             self.all_data.append([x, y, z])
+    '''
