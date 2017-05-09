@@ -312,6 +312,10 @@ class AppParameters(object):
         return string_out
 
     def internet_on(self):
+        #Some bug with ssl certificates on this platform
+        #TODO:Find some workaround
+        if self.system_platform in ['Darwin']:
+            return False
         try:
             urlopen('http://google.com', timeout=1)
             return True
