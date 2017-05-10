@@ -16,10 +16,10 @@ OPTIONS = {'argv_emulation': True,
 		'CFBundleName': APP_NAME,
 		'CFBundleDisplayName': APP_NAME,
 		'CFBundleGetInfoString': '3D printing tool',
-		'CFBundleIdentifier': 'com.prusa3d.osx.prusacontroll',
-		'CFBundleVersion': '0.1.0',
-		'CFBundleShortVersion': '0.1.0',
-		'NSHumanReadebleCopyright': u"Copyleft (c) 2016, Tibor Vavra"
+		'CFBundleIdentifier': 'com.prusa3d.osx.prusacontrol',
+		'CFBundleVersion': '0.9.2',
+		'CFBundleShortVersion': '0.9.2',
+		'NSHumanReadebleCopyright': u"Copyleft (c) 2017, Tibor Vavra"
 	}
 }
 

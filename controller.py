@@ -155,6 +155,8 @@ class Controller(QObject):
         self.models_selected = False
         self.advance_settings = False
 
+        self.analyze_result = {}
+
         self.app = app
         self.app_parameters = app.arguments()
         #calculate dpi coeficient for scale of widgets
@@ -173,8 +175,6 @@ class Controller(QObject):
         self.view = PrusaControlView(self)
 
         progress_bar.setValue(92)
-
-        self.analyze_result = {}
 
         self.tools = self.view.get_tool_buttons()
         self.tool = ''
