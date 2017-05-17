@@ -15,6 +15,7 @@ from sceneRender import *
 import logging
 import cProfile
 import os
+import platform
 #import shutil
 
 
@@ -25,12 +26,13 @@ DEBUG = False
 class EventLoopRunner(QObject):
     finished = pyqtSignal()
 
-    def __init__(self, app):
+    def __init__(self, app, base_path=""):
         super(EventLoopRunner, self).__init__()
+        self.base_path = base_path
         self.app = app
         self.version = ""
 
-        with __builtins__.open("data/v.txt", 'r') as version_file:
+        with __builtins__.open(self.base_path + "data/v.txt", 'r') as version_file:
             self.version_full = version_file.read()
             self.version = AppParameters.strip_version_string(self.version_full)
 
@@ -43,10 +45,10 @@ class EventLoopRunner(QObject):
         self.initializeGUI()
 
     def initializeGUI(self):
-        self.css = QFile('data/my_stylesheet.css')
+        self.css = QFile(self.base_path + 'data/my_stylesheet.css')
         self.css.open(QIODevice.ReadOnly)
 
-        self.splash_pix = QPixmap('data/img/splashscreen.png')
+        self.splash_pix = QPixmap(self.base_path + 'data/img/splashscreen.png')
         self.splash = QSplashScreen(self.splash_pix, Qt.SplashScreen | Qt.WindowStaysOnTopHint)
 
         self.progressBar = QProgressBar(self.splash)
@@ -77,6 +79,19 @@ def log_exception(excType, excValue, traceback):
     sys.__excepthook__(excType, excValue, traceback)
 
 def main():
+    if getattr(sys, 'frozen', False):
+        # it is freeze app
+        base_dir = sys._MEIPASS
+    else:
+        # we are running in a normal Python environment
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    system_platform = platform.system()
+    if system_platform in ['Windows']:
+        base_dir+='\\'
+    else:
+        base_dir+='/'
+
     sys.excepthook = log_exception
 
     app = QApplication(sys.argv)
@@ -86,17 +101,17 @@ def main():
 
     dpi = app.desktop().logicalDpiX()
 
-    app.setWindowIcon(QIcon("data/icon/favicon.ico"))
+    app.setWindowIcon(QIcon(base_dir + "data/icon/favicon.ico"))
     if dpi==96:
-        file = QFile("data/my_stylesheet.qss")
+        file = QFile(base_dir + "data/my_stylesheet.qss")
     else:
-        file = QFile("data/my_stylesheet_without_f.qss")
+        file = QFile(base_dir + "data/my_stylesheet_without_f.qss")
     file.open(QFile.ReadOnly)
     StyleSheet = str(file.readAll(), 'utf-8')
 
     app.setStyleSheet(StyleSheet)
 
-    event_loop_runner = EventLoopRunner(app)
+    event_loop_runner = EventLoopRunner(app, base_dir)
     event_loop_runner_thread = QThread()
     event_loop_runner.moveToThread(event_loop_runner_thread)
     event_loop_runner_thread.started.connect(event_loop_runner.process_event_loop)
@@ -105,9 +120,9 @@ def main():
 
     event_loop_runner_thread.start()
 
-    local_path = os.path.realpath(__file__)
+    #local_path = os.path.realpath(__file__)
 
-    controller = Controller(app, local_path, progressBar)
+    controller = Controller(app, base_dir, progressBar)
     progressBar.setValue(100)
     window = controller.get_view()
 

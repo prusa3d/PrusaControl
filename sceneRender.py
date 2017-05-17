@@ -266,67 +266,67 @@ class GLWidget(QGLWidget):
 
     def initializeGL(self):
         #load textures
-        self.image_background = self.texture_from_png("data/img/background.png")
-        self.catching_point = self.texture_from_png("data/img/gui/slider_knob_2.png")
+        self.image_background = self.texture_from_png(self.controller.app_config.local_path + "data/img/background.png")
+        self.catching_point = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/slider_knob_2.png")
 
 
         #tools
         #self.selectTool = GlButton(self.texture_from_png("data/img/select_ns.png"), [3.,3.], [95.5, 18])
         #self.moveTool = GlButton(self.texture_from_png("data/img/move_ns.png"), [3.,3.], [95.5, 12.])
-        self.scaleTool = GlButton(self.texture_from_png("data/img/gui/scale_off.png"),
-                                  self.texture_from_png("data/img/gui/scale_on.png"),
-                                  self.texture_from_png("data/img/gui/scale_hover.png"),
-                                  self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.scaleTool = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/scale_off.png"),
+                                  self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/scale_on.png"),
+                                  self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/scale_hover.png"),
+                                  self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
         #                          [40., 40.], [10., -200.], False,
                                   [40., 40.], [10., -245.], False,
                                   self.tr("Scale tool"),'scale')
 
-        self.placeOnFaceTool = GlButton(self.texture_from_png("data/img/gui/placeonface_off.png"),
-                                        self.texture_from_png("data/img/gui/placeonface_on.png"),
-                                        self.texture_from_png("data/img/gui/placeonface_hover.png"),
-                                        self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.placeOnFaceTool = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/placeonface_off.png"),
+                                        self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/placeonface_on.png"),
+                                        self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/placeonface_hover.png"),
+                                        self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -245.], False,
                                         self.tr("Place on face tool"), 'placeonface')
 
-        self.rotateTool = GlButton(self.texture_from_png("data/img/gui/rotate_off.png"),
-                                   self.texture_from_png("data/img/gui/rotate_on.png"),
-                                   self.texture_from_png("data/img/gui/rotate_hover.png"),
-                                   self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.rotateTool = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/rotate_off.png"),
+                                   self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/rotate_on.png"),
+                                   self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/rotate_hover.png"),
+                                   self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                    [40., 40.], [10., -290.], False,
                                    self.tr("Rotate tool"), 'rotate')
-        self.organize_tool = GlButton(self.texture_from_png("data/img/gui/organize_off.png"),
-                                        self.texture_from_png("data/img/gui/organize_on.png"),
-                                        self.texture_from_png("data/img/gui/organize_hover.png"),
-                                        self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.organize_tool = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/organize_off.png"),
+                                        self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/organize_on.png"),
+                                        self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/organize_hover.png"),
+                                        self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                         [40., 40.], [10., -335.], True,
                                       self.tr("Arrange tool"), 'organize')
-        self.multiply_tool = GlButton(self.texture_from_png("data/img/gui/multi_off.png"),
-                                      self.texture_from_png("data/img/gui/multi_on.png"),
-                                      self.texture_from_png("data/img/gui/multi_hover.png"),
-                                      self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.multiply_tool = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/multi_off.png"),
+                                      self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/multi_on.png"),
+                                      self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/multi_hover.png"),
+                                      self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                       [40., 40.], [10., -380.], False,
                                       self.tr("Multiplication tool"), 'multi')
 
-        self.support_tool = GlButton(self.texture_from_png("data/img/gui/support_off.png"),
-                                      self.texture_from_png("data/img/gui/support_on.png"),
-                                      self.texture_from_png("data/img/gui/support_hover.png"),
-                                      self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.support_tool = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/support_off.png"),
+                                      self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/support_on.png"),
+                                      self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/support_hover.png"),
+                                      self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                       [40., 40.], [10., -425.], False,
                                       self.tr("Support tool"), 'support')
 
 
 
         #back, forward buttons
-        self.undo_button = GlButton(self.texture_from_png("data/img/gui/backarrow_off.png"),
-                                    self.texture_from_png("data/img/gui/backarrow_on.png"),
-                                    self.texture_from_png("data/img/gui/backarrow_hover.png"),
-                                    self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.undo_button = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/backarrow_off.png"),
+                                    self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/backarrow_on.png"),
+                                    self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/backarrow_hover.png"),
+                                    self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                     [40., 40.], [10, -50], True,
                                     self.tr("Undo"), "undo")
-        self.do_button = GlButton(self.texture_from_png("data/img/gui/forwardarrow_off.png"),
-                                  self.texture_from_png("data/img/gui/forwardarrow_on.png"),
-                                  self.texture_from_png("data/img/gui/forwardarrow_hover.png"),
-                                  self.texture_from_png("data/img/gui/tool_mask.png"),
+        self.do_button = GlButton(self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/forwardarrow_off.png"),
+                                  self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/forwardarrow_on.png"),
+                                  self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/forwardarrow_hover.png"),
+                                  self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png"),
                                   [40., 40.], [60, -50], True,
                                   self.tr("Redo"), "redo")
 
@@ -344,8 +344,8 @@ class GLWidget(QGLWidget):
         self.do_button.set_callback(self.controller.do_button_pressed)
 
 
-        self.tool_background = self.texture_from_png("data/img/tool_background.png")
-        self.popup_widget = self.texture_from_png("data/img/gui/popup_window.png")
+        self.tool_background = self.texture_from_png(self.controller.app_config.local_path + "data/img/tool_background.png")
+        self.popup_widget = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/popup_window.png")
 
 
         #self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
@@ -405,16 +405,16 @@ class GLWidget(QGLWidget):
 
 
 
-        if self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/lightning.vert") \
-                and self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/lightning.frag"):
+        if self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Vertex, self.controller.app_config.local_path + "data/shaders/lightning.vert") \
+                and self.lightning_shader_program.addShaderFromSourceFile(QGLShader.Fragment, self.controller.app_config.local_path + "data/shaders/lightning.frag"):
             self.lightning_shader_program.link()
             if not self.lightning_shader_program.log():
                 self.lightning_shader_ok = True
             self.lightning_shader_program.release()
 
 
-        if self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Vertex, "data/shaders/variable_height_slic3r.vert") \
-                and self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Fragment, "data/shaders/variable_height_slic3r.frag"):
+        if self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Vertex, self.controller.app_config.local_path + "data/shaders/variable_height_slic3r.vert") \
+                and self.variable_layer_shader_program.addShaderFromSourceFile(QGLShader.Fragment, self.controller.app_config.local_path + "data/shaders/variable_height_slic3r.frag"):
             self.variable_layer_shader_program.link()
             if not self.variable_layer_shader_program.log():
                 self.variable_layer_shader_ok = True
@@ -1330,13 +1330,13 @@ class GLWidget(QGLWidget):
     def make_printing_bed(self, printer_data):
         #print("Printer data: " + str(printer_data))
         #Model = ModelTypeStl.load(printer_data['model'])
-        Model = ModelTypeObj.load(printer_data['model'])
+        Model = ModelTypeObj.load(self.controller.app_config.local_path + printer_data['model'])
         bed_texture = printer_data['texture']
         bed_texture_from_below = printer_data['texture_from_below']
         printing_space = printer_data['printing_space']
 
-        image_hotbed = self.texture_from_png(bed_texture)
-        image_hotbed_from_below = self.texture_from_png(bed_texture_from_below)
+        image_hotbed = self.texture_from_png(self.controller.app_config.local_path + bed_texture)
+        image_hotbed_from_below = self.texture_from_png(self.controller.app_config.local_path + bed_texture_from_below)
 
 
         genList_top = glGenLists(1)

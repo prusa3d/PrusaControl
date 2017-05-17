@@ -56,7 +56,7 @@ class Controller(QObject):
         self.view = []
 
         #this flag is only for development only, Development = True, Production = False
-        self.development_flag = False
+        self.development_flag = True
         progress_bar.setValue(10)
 
         self.app_config = AppParameters(self, local_path)
