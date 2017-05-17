@@ -638,7 +638,9 @@ class AboutDialog(QDialog):
         self.prusa_control_label = QLabel("PrusaControl")
         self.prusa_control_label.setAlignment(Qt.AlignCenter)
 
-        self.prusa_control_text = QLabel(controller.view.tr("Created by Tibor Vavra for Prusa Research s.r.o."))
+        self.prusa_control_text = QLabel(controller.view.tr("PrusaControl\nTibor Vavra, Prusa Research\nDominik Cisar, Prusa Research\n\nSlic3r engine\nVojtech Bubnik, Prusa Research\nAlessandro Ranellucci"))
+
+
 
         self.local_version_label = QLabel(controller.view.tr("PrusaControl version is ") + str(self.your_version))
         self.slic3r_engine_version_label = QLabel(controller.view.tr("Slic3r engine version is ") + str(self.slic3r_version))
@@ -720,7 +722,7 @@ class PrusaControlView(QMainWindow):
         self.restoreState(self.settings.value("windowState", ""))
 
         #print("font load of PrusaControlView")
-        font_id = QFontDatabase.addApplicationFont("data/font/TitilliumWeb-Light.ttf")
+        font_id = QFontDatabase.addApplicationFont(self.controller.app_config.local_path + "data/font/TitilliumWeb-Light.ttf")
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         self.font = QFont(font_family)
         self.setFont(self.font)
@@ -729,18 +731,9 @@ class PrusaControlView(QMainWindow):
         self.setAcceptDrops(True)
 
         self.is_setting_panel_opened = True
-        #self.setStyleSheet()
 
-        #print("basic settings of PrusaControlView")
         self.setObjectName('PrusaControlView')
-        #css = QFile('data/my_stylesheet.css')
-        #css.open(QIODevice.ReadOnly)
 
-        #if css.isOpen():
-        #    self.setStyleSheet(QVariant(css.readAll()).toString())
-        #    css.close()
-
-        #print("some constants")
 
         self.infillValue = 20
         self.changable_widgets = {}
