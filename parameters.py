@@ -210,7 +210,7 @@ class AppParameters(object):
 
         # read from version.txt
         #try:
-        with open("data/v.txt", 'r') as version_file:
+        with open(self.local_path + "data/v.txt", 'r') as version_file:
             self.version_full = version_file.read()
             self.version = self.strip_version_string(self.version_full)
                 #print("in version file: " + self.version)
