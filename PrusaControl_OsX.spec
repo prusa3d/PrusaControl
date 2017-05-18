@@ -1,4 +1,5 @@
 # -*- mode: python -*-
+# /opt/local/Library/Frameworks/Python.framework/Versions/3.5/bin/pyinstaller PrusaControl_OsX.spec
 
 block_cipher = None
 
