@@ -139,10 +139,17 @@ def main():
 
 
 if __name__ == '__main__':
+    system_platform = platform.system()
+    log_path = "/"
+    if system_platform in ['Windows']:
+        log_path = "\\"
+    else:
+        log_path = "/"
     FORMAT = "[%(levelname)s][%(filename)s:%(lineno)s:%(funcName)s()]-%(message)s"
-    logging.basicConfig(filename=os.path.expanduser("~\\prusacontrol.log"), format=FORMAT, filemode='w', level=logging.DEBUG)
 
     if DEBUG:
+        logging.basicConfig(filename=os.path.expanduser("~" + log_path + "prusacontrol.log"), format=FORMAT, filemode='w', level=logging.DEBUG)
         cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
     else:
+        logging.basicConfig(filename=os.path.expanduser("~" + log_path + "prusacontrol.log"), format=FORMAT, filemode='w', level=logging.WARNING)
         main()
