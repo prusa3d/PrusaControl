@@ -7,11 +7,11 @@ import sys
 sys.modules['FixTk'] = None
 
 a = Analysis(['main.py'],
-             pathex=['/Users/prusa3d/Documents/projects/tmp/PrusaControl'],
+             pathex=['/Users/prusa3d/Documents/projects/buildbot-slave/PrusaControl_OsX/build'],
              binaries=[],
              datas=[
-             ('/Users/prusa3d/Documents/projects/tmp/prusacontrol/data', 'data'),
-             ('/Users/prusa3d/Documents/projects/tmp/prusacontrol/translation', 'translation')],
+             ('/Users/prusa3d/Documents/projects/buildbot-slave/PrusaControl_OsX/build/data', 'data'),
+             ('/Users/prusa3d/Documents/projects/buildbot-slave/PrusaControl_OsX/build/translation', 'translation')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -38,5 +38,5 @@ coll = COLLECT(exe,
                name='PrusaControl')
 app = BUNDLE(coll,
              name='PrusaControl.app',
-             icon='/Users/prusa3d/Documents/projects/tmp/prusacontrol/data/icon/favicon.ico',
+             icon='/Users/prusa3d/Documents/projects/buildbot-slave/PrusaControl_OsX/build/data/icon/favicon.ico',
              bundle_identifier=None)
