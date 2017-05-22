@@ -102,8 +102,11 @@ def main():
     dpi = app.desktop().logicalDpiX()
 
     app.setWindowIcon(QIcon(base_dir + "data/icon/favicon.ico"))
-    if dpi==96:
+    print("Dpi je: " + str(dpi))
+    if dpi == 96:
         file = QFile(base_dir + "data/my_stylesheet.qss")
+    elif dpi == 72:
+        file = QFile(base_dir + "data/my_stylesheet_72.qss")
     else:
         file = QFile(base_dir + "data/my_stylesheet_without_f.qss")
     file.open(QFile.ReadOnly)

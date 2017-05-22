@@ -1002,7 +1002,7 @@ class PrusaControlView(QMainWindow):
         #self.right_panel_layout = QtGui.QFormLayout()
         self.right_panel_layout = QVBoxLayout()
         self.right_panel_layout.setObjectName('right_panel_layout')
-        self.right_panel_layout.setSpacing(5)
+        #self.right_panel_layout.setSpacing(5)
         self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
         #self.right_panel_layout.setMargin(0)
         #self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
@@ -1170,7 +1170,7 @@ class PrusaControlView(QMainWindow):
 
         self.right_panel.setLayout(self.right_panel_layout)
         self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
-        self.right_panel.setMaximumWidth((int)(275 * self.controller.dpi_coef))
+        #self.right_panel.setMaximumWidth((int)(275 * self.controller.dpi_coef))
 
         #print("Sirka praveho panelu: " + str(self.right_panel.width()))
         self.transformation_reset_b.move((int)((self.right_panel.width() - 3) * self.controller.dpi_coef),
