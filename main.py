@@ -95,6 +95,7 @@ def main():
     sys.excepthook = log_exception
 
     app = QApplication(sys.argv)
+    app.setStyle(QtGui.QStyleFactory.create('Plastique'))
     app.setApplicationName("PrusaControl")
     app.setOrganizationName("Prusa Research")
     app.setOrganizationDomain("prusa3d.com")
