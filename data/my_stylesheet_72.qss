@@ -582,7 +582,7 @@ QDoubleSpinBox::down-button:pressed{
     image: url(data/img/gui/arrow_down_objectadjust_on.png);
 }
 
-
+/*
 QCheckBox {
     spacing: 5px;
     font-size: 10px;
@@ -592,9 +592,10 @@ QCheckBox::indicator {
     width: 42px;
     height: 17px;
 }
+*/
 
 QCheckBox::indicator:checked:hover {
-    image: url(data/img/gui/checkbox_on_hover.png);
+    image: url(base_dirdata/img/gui/checkbox_on_hover.png);
 }
 
 QCheckBox#brimCheckBox::indicator:unchecked {
@@ -603,37 +604,37 @@ QCheckBox#brimCheckBox::indicator:unchecked {
 
 
 QCheckBox#brimCheckBox::indicator:unchecked:hover {
-    image: url(data/img/gui/checkbox_dark_off_hover.png);
+    image: url(base_dirdata/img/gui/checkbox_dark_off_hover.png);
 }
 
 QCheckBox::indicator:unchecked {
-    image: url(data/img/gui/checkbox_off.png);
+    image: url(base_dirdata/img/gui/checkbox_off.png);
+    /*image: url(base_dirdata/img/gui/colorchange_delete_on.png);*/
     color: rgb(0,0,0);
 }
 
 QCheckBox::indicator:checked {
-    image: url(data/img/gui/checkbox_on.png);
+    image: url(base_dirdata/img/gui/checkbox_on.png);
 }
 
 QCheckBox::indicator:checked:disabled {
-    /*image: url(data/img/gui/Disable_checkbox_On.png);*/
-    image: url(data/img/gui/checkbox_on_disabled.png);
+    image: url(base_dirdata/img/gui/checkbox_on_disabled.png);
     color: rgb(0,0,0);
     background-color: transparent;
 }
 
 QCheckBox::indicator:unchecked:disabled {
-    image: url(data/img/gui/disable_checkbox_off.png);
+    image: url(base_dirdata/img/gui/disable_checkbox_off.png);
     color: rgb(0,0,0);
     background-color: transparent;
 }
 
 QCheckBox::indicator:unchecked:hover {
-    image: url(data/img/gui/checkbox_off_hover.png);
+    image: url(base_dirdata/img/gui/checkbox_off_hover.png);
 }
 
 QCheckBox#brimCheckBox::indicator:unchecked:disabled {
-    image: url(data/img/gui/checkbox_dark_off_disabled.png);
+    image: url(base_dirdata/img/gui/checkbox_dark_off_disabled.png);
 }
 
 
@@ -648,25 +649,25 @@ QCheckBox#lock_axis_checkbox::indicator {
 }
 
 QCheckBox#lock_axis_checkbox::indicator:checked {
-    image: url(data/img/gui/scalelock_on.png);
+    image: url(base_dirdata/img/gui/scalelock_on.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked {
-    image: url(data/img/gui/scalelock_off.png);
+    image: url(base_dirdata/img/gui/scalelock_off.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:checked:hover {
-    image: url(data/img/gui/scalelock_on_hover.png);
+    image: url(base_dirdata/img/gui/scalelock_on_hover.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked:hover {
-    image: url(data/img/gui/scalelock_off_hover.png);
+    image: url(base_dirdata/img/gui/scalelock_off_hover.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:checked:disabled {
-    image: url(data/img/gui/scalelock_on_disabled.png);
+    image: url(base_dirdata/img/gui/scalelock_on_disabled.png);
 }
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked:disabled {
-    image: url(data/img/gui/scalelock_off_disabled.png);
+    image: url(base_dirdata/img/gui/scalelock_off_disabled.png);
 }

@@ -21,7 +21,7 @@ import platform
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = False
+DEBUG = True
 
 class EventLoopRunner(QObject):
     finished = pyqtSignal()
@@ -45,7 +45,7 @@ class EventLoopRunner(QObject):
         self.initializeGUI()
 
     def initializeGUI(self):
-        self.css = QFile(self.base_path + 'data/my_stylesheet.css')
+        self.css = QFile(self.base_path + 'data/my_stylesheet.qss')
         self.css.open(QIODevice.ReadOnly)
 
         self.splash_pix = QPixmap(self.base_path + 'data/img/splashscreen.png')
@@ -78,6 +78,8 @@ def log_exception(excType, excValue, traceback):
 
     sys.__excepthook__(excType, excValue, traceback)
 
+
+
 def main():
     if getattr(sys, 'frozen', False):
         # it is freeze app
@@ -95,7 +97,7 @@ def main():
     sys.excepthook = log_exception
 
     app = QApplication(sys.argv)
-    app.setStyle(QtGui.QStyleFactory.create('Plastique')) 
+     
     app.setApplicationName("PrusaControl")
     app.setOrganizationName("Prusa Research")
     app.setOrganizationDomain("prusa3d.com")
@@ -111,9 +113,13 @@ def main():
     else:
         file = QFile(base_dir + "data/my_stylesheet_without_f.qss")
     file.open(QFile.ReadOnly)
-    StyleSheet = str(file.readAll(), 'utf-8')
+    StyleSheet_tmp = str(file.readAll(), 'utf-8')
+    StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir)
 
     app.setStyleSheet(StyleSheet)
+    app.setStyle(QStyleFactory.create("Windows"))
+    
+    
 
     event_loop_runner = EventLoopRunner(app, base_dir)
     event_loop_runner_thread = QThread()
@@ -153,7 +159,8 @@ if __name__ == '__main__':
 
     if DEBUG:
         logging.basicConfig(filename=os.path.expanduser("~" + log_path + "prusacontrol.log"), format=FORMAT, filemode='w', level=logging.DEBUG)
-        cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
+        #cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
     else:
         logging.basicConfig(filename=os.path.expanduser("~" + log_path + "prusacontrol.log"), format=FORMAT, filemode='w', level=logging.WARNING)
-        main()
+    
+    main()
