@@ -486,10 +486,13 @@ class Controller(QObject):
         self.view.close_gcode_view()
 
     def set_language(self, language):
-        full_name = 'translation/' + language + '.qm'
+        full_name = self.app_config.local_path + 'translation/' + language + '.qm'
         self.translate_app(full_name)
 
-    def translate_app(self, translation="translation/en_US.qm"):
+    def translate_app(self, translation=""):
+        if translation == "":
+            translation = self.app_config.local_path + "translation/en_US.qm"
+
         self.translator.load(translation)
         self.app.installTranslator(self.translator)
         if self.view:

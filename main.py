@@ -84,9 +84,11 @@ def main():
     if getattr(sys, 'frozen', False):
         # it is freeze app
         base_dir = sys._MEIPASS
+        base_dir_with = sys._MEIPASS
     else:
         # we are running in a normal Python environment
         base_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir_with = os.path.dirname(os.path.abspath(__file__))
 
     system_platform = platform.system()
     if system_platform in ['Windows']:
@@ -105,20 +107,21 @@ def main():
     dpi = app.desktop().logicalDpiX()
 
     app.setWindowIcon(QIcon(base_dir + "data/icon/favicon.ico"))
-    print("Dpi je: " + str(dpi))
+    #print("Dpi je: " + str(dpi))
     if dpi == 96:
         file = QFile(base_dir + "data/my_stylesheet.qss")
-    elif dpi == 72:
-        file = QFile(base_dir + "data/my_stylesheet_72.qss")
+    #elif dpi == 72:
+    #    file = QFile(base_dir + "data/my_stylesheet.qss")
     else:
         file = QFile(base_dir + "data/my_stylesheet_without_f.qss")
     file.open(QFile.ReadOnly)
-    StyleSheet_tmp = str(file.readAll(), 'utf-8')
-    StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir)
-
-    app.setStyleSheet(StyleSheet)
-    app.setStyle(QStyleFactory.create("Windows"))
     
+    StyleSheet_tmp = str(file.readAll(), 'utf-8')
+    StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir_with)
+
+    app.setStyle(QStyleFactory.create("windows"))
+    app.setStyleSheet(StyleSheet)
+   
     
 
     event_loop_runner = EventLoopRunner(app, base_dir)

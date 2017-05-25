@@ -1132,6 +1132,7 @@ class PrusaControlView(QMainWindow):
         printing_parameters_layout = QGridLayout()
         #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
+
         printing_parameters_layout.addWidget(self.materials_settings_l, 0, 0, 1, 3)
         printing_parameters_layout.addWidget(self.extruder1_l, 1, 0)
         printing_parameters_layout.addWidget(self.extruder1_c, 1, 1, 1, 3)
@@ -1154,6 +1155,7 @@ class PrusaControlView(QMainWindow):
         printing_parameters_layout.addWidget(self.supportCombo, 10, 1, 1, 3)
         printing_parameters_layout.addWidget(self.brim_label, 11, 0)
         printing_parameters_layout.addWidget(self.brimCheckBox, 11, 1, 1, 3)
+        printing_parameters_layout.setColumnMinimumWidth(1, 150)
 
         self.right_panel_layout.addLayout(printing_parameters_layout)
 
@@ -1169,8 +1171,9 @@ class PrusaControlView(QMainWindow):
         self.right_panel_layout.addSpacerItem(QSpacerItem(0, 5, QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.right_panel.setLayout(self.right_panel_layout)
-        self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
-        #self.right_panel.setMaximumWidth((int)(275 * self.controller.dpi_coef))
+        self.right_panel.setFixedWidth((int) (300*self.controller.dpi_coef))
+        #self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
+        #self.right_panel.setMaximumWidth((int)(350 * self.controller.dpi_coef))
 
         #print("Sirka praveho panelu: " + str(self.right_panel.width()))
         self.transformation_reset_b.move((int)((self.right_panel.width() - 3) * self.controller.dpi_coef),
