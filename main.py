@@ -84,11 +84,9 @@ def main():
     if getattr(sys, 'frozen', False):
         # it is freeze app
         base_dir = sys._MEIPASS
-        base_dir_with = sys._MEIPASS
     else:
         # we are running in a normal Python environment
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        base_dir_with = os.path.dirname(os.path.abspath(__file__))
 
     system_platform = platform.system()
     if system_platform in ['Windows']:
@@ -117,7 +115,10 @@ def main():
     file.open(QFile.ReadOnly)
     
     StyleSheet_tmp = str(file.readAll(), 'utf-8')
-    StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir_with)
+    if system_platform in ['Windows']:
+        StyleSheet = StyleSheet_tmp.replace('base_dir', "")
+    else:
+        StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir)
 
     app.setStyle(QStyleFactory.create("windows"))
     app.setStyleSheet(StyleSheet)

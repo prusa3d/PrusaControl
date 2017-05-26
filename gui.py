@@ -1171,9 +1171,9 @@ class PrusaControlView(QMainWindow):
         self.right_panel_layout.addSpacerItem(QSpacerItem(0, 5, QSizePolicy.Minimum, QSizePolicy.Minimum))
 
         self.right_panel.setLayout(self.right_panel_layout)
-        self.right_panel.setFixedWidth((int) (300*self.controller.dpi_coef))
-        #self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
-        #self.right_panel.setMaximumWidth((int)(350 * self.controller.dpi_coef))
+        #self.right_panel.setFixedWidth((int) (300*self.controller.dpi_coef))
+        self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
+        self.right_panel.setMaximumWidth((int)(350 * self.controller.dpi_coef))
 
         #print("Sirka praveho panelu: " + str(self.right_panel.width()))
         self.transformation_reset_b.move((int)((self.right_panel.width() - 3) * self.controller.dpi_coef),
