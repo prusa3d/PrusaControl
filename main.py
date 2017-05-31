@@ -105,7 +105,6 @@ def main():
     dpi = app.desktop().logicalDpiX()
 
     app.setWindowIcon(QIcon(base_dir + "data/icon/favicon.ico"))
-    #print("Dpi je: " + str(dpi))
     if dpi == 96:
         file = QFile(base_dir + "data/my_stylesheet.qss")
     #elif dpi == 72:
@@ -120,7 +119,8 @@ def main():
     else:
         StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir)
 
-    app.setStyle(QStyleFactory.create("windows"))
+    if not system_platform in ['Windows']:
+        app.setStyle(QStyleFactory.create("windows"))
     app.setStyleSheet(StyleSheet)
    
     

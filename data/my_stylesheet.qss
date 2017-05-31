@@ -390,7 +390,6 @@ QPushButton#variable_hight_plus_button,
 QPushButton#variable_hight_plus_button:pressed,
 QPushButton#variable_hight_plus_button:flat
 {
-    /*image: url(base_dirdata/img/gui/plusButton.png);*/
     image: url(base_dirdata/img/gui/colorchange_add_off.png);
     background-color: transparent;
     height: 19px;
@@ -431,13 +430,10 @@ QPushButton#variable_hight_plus_button:hover
 QPushButton#transformation_reset_b,
 QPushButton#transformation_reset_b:flat
 {
-    /*image: url(base_dirdata/img/gui/plusButton.png);*/
     image: url(base_dirdata/img/gui/reset_light_normal_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
-    /*padding-left: 0px;
-    padding-top: 15px;*/
     height: 19px;
     width: 19px;
     border-width: 0px;
@@ -461,8 +457,6 @@ QPushButton#transformation_reset_b:hover
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
-    /*padding-left: 0px;
-    padding-top: 15px;*/
     height: 19px;
     width: 19px;
     border-width: 0px;
@@ -470,13 +464,10 @@ QPushButton#transformation_reset_b:hover
 
 QPushButton#transformation_reset_b:disabled
 {
-    /*image: url(base_dirdata/img/gui/plusButton.png);*/
     image: url(base_dirdata/img/gui/reset_light_dissabled_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
-    /*padding-left: 0px;
-    padding-top: 15px;*/
     height: 19px;
     width: 19px;
     border-width: 0px;
@@ -613,7 +604,6 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:checked:disabled {
-    /*image: url(base_dirdata/img/gui/Disable_checkbox_On.png);*/
     image: url(base_dirdata/img/gui/checkbox_on_disabled.png);
     color: rgb(0,0,0);
     background-color: transparent;
