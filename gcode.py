@@ -84,7 +84,7 @@ class GCode(object):
             line = self.data[i]
             for o in line:
                 _a, _b, type, _speed, _extr, line_n = o
-                if 'E' in self.line_type(type):
+                if 'E' in type:
                     lines_number.append(line_n)
                     break
 
@@ -254,7 +254,7 @@ class GcodeParserRunner(QObject):
     def load_gcode_file_with_profile(self):
         cProfile.runctx('self.load_gcode_file()', globals(), locals(), 'gcode_parser.profile')
 
-    @timing
+    #@timing
     def load_gcode_file(self):
         file = QFile(self.filename)
         file.open(QIODevice.ReadOnly | QIODevice.Text)
