@@ -11,8 +11,8 @@ a = Analysis(['main.py'],
              datas=[
              ('C:\\projects\\slave\\PrusaControl_Windows\\build\\data', 'data'),
              ('C:\\projects\\slave\\PrusaControl_Windows\\build\\translation', 'translation')
-             #,('C:\\projects\\slave\\PrusaControl_Windows\\build\\tools', 'tools'
-             )],
+             #,('C:\\projects\\slave\\PrusaControl_Windows\\build\\tools', 'tools')
+             ],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
