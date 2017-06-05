@@ -344,7 +344,7 @@ class GLWidget(QGLWidget):
         self.do_button.set_callback(self.controller.do_button_pressed)
 
 
-        self.tool_background = self.texture_from_png(self.controller.app_config.local_path + "data/img/tool_background.png")
+        self.tool_background = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png")
         self.popup_widget = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/popup_window.png")
 
 
