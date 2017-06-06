@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import cProfile
+
 import time
 #from fastnumbers import fast_float
 from collections import defaultdict
-from collections import deque
 from copy import deepcopy
 from pprint import pprint
 import os
@@ -17,15 +16,7 @@ from PyQt4.QtCore import QThread
 from PyQt4.QtCore import pyqtSignal
 
 
-#Mesure
-def timing(f):
-    def wrap(*args):
-        time1 = time.time()
-        ret = f(*args)
-        time2 = time.time()
-        print('%s function took %0.3f ms' % (f.__name__, (time2-time1)*1000.0))
-        return ret
-    return wrap
+
 
 class GCode(object):
 
@@ -33,7 +24,7 @@ class GCode(object):
         self.controller = controller
         self.done_loading_callback = done_loading_callback
         self.writing_done_callback = done_writing_callback
-        self.data = {}
+        self.data = defaultdict(list)
         self.all_data = []
         self.data_keys = set()
         self.color_change_data = []
@@ -61,7 +52,7 @@ class GCode(object):
 
 
     def cancel_parsing_gcode(self):
-        #print("Cancel presset")
+        print("Cancel presset")
         if self.gcode_parser and self.gcode_parser_thread and self.gcode_parser_thread.isRunning():
             self.gcode_parser.is_running = False
             self.gcode_parser_thread.quit()
@@ -73,7 +64,7 @@ class GCode(object):
         self.controller.set_progress_bar(0)
 
     def cancel_writing_gcode(self):
-        #print("Cancel writing gcode")
+        print("Cancel writing gcode")
         if self.gcode_copy and self.gcode_copy_thread and self.gcode_copy_thread.isRunning():
             self.gcode_copy.quit()
             self.gcode_copy_thread.wait()
@@ -90,14 +81,15 @@ class GCode(object):
 
         return lines_number
 
+
+
     def read_in_thread(self, update_progressbar_function, after_done_function):
-        #print("reading in thread")
+        print("reading in thread")
         self.gcode_parser.moveToThread(self.gcode_parser_thread)
         self.done_loading_callback = after_done_function
 
         # connect all signals to thread class
         self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file)
-        #self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file_with_profile)
         # connect all signals to parser class
         self.gcode_parser.finished.connect(self.set_finished_read)
         self.gcode_parser.set_update_progress.connect(update_progressbar_function)
@@ -159,6 +151,7 @@ class GCode(object):
         self.gcode_copy.set_update_progress.connect(update_function)
 
         self.gcode_copy_thread.start()
+
 
 
 
@@ -251,37 +244,26 @@ class GcodeParserRunner(QObject):
         self.printing_time = 0.0
         self.filament_length = 0.0
 
-    def load_gcode_file_with_profile(self):
-        cProfile.runctx('self.load_gcode_file()', globals(), locals(), 'gcode_parser.profile')
 
-    #@timing
+
     def load_gcode_file(self):
         file = QFile(self.filename)
         file.open(QIODevice.ReadOnly | QIODevice.Text)
         in_stream = QTextStream(file)
-        file_size = np.array([file.size()])
-        counter_size = int(file_size/800.)
-        #print(counter_size)
+        file_size = file.size()
         counter = 0
         line = 0
         line_number = 0
-
-        while in_stream.atEnd() is False and self.is_running is True:
-        #for line in in_stream.readAll():
-            if self.is_running is False:
-                break
+        while not in_stream.atEnd() and self.is_running is True:
 
             counter+=1
-            if self.set_update_progress and counter==counter_size:
+            if self.set_update_progress and counter==10000:
                 #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
-                progress = (in_stream.pos()*1./file_size) * 100.
+                progress = (in_stream.pos()*1./file_size*1.) * 100.
                 self.set_update_progress.emit(int(progress))
                 counter=0
 
             line = in_stream.readLine()
-
-            #print(line)
-            # self.process_line(line)
             bits = line.split(';', 1)
             if bits[0] == '':
                 line_number+=1
@@ -290,12 +272,13 @@ class GcodeParserRunner(QObject):
                 self.parse_g1_line(bits, line_number)
             else:
                 line_number += 1
+                continue
+            line_number += 1
 
-        if self.is_running == False:
+        if self.is_running is False:
             self.set_update_progress.emit(0)
 
         self.printing_time = self.calculate_time_of_print()
-        #self.printing_time = 0.
         self.filament_length = 0.0  # self.calculate_length_of_filament()
 
         ###
@@ -316,7 +299,6 @@ class GcodeParserRunner(QObject):
         self.data_keys = set()
         self.data_keys = set(self.data)
         self.data_keys = sorted(self.data_keys, key=float)
-        #self.data_keys.sort(key=lambda x: float(x))
 
 
         self.set_data_keys.emit(self.data_keys)
@@ -326,7 +308,7 @@ class GcodeParserRunner(QObject):
 
         self.finished.emit()
 
-    #@timing
+
     def calculate_time_of_print(self):
         time_of_print = 0.0
         all_data = self.all_data
@@ -373,7 +355,6 @@ class GcodeParserRunner(QObject):
 
         line = text.split(' ')
         line = list(filter(None, line))
-        #print(line)
 
         #print(comment)
         comment_line = comment.split(' ')
