@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+__author__ = 'Tibor Vavra'
+
 import time
 #from fastnumbers import fast_float
 from collections import defaultdict

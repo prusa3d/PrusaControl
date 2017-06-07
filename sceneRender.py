@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+__author__ = 'Tibor Vavra'
+
 #import inspect
 #import logging
 from copy import deepcopy

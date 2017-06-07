@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+__author__ = 'Tibor Vavra'
+
 import logging
 from collections import defaultdict
 
@@ -21,6 +24,7 @@ from pprint import pprint
 
 
 import OpenGL
+
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
 

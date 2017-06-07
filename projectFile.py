@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+__author__ = 'Tibor Vavra'
+
 import ast
 import logging
 from abc import ABCMeta, abstractmethod

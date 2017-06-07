@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import itertools
 import logging
 
+__author__ = 'Tibor Vavra'
 
 class GlButton(object):
 

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+__author__ = 'Tibor Vavra'
+
 import logging
 import math
 import os

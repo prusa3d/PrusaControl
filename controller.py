@@ -39,6 +39,7 @@ from copy import deepcopy
 #Mesure
 from slicer import SlicerEngineManager
 
+__author__ = 'Tibor Vavra'
 
 def timing(f):
     def wrap(*args):
