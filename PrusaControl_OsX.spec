@@ -39,7 +39,7 @@ coll = COLLECT(exe,
                name='PrusaControl')
 app = BUNDLE(coll,
              name='PrusaControl.app',
-             icon='/Users/prusa3d/Documents/projects/buildbot-slave/PrusaControl_OsX/build/data/icon/favicon.ico',
+             icon='/Users/prusa3d/Documents/projects/buildbot-slave/PrusaControl_OsX/build/data/icon/favicon.icns',
              bundle_identifier=None,
              info_plist={
                 'NSHighResolutionCapable': 'True'
