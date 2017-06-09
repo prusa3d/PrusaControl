@@ -690,7 +690,7 @@ class GLWidget(QGLWidget):
             position_y = 25
 
             if mes_max_len>51:
-                size_w = 400*self.controller.dpi_coef
+                size_w = 400 * self.controller.dpi_coef
             else:
                 size_w = 350 * self.controller.dpi_coef
             size_h = 180*self.controller.dpi_coef
@@ -715,11 +715,17 @@ class GLWidget(QGLWidget):
 
             glColor4f(1.,1.,1.,1.)
             font = self.controller.view.font
-            font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
+            if self.controller.app_config.system_platform in ['Darwin']:
+                font.setPointSize(28)
+            else:
+                font.setPointSize(25*self.controller.dpi_coef - self.controller.dpi_scale)
             #font.setPointSize(25)
             self.renderText(115*self.controller.dpi_coef, sH - 153*self.controller.dpi_coef, self.tr("WARNING"), font)
 
-            font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
+            if self.controller.app_config.system_platform in ['Darwin']:
+                font.setPointSize(10)
+            else:
+                font.setPointSize(8*self.controller.dpi_coef - self.controller.dpi_scale)
             #font.setPointSize(8)
             for n, message in enumerate(messages):
                 #Maximum of massages in warning box
@@ -792,10 +798,16 @@ class GLWidget(QGLWidget):
 
             glColor4f(1., 1., 1., 1.)
             font = self.controller.view.font
-            font.setPointSize(17 *self.controller.dpi_coef - self.controller.dpi_scale)
+            if self.controller.app_config.system_platform in ['Darwin']:
+                font.setPointSize(19)
+            else:
+                font.setPointSize(17 *self.controller.dpi_coef - self.controller.dpi_scale)
             self.renderText(position_x + 8, sH - position_y - size_h + 30, self.tr("PRINT INFO"), font)
 
-            font.setPointSize(9 *self.controller.dpi_coef - self.controller.dpi_scale)
+            if self.controller.app_config.system_platform in ['Darwin']:
+                font.setPointSize(11)
+            else:
+                font.setPointSize(9 *self.controller.dpi_coef - self.controller.dpi_scale)
 
             #header = '{:>20}{:>10}{:>14}'.format(' ', 'time:', 'filament:')
             #print(header)
