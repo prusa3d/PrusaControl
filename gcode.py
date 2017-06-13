@@ -94,6 +94,7 @@ class GCode(object):
         self.gcode_parser_thread.started.connect(self.gcode_parser.load_gcode_file)
         # connect all signals to parser class
         self.gcode_parser.finished.connect(self.set_finished_read)
+        self.gcode_parser.update_progressbar=True
         self.gcode_parser.set_update_progress.connect(update_progressbar_function)
         self.gcode_parser.set_data_keys.connect(self.set_data_keys)
         self.gcode_parser.set_data.connect(self.set_data)
@@ -104,11 +105,14 @@ class GCode(object):
 
 
     def read_in_realtime(self):
+        print("Read in realtime")
         self.gcode_parser.set_data_keys.connect(self.set_data_keys)
         self.gcode_parser.set_data.connect(self.set_data)
         self.gcode_parser.set_all_data.connect(self.set_all_data)
         self.gcode_parser.set_printing_time.connect(self.set_printig_time)
+        self.gcode_parser.update_progressbar=False
 
+        print("start read procedure")
         self.gcode_parser.load_gcode_file()
 
         self.is_loaded = True
@@ -232,6 +236,7 @@ class GcodeParserRunner(QObject):
         self.is_running = True
         self.controller = controller
         self.filename = filename
+        self.update_progressbar=False
 
         self.data = defaultdict(list)
         self.all_data = []
@@ -258,12 +263,14 @@ class GcodeParserRunner(QObject):
         line_number = 0
         while not in_stream.atEnd() and self.is_running is True:
 
-            counter+=1
-            if self.set_update_progress and counter==10000:
-                #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
-                progress = (in_stream.pos()*1./file_size*1.) * 100.
-                self.set_update_progress.emit(int(progress))
-                counter=0
+            if self.update_progressbar:
+                if counter==10000:
+                    #in_stream.pos() je hodne pomala funkce takze na ni pozor!!!
+                    progress = (in_stream.pos()*1./file_size*1.) * 100.
+                    self.set_update_progress.emit(int(progress))
+                    counter=0
+                else:
+                    counter+=1
 
             line = in_stream.readLine()
             bits = line.split(';', 1)
@@ -277,7 +284,7 @@ class GcodeParserRunner(QObject):
                 continue
             line_number += 1
 
-        if self.is_running is False:
+        if self.is_running is False and self.update_progressbar is True:
             self.set_update_progress.emit(0)
 
         self.printing_time = self.calculate_time_of_print()
