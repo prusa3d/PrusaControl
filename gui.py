@@ -17,7 +17,7 @@ from PyQt4.QtCore import Qt, SIGNAL, QSettings, QFile, QIODevice, QVariant, QEve
 from PyQt4.QtGui import QFont, QFontDatabase, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow, \
 QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, \
 QPainter, QPainterPath, QPen, QSlider, QStyleOptionSlider, QDialog, QDialogButtonBox, \
-QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog
+QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog, QStyleFactory
 from PyQt4.QtOpenGL import QGLWidget
 
 import projectFile
@@ -74,6 +74,8 @@ class Gcode_slider(QWidget):
         self.value_label.setFixedWidth((int)(70*self.controller.dpi_coef))
 
         self.add_button = QPushButton("", self)
+        if self.controller.app_config.system_platform in ["Darwin"]:
+            self.add_button.setStyle(QStyleFactory.create("Macintosh"))
         self.add_button.setObjectName("gcode_slider_add_button")
         self.add_button.setVisible(False)
         self.add_button.setFixedWidth((int)(20*self.controller.dpi_coef))
@@ -115,6 +117,8 @@ class Gcode_slider(QWidget):
                 label.setVisible(False)
                 label.setFixedWidth((int)(60*self.controller.dpi_coef))
                 button = QPushButton('', self)
+                if self.controller.app_config.system_platform in ["Darwin"]:
+                    button.setStyle(QStyleFactory.create("Macintosh"))
                 button.setObjectName("gcode_slider_point_button")
                 button.setVisible(False)
                 button.setFixedWidth((int)(20*self.controller.dpi_coef))
@@ -1102,9 +1106,11 @@ class PrusaControlView(QMainWindow):
         self.object_group_box.setLayout(self.create_object_settings_layout())
         self.object_group_box.setEnabled(False)
         self.transformation_reset_b = QPushButton("", self.object_group_box)
+        if self.controller.app_config.system_platform in ["Darwin"]:
+            self.transformation_reset_b.setStyle(QStyleFactory.create("Macintosh"))
         self.transformation_reset_b.setObjectName("transformation_reset_b")
-        self.transformation_reset_b.setFixedHeight((int)(19*self.controller.dpi_coef))
-        self.transformation_reset_b.setFixedWidth((int)(19*self.controller.dpi_coef))
+        #self.transformation_reset_b.setFixedHeight((int)(19*self.controller.dpi_coef))
+        #self.transformation_reset_b.setFixedWidth((int)(19*self.controller.dpi_coef))
         self.transformation_reset_b.clicked.connect(lambda: self.reset_transformation_on_object(self.get_object_id()))
 
 

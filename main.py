@@ -120,10 +120,9 @@ def main():
         StyleSheet = StyleSheet_tmp.replace('base_dir', base_dir)
 
     if not system_platform in ['Windows']:
-        app.setStyle(QStyleFactory.create("windows"))
-    app.setStyleSheet(StyleSheet)
-   
-    
+        app.setStyle(QStyleFactory.create("Windows"))
+        
+    app.setStyleSheet(StyleSheet)    
 
     event_loop_runner = EventLoopRunner(app, base_dir)
     event_loop_runner_thread = QThread()
