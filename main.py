@@ -31,6 +31,7 @@ class EventLoopRunner(QObject):
         self.base_path = base_path
         self.app = app
         self.version = ""
+        self.system_platform = platform.system()
 
         with __builtins__.open(self.base_path + "data/v.txt", 'r') as version_file:
             self.version_full = version_file.read()
@@ -48,15 +49,21 @@ class EventLoopRunner(QObject):
         self.css = QFile(self.base_path + 'data/my_stylesheet.qss')
         self.css.open(QIODevice.ReadOnly)
 
-        self.splash_pix = QPixmap(self.base_path + 'data/img/splashscreen.png')
+        if self.system_platform in ["Darwin"]:
+            self.splash_pix = QPixmap(self.base_path + 'data/img/splashscreen_osx.png')    
+            self.progressbar_on = 0
+        else:
+            self.splash_pix = QPixmap(self.base_path + 'data/img/splashscreen.png')
+            self.progressbar_on = 1
         self.splash = QSplashScreen(self.splash_pix, Qt.SplashScreen | Qt.WindowStaysOnTopHint)
 
-        self.progressBar = QProgressBar(self.splash)
-        self.progressBar.setObjectName("splash_progressbar")
-        self.progressBar.setFormat("")
-        self.progressBar.setFixedWidth(209)
-        self.progressBar.setFixedHeight(6)
-        self.progressBar.move(245, 453)
+        if self.progressbar_on:
+            self.progressBar = QProgressBar(self.splash)
+            self.progressBar.setObjectName("splash_progressbar")
+            self.progressBar.setFormat("")
+            self.progressBar.setFixedWidth(209)
+            self.progressBar.setFixedHeight(6)
+            self.progressBar.move(245, 453)
 
         self.version_label = QLabel(self.version, self.splash)
         self.version_label.setObjectName("version_label")
@@ -64,11 +71,15 @@ class EventLoopRunner(QObject):
 
         self.splash.show()
 
-        self.progressBar.setValue(0)
+        self.set_progress(0)
 
     def process_event_loop(self):
         while self.is_running == True:
             self.app.processEvents()
+
+    def set_progress(self, value):
+        if self.progressbar_on:
+            self.progressBar.setValue(value)
 
 
 
@@ -129,14 +140,14 @@ def main():
     event_loop_runner.moveToThread(event_loop_runner_thread)
     event_loop_runner_thread.started.connect(event_loop_runner.process_event_loop)
 
-    progressBar = event_loop_runner.progressBar
+    progressBar = event_loop_runner.set_progress
 
     event_loop_runner_thread.start()
 
     #local_path = os.path.realpath(__file__)
 
     controller = Controller(app, base_dir, progressBar)
-    progressBar.setValue(100)
+    progressBar(100)
     window = controller.get_view()
 
     event_loop_runner.is_running = False

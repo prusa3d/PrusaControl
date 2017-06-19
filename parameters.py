@@ -312,12 +312,8 @@ class AppParameters(object):
         return string_out
 
     def internet_on(self):
-        #Some bug with ssl certificates on this platform
-        #TODO:Find some workaround
-        if self.system_platform in ['Darwin']:
-            return False
         try:
-            urlopen('http://google.com', timeout=1)
+            urlopen('https://google.com')
             return True
         except URLError as err:
             return False
@@ -415,10 +411,8 @@ class AppParameters(object):
         try:
             r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
         except HTTPError as e:
-            print("HTTP error")
             return None
         except URLError as e:
-            print("URL error")
             return None
         else:
             data = r.read()

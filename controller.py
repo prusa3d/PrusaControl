@@ -58,12 +58,12 @@ class Controller(QObject):
 
         #this flag is only for development only, Development = True, Production = False
         self.development_flag = False
-        progress_bar.setValue(10)
+        progress_bar(10)
 
         self.app_config = AppParameters(self, local_path)
 
         self.printing_parameters = PrintingParameters(self.app_config)
-        progress_bar.setValue(30)
+        progress_bar(30)
 
         self.analyzer = Analyzer(self)
         self.gcode = None
@@ -166,23 +166,23 @@ class Controller(QObject):
 
         self.translator = QTranslator()
         self.set_language(self.settings['language'])
-        progress_bar.setValue(40)
+        progress_bar(40)
 
-        progress_bar.setValue(85)
+        progress_bar(85)
         self.slicer_manager = SlicerEngineManager(self)
 
         self.scene = AppScene(self)
-        progress_bar.setValue(90)
+        progress_bar(90)
         self.view = PrusaControlView(self)
 
-        progress_bar.setValue(92)
+        progress_bar(92)
 
         self.tools = self.view.get_tool_buttons()
         self.tool = ''
         self.camera_move = False
         self.camera_rotate = False
         self.view.update_gui_for_material()
-        progress_bar.setValue(95)
+        progress_bar(95)
 
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
@@ -191,7 +191,7 @@ class Controller(QObject):
         else:
             self.view.set_multimaterial_gui_off()
 
-        progress_bar.setValue(97)
+        progress_bar(97)
 
 
         #logging.info('Parameters: %s' % ([unicode(i.toUtf8(), encoding="UTF-8") for i in self.app_parameters]))
@@ -203,7 +203,7 @@ class Controller(QObject):
                 #self.open_file(unicode(file.toUtf8(), encoding="UTF-8"))
                 self.open_file(file)
 
-        progress_bar.setValue(99)
+        progress_bar(99)
 
         self.message_object00 = ""
         self.message_object01 = ""
@@ -1876,13 +1876,16 @@ class Controller(QObject):
                 return
 
 
-        urlSplited = url.split('.')
-        if len(urlSplited)==2:
-            fileEnd = urlSplited[1]
-        elif len(urlSplited)>2:
-            fileEnd = urlSplited[-1]
-        else:
-            fileEnd=''
+        if self.app_config.system_platform in ["Darwin"]:
+            fileEnd = 'stl'
+        else:   
+            urlSplited = url.split('.')
+            if len(urlSplited)==2:
+                fileEnd = urlSplited[1]
+            elif len(urlSplited)>2:
+                fileEnd = urlSplited[-1]
+            else:
+                fileEnd=''
 
         if fileEnd in ['stl', 'STL', 'Stl']:
             #print('import model')
