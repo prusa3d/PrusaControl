@@ -1866,9 +1866,6 @@ class Controller(QObject):
             import objc
             import CoreFoundation as CF
 
-            localFileQString = localFileID
-            #relCFStringRef = CF.CFStringCreateWithCString(CF.kCFAllocatorDefault, localFileQString, CF.kCFStringEncodingUTF8)
-
             relCFURL = CF.CFURLCreateWithFileSystemPath(
                 CF.kCFAllocatorDefault,
                 localFileID,

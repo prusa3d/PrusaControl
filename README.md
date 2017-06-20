@@ -27,6 +27,8 @@ Some features are still in development
 - PyOpenGL-accelerate (3.1.0)
 - Slic3r PE (>=1.31.2)
 
+- pyobjc (3.2.1) on Os X platform
+
 Slic3r is placed in folder tools/Slic3r-Lite
 
 

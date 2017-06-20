@@ -1108,9 +1108,10 @@ class PrusaControlView(QMainWindow):
         self.transformation_reset_b = QPushButton("", self.object_group_box)
         if self.controller.app_config.system_platform in ["Darwin"]:
             self.transformation_reset_b.setStyle(QStyleFactory.create("Macintosh"))
+        else:
+            self.transformation_reset_b.setFixedHeight((int)(19 * self.controller.dpi_coef))
+            self.transformation_reset_b.setFixedWidth((int)(19 * self.controller.dpi_coef))
         self.transformation_reset_b.setObjectName("transformation_reset_b")
-        #self.transformation_reset_b.setFixedHeight((int)(19*self.controller.dpi_coef))
-        #self.transformation_reset_b.setFixedWidth((int)(19*self.controller.dpi_coef))
         self.transformation_reset_b.clicked.connect(lambda: self.reset_transformation_on_object(self.get_object_id()))
 
 
