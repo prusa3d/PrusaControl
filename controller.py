@@ -1858,6 +1858,31 @@ class Controller(QObject):
         elif ret == QMessageBox.No:
             return False
 
+    def get_url_from_local_fileid(self, localFileID):
+        if not self.app_config.system_platform in ["Darwin"]:
+            return
+        else:
+            import objc
+            import CoreFoundation as CF
+
+            localFileQString = QString(localFileID.toLocalFile())
+            relCFStringRef = CF.CFStringCreateWithCString(
+                CF.kCFAllocatorDefault,
+                localFileQString.toUtf8(),
+                CF.kCFStringEncodingUTF8
+            )
+            relCFURL = CF.CFURLCreateWithFileSystemPath(
+                CF.kCFAllocatorDefault,
+                relCFStringRef,
+                CF.kCFURLPOSIXPathStyle,
+                False  # is directory
+            )
+            absCFURL = CF.CFURLCreateFilePathURL(
+                CF.kCFAllocatorDefault,
+                relCFURL,
+                objc.NULL
+            )
+            return QUrl(str(absCFURL[0])).toLocalFile()
 
     def open_file(self, url):
         '''
@@ -1877,15 +1902,17 @@ class Controller(QObject):
 
 
         if self.app_config.system_platform in ["Darwin"]:
-            fileEnd = 'stl'
-        else:   
-            urlSplited = url.split('.')
-            if len(urlSplited)==2:
-                fileEnd = urlSplited[1]
-            elif len(urlSplited)>2:
-                fileEnd = urlSplited[-1]
-            else:
-                fileEnd=''
+            if QString(url.toLocalFile()).startsWith('/.file/id='):
+                url = self.get_url_from_local_fileid(url)
+
+
+        urlSplited = url.split('.')
+        if len(urlSplited)==2:
+            fileEnd = urlSplited[1]
+        elif len(urlSplited)>2:
+            fileEnd = urlSplited[-1]
+        else:
+            fileEnd=''
 
         if fileEnd in ['stl', 'STL', 'Stl']:
             #print('import model')
@@ -1902,6 +1929,7 @@ class Controller(QObject):
                 if not self.open_clear_scene_and_load_gcode_file():
                     return
             self.read_gcode(url)
+
 
 
 
