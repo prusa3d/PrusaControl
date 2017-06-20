@@ -1858,22 +1858,20 @@ class Controller(QObject):
         elif ret == QMessageBox.No:
             return False
 
+
     def get_url_from_local_fileid(self, localFileID):
         if not self.app_config.system_platform in ["Darwin"]:
-            return
+            return ""
         else:
             import objc
             import CoreFoundation as CF
 
-            localFileQString = QString(localFileID.toLocalFile())
-            relCFStringRef = CF.CFStringCreateWithCString(
-                CF.kCFAllocatorDefault,
-                localFileQString.toUtf8(),
-                CF.kCFStringEncodingUTF8
-            )
+            localFileQString = localFileID
+            #relCFStringRef = CF.CFStringCreateWithCString(CF.kCFAllocatorDefault, localFileQString, CF.kCFStringEncodingUTF8)
+
             relCFURL = CF.CFURLCreateWithFileSystemPath(
                 CF.kCFAllocatorDefault,
-                relCFStringRef,
+                localFileID,
                 CF.kCFURLPOSIXPathStyle,
                 False  # is directory
             )
@@ -1882,7 +1880,12 @@ class Controller(QObject):
                 relCFURL,
                 objc.NULL
             )
-            return QUrl(str(absCFURL[0])).toLocalFile()
+            url_tmp = str(absCFURL[0])
+            if url_tmp.startswith('file://'):
+                url = url_tmp[7:]
+            else:
+                url = url_tmp
+            return url
 
     def open_file(self, url):
         '''
@@ -1902,8 +1905,9 @@ class Controller(QObject):
 
 
         if self.app_config.system_platform in ["Darwin"]:
-            if QString(url.toLocalFile()).startsWith('/.file/id='):
+            if url.startswith('/.file/id='):
                 url = self.get_url_from_local_fileid(url)
+
 
 
         urlSplited = url.split('.')
