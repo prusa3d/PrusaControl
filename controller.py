@@ -1882,6 +1882,8 @@ class Controller(QObject):
                 url = url_tmp[7:]
             else:
                 url = url_tmp
+            url = url.replace('%20', ' ')
+
             return url
 
     def open_file(self, url):
