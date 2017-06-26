@@ -518,6 +518,8 @@ class SettingsDialog(QDialog):
         # nice widget for editing the date
         self.language_label = QLabel(self.tr("Language"))
         self.language_combo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.language_combo.setStyle(QStyleFactory.create('Windows'))
         #set enumeration
         self.language_combo.addItems(list(self.controller.enumeration['language'].values()))
         l = list(self.controller.enumeration['language'])
@@ -525,6 +527,8 @@ class SettingsDialog(QDialog):
 
         self.printer_label = QLabel(self.tr("Printer model"))
         self.printer_combo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.printer_combo.setStyle(QStyleFactory.create('Windows'))
         self.printer_combo.addItems(self.controller.get_printers_labels_ls())
         #print(self.controller.get_printers_names_ls())
         #print(self.controller.settings['printer'])
@@ -532,6 +536,8 @@ class SettingsDialog(QDialog):
 
         self.printer_type_label = QLabel(self.tr("Printer variation"))
         self.printer_type_combo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.printer_type_combo.setStyle(QStyleFactory.create('Windows'))
         self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
         self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
 
@@ -784,6 +790,8 @@ class PrusaControlView(QMainWindow):
         self.object_extruder_l = QLabel("", self.object_group_box)
         self.object_extruder_l.setObjectName("object_extruder_l")
         self.object_extruder_c = QComboBox(self.object_group_box)
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.object_extruder_c.setStyle(QStyleFactory.create('Windows'))
         self.object_extruder_c.setObjectName("object_extruder_c")
         self.object_extruder_c.insertItems(4, ['Extruder 1', 'Extruder 2', 'Extruder 3', 'Extruder 4'])
         self.object_extruder_c.setCurrentIndex(0)
@@ -911,6 +919,8 @@ class PrusaControlView(QMainWindow):
                                                                                 self.edit_scale_z.value(),
                                                                                 self.place_on_zero.isChecked()))
         self.combobox_scale_units = QComboBox(self.object_group_box)
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.combobox_scale_units.setStyle(QStyleFactory.create('Windows'))
         self.combobox_scale_units.setObjectName("combobox_scale_units")
         self.combobox_scale_units.addItems(["%", "mm"])
         self.combobox_scale_units.setCurrentIndex(0)
@@ -1022,6 +1032,8 @@ class PrusaControlView(QMainWindow):
         self.materialLabel = QLabel()
         self.materialLabel.setObjectName('materialLabel')
         self.materialCombo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.materialCombo.setStyle(QStyleFactory.create('Windows'))
         self.materialCombo.setObjectName('materialCombo')
         material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
         self.materialCombo.addItems(material_label_ls)
@@ -1035,6 +1047,8 @@ class PrusaControlView(QMainWindow):
         self.qualityLabel = QLabel()
         self.qualityLabel.setObjectName('qualityLabel')
         self.qualityCombo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.qualityCombo.setStyle(QStyleFactory.create('Windows'))
         self.qualityCombo.setObjectName('qualityCombo')
 
         #self.infillLabel = QtGui.QLabel(self.tr("Infill") + " %s" % str(self.infillValue) + '%')
@@ -1047,6 +1061,8 @@ class PrusaControlView(QMainWindow):
         self.infillLabel.setObjectName('infillLabel')
         self.infillLabel.setFixedWidth((int)(75*self.controller.dpi_coef))
         self.infillCombo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.infillCombo.setStyle(QStyleFactory.create('Windows'))
         self.infillCombo.setObjectName('infillCombo')
         infill_ls, f = self.controller.get_infill_ls_and_index_of_default("0%")
         self.infillCombo.insertItems(len(infill_ls), infill_ls)
@@ -1057,6 +1073,8 @@ class PrusaControlView(QMainWindow):
         self.supportLabel = QLabel()
         self.supportLabel.setObjectName('supportLabel')
         self.supportCombo = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.supportCombo.setStyle(QStyleFactory.create('Windows'))
         self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
         self.supportCombo.setObjectName('supportCombo')
         self.supportCombo.setMaxVisibleItems(10)
@@ -1074,6 +1092,8 @@ class PrusaControlView(QMainWindow):
         self.extruder1_l = QLabel()
         self.extruder1_l.setObjectName("extruder1_l")
         self.extruder1_c = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.extruder1_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder1_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder1_c.setCurrentIndex(first)
         self.extruder1_c.setObjectName("extruder1_c")
@@ -1081,6 +1101,8 @@ class PrusaControlView(QMainWindow):
         self.extruder2_l = QLabel()
         self.extruder2_l.setObjectName("extruder2_l")
         self.extruder2_c = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.extruder2_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder2_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder2_c.setCurrentIndex(first)
         self.extruder2_c.setObjectName("extruder2_c")
@@ -1088,6 +1110,8 @@ class PrusaControlView(QMainWindow):
         self.extruder3_l = QLabel()
         self.extruder3_l.setObjectName("extruder3_l")
         self.extruder3_c = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.extruder3_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder3_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder3_c.setCurrentIndex(first)
         self.extruder3_c.setObjectName("extruder3_c")
@@ -1095,12 +1119,12 @@ class PrusaControlView(QMainWindow):
         self.extruder4_l = QLabel()
         self.extruder4_l.setObjectName("extruder4_l")
         self.extruder4_c = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.extruder4_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder4_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder4_c.setCurrentIndex(first)
         self.extruder4_c.setObjectName("extruder4_c")
         # multimaterial settings
-
-        #print("multimaterial settings done")
 
 
         self.object_group_box.setLayout(self.create_object_settings_layout())
@@ -1182,7 +1206,7 @@ class PrusaControlView(QMainWindow):
         self.right_panel.setLayout(self.right_panel_layout)
 
 
-        if self.controller.app_config.system_platform in ['Windows']:
+        if self.controller.app_config.system_platform in ['Windows', 'Linux']:
             printing_parameters_layout.setColumnMinimumWidth(1, (int)(100 * self.controller.dpi_coef))
             self.right_panel.setFixedWidth((int)(250 * self.controller.dpi_coef))
         else:
