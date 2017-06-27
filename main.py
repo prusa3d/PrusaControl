@@ -4,9 +4,8 @@ import atexit
 #import inspect
 #from msilib.schema import File
 
-from PyQt4.QtGui import QApplication, QIcon
-from PyQt4 import QtGui
-#from tendo.singleton import SingleInstance
+#from PyQt4.QtGui import QApplication, QIcon
+#from PyQt4.QtCore import QCoreApplication
 
 from controller import Controller
 from parameters import AppParameters
@@ -32,22 +31,28 @@ class EventLoopRunner(QObject):
         self.app = app
         self.version = ""
         self.system_platform = platform.system()
+        self.progressbar_on = 0
+
 
         with __builtins__.open(self.base_path + "data/v.txt", 'r') as version_file:
             self.version_full = version_file.read()
             self.version = AppParameters.strip_version_string(self.version_full)
+
 
         self.is_running = True
         self.css = []
         self.splash_pix = []
         self.splash = []
         self.progressBar = []
+        self.version_label = []
 
         self.initializeGUI()
 
     def initializeGUI(self):
+
         self.css = QFile(self.base_path + 'data/my_stylesheet.qss')
         self.css.open(QIODevice.ReadOnly)
+
 
         if self.system_platform in ["Darwin"]:
             self.splash_pix = QPixmap(self.base_path + 'data/img/splashscreen_osx.png')    
@@ -92,6 +97,7 @@ def log_exception(excType, excValue, traceback):
 
 
 def main():
+    QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads, True)
     if getattr(sys, 'frozen', False):
         # it is freeze app
         base_dir = sys._MEIPASS
@@ -106,8 +112,17 @@ def main():
         base_dir+='/'
 
     sys.excepthook = log_exception
-
     app = QApplication(sys.argv)
+
+    event_loop_runner = EventLoopRunner(app, base_dir)
+    event_loop_runner_thread = QThread()
+    event_loop_runner.moveToThread(event_loop_runner_thread)
+    event_loop_runner_thread.started.connect(event_loop_runner.process_event_loop)
+
+    progressBar = event_loop_runner.set_progress
+
+    event_loop_runner_thread.start()
+
      
     app.setApplicationName("PrusaControl")
     app.setOrganizationName("Prusa Research")
@@ -135,14 +150,7 @@ def main():
         
     app.setStyleSheet(StyleSheet)    
 
-    event_loop_runner = EventLoopRunner(app, base_dir)
-    event_loop_runner_thread = QThread()
-    event_loop_runner.moveToThread(event_loop_runner_thread)
-    event_loop_runner_thread.started.connect(event_loop_runner.process_event_loop)
 
-    progressBar = event_loop_runner.set_progress
-
-    event_loop_runner_thread.start()
 
     #local_path = os.path.realpath(__file__)
 
