@@ -64,6 +64,7 @@ class EventLoopRunner(QObject):
 
         if self.progressbar_on:
             self.progressBar = QProgressBar(self.splash)
+            self.progressBar.setStyleSheet(str(self.css.readAll(), "utf-8"))
             self.progressBar.setObjectName("splash_progressbar")
             self.progressBar.setFormat("")
             self.progressBar.setFixedWidth(209)
