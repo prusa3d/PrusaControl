@@ -1896,7 +1896,7 @@ class PrusaControlView(QMainWindow):
             if not model:
                 return
             model.set_move(np.array([x*.1, y*.1, z*.1]), False, place_on_zero)
-            self.controller.view.update_scene()
+            self.controller.update_scene()
 
     #@timing
     def set_rotation_on_object(self, widget, object_id, x, y, z, place_on_zero):
@@ -1906,7 +1906,7 @@ class PrusaControlView(QMainWindow):
             if not model:
                 return
             model.set_rot(np.deg2rad(x), np.deg2rad(y), np.deg2rad(z), False, True, place_on_zero)
-            self.controller.view.update_scene()
+            self.controller.update_scene()
             self.controller.make_analyze()
 
     def set_scale_on_object(self, widget, active_axis, object_id, x, y, z, place_on_zero):
@@ -2022,7 +2022,7 @@ class PrusaControlView(QMainWindow):
                     model.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
 
         #self.update_object_settings(self.object_id)
-        self.controller.view.update_scene()
+        self.controller.update_scene()
 
 
     def create_object_settings_layout(self):
