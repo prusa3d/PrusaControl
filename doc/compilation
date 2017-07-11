@@ -1,5 +1,5 @@
-For evert platform there is a make_ file:
-make_lin.sh
-make_win.bat
-make_osx.sh
+Creating binary bundle by
+pyinstaller PrusaControl_Win.spec for Windows
+pyinstaller PrusaControl_OsX.spec for OsX
+
 
