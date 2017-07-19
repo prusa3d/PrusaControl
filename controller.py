@@ -130,6 +130,7 @@ class Controller(QObject):
         self.canceled = False
         self.filament_use = ''
         self.resolution_of_texture = 16
+        self.soluble_extruder = -1
 
         #event flow flags
         self.mouse_double_click_event_flag = False
@@ -186,7 +187,7 @@ class Controller(QObject):
 
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
-        if self.printer_number_of_materials > 1 and self.development_flag:
+        if self.printer_number_of_materials > 1:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
         else:
             self.view.set_multimaterial_gui_off()
@@ -213,6 +214,12 @@ class Controller(QObject):
         self.show_message_on_status_bar("Ready")
         self.create_messages()
 
+    def is_multimaterial(self):
+        if self.printer_number_of_materials > 1:
+            return True
+        else:
+            return False
+        return False
 
     def set_analyze_result_messages(self, result):
         self.analyze_result = result
@@ -610,6 +617,32 @@ class Controller(QObject):
 
         return printing_settings_tmp
 
+    def update_material_settings(self):
+        # get combobox materials
+        soluble_material = []
+
+        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder1_c.currentText())["soluble"])
+        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder2_c.currentText())["soluble"])
+        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder3_c.currentText())["soluble"])
+        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder4_c.currentText())["soluble"])
+
+        # if one of them soluble then add special support form, if not support combo without it
+        if 1 in soluble_material:
+            soluble_extruders = [i+1 for i, m in enumerate(soluble_material) if m == 1]
+            self.soluble_extruder = soluble_extruders[0]
+            self.set_special_support_settings()
+        else:
+            self.soluble_extruder = -1
+            self.set_normal_support_settings()
+
+
+    def set_special_support_settings(self):
+        self.view.set_special_support_settings()
+
+    def set_normal_support_settings(self):
+        self.view.set_normal_support_settings()
+
+
     def get_infill_ls_and_index_of_default(self, default):
         first = 0
         #infill_ls = ["0%", "10%", "15%", "20%", "30%", "50%", "70%"]
@@ -846,17 +879,24 @@ class Controller(QObject):
         data = self.view.open_model_file_dialog()
         model_lst = []
         for path in data:
-            model_lst.append(self.import_model(path, one_model=True))
+            model_lst.append(ModelTypeStl().load(path, False))
 
-        for m in model_lst:
-            m.pos = model_lst[0].pos
-            m.rot = model_lst[0].rot
-            m.scale = model_lst[0].scale
+        multiModel = sceneData.MultiModel(model_lst, self.scene)
+        self.scene.models.append(multiModel)
+        self.is_model_loaded = True
+
+        self.scene.normalize_group_of_models(model_lst)
+
+        #for m in model_lst:
+        #    m.pos = model_lst[0].pos
+        #    m.rot = model_lst[0].rot
+        #    m.scale = model_lst[0].scale
 
 
     def import_model(self, path, one_model=False):
         self.view.statusBar().showMessage('Load file name: ' + path)
-        model = ModelTypeStl().load(path)
+
+        model = ModelTypeStl().load(path, False)
         model.parent = self.scene
         self.scene.models.append(model)
         if self.settings['automatic_placing'] and not one_model:
@@ -902,7 +942,7 @@ class Controller(QObject):
 
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
-        if self.printer_number_of_materials>1 and self.development_flag:
+        if self.printer_number_of_materials>1:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
         else:
             self.view.set_multimaterial_gui_off()
@@ -974,7 +1014,7 @@ class Controller(QObject):
 
     def get_object_by_id(self, object_id):
         for model in self.scene.models:
-            if object_id==model.id:
+            if object_id in model.id:
                 return model
         return None
 
@@ -1049,7 +1089,7 @@ class Controller(QObject):
         print("is_object_already_selected")
         for model in self.scene.models:
             #object founded
-            if model.id == object_id:
+            if object_id in model.id:
                 print("Je model oznaceny: " + str(model.selected))
                 if model.selected:
                     #object is selected
@@ -1067,7 +1107,7 @@ class Controller(QObject):
         one_selected = False
         for model in self.scene.models:
             #object founded
-            if model.id == object_id:
+            if object_id in model.id:
                 model.selected = True
                 one_selected = True
                 self.object_select_event_flag = True
@@ -1081,7 +1121,7 @@ class Controller(QObject):
     def unselect_object(self, object_id):
         for model in self.scene.models:
             # object founded
-            if model.id == object_id:
+            if object_id in model.id:
                 model.selected = False
                 return True
         return False
@@ -1089,11 +1129,11 @@ class Controller(QObject):
     def select_object(self, object_id):
         for model in self.scene.models:
             # object founded
-            if model.id == object_id:
+            if object_id in model.id:
                 model.selected = True
                 self.object_select_event_flag = True
                 self.open_object_settings(object_id)
-                self.scene.last_selected_object = model.id
+                self.scene.last_selected_object = object_id
                 return True
         return False
 
@@ -1724,7 +1764,7 @@ class Controller(QObject):
         if find_id == 0:
             return False
         for model in self.scene.models:
-            if model.id == find_id:
+            if find_id in model.get_id():
                 #print("Tady to je!!!")
                 model.selected = not model.selected
                 return True

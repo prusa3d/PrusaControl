@@ -1096,6 +1096,7 @@ class PrusaControlView(QMainWindow):
             self.extruder1_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder1_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder1_c.setCurrentIndex(first)
+        self.extruder1_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder1_c.setObjectName("extruder1_c")
 
         self.extruder2_l = QLabel()
@@ -1105,6 +1106,7 @@ class PrusaControlView(QMainWindow):
             self.extruder2_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder2_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder2_c.setCurrentIndex(first)
+        self.extruder2_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder2_c.setObjectName("extruder2_c")
 
         self.extruder3_l = QLabel()
@@ -1114,6 +1116,7 @@ class PrusaControlView(QMainWindow):
             self.extruder3_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder3_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder3_c.setCurrentIndex(first)
+        self.extruder3_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder3_c.setObjectName("extruder3_c")
 
         self.extruder4_l = QLabel()
@@ -1123,6 +1126,7 @@ class PrusaControlView(QMainWindow):
             self.extruder4_c.setStyle(QStyleFactory.create('Windows'))
         self.extruder4_c.insertItems(len(material_label_ls), material_label_ls)
         self.extruder4_c.setCurrentIndex(first)
+        self.extruder4_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder4_c.setObjectName("extruder4_c")
         # multimaterial settings
 
@@ -1340,7 +1344,7 @@ class PrusaControlView(QMainWindow):
         self.supportLabel.setText(self.tr("Support"))
         self.support_tooltip = self.tr("Select what kind of supports do you need, if any")
         self.supportCombo.clear()
-        self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
+        self.set_normal_support_settings()
         self.supportLabel.setToolTip(self.support_tooltip)
         self.supportCombo.setToolTip(self.support_tooltip)
 
@@ -1369,9 +1373,18 @@ class PrusaControlView(QMainWindow):
         self.controller.create_messages()
 
 
+    def set_special_support_settings(self):
+        print("GUI set special support settings")
+        self.supportCombo.clear()
+        self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere"), self.tr("Build plate only with soluble interface"), self.tr("Everywhere with soluble interface")])
 
+    def set_normal_support_settings(self):
+        print("GUI set normal support settings")
+        self.supportCombo.clear()
+        self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
 
     def set_multimaterial_gui_on(self, number_of_materials):
+        self.create_menu()
         self.materials_settings_l.setVisible(True)
         if number_of_materials==2:
             self.extruder1_l.setVisible(True)
@@ -1403,6 +1416,7 @@ class PrusaControlView(QMainWindow):
 
 
     def set_multimaterial_gui_off(self):
+        self.create_menu()
         self.materials_settings_l.setVisible(False)
         self.extruder1_l.setVisible(False)
         self.extruder1_c.setVisible(False)
@@ -1424,7 +1438,7 @@ class PrusaControlView(QMainWindow):
         # file menu definition
         self.file_menu = self.menubar.addMenu(self.tr('&File'))
         self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
-        if self.controller.development_flag:
+        if self.controller.is_multimaterial():
             self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
         self.file_menu.addAction(self.tr('Import gcode file'), self.controller.open_gcode_file)
         self.file_menu.addSeparator()
@@ -2268,6 +2282,11 @@ class PrusaControlView(QMainWindow):
         return converted_path
 
 
+    def update_material_settings(self):
+        self.controller.update_material_settings()
+
+
+
     def update_gui(self):
         self.controller.scene_was_changed()
         self.update_gui_for_material()
@@ -2320,13 +2339,23 @@ class PrusaControlView(QMainWindow):
         brim = self.brimCheckBox.isChecked()
         support = self.supportCombo.currentIndex()
 
+        if self.controller.soluble_extruder == -1:
+            support_material_extruder = 0
+            support_material_interface_extruder = 0
+        else:
+            support_material_extruder = self.controller.soluble_extruder
+            support_material_interface_extruder = self.controller.soluble_extruder
+
         data = {'material': material_name,
                 'quality': quality_name,
                 'infill': infill_value,
                 'brim': brim,
                 'support_on_off': support,
                 'support_build_plate': support,
-                'overhangs': support
+                'overhangs': support,
+                #for multimaterial special settings(soluble supports)
+                'support_material_extruder': [support_material_extruder, support],
+                'support_material_interface_extruder' : support_material_interface_extruder
                 }
         return data
 

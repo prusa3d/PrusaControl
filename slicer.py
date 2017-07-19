@@ -78,11 +78,15 @@ class Slic3rEngineRunner(QObject):
     def translate_dictionary(self, old, update):
         translation_table = [
             ['fill_density', 'infill', self.percent_transform],
-            ['brim_width', 'brim', self.boolean_transform],
+            ['brim_width', 'brim', self.brim_transform],
             #['support_material', 'support', self.boolean_transform]
             ['support_material', 'support_on_off', self.support1_transform],
             ['support_material_buildplate_only', 'support_build_plate', self.support2_transform],
-            ['overhangs', 'overhangs', self.support3_transform]
+            ['overhangs', 'overhangs', self.support3_transform],
+
+            ['support_material_extruder', 'support_material_extruder', self.support4_transform],
+            ['support_material_interface_extruder', 'support_material_interface_extruder', self.str_transform]
+
         ]
         for i in translation_table:
             old[i[0]] = i[2](update[i[1]])
@@ -91,7 +95,7 @@ class Slic3rEngineRunner(QObject):
     def percent_transform(self, in_value):
         return "%s" % str(in_value) + '%'
 
-    def boolean_transform(self, in_value):
+    def brim_transform(self, in_value):
         return "%s" % str(int(in_value)*10)
 
     def support1_transform(self, in_value):
@@ -126,6 +130,22 @@ class Slic3rEngineRunner(QObject):
         else:
             return "1"
         return "0"
+
+    def support4_transform(self, in_value):
+        #support material extruder
+        [a, b] = in_value
+        if b == 0:   #None
+            return "0"
+        elif b == 1: #Build plate only
+            return self.str_transform(a)
+        elif b == 2: #Everywhere
+            return self.str_transform(a)
+        elif b > 2: #Build plate only
+            return "0"
+        return "0"
+
+    def str_transform(self, in_value):
+        return "%s" % str(in_value)
 
 
     def save_configuration(self, filename):
