@@ -1098,6 +1098,7 @@ class PrusaControlView(QMainWindow):
         self.extruder1_c.setCurrentIndex(first)
         self.extruder1_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder1_c.setObjectName("extruder1_c")
+        self.extruder1_c.setMaxVisibleItems(len(material_label_ls))
 
         self.extruder2_l = QLabel()
         self.extruder2_l.setObjectName("extruder2_l")
@@ -1108,6 +1109,7 @@ class PrusaControlView(QMainWindow):
         self.extruder2_c.setCurrentIndex(first)
         self.extruder2_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder2_c.setObjectName("extruder2_c")
+        self.extruder2_c.setMaxVisibleItems(len(material_label_ls))
 
         self.extruder3_l = QLabel()
         self.extruder3_l.setObjectName("extruder3_l")
@@ -1118,6 +1120,7 @@ class PrusaControlView(QMainWindow):
         self.extruder3_c.setCurrentIndex(first)
         self.extruder3_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder3_c.setObjectName("extruder3_c")
+        self.extruder3_c.setMaxVisibleItems(len(material_label_ls))
 
         self.extruder4_l = QLabel()
         self.extruder4_l.setObjectName("extruder4_l")
@@ -1128,6 +1131,7 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c.setCurrentIndex(first)
         self.extruder4_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder4_c.setObjectName("extruder4_c")
+        self.extruder4_c.setMaxVisibleItems(len(material_label_ls))
         # multimaterial settings
 
 
@@ -1734,9 +1738,13 @@ class PrusaControlView(QMainWindow):
 
 
     def update_position_widgets(self, object_id):
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
+        mesh_tmp = self.controller.get_object_by_id(object_id)
+        if not mesh_tmp:
             return
+        if mesh_tmp.is_multipart_model:
+            mesh = mesh_tmp.multipart_parent
+        else:
+            mesh = mesh_tmp
         self.object_id = object_id
 
         self.edit_pos_x.setDisabled(True)
@@ -1756,9 +1764,13 @@ class PrusaControlView(QMainWindow):
 
 
     def update_rotate_widgets(self, object_id):
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
+        mesh_tmp = self.controller.get_object_by_id(object_id)
+        if not mesh_tmp:
             return
+        if mesh_tmp.is_multipart_model:
+            mesh = mesh_tmp.multipart_parent
+        else:
+            mesh = mesh_tmp
         self.object_id = object_id
         self.edit_rot_x.setDisabled(True)
         self.edit_rot_x.setValue(np.rad2deg(mesh.rot[0]))
@@ -1774,9 +1786,13 @@ class PrusaControlView(QMainWindow):
 
 
     def update_scale_widgets(self, object_id):
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
+        mesh_tmp = self.controller.get_object_by_id(object_id)
+        if not mesh_tmp:
             return
+        if mesh_tmp.is_multipart_model:
+            mesh = mesh_tmp.multipart_parent
+        else:
+            mesh = mesh_tmp
         self.object_id = object_id
         self.set_scale_widgets(mesh)
 
@@ -1802,13 +1818,17 @@ class PrusaControlView(QMainWindow):
         self.glWidget.setFocusPolicy(Qt.NoFocus)
 
     def set_gui_for_object(self, object_id, scale_units_perc=True):
-        mesh = self.controller.get_object_by_id(object_id)
-        if not mesh:
+        mesh_tmp = self.controller.get_object_by_id(object_id)
+        if not mesh_tmp:
             return
+        if mesh_tmp.is_multipart_model:
+            mesh = mesh_tmp.multipart_parent
+        else:
+            mesh = mesh_tmp
         self.object_group_box.setEnabled(True)
         self.object_id = object_id
 
-        self.filename_label.setText(mesh.filename)
+        self.filename_label.setText(mesh_tmp.filename)
         self.edit_pos_x.setDisabled(True)
         self.edit_pos_x.setValue(mesh.pos[0]*10)
         self.edit_pos_x.setDisabled(False)
@@ -1868,9 +1888,13 @@ class PrusaControlView(QMainWindow):
 
 
     def change_scale_units(self):
-        mesh = self.controller.get_object_by_id(self.object_id)
-        if not mesh:
+        mesh_tmp = self.controller.get_object_by_id(self.object_id)
+        if not mesh_tmp:
             return
+        if mesh_tmp.is_multipart_model:
+            mesh = mesh_tmp.multipart_parent
+        else:
+            mesh = mesh_tmp
         self.scale_units = self.combobox_scale_units.currentText()
         self.set_scale_widgets(mesh)
 
@@ -2328,10 +2352,23 @@ class PrusaControlView(QMainWindow):
         self.infillCombo.setCurrentIndex(first_infill)
 
     def get_actual_printing_data(self):
-        material_label = self.materialCombo.currentText()
-        material_name = self.controller.get_material_name_by_material_label(material_label)
+        material_names = []
+        if self.controller.is_multimaterial():
+            material_labels = []
+            material_labels.append(self.extruder1_c.currentText())
+            material_labels.append(self.extruder2_c.currentText())
+            material_labels.append(self.extruder3_c.currentText())
+            material_labels.append(self.extruder4_c.currentText())
+
+
+            for mat in material_labels:
+                material_names.append(self.controller.get_material_name_by_material_label(mat))
+        else:
+            material_label = self.materialCombo.currentText()
+            material_names = [self.controller.get_material_name_by_material_label(material_label)]
+
         quality_label = self.qualityCombo.currentText()
-        quality_name = self.controller.get_material_quality_name_by_quality_label(material_name, quality_label)
+        quality_name = self.controller.get_material_quality_name_by_quality_label(material_names[0], quality_label)
 
         infill_index = self.infillCombo.currentIndex()
         infill_value_ls = self.controller.get_infill_values_ls()
@@ -2346,7 +2383,7 @@ class PrusaControlView(QMainWindow):
             support_material_extruder = self.controller.soluble_extruder
             support_material_interface_extruder = self.controller.soluble_extruder
 
-        data = {'material': material_name,
+        data = {'material': material_names,
                 'quality': quality_name,
                 'infill': infill_value,
                 'brim': brim,

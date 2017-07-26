@@ -52,6 +52,43 @@ class Slic3rEngineRunner(QObject):
     send_message = pyqtSignal(str)
     send_gcodedata = pyqtSignal(GCode)
 
+    mm_extruder_parameters = ["bridge_fan_speed",
+                        "cooling",
+                        "deretract_speed",
+                        "disable_fan_first_layers",
+                        "extrusion_multiplier",
+                        "fan_always_on",
+                        "fan_below_layer_time",
+                        "filament_density",
+                        "filament_diameter",
+                        "filament_max_volumetric_speed",
+                        "filament_type",
+                        "filament_soluble",
+                        "first_layer_bed_temperature",
+                        "first_layer_temperature",
+                        "max_fan_speed",
+                        "max_layer_height",
+                        "min_fan_speed",
+                        "min_layer_height",
+                        "min_print_speed",
+                        "nozzle_diameter",
+                        "retract_before_travel",
+                        "retract_before_wipe",
+                        "retract_layer_change",
+                        "retract_length",
+                        "retract_length_toolchange",
+                        "retract_lift",
+                        "retract_lift_above",
+                        "retract_lift_below",
+                        "retract_restart_extra",
+                        "retract_restart_extra_toolchange",
+                        "retract_speed",
+                        "slowdown_below_layer_time",
+                        "temperature",
+                        "wipe"]
+
+
+
     def __init__(self, controller):
         super(Slic3rEngineRunner, self).__init__()
         self.is_running = True
@@ -147,6 +184,9 @@ class Slic3rEngineRunner(QObject):
     def str_transform(self, in_value):
         return "%s" % str(in_value)
 
+    def list_to_str(self, lst):
+        return ','.join(str(e) for e in lst)
+
 
     def save_configuration(self, filename):
         actual_printing_data = self.controller.get_actual_printing_data()
@@ -155,14 +195,17 @@ class Slic3rEngineRunner(QObject):
                 self.step_max+=1
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
-        material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'])
+        material_printing_data = self.controller.printing_parameters.get_actual_settings_multimaterial(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'])
         #print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = configparser.RawConfigParser()
         new_config.add_section('settings')
         #new_config.set('settings', i, new_parameters)
         for i in new_parameters:
-            new_config.set('settings', i, new_parameters[i])
+            if type(new_parameters[i]) == list:
+                new_config.set('settings', i, self.list_to_str(new_parameters[i]))
+            else:
+                new_config.set('settings', i, new_parameters[i])
 
         #write ini file
         with open(filename, 'w') as ini_file:
@@ -170,9 +213,13 @@ class Slic3rEngineRunner(QObject):
             new_config.write(fake_file)
             ini_file.write(fake_file.getvalue()[11:])
 
+        print("saved")
+
 
     def slice(self):
         self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
+        #DEV
+        return
 
         self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
                                     self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',

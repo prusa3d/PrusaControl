@@ -176,6 +176,40 @@ class PrintingParameters(object):
                 return None
         return None
 
+    def get_actual_settings_multimaterial(self, printer_name, printer_variation, material_names, quality_seting):
+        if len(material_names) > 1:
+            print("multi material")
+            # multimaterial version
+            settings_lst = []
+            for mat in material_names:
+                settings_lst.append(self.get_actual_settings(printer_name, printer_variation, mat, quality_seting))
+            return self.connect_different_settings(settings_lst)
+        else:
+            print("one material")
+            # one material version
+            return self.get_actual_settings(printer_name, printer_variation, material_names[0], quality_seting)
+
+
+    def connect_different_settings(self, lst):
+        print("connect complex lists")
+        diff_keys_set = set()
+        out = dict()
+
+        #TODO:Filtrate over special mm list not this one!!!
+        for mat in lst:
+            diff_keys_set.update([k for k in mat if lst[0][k] != mat[k]])
+
+        for mat in lst:
+            out.update(mat)
+
+        for key in diff_keys_set:
+            out[key] = [mat[key] for mat in lst]
+
+        pprint(out)
+        return out
+
+
+
     def read_printers_parameters(self, filename):
         printers = {}
         with open(filename, 'rb') as json_file:

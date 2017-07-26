@@ -619,12 +619,13 @@ class Controller(QObject):
 
     def update_material_settings(self):
         # get combobox materials
-        soluble_material = []
+        soluble_material_tmp = []
 
-        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder1_c.currentText())["soluble"])
-        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder2_c.currentText())["soluble"])
-        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder3_c.currentText())["soluble"])
-        soluble_material.append(self.get_printing_settings_for_material_by_label(self.view.extruder4_c.currentText())["soluble"])
+        soluble_material_tmp.append(self.get_printing_settings_for_material_by_label(self.view.extruder1_c.currentText())["soluble"])
+        soluble_material_tmp.append(self.get_printing_settings_for_material_by_label(self.view.extruder2_c.currentText())["soluble"])
+        soluble_material_tmp.append(self.get_printing_settings_for_material_by_label(self.view.extruder3_c.currentText())["soluble"])
+        soluble_material_tmp.append(self.get_printing_settings_for_material_by_label(self.view.extruder4_c.currentText())["soluble"])
+        soluble_material = soluble_material_tmp[:self.printer_number_of_materials]
 
         # if one of them soluble then add special support form, if not support combo without it
         if 1 in soluble_material:
@@ -879,14 +880,20 @@ class Controller(QObject):
         data = self.view.open_model_file_dialog()
         model_lst = []
         for path in data:
-            model_lst.append(ModelTypeStl().load(path, False))
+            model = ModelTypeStl().load(path, False)
+            model.parent = self.scene
+            model.is_multipart_model = True
+            self.scene.models.append(model)
+            model_lst.append(model)
 
         multiModel = sceneData.MultiModel(model_lst, self.scene)
-        self.scene.models.append(multiModel)
+        self.scene.multipart_models.append(multiModel)
+        
         self.is_model_loaded = True
 
         self.scene.normalize_group_of_models(model_lst)
 
+        #not right way
         #for m in model_lst:
         #    m.pos = model_lst[0].pos
         #    m.rot = model_lst[0].rot
@@ -896,7 +903,7 @@ class Controller(QObject):
     def import_model(self, path, one_model=False):
         self.view.statusBar().showMessage('Load file name: ' + path)
 
-        model = ModelTypeStl().load(path, False)
+        model = ModelTypeStl().load(path, True)
         model.parent = self.scene
         self.scene.models.append(model)
         if self.settings['automatic_placing'] and not one_model:
@@ -944,8 +951,10 @@ class Controller(QObject):
         self.printer_number_of_materials = printer_settings['multimaterial']
         if self.printer_number_of_materials>1:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
+            self.update_material_settings()
         else:
             self.view.set_multimaterial_gui_off()
+            self.update_material_settings()
 
         self.settings = temp_settings
 
@@ -1014,7 +1023,7 @@ class Controller(QObject):
 
     def get_object_by_id(self, object_id):
         for model in self.scene.models:
-            if object_id in model.id:
+            if object_id == model.id:
                 return model
         return None
 
@@ -1089,7 +1098,7 @@ class Controller(QObject):
         print("is_object_already_selected")
         for model in self.scene.models:
             #object founded
-            if object_id in model.id:
+            if object_id == model.id:
                 print("Je model oznaceny: " + str(model.selected))
                 if model.selected:
                     #object is selected
@@ -1107,7 +1116,7 @@ class Controller(QObject):
         one_selected = False
         for model in self.scene.models:
             #object founded
-            if object_id in model.id:
+            if object_id == model.id:
                 model.selected = True
                 one_selected = True
                 self.object_select_event_flag = True
@@ -1121,7 +1130,7 @@ class Controller(QObject):
     def unselect_object(self, object_id):
         for model in self.scene.models:
             # object founded
-            if object_id in model.id:
+            if object_id == model.id:
                 model.selected = False
                 return True
         return False
@@ -1129,7 +1138,7 @@ class Controller(QObject):
     def select_object(self, object_id):
         for model in self.scene.models:
             # object founded
-            if object_id in model.id:
+            if object_id == model.id:
                 model.selected = True
                 self.object_select_event_flag = True
                 self.open_object_settings(object_id)
@@ -1422,9 +1431,14 @@ class Controller(QObject):
 
             for model in self.scene.models:
                 if model.selected:
-                    pos = deepcopy(model.pos)
-                    pos[2] = 0.
-                    self.original_scale = deepcopy(model.scale)
+                    if model.is_multipart_model:
+                        pos = deepcopy(model.multipart_parent.pos)
+                        pos[2] = 0.
+                        self.original_scale = deepcopy(model.multipart_parent.scale)
+                    else:
+                        pos = deepcopy(model.pos)
+                        pos[2] = 0.
+                        self.original_scale = deepcopy(model.scale)
 
 
     def mouse_move_event(self, event):
@@ -1460,7 +1474,10 @@ class Controller(QObject):
                     res_new = res - self.res_old
                     for model in self.scene.models:
                         if model.selected:
-                            pos = deepcopy(model.pos)
+                            if model.is_multipart_model:
+                                pos = deepcopy(model.multipart_parent.pos)
+                            else:
+                                pos = deepcopy(model.pos)
                             pos[2] = 0.
 
                             #New
@@ -1490,10 +1507,17 @@ class Controller(QObject):
                             if new_vect_leng >= radius:
                                 if numpy.abs(alpha - numpy.pi) <= 0.05:
                                     alpha = numpy.pi
-                                model.set_rot(model.rot[0], model.rot[1], numpy.around(alpha, decimals=3), False, False, False)
+
+                                if model.is_multipart_model:
+                                    model.set_rot(model.multipart_parent.rot[0], model.multipart_parent.rot[1], numpy.around(alpha, decimals=3), False, False, False)
+                                else:
+                                    model.set_rot(model.rot[0], model.rot[1], numpy.around(alpha, decimals=3), False, False, False)
                             else:
                                 alpha_new = numpy.degrees(alpha) // 45.
-                                model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
+                                if model.is_multipart_model:
+                                    model.set_rot(model.multipart_parent.rot[0], model.multipart_parent.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
+                                else:
+                                    model.set_rot(model.rot[0], model.rot[1], alpha_new*(numpy.pi*.25), False, False, False)
 
                             #self.view.update_object_settings(model.id)
                             self.view.update_rotate_widgets(model.id)
@@ -1504,7 +1528,11 @@ class Controller(QObject):
                 # camera_pos, direction, _, _ = self.view.get_camera_direction(event)
                 for model in self.scene.models:
                     if model.selected:
-                        pos = deepcopy(model.pos)
+                        if model.is_multipart_model:
+                            pos = deepcopy(model.multipart_parent.pos)
+                        else:
+                            pos = deepcopy(model.pos)
+
                         pos[2] = 0.
                         new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
                         new_scale_vect = new_scale_point - pos

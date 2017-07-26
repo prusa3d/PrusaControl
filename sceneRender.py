@@ -10,7 +10,7 @@ from pprint import pprint
 import OpenGL
 import numpy as np
 
-from sceneData import ModelTypeStl, ModelTypeObj
+from sceneData import ModelTypeStl, ModelTypeObj, MultiModel
 
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_LOGGING = False
@@ -260,11 +260,11 @@ class GLWidget(QGLWidget):
         glBindTexture(GL_TEXTURE_2D, texture)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+
         glTexImage2D(GL_TEXTURE_2D, 0, type, img.size[0], img.size[1], 0, type, GL_UNSIGNED_BYTE, img_data)
         glGenerateMipmap(GL_TEXTURE_2D)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
         return texture
 
     def initializeGL(self):
@@ -947,18 +947,30 @@ class GLWidget(QGLWidget):
             rotateColors = [[180,180,180],[180,180,180],[180,180,180]]
             scaleColors = [model.scaleColorXId, model.scaleColorYId, model.scaleColorZId, model.scaleColorXYZId]
 
+        if model.is_multipart_model:
+            pos = model.multipart_parent.pos + model.pos
+            model = model.multipart_parent
+        else:
+            pos = model.pos
+
         if self.rotateTool.is_pressed():
-        #if settings['toolButtons']['rotateButton']:
-            #self.draw_rotation_circle(model, rotateColors, [i + o for i,o in zip(model.boundingSphereCenter, model.pos)], model.boundingSphereSize, picking)
-            self.draw_rotation_circle(model, rotateColors, model.pos, model.max_bs, picking)
+            self.draw_rotation_circle(model, rotateColors, pos, model.max_bs, picking)
         if self.scaleTool.is_pressed():
-        #elif settings['toolButtons']['scaleButton']:
-            self.draw_scale_rect(model, scaleColors, model.pos, model.boundingSphereSize, picking)
+            self.draw_scale_rect(model, scaleColors, pos, model.boundingSphereSize, picking)
 
 
     def draw_scale_rect(self, model, colors, position, radius, picking=False):
         if not picking:
                 colors[3] = [255, 255, 255]
+
+        scale_axis = []
+
+        if isinstance(model, MultiModel):
+            for m in model.models:
+                scale_axis.append(m.scaleAxis)
+        else:
+            scale_axis.append(model.scaleAxis)
+
 
         offset=0.5
         size_of_selector = 0.2
@@ -1030,7 +1042,7 @@ class GLWidget(QGLWidget):
             glVertex3f(max[0], min[1], 0.)
             glEnd()
 
-            if model.scaleAxis == 'XYZ':
+            if 'XYZ' in scale_axis:
                 glColor3ub(255, 97, 0)
             else:
                 glColor3f(1.,1.,1.)
@@ -1042,9 +1054,9 @@ class GLWidget(QGLWidget):
             glVertex3f(max[0] + size_of_selector, max[1] + size_of_selector, 0.)
             glVertex3f(max[0] + size_of_selector, max[1] - size_of_selector, 0.)
             glVertex3f(max[0] - size_of_selector, max[1] - size_of_selector, 0.)
-            glEnd()
+            #glEnd()
 
-            glBegin(GL_TRIANGLES)
+            #glBegin(GL_TRIANGLES)
             glVertex3f(min[0] - size_of_selector, min[1] - size_of_selector, 0.)
             glVertex3f(min[0] - size_of_selector, min[1] + size_of_selector, 0.)
             glVertex3f(min[0] + size_of_selector, min[1] + size_of_selector, 0.)
@@ -1052,9 +1064,9 @@ class GLWidget(QGLWidget):
             glVertex3f(min[0] + size_of_selector, min[1] + size_of_selector, 0.)
             glVertex3f(min[0] + size_of_selector, min[1] - size_of_selector, 0.)
             glVertex3f(min[0] - size_of_selector, min[1] - size_of_selector, 0.)
-            glEnd()
+            #glEnd()
 
-            glBegin(GL_TRIANGLES)
+            #glBegin(GL_TRIANGLES)
             glVertex3f(max[0] - size_of_selector, min[1] - size_of_selector, 0.)
             glVertex3f(max[0] + size_of_selector, min[1] - size_of_selector, 0.)
             glVertex3f(max[0] - size_of_selector, min[1] + size_of_selector, 0.)
@@ -1062,9 +1074,9 @@ class GLWidget(QGLWidget):
             glVertex3f(max[0] + size_of_selector, min[1] + size_of_selector, 0.)
             glVertex3f(max[0] + size_of_selector, min[1] - size_of_selector, 0.)
             glVertex3f(max[0] - size_of_selector, min[1] + size_of_selector, 0.)
-            glEnd()
+            #glEnd()
 
-            glBegin(GL_TRIANGLES)
+            #glBegin(GL_TRIANGLES)
             glVertex3f(min[0] - size_of_selector, max[1] - size_of_selector, 0.)
             glVertex3f(min[0] + size_of_selector, max[1] - size_of_selector, 0.)
             glVertex3f(min[0] - size_of_selector, max[1] + size_of_selector, 0.)
@@ -1237,10 +1249,17 @@ class GLWidget(QGLWidget):
             glEnable(GL_BLEND)
 
             glBindTexture(GL_TEXTURE_2D, self.catching_point)
-            if model.rotationAxis == "Z":
-                glColor3ub(255, 97, 0)
+            color = [255, 255, 255]
+            if isinstance(model, MultiModel):
+                for m in model.models:
+                    if m.rotationAxis == "Z":
+                        color = [255, 97, 0]
             else:
-                glColor3ub(255, 255, 255)
+                if model.rotationAxis == "Z":
+                    color = [255, 97, 0]
+                else:
+                    color = [255, 255, 255]
+            glColor3ub(color[0], color[1], color[2])
             glBegin(GL_QUADS)
             glTexCoord2f(0., 0.)
             glVertex3f(a[0], a[1], 0.0)
