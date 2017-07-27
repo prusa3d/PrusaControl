@@ -152,7 +152,7 @@ class PrintingParameters(object):
         return return_dict
 
 
-    def get_actual_settings(self, printer_name, printer_variation, material_name, quality_seting):
+    def get_actual_settings_for_one_material(self, printer_name, printer_variation, material_name, quality_seting):
         if not printer_name or not printer_variation or not material_name or not quality_seting:
             return None
         else:
@@ -176,34 +176,29 @@ class PrintingParameters(object):
                 return None
         return None
 
-    def get_actual_settings_multimaterial(self, printer_name, printer_variation, material_names, quality_seting):
+    def get_actual_settings(self, printer_name, printer_variation, material_names, quality_seting, slicer):
         if len(material_names) > 1:
             print("multi material")
             # multimaterial version
             settings_lst = []
             for mat in material_names:
-                settings_lst.append(self.get_actual_settings(printer_name, printer_variation, mat, quality_seting))
-            return self.connect_different_settings(settings_lst)
+                settings_lst.append(self.get_actual_settings_for_one_material(printer_name, printer_variation, mat, quality_seting))
+            return self.connect_different_settings(slicer.multimaterial_spec_parameters, settings_lst)
         else:
             print("one material")
             # one material version
-            return self.get_actual_settings(printer_name, printer_variation, material_names[0], quality_seting)
+            return self.get_actual_settings_for_one_material(printer_name, printer_variation, material_names[0], quality_seting)
 
 
-    def connect_different_settings(self, lst):
+    def connect_different_settings(self, keys_lst, lst):
         print("connect complex lists")
-        diff_keys_set = set()
         out = dict()
-
-        #TODO:Filtrate over special mm list not this one!!!
-        for mat in lst:
-            diff_keys_set.update([k for k in mat if lst[0][k] != mat[k]])
 
         for mat in lst:
             out.update(mat)
 
-        for key in diff_keys_set:
-            out[key] = [mat[key] for mat in lst]
+        for key in keys_lst:
+            out[key] = [mat[key] for mat in lst if key in mat]
 
         pprint(out)
         return out

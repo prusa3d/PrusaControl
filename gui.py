@@ -795,6 +795,8 @@ class PrusaControlView(QMainWindow):
         self.object_extruder_c.setObjectName("object_extruder_c")
         self.object_extruder_c.insertItems(4, ['Extruder 1', 'Extruder 2', 'Extruder 3', 'Extruder 4'])
         self.object_extruder_c.setCurrentIndex(0)
+        self.object_extruder_c.currentIndexChanged.connect(lambda: self.set_extruder_on_object(self.object_extruder_c,
+                                                                                               self.get_object_id()))
 
 
         self.filename_label = QLabel("", self.object_group_box)
@@ -1819,16 +1821,23 @@ class PrusaControlView(QMainWindow):
 
     def set_gui_for_object(self, object_id, scale_units_perc=True):
         mesh_tmp = self.controller.get_object_by_id(object_id)
+        extruder_index = 0
+
         if not mesh_tmp:
             return
         if mesh_tmp.is_multipart_model:
             mesh = mesh_tmp.multipart_parent
+            extruder_index = mesh_tmp.extruder
         else:
             mesh = mesh_tmp
         self.object_group_box.setEnabled(True)
         self.object_id = object_id
 
+        if self.controller.is_multimaterial():
+            self.object_extruder_c.setCurrentIndex(extruder_index-1)
+
         self.filename_label.setText(mesh_tmp.filename)
+        self.filename_label.setToolTip(mesh_tmp.filename)
         self.edit_pos_x.setDisabled(True)
         self.edit_pos_x.setValue(mesh.pos[0]*10)
         self.edit_pos_x.setDisabled(False)
@@ -1926,6 +1935,14 @@ class PrusaControlView(QMainWindow):
         self.object_id = 0
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
+
+    def set_extruder_on_object(self, widget, object_id):
+        if widget.hasFocus():
+            model = self.controller.get_object_by_id(object_id)
+            if not model:
+                return
+            model.set_extruder(widget.currentIndex()+1)
+            self.controller.recalculate_vaste_tower()
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():

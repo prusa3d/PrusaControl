@@ -1085,6 +1085,11 @@ class Controller(QObject):
         pass
 
 
+    def recalculate_vaste_tower(self):
+        print("calculating vaste tower")
+
+
+
     @staticmethod
     def is_ctrl_pressed():
         #print("is_ctrl_pressed")

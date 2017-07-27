@@ -40,7 +40,6 @@ class SlicerEngineAbstract():
         pass
 
 
-#TODO:This is wrong design,
 class Slic3rEngineRunner(QObject):
     '''
     This is just connector to console version of Slic3r software
@@ -52,7 +51,7 @@ class Slic3rEngineRunner(QObject):
     send_message = pyqtSignal(str)
     send_gcodedata = pyqtSignal(GCode)
 
-    mm_extruder_parameters = ["bridge_fan_speed",
+    multimaterial_spec_parameters = ["bridge_fan_speed",
                         "cooling",
                         "deretract_speed",
                         "disable_fan_first_layers",
@@ -195,7 +194,7 @@ class Slic3rEngineRunner(QObject):
                 self.step_max+=1
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
-        material_printing_data = self.controller.printing_parameters.get_actual_settings_multimaterial(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'])
+        material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'], self)
         #print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = configparser.RawConfigParser()
@@ -218,8 +217,10 @@ class Slic3rEngineRunner(QObject):
 
     def slice(self):
         self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
+
         #DEV
         return
+        #DEV
 
         self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
                                     self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',

@@ -513,8 +513,6 @@ class AppScene(object):
             m.update_min_max()
 
 
-
-
     def find_new_position(self, index, model):
         position_vector = [.0, .0]
         if index == 0:
@@ -668,6 +666,7 @@ class Model(object):
         #multimaterial upgrade
         self.is_multipart_model = False
         self.multipart_parent = []
+        self.extruder = 1
 
         self.texture_size = 16
         self.variable_texture_data = np.full((self.texture_size*self.texture_size*4), 255, dtype=np.int)
@@ -783,6 +782,8 @@ class Model(object):
     def get_id(self):
         return self.id
 
+    def set_extruder(self, extruder_number):
+        self.extruder = extruder_number
 
     def recalculate_texture(self):
         #TODO:
