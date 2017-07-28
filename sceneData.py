@@ -75,7 +75,64 @@ class AppScene(object):
 
         self.analyze_result_data_tmp = []
 
-        self.place_of_vaste_tower = np.array([.0, .0, .0])
+        self.is_waste_tower = False
+        self.place_of_waste_tower = np.array([.0, .0, .0])
+        self.waste_tower_model = []
+
+        self.create_wipe_tower()
+
+    def create_wipe_tower(self):
+        size_x = 60.
+        size_y = 45.
+        size_z = .1
+
+        # Define the 8 vertices of the cube
+        vertices = np.array([ \
+            [-1.*(size_x*.5), -1.*(size_y*.5), -1.*(size_z*.5)],
+            [1.*(size_x*.5), -1.*(size_y*.5), -1.*(size_z*.5)],
+            [1.*(size_x*.5), 1.*(size_y*.5), -1.*(size_z*.5)],
+            [-1.*(size_x*.5), 1.*(size_y*.5), -1.*(size_z*.5)],
+            [-1.*(size_x*.5), -1.*(size_y*.5), 1.*(size_z*.5)],
+            [1.*(size_x*.5), -1.*(size_y*.5), 1.*(size_z*.5)],
+            [1.*(size_x*.5), 1.*(size_y*.5), 1.*(size_z*.5)],
+            [-1.*(size_x*.5), 1.*(size_y*.5), 1.*(size_z*.5)]])
+        # Define the 12 triangles composing the cube
+        faces = np.array([ \
+            [0, 3, 1],
+            [1, 3, 2],
+            [0, 4, 7],
+            [0, 7, 3],
+            [4, 5, 6],
+            [4, 6, 7],
+            [5, 1, 2],
+            [5, 2, 6],
+            [2, 3, 6],
+            [3, 7, 6],
+            [0, 1, 5],
+            [0, 5, 4]])
+
+
+        # Create the mesh
+        cube = Mesh(np.zeros(faces.shape[0], dtype=Mesh.dtype), calculate_normals=False)
+
+        for i, f in enumerate(faces):
+            for j in range(3):
+                cube.vectors[i][j] = vertices[f[j], :]
+
+        cube.update_normals()
+        print(str(cube.normals))
+
+        m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
+        m.parent = self
+        m.is_wipe_tower = True
+
+        print(str(m.mesh.normals))
+        print(str(m.tiled_normals))
+
+
+        self.models.append(m)
+
+
 
     def set_no_changes(self):
         for m in self.models:
@@ -667,6 +724,7 @@ class Model(object):
         self.is_multipart_model = False
         self.multipart_parent = []
         self.extruder = 1
+        self.is_wipe_tower = False
 
         self.texture_size = 16
         self.variable_texture_data = np.full((self.texture_size*self.texture_size*4), 255, dtype=np.int)
@@ -784,83 +842,6 @@ class Model(object):
 
     def set_extruder(self, extruder_number):
         self.extruder = extruder_number
-
-    def recalculate_texture(self):
-        #TODO:
-        #coef = (self.texture_size*self.texture_size)/11.
-        #coef = [int(np.floor(((self.texture_size * self.texture_size*4.) / 11.) * i)) for i in range(0, 11)]
-        #interpolate = [i for i in range(0, self.texture_size * self.texture_size)]
-        #self.variable_layer_height_data
-        #print("Coef: " + str(coef))
-
-        print("variable vector: " + str(len(self.variable_layer_height_data)))
-        pprint(self.variable_layer_height_data)
-
-        interpolated_vector = np.array([])
-        for i in range(0, 10, 1):
-            interpolated_vector = np.append(interpolated_vector,
-                np.linspace(self.variable_layer_height_data[i],
-                            self.variable_layer_height_data[i+1],
-                            np.floor(self.texture_size*self.texture_size)/11.)
-                )
-
-        print("Interpolated vector: " + str(len(interpolated_vector)))
-        pprint(interpolated_vector)
-
-
-        '''
-        n = 0
-        for i in range(0, self.texture_size*self.texture_size*4, 4):
-            change = 0.0
-            if i in coef:
-                print(i)
-                change = self.variable_layer_height_data[n]
-                n+=1
-
-            self.variable_texture_data[i + 0] = 100 + int(change*75) # R
-            self.variable_texture_data[i + 1] = 100 + int(change*75) # G
-            self.variable_texture_data[i + 2] = 100 + int(change*75) # B
-            self.variable_texture_data[i + 3] = 255 # A
-        '''
-
-        #self.variable_texture_data = np.array([], dtype=np.int)
-
-
-        for n in range(0, self.texture_size*self.texture_size, 1):
-            if n in interpolated_vector:
-                i = interpolated_vector[n*-1]
-            else:
-                i = 0.0
-            if i == 0.0:
-                self.variable_texture_data[n * 4 + 0] = 255
-                self.variable_texture_data[n * 4 + 1] = 255
-                self.variable_texture_data[n * 4 + 2] = 255
-                self.variable_texture_data[n * 4 + 3] = 255
-                #np.append(self.variable_texture_data, np.array([255, 255, 255, 255], dtype=np.int))
-            elif i < 0.0:
-                self.variable_texture_data[n * 4 + 0] = 1
-                self.variable_texture_data[n * 4 + 1] = 1
-                self.variable_texture_data[n * 4 + 2] = int(100*-i)
-                self.variable_texture_data[n * 4 + 3] = 255
-                #np.append(self.variable_texture_data, np.array([55, 55, int(100*i), 255], dtype=np.int))
-            elif i > 0.0:
-                self.variable_texture_data[n * 4 + 0] = int(100*i)
-                self.variable_texture_data[n * 4 + 1] = 1
-                self.variable_texture_data[n * 4 + 2] = 1
-                self.variable_texture_data[n * 4 + 3] = 255
-                #np.append(self.variable_texture_data, np.array([int(100*i), 55, 55, 255], dtype=np.int))
-
-        #print("Data: " + str(self.variable_texture_data))
-
-
-        self.variable_texture = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, self.variable_texture)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, self.texture_size, self.texture_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, self.variable_texture_data)
-        glBindTexture(GL_TEXTURE_2D, 0)
 
 
     def reset_transformation(self):
@@ -1672,8 +1653,10 @@ class MultiModel(Model):
     '''
     this is class for object constructed from more models(mainly for multimaterial printing)
     '''
+    group_id_counter = itertools.count(1)
     def __init__(self, models_lst, parent):
         super(MultiModel, self).__init__()
+        self.group_id = next(self.group_id_counter)
         self.models = models_lst
         self.parent = parent
         self.filename = "multi"

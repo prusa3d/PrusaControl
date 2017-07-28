@@ -1085,8 +1085,10 @@ class Controller(QObject):
         pass
 
 
-    def recalculate_vaste_tower(self):
+    def recalculate_waste_tower(self):
         print("calculating vaste tower")
+        #TODO:
+
 
 
 

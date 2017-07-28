@@ -1827,13 +1827,14 @@ class PrusaControlView(QMainWindow):
             return
         if mesh_tmp.is_multipart_model:
             mesh = mesh_tmp.multipart_parent
-            extruder_index = mesh_tmp.extruder
+            print("Group ID: " + str(mesh.group_id))
         else:
             mesh = mesh_tmp
         self.object_group_box.setEnabled(True)
         self.object_id = object_id
 
         if self.controller.is_multimaterial():
+            extruder_index = mesh_tmp.extruder
             self.object_extruder_c.setCurrentIndex(extruder_index-1)
 
         self.filename_label.setText(mesh_tmp.filename)
@@ -1865,10 +1866,43 @@ class PrusaControlView(QMainWindow):
 
         self.set_scale_widgets(mesh)
 
+        if mesh.is_wipe_tower:
+            self.disable_edit_for_wipe_tower()
+        else:
+            self.enable_edit_for_normal_objects()
+
         self.variable_layer_widget.setMaximum(mesh.size[2]*10.)
         self.variable_layer_widget.setMinimum(0.0)
         self.variable_layer_widget.set_number_of_ticks(10)
         self.variable_layer_widget.set_model(mesh)
+
+    def disable_edit_for_wipe_tower(self):
+        self.edit_scale_x.setEnabled(False)
+        self.edit_scale_y.setEnabled(False)
+        self.edit_scale_z.setEnabled(False)
+        self.combobox_scale_units.setEnabled(False)
+
+        self.edit_rot_x.setEnabled(False)
+        self.edit_rot_y.setEnabled(False)
+        self.edit_rot_z.setEnabled(False)
+
+        self.object_extruder_c.setEnabled(False)
+        self.place_on_zero.setEnabled(False)
+        self.lock_scale_axes_checkbox.setEnabled(False)
+
+    def enable_edit_for_normal_objects(self):
+        self.edit_scale_x.setEnabled(True)
+        self.edit_scale_y.setEnabled(True)
+        self.edit_scale_z.setEnabled(True)
+        self.combobox_scale_units.setEnabled(True)
+
+        self.edit_rot_x.setEnabled(True)
+        self.edit_rot_y.setEnabled(True)
+        self.edit_rot_z.setEnabled(True)
+
+        self.object_extruder_c.setEnabled(True)
+        self.place_on_zero.setEnabled(True)
+        self.lock_scale_axes_checkbox.setEnabled(True)
 
 
     def set_scale_widgets(self, mesh):
@@ -1942,7 +1976,7 @@ class PrusaControlView(QMainWindow):
             if not model:
                 return
             model.set_extruder(widget.currentIndex()+1)
-            self.controller.recalculate_vaste_tower()
+            self.controller.recalculate_waste_tower()
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
