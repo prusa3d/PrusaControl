@@ -58,6 +58,10 @@ class AppScene(object):
         self.controller = controller
         self.model_position_offset = 0.1
 
+        self.size_x = 60.
+        self.size_y = 45.
+        self.size_z = .1
+
         self.sceneZero = [.0, .0, .0]
         self.models = []
         self.multipart_models = []
@@ -77,14 +81,22 @@ class AppScene(object):
 
         self.is_waste_tower = False
         self.place_of_waste_tower = np.array([.0, .0, .0])
-        self.waste_tower_model = []
+        self.wipe_tower_model = []
 
         self.create_wipe_tower()
 
     def create_wipe_tower(self):
-        size_x = 60.
-        size_y = 45.
-        size_z = .1
+        size_x = self.size_x
+        size_y = self.size_y
+        size_z = self.size_z
+
+        if len(self.get_models()) == 0:
+            #no wipe_tower
+            old_wipe_tower = []
+        else:
+            #something is in scene
+            old_wipe_tower = self.wipe_tower_model
+
 
         # Define the 8 vertices of the cube
         vertices = np.array([ \
@@ -120,19 +132,39 @@ class AppScene(object):
                 cube.vectors[i][j] = vertices[f[j], :]
 
         cube.update_normals()
-        print(str(cube.normals))
 
-        m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
-        m.parent = self
-        m.is_wipe_tower = True
+        if old_wipe_tower:
+            old_wipe_tower = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
 
-        print(str(m.mesh.normals))
-        print(str(m.tiled_normals))
+        else:
+            m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
+            m.parent = self
+            m.is_wipe_tower = True
+            self.wipe_tower_model = m
+
+            self.models.append(m)
+
+    def update_wipe_tower_z(self):
+        list_of_z = [m.get_maximal_z() for m in self.get_models()]
+        max = np.amax(list_of_z)
+        self.size_z = max
+
+        print("Size in z: " + str(self.size_z*10.))
+
+        self.create_wipe_tower()
 
 
-        self.models.append(m)
+    def get_wipe_tower_possition_and_size(self):
+        printer_parameters = self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)
 
+        parameters = {}
+        parameters['is_wipe_tower'] = int(self.controller.is_multimaterial())
+        parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0]-self.size_x*.05)*10. + printer_parameters['printing_space'][0]*.5)
+        parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1]-self.size_y*.05)*10. + printer_parameters['printing_space'][1]*.5)
+        parameters['wipe_size_x'] = int(self.size_x)
+        parameters['wipe_size_y'] = int(self.size_y/3)
 
+        return parameters
 
     def set_no_changes(self):
         for m in self.models:
@@ -436,7 +468,10 @@ class AppScene(object):
                 if m.is_multipart_model:
                     m.multipart_parent.delete_models()
                 else:
-                    m.isVisible = False
+                    if m.is_wipe_tower:
+                        pass
+                    else:
+                        m.isVisible = False
 
         #TODO: Add state to history
         self.clear_selected_models()
@@ -521,11 +556,12 @@ class AppScene(object):
         for m in self.get_models():
             #Set possition by fce
             zer = np.array([.0, .0, .0])
-            m.pos[0] = zer[0]
-            m.pos[1] = zer[1]
+            m.set_2d_pos(zer)
+            #m.pos[0] = zer[0]
+            #m.pos[1] = zer[1]
 
-            m.max_scene = m.max + m.pos
-            m.min_scene = m.min + m.pos
+            #m.max_scene = m.max + m.pos
+            #m.min_scene = m.min + m.pos
 
         #place biggest object(first one) on center
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
@@ -533,8 +569,9 @@ class AppScene(object):
             #grid placing algoritm
             self.place_objects_in_grid()
         else:
+            placed_groups = []
             for i, m in enumerate(self.get_models()):
-                self.find_new_position(i, m)
+                self.find_new_position(i, m, placed_groups)
 
         self.save_change(self.models)
 
@@ -570,42 +607,55 @@ class AppScene(object):
             m.update_min_max()
 
 
-    def find_new_position(self, index, model):
+    def find_new_position(self, index, model, placed_groups):
         position_vector = [.0, .0]
+        pos = np.array([.0,.0,.0])
         if index == 0:
-            self.get_models()[0].pos[0] = position_vector[0]
-            self.get_models()[0].pos[1] = position_vector[1]
+            if self.get_models()[0].is_multipart_model:
+                placed_groups.append(self.get_models()[0].multipart_parent.group_id)
+            self.get_models()[0].set_2d_pos(position_vector)
+            #self.get_models()[0].pos[0] = position_vector[0]
+            #self.get_models()[0].pos[1] = position_vector[1]
 
-            self.get_models()[0].max_scene = self.get_models()[0].max + self.get_models()[0].pos
-            self.get_models()[0].min_scene = self.get_models()[0].min + self.get_models()[0].pos
+            #self.get_models()[0].max_scene = self.get_models()[0].max + self.get_models()[0].pos
+            #self.get_models()[0].min_scene = self.get_models()[0].min + self.get_models()[0].pos
             return
         scene_tmp = self.get_models()[:index]
         if index > 0:
+            if model.is_multipart_model:
+                if model.multipart_parent.group_id in placed_groups:
+                    return
             while model.intersection_model_list_model_(scene_tmp):
                 #for angle in range(0, 360, 20):
                 for angle in range(0, 360, 45):
-                    model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
-                    model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
+                    pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
+                    pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
+                    model.set_2d_pos(pos)
 
-                    model.max_scene = model.max + model.pos
-                    model.min_scene = model.min + model.pos
+                    #model.max_scene = model.max + model.pos
+                    #model.min_scene = model.min + model.pos
 
                     #TODO:Add some test for checking if object is inside of printing space of printer
                     if not model.intersection_model_list_model_(scene_tmp):
+                        if model.is_multipart_model:
+                            placed_groups.append(model.multipart_parent.group_id)
                         return
 
                 for angle in range(0, 360, 5):
                     #this angels are tried
                     if angle in [0, 45, 90, 135, 180, 225, 270, 315, 360]:
                         continue
-                    model.pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
-                    model.pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
+                    pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
+                    pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
+                    model.set_2d_pos(pos)
 
-                    model.max_scene = model.max + model.pos
-                    model.min_scene = model.min + model.pos
+                    #model.max_scene = model.max + model.pos
+                    #model.min_scene = model.min + model.pos
 
                     #TODO:Add some test for checking if object is inside of printing space of printer
                     if not model.intersection_model_list_model_(scene_tmp):
+                        if model.is_multipart_model:
+                            placed_groups.append(model.multipart_parent.group_id)
                         return
 
                 position_vector[0] += model.boundingSphereSize*.1
@@ -643,11 +693,13 @@ class AppScene(object):
 
     def save_whole_scene_to_one_stl_file(self, filename):
         whole_scene = self.get_whole_scene_in_one_mesh(True)
-        whole_scene.save(filename, None, mode=stl.Mode.ASCII, update_normals=False)
+        whole_scene.save(filename, None, mode=stl.Mode.BINARY, update_normals=True)
 
     def is_scene_printable(self):
         scene_models = [m for m in self.models if m.isVisible]
         if len(scene_models) == 0:
+            return False
+        if len(scene_models) == 1 and scene_models[0].is_wipe_tower:
             return False
         for model in scene_models:
             if not model.is_in_printing_space(self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)):
@@ -1011,6 +1063,22 @@ class Model(object):
 
         self.normalization_flag = True
 
+    def set_2d_pos(self, vector):
+        vector = np.array(vector)
+        if self.is_multipart_model:
+            self.multipart_parent.pos[0] = vector[0]
+            self.multipart_parent.pos[1] = vector[1]
+
+            self.multipart_parent.update_min_max()
+        else:
+            self.pos[0] = vector[0]
+            self.pos[1] = vector[1]
+
+            self.min_scene = self.min + self.pos
+            self.max_scene = self.max + self.pos
+
+
+
     def set_move(self, vector, add=True, place_on_zero=False):
         vector = np.array(vector)
         if self.is_multipart_model:
@@ -1064,6 +1132,11 @@ class Model(object):
                                         [ 0.,  1.,  0.],
                                         [ 0.,  0.,  1.]])
     '''
+
+    def get_maximal_z(self):
+        return self.max_scene[2]
+
+
 
     def place_on_zero(self):
         min = self.min_scene

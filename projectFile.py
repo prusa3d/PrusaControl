@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 
 __author__ = 'Tibor Vavra'
 
@@ -17,7 +18,7 @@ import stl
 
 from stl.mesh import Mesh
 
-from sceneData import ModelTypeStl
+from sceneData import ModelTypeStl, MultiModel
 
 fileExtension = 'prusa'
 
@@ -91,6 +92,12 @@ class Version_1_0(VersionAbstract):
             for model in models.findall('model'):
                 model_data = {}
                 model_data['file_name'] = model.get('name')
+                if model.find('extruder'):
+                    print("je tam extruder")
+                    model_data['extruder'] = ast.literal_eval(model.find('extruder').text)
+                if model.find('group'):
+                    print("je tam group")
+                    model_data['group'] = ast.literal_eval(model.find('group').text)
                 model_data['normalization'] = ast.literal_eval(model.find('normalization').text)
                 model_data['position'] = ast.literal_eval(model.find('position').text)
                 model_data['rotation'] = ast.literal_eval(model.find('rotation').text)
@@ -98,7 +105,10 @@ class Version_1_0(VersionAbstract):
                 models_data.append(model_data)
 
             #scene.models = []
+            models_groups = {}
+            groups_properties = {}
             for m in models_data:
+                print(str(m))
                 logging.debug("Jmeno souboru je: " + m['file_name'])
 
                 tmp = scene.controller.app_config.tmp_place
@@ -109,15 +119,48 @@ class Version_1_0(VersionAbstract):
                 os.remove(model_filename)
 
                 #mesh = Mesh.from_file(filename="", fh=openedZipfile.open(m['file_name']))
-                model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
-                model.rot = numpy.array(m['rotation'])
-                model.pos = numpy.array(m['position'])
-                model.pos *= 0.1
-                model.scale = numpy.array(m['scale'])
-                model.update_min_max()
-                model.parent = scene
+                if 'group' in m:
+                    model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
+                else:
+                    model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
+                if 'extruder' in m:
+                    model.extruder = int(m['extruder'])
+
+                if 'group' in m:
+                    print("group")
+                    model.is_multipart_model = True
+                    if m['group'] in models_groups:
+                        models_groups[m['group']].append(model)
+                    else:
+                        models_groups[m['group']] = []
+                        models_groups[m['group']].append(model)
+
+                    groups_properties[m['group']]['pos'] = numpy.array(m['position'])
+                    groups_properties[m['group']]['rot'] = numpy.array(m['rotation']) *0.1
+                    groups_properties[m['group']]['scale'] = numpy.array(m['scale'])
+
+                else:
+                    print("ne group")
+                    model.rot = numpy.array(m['rotation'])
+                    model.pos = numpy.array(m['position'])
+                    model.pos *= 0.1
+                    model.scale = numpy.array(m['scale'])
+                    model.update_min_max()
+                    model.parent = scene
 
                 scene.models.append(model)
+
+            for group in models_groups:
+                print("Vytvarim multimodel")
+                print("List modelu: " +str(models_groups[group]))
+
+                mm = MultiModel(models_groups[group], scene)
+                mm.pos = groups_properties[group]['pos']
+                mm.rot = groups_properties[group]['rot']
+                mm.scale = groups_properties[group]['scale']
+                scene.multipart_models.append(mm)
+
+
 
     def save(self, scene, filename):
         printing_space =  scene.controller.printing_parameters.get_printer_parameters(scene.controller.actual_printer)
@@ -135,13 +178,31 @@ class Version_1_0(VersionAbstract):
 
 
             for model in scene.models:
-                if model.isVisible:
-                    pos = model.pos*10.
-                    model_element = ET.SubElement(models_tag, "model", name=model.filename)
-                    ET.SubElement(model_element, "normalization").text=str(model.normalization_flag)
-                    ET.SubElement(model_element, "position").text=str(pos.tolist())
-                    ET.SubElement(model_element, "rotation").text=str(model.rot.tolist())
-                    ET.SubElement(model_element, "scale").text=str(model.scale.tolist())
+                if model.isVisible and not model.is_wipe_tower:
+                    if model.is_multipart_model:
+                        model_tmp = model.multipart_parent
+                        pos = deepcopy(model.pos)
+                        pos += model_tmp.pos
+                        pos *= 10.
+                        model_element = ET.SubElement(models_tag, "model", name=model.filename)
+                        ET.SubElement(model_element, "extruder").text = str(model.extruder)
+                        if model.is_multipart_model:
+                            ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
+                        ET.SubElement(model_element, "normalization").text = str(model.normalization_flag)
+                        ET.SubElement(model_element, "position").text = str(pos.tolist())
+                        ET.SubElement(model_element, "rotation").text = str(model_tmp.rot.tolist())
+                        ET.SubElement(model_element, "scale").text = str(model_tmp.scale.tolist())
+                    else:
+                        pos = model.pos*10.
+                        model_element = ET.SubElement(models_tag, "model", name=model.filename)
+                        ET.SubElement(model_element, "extruder").text = str(model.extruder)
+                        if model.is_multipart_model:
+                            ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
+                        ET.SubElement(model_element, "normalization").text = str(model.normalization_flag)
+                        ET.SubElement(model_element, "position").text = str(pos.tolist())
+                        ET.SubElement(model_element, "rotation").text = str(model.rot.tolist())
+                        ET.SubElement(model_element, "scale").text = str(model.scale.tolist())
+
 
             #save xml file to new created zip file
             newXml = ET.tostring(root)
@@ -149,12 +210,12 @@ class Version_1_0(VersionAbstract):
 
             #write stl files to zip file
             for model in scene.models:
-                if model.isVisible:
+                if model.isVisible and not model.is_wipe_tower:
                     #transform data to stl file
-                    mesh= model.get_mesh(False, False)
+                    mesh = model.get_mesh(False, False)
 
                     model_filename = scene.controller.app_config.tmp_place + model.filename
-                    mesh.save(model_filename, mode=stl.Mode.BINARY)
+                    mesh.save(model_filename, mode=stl.Mode.BINARY, update_normals=False)
                     zip_fh.write(model_filename, model.filename)
                     os.remove(model_filename)
 

@@ -121,7 +121,15 @@ class Slic3rEngineRunner(QObject):
             ['overhangs', 'overhangs', self.support3_transform],
 
             ['support_material_extruder', 'support_material_extruder', self.support4_transform],
-            ['support_material_interface_extruder', 'support_material_interface_extruder', self.str_transform]
+            ['support_material_interface_extruder', 'support_material_interface_extruder', self.str_transform],
+
+            ['wipe_tower', 'is_wipe_tower', self.str_transform],
+            ['wipe_tower_per_color_wipe', 'wipe_size_y', self.str_transform],
+            ['wipe_tower_width', 'wipe_size_x', self.str_transform],
+            ['wipe_tower_x', 'wipe_pos_x', self.str_transform],
+            ['wipe_tower_y', 'wipe_pos_y', self.str_transform],
+
+            ['single_extruder_multi_material', 'is_multimat', self.str_transform]
 
         ]
         for i in translation_table:
@@ -218,11 +226,15 @@ class Slic3rEngineRunner(QObject):
     def slice(self):
         self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
 
-        #DEV
-        return
-        #DEV
 
-        self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
+        if self.controller.is_multimaterial():
+            self.process = subprocess.Popen(
+                self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.prusa', '--load',
+                                     self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
+                                     self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
+                stdout=subprocess.PIPE)
+        else:
+            self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
                                     self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
                                     self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
                                    stdout=subprocess.PIPE)

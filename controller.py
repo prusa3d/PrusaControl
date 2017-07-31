@@ -665,7 +665,20 @@ class Controller(QObject):
         return [0, 10, 15, 20, 30, 50, 70]
 
     def get_actual_printing_data(self):
-        return self.view.get_actual_printing_data()
+        #GUI parameters
+        gui_parameters = self.view.get_actual_printing_data()
+        #Scene parameters(wipe tower possition)
+        scene_parameters = self.scene.get_wipe_tower_possition_and_size()
+
+        #multimaterial parameters
+        multimat = dict()
+        multimat["is_multimat"] = int(self.is_multimaterial())
+
+        out = {}
+        for param in (gui_parameters, scene_parameters, multimat):
+            out.update(param)
+
+        return out
 
 
     def open_cancel_generating_dialog(self):
@@ -893,6 +906,8 @@ class Controller(QObject):
 
         self.scene.normalize_group_of_models(model_lst)
 
+        #self.update_wipe_tower()
+
         #not right way
         #for m in model_lst:
         #    m.pos = model_lst[0].pos
@@ -920,6 +935,10 @@ class Controller(QObject):
         self.update_scene()
 
         #self.view.update_scene()
+
+    def update_wipe_tower(self):
+        if self.is_multimaterial():
+            self.scene.update_wipe_tower_z()
 
     def save_project(self, path):
         self.scene.check_models_name()
@@ -964,11 +983,18 @@ class Controller(QObject):
     def generate_gcode(self):
         self.set_progress_bar(int((100. / 9.)))
         if self.scene.models:
-            self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")
+            if self.is_multimaterial():
+                self.save_whole_scene_to_one_prusa_file(self.app_config.tmp_place + "tmp.prusa")
+            else:
+                self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")
             self.slicer_manager.slice()
 
     def gcode_generated(self):
         self.view.enable_save_gcode_button()
+
+    def save_whole_scene_to_one_prusa_file(self, path):
+        self.save_project(path)
+        self.scene_was_saved = False
 
     def close(self):
         self.analyzer.cancel_analyz()
