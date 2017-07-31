@@ -214,6 +214,9 @@ class Controller(QObject):
         self.show_message_on_status_bar("Ready")
         self.create_messages()
 
+        if self.is_multimaterial():
+            self.add_wipe_tower()
+
     def is_multimaterial(self):
         if self.printer_number_of_materials > 1:
             return True
@@ -757,7 +760,7 @@ class Controller(QObject):
             suggest_filename = "mix"
         '''
         for m in self.scene.models:
-            if m.isVisible:
+            if m.isVisible and not m.is_wipe_tower:
                 filename = m.filename
                 break
 
@@ -770,7 +773,7 @@ class Controller(QObject):
             material_name = data['material']
             quality_name = data['quality']
 
-            suggest_filename += "_" + material_name.upper() + "_" + quality_name.upper()
+            suggest_filename += "_" + material_name[0].upper() + "_" + quality_name.upper()
             print(suggest_filename)
 
         return suggest_filename
@@ -971,11 +974,19 @@ class Controller(QObject):
         if self.printer_number_of_materials>1:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
             self.update_material_settings()
+            self.add_wipe_tower()
         else:
             self.view.set_multimaterial_gui_off()
             self.update_material_settings()
+            self.remove_wipe_tower()
 
         self.settings = temp_settings
+
+    def add_wipe_tower(self):
+        self.scene.create_wipe_tower()
+
+    def remove_wipe_tower(self):
+        self.scene.remove_wipe_tower()
 
     def open_about(self):
         self.view.open_about_dialog()

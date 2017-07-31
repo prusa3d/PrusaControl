@@ -83,19 +83,12 @@ class AppScene(object):
         self.place_of_waste_tower = np.array([.0, .0, .0])
         self.wipe_tower_model = []
 
-        self.create_wipe_tower()
+
 
     def create_wipe_tower(self):
         size_x = self.size_x
         size_y = self.size_y
         size_z = self.size_z
-
-        if len(self.get_models()) == 0:
-            #no wipe_tower
-            old_wipe_tower = []
-        else:
-            #something is in scene
-            old_wipe_tower = self.wipe_tower_model
 
 
         # Define the 8 vertices of the cube
@@ -133,25 +126,18 @@ class AppScene(object):
 
         cube.update_normals()
 
-        if old_wipe_tower:
-            old_wipe_tower = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
+        m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
+        m.parent = self
+        m.is_wipe_tower = True
+        self.wipe_tower_model = m
 
-        else:
-            m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
-            m.parent = self
-            m.is_wipe_tower = True
-            self.wipe_tower_model = m
+        self.models.append(m)
 
-            self.models.append(m)
 
-    def update_wipe_tower_z(self):
-        list_of_z = [m.get_maximal_z() for m in self.get_models()]
-        max = np.amax(list_of_z)
-        self.size_z = max
-
-        print("Size in z: " + str(self.size_z*10.))
-
-        self.create_wipe_tower()
+    def remove_wipe_tower(self):
+        if self.wipe_tower_model:
+            self.models.remove(self.wipe_tower_model)
+            self.wipe_tower_model = None
 
 
     def get_wipe_tower_possition_and_size(self):
@@ -632,9 +618,6 @@ class AppScene(object):
                     pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
                     model.set_2d_pos(pos)
 
-                    #model.max_scene = model.max + model.pos
-                    #model.min_scene = model.min + model.pos
-
                     #TODO:Add some test for checking if object is inside of printing space of printer
                     if not model.intersection_model_list_model_(scene_tmp):
                         if model.is_multipart_model:
@@ -648,9 +631,6 @@ class AppScene(object):
                     pos[0] = math.cos(math.radians(angle)) * (position_vector[0])
                     pos[1] = math.sin(math.radians(angle)) * (position_vector[1])
                     model.set_2d_pos(pos)
-
-                    #model.max_scene = model.max + model.pos
-                    #model.min_scene = model.min + model.pos
 
                     #TODO:Add some test for checking if object is inside of printing space of printer
                     if not model.intersection_model_list_model_(scene_tmp):
