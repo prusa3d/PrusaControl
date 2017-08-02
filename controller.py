@@ -175,6 +175,7 @@ class Controller(QObject):
         self.scene = AppScene(self)
         progress_bar(90)
         self.view = PrusaControlView(self)
+        self.update_object_extruders()
 
         progress_bar(92)
 
@@ -216,6 +217,28 @@ class Controller(QObject):
 
         if self.is_multimaterial():
             self.add_wipe_tower()
+
+    def update_object_extruders(self):
+        self.view.update_object_extruders_cb()
+
+    def open_color_pick_dialog1(self):
+        self.view.open_color_pick_dialog1()
+
+    def open_color_pick_dialog2(self):
+        self.view.open_color_pick_dialog2()
+
+    def open_color_pick_dialog3(self):
+        self.view.open_color_pick_dialog3()
+
+    def open_color_pick_dialog4(self):
+        self.view.open_color_pick_dialog4()
+
+    def get_extruder_color(self, extruder_number):
+        #print(extruder_number)
+        #print(self.view.extruder1_color)
+        extruders_color_lst = [self.view.extruder1_color, self.view.extruder2_color, self.view.extruder3_color, self.view.extruder4_color]
+        return extruders_color_lst[extruder_number-1]
+
 
     def is_multimaterial(self):
         if self.printer_number_of_materials > 1:

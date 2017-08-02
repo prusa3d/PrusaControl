@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+from PIL.ImageEnhance import Color
+from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QColorDialog
+from PyQt4.QtGui import QStandardItem
+
 __author__ = 'Tibor Vavra'
 
 import logging
@@ -786,15 +791,16 @@ class PrusaControlView(QMainWindow):
         self.name_l = QLabel(self.object_group_box)
         self.name_l.setObjectName("name_l")
 
-
         self.object_extruder_l = QLabel("", self.object_group_box)
         self.object_extruder_l.setObjectName("object_extruder_l")
         self.object_extruder_c = QComboBox(self.object_group_box)
         if self.controller.app_config.system_platform in ['Linux']:
             self.object_extruder_c.setStyle(QStyleFactory.create('Windows'))
         self.object_extruder_c.setObjectName("object_extruder_c")
+
         self.object_extruder_c.insertItems(4, ['Extruder 1', 'Extruder 2', 'Extruder 3', 'Extruder 4'])
         self.object_extruder_c.setCurrentIndex(0)
+
         self.object_extruder_c.currentIndexChanged.connect(lambda: self.set_extruder_on_object(self.object_extruder_c,
                                                                                                self.get_object_id()))
 
@@ -1091,6 +1097,10 @@ class PrusaControlView(QMainWindow):
         self.materials_settings_l = QLabel()
         self.materials_settings_l.setObjectName("materials_settings_l")
 
+        self.extruder1_cb = QPushButton()
+        self.extruder1_color = QColor.fromRgb(255, 170, 85)
+        self.extruder1_cb.setObjectName("extruder1_cb")
+        self.extruder1_cb.clicked.connect(self.controller.open_color_pick_dialog1)
         self.extruder1_l = QLabel()
         self.extruder1_l.setObjectName("extruder1_l")
         self.extruder1_c = QComboBox()
@@ -1102,6 +1112,10 @@ class PrusaControlView(QMainWindow):
         self.extruder1_c.setObjectName("extruder1_c")
         self.extruder1_c.setMaxVisibleItems(len(material_label_ls))
 
+        self.extruder2_cb = QPushButton()
+        self.extruder2_color = QColor.fromRgb(81, 130, 219)
+        self.extruder2_cb.setObjectName("extruder2_cb")
+        self.extruder2_cb.clicked.connect(self.controller.open_color_pick_dialog2)
         self.extruder2_l = QLabel()
         self.extruder2_l.setObjectName("extruder2_l")
         self.extruder2_c = QComboBox()
@@ -1113,6 +1127,10 @@ class PrusaControlView(QMainWindow):
         self.extruder2_c.setObjectName("extruder2_c")
         self.extruder2_c.setMaxVisibleItems(len(material_label_ls))
 
+        self.extruder3_cb = QPushButton()
+        self.extruder3_color = QColor.fromRgb(78, 205, 211)
+        self.extruder3_cb.setObjectName("extruder3_cb")
+        self.extruder3_cb.clicked.connect(self.controller.open_color_pick_dialog3)
         self.extruder3_l = QLabel()
         self.extruder3_l.setObjectName("extruder3_l")
         self.extruder3_c = QComboBox()
@@ -1124,6 +1142,10 @@ class PrusaControlView(QMainWindow):
         self.extruder3_c.setObjectName("extruder3_c")
         self.extruder3_c.setMaxVisibleItems(len(material_label_ls))
 
+        self.extruder4_cb = QPushButton()
+        self.extruder4_color = QColor.fromRgb(251, 114, 89)
+        self.extruder4_cb.setObjectName("extruder4_cb")
+        self.extruder4_cb.clicked.connect(self.controller.open_color_pick_dialog4)
         self.extruder4_l = QLabel()
         self.extruder4_l.setObjectName("extruder4_l")
         self.extruder4_c = QComboBox()
@@ -1172,20 +1194,29 @@ class PrusaControlView(QMainWindow):
 
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
-        printing_parameters_layout = QGridLayout()
+        printing_mm_parameters_layout = QGridLayout()
         #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
+        printing_mm_parameters_layout.setColumnMinimumWidth(0, 10)
+        printing_mm_parameters_layout.addWidget(self.materials_settings_l, 0, 0, 1, 3)
+        printing_mm_parameters_layout.addWidget(self.extruder1_cb, 1, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder1_l, 1, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder1_c, 1, 2, 1, 2)
 
-        printing_parameters_layout.addWidget(self.materials_settings_l, 0, 0, 1, 3)
-        printing_parameters_layout.addWidget(self.extruder1_l, 1, 0)
-        printing_parameters_layout.addWidget(self.extruder1_c, 1, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.extruder2_l, 2, 0)
-        printing_parameters_layout.addWidget(self.extruder2_c, 2, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.extruder3_l, 3, 0)
-        printing_parameters_layout.addWidget(self.extruder3_c, 3, 1, 1, 3)
-        printing_parameters_layout.addWidget(self.extruder4_l, 4, 0)
-        printing_parameters_layout.addWidget(self.extruder4_c, 4, 1, 1, 3)
+        printing_mm_parameters_layout.addWidget(self.extruder2_cb, 2, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder2_l, 2, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder2_c, 2, 2, 1, 2)
 
+        printing_mm_parameters_layout.addWidget(self.extruder3_cb, 3, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder3_l, 3, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder3_c, 3, 2, 1, 2)
+
+        printing_mm_parameters_layout.addWidget(self.extruder4_cb, 4, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder4_l, 4, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder4_c, 4, 2, 1, 2)
+
+
+        printing_parameters_layout = QGridLayout()
         printing_parameters_layout.addWidget(self.printer_settings_l, 6, 0, 1, 3)
         printing_parameters_layout.addWidget(self.materialLabel, 7,0)
         printing_parameters_layout.addWidget(self.materialCombo, 7, 1, 1, 3)
@@ -1199,7 +1230,7 @@ class PrusaControlView(QMainWindow):
         printing_parameters_layout.addWidget(self.brim_label, 11, 0)
         printing_parameters_layout.addWidget(self.brimCheckBox, 11, 1, 1, 3)
 
-
+        self.right_panel_layout.addLayout(printing_mm_parameters_layout)
         self.right_panel_layout.addLayout(printing_parameters_layout)
 
         self.right_panel_layout.addWidget(self.object_group_box)
@@ -1278,6 +1309,20 @@ class PrusaControlView(QMainWindow):
         #print("Show all")
         self.show()
 
+
+    def update_object_extruders_cb(self):
+        actual_index = self.object_extruder_c.currentIndex()
+        self.object_extruder_c.clear()
+
+        model = self.object_extruder_c.model()
+        for n, i in enumerate(['Extruder 1', 'Extruder 2', 'Extruder 3', 'Extruder 4']):
+            item = QStandardItem(str(i))
+            item.setBackground(self.controller.get_extruder_color(n+1))
+            model.appendRow(item)
+
+        self.object_extruder_c.setCurrentIndex(actual_index)
+
+
     def set_scale(self, scale):
         #resize window
         print(scale)
@@ -1292,6 +1337,35 @@ class PrusaControlView(QMainWindow):
                 print(scale* widget.maximumWidth())
                 print(scale * widget.maximumHeight())
                 widget.setFixedSize((int)(scale * widget.maximumWidth()), (int)(scale * widget.maximumHeight()))
+
+
+    def open_color_pick_dialog1(self):
+        color = QColorDialog.getColor(self.extruder1_color)
+        if color.isValid():
+            self.extruder1_color = color
+            self.extruder1_cb.setStyleSheet("background-color: rgb(%s, %s, %s)" % (color.red(), color.green(), color.blue()))
+            self.update_object_extruders_cb()
+
+    def open_color_pick_dialog2(self):
+        color = QColorDialog.getColor(self.extruder2_color)
+        if color.isValid():
+            self.extruder2_color = color
+            self.extruder2_cb.setStyleSheet("background-color: rgb(%s, %s, %s)" % (color.red(), color.green(), color.blue()))
+            self.update_object_extruders_cb()
+
+    def open_color_pick_dialog3(self):
+        color = QColorDialog.getColor(self.extruder3_color)
+        if color.isValid():
+            self.extruder3_color = color
+            self.extruder3_cb.setStyleSheet("background-color: rgb(%s, %s, %s)" % (color.red(), color.green(), color.blue()))
+            self.update_object_extruders_cb()
+
+    def open_color_pick_dialog4(self):
+        color = QColorDialog.getColor(self.extruder4_color)
+        if color.isValid():
+            self.extruder4_color = color
+            self.extruder4_cb.setStyleSheet("background-color: rgb(%s, %s, %s)" % (color.red(), color.green(), color.blue()))
+            self.update_object_extruders_cb()
 
 
     def set_default(self):
@@ -1393,23 +1467,31 @@ class PrusaControlView(QMainWindow):
         self.create_menu()
         self.materials_settings_l.setVisible(True)
         if number_of_materials==2:
+            self.extruder1_cb.setVisible(True)
             self.extruder1_l.setVisible(True)
             self.extruder1_c.setVisible(True)
+            self.extruder2_cb.setVisible(True)
             self.extruder2_l.setVisible(True)
             self.extruder2_c.setVisible(True)
 
+            self.extruder3_cb.setVisible(False)
             self.extruder3_l.setVisible(False)
             self.extruder3_c.setVisible(False)
+            self.extruder4_cb.setVisible(False)
             self.extruder4_l.setVisible(False)
             self.extruder4_c.setVisible(False)
         elif number_of_materials==4:
+            self.extruder1_cb.setVisible(True)
             self.extruder1_l.setVisible(True)
             self.extruder1_c.setVisible(True)
+            self.extruder2_cb.setVisible(True)
             self.extruder2_l.setVisible(True)
             self.extruder2_c.setVisible(True)
 
+            self.extruder3_cb.setVisible(True)
             self.extruder3_l.setVisible(True)
             self.extruder3_c.setVisible(True)
+            self.extruder4_cb.setVisible(True)
             self.extruder4_l.setVisible(True)
             self.extruder4_c.setVisible(True)
 
@@ -1423,13 +1505,23 @@ class PrusaControlView(QMainWindow):
 
     def set_multimaterial_gui_off(self):
         self.create_menu()
+
+        #self.printing_mm_parameters_layout
+
         self.materials_settings_l.setVisible(False)
+        self.extruder1_cb.setVisible(False)
         self.extruder1_l.setVisible(False)
         self.extruder1_c.setVisible(False)
+
+        self.extruder2_cb.setVisible(False)
         self.extruder2_l.setVisible(False)
         self.extruder2_c.setVisible(False)
+
+        self.extruder3_cb.setVisible(False)
         self.extruder3_l.setVisible(False)
         self.extruder3_c.setVisible(False)
+
+        self.extruder4_cb.setVisible(False)
         self.extruder4_l.setVisible(False)
         self.extruder4_c.setVisible(False)
 
@@ -1438,6 +1530,7 @@ class PrusaControlView(QMainWindow):
 
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
+
 
     def create_menu(self):
         self.menubar.clear()

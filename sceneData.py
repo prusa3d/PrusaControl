@@ -144,11 +144,19 @@ class AppScene(object):
         printer_parameters = self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)
 
         parameters = {}
+
         parameters['is_wipe_tower'] = int(self.controller.is_multimaterial())
-        parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0]-self.size_x*.05)*10. + printer_parameters['printing_space'][0]*.5)
-        parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1]-self.size_y*.05)*10. + printer_parameters['printing_space'][1]*.5)
-        parameters['wipe_size_x'] = int(self.size_x)
-        parameters['wipe_size_y'] = int(self.size_y/3)
+
+        if self.controller.is_multimaterial():
+            parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0]-self.size_x*.05)*10. + printer_parameters['printing_space'][0]*.5)
+            parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1]-self.size_y*.05)*10. + printer_parameters['printing_space'][1]*.5)
+            parameters['wipe_size_x'] = int(self.size_x)
+            parameters['wipe_size_y'] = int(self.size_y/3)
+        else:
+            parameters['wipe_pos_x'] = 0
+            parameters['wipe_pos_y'] = 0
+            parameters['wipe_size_x'] = 0
+            parameters['wipe_size_y'] = 0
 
         return parameters
 
@@ -1391,7 +1399,11 @@ class Model(object):
                     glColor4ubv(self.select_color)
                 else:
                     if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
-                        glColor4ubv(self.color)
+                        if self.parent.controller.is_multimaterial() and not self.is_wipe_tower:
+                            c = self.parent.controller.get_extruder_color(self.extruder)
+                            glColor3ub(c.red(), c.green(), c.blue())
+                        else:
+                            glColor4ubv(self.color)
                     else:
                         glColor4f(0.25, 0.25, 0.25, 1.)
 

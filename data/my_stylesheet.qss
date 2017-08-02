@@ -1,5 +1,5 @@
 
-.QWidget, .SettingsDialog, .AboutDialog {
+.QWidget, .SettingsDialog, .AboutDialog, .QColorDialog {
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
     font-family: 'Titillium Web';
@@ -53,15 +53,21 @@ QLabel#infillLabel,
 QLabel#supportLabel,
 QLabel#qualityLabel,
 QLabel#materialLabel,
-QLabel#brim_label,
-QLabel#extruder1_l,
-QLabel#extruder2_l,
-QLabel#extruder3_l,
-QLabel#extruder4_l{
+QLabel#brim_label{
     margin: 0px 0px 0px 26px;
     padding: 0px 0px 0px 0px;
     font-size: 12px;
 }
+
+QLabel#extruder1_l,
+QLabel#extruder2_l,
+QLabel#extruder3_l,
+QLabel#extruder4_l{
+    margin: 0px 0px 0px 2px;
+    padding: 0px 0px 0px 0px;
+    font-size: 12px;
+}
+
 
 QLabel#printer_settings_l:disabled,
 QLabel#infillLabel:disabled,
@@ -239,7 +245,7 @@ QComboBox#object_extruder_c::down-arrow:on { /* shift the arrow when popup is op
 
 }
 
-QComboBox#object_extruder_c QAbstractItemView, QComboBox#combobox_scale_units QAbstractItemView {
+QComboBox#combobox_scale_units QAbstractItemView {
     background-color:rgb(132, 132, 132);
     selection-background-color: rgb(255, 97, 0);
     /*selection-color: rgb(25, 25, 25);*/
@@ -249,6 +255,18 @@ QComboBox#object_extruder_c QAbstractItemView, QComboBox#combobox_scale_units QA
     outline: 0px;
 }
 
+QComboBox#object_extruder_c QAbstractItemView
+{
+    background-color:transparent;
+    selection-background-color: transparent;
+    selection-color: black;
+    color:rgb(255, 255, 255);
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    outline-style: solid;
+    outline-color: rgb(255, 97, 0);
+    outline: 2px;
+}
 
 QGroupBox#object_group_box,
 QGroupBox#gcode_group_box,
@@ -261,7 +279,8 @@ QGraphicsView#spline_edit
     /*
     width: 221px;
     */
-    border-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
     background-color:rgb(77, 77, 77);
     font-family: 'Titillium Web';
     font-size: 16px;
@@ -367,7 +386,8 @@ QPushButton#basic_settings_b,
 QPushButton#advance_settings_b,
 SettingsDialog QPushButton,
 AboutDialog QPushButton,
-QMessageBox#msgBox QPushButton
+QMessageBox#msgBox QPushButton,
+QColorDialog QPushButton
 {
     font-family: 'Titillium Web';
     font-size: 12px;
@@ -380,6 +400,43 @@ QMessageBox#msgBox QPushButton
     border-radius: 5px;
     text-align:center;
     min-width: 75px;
+}
+
+QPushButton#extruder1_cb,
+QPushButton#extruder2_cb,
+QPushButton#extruder3_cb,
+QPushButton#extruder4_cb
+{
+    font-family: 'Titillium Web';
+    font-size: 12px;
+    font-weight: bold;
+    height: 10px;
+    width: 10px;
+    background-color:rgb(255, 97, 0);
+    padding-left: 0px;
+    margin: 0px 0px 0px 10px;
+    color:rgb(255, 255, 255);
+    border-radius: 5px;
+}
+
+QPushButton#extruder1_cb
+{
+    background-color:rgb(255, 170, 85);
+}
+
+QPushButton#extruder2_cb
+{
+    background-color:rgb(81, 130, 219);
+}
+
+QPushButton#extruder3_cb
+{
+    background-color:rgb(78, 205, 211);
+}
+
+QPushButton#extruder4_cb
+{
+    background-color:rgb(251, 114, 89);
 }
 
 
