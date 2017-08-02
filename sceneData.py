@@ -495,7 +495,9 @@ class AppScene(object):
                     self.last_selected_object = m.id
                     self.models.append(m)
                     new_models_lst.append(m)
-                self.multipart_models.append(MultiModel(new_models_lst, self))
+                mm = MultiModel(new_models_lst, self)
+                mm.pos = i.multipart_parent.pos + self.place_offset
+                self.multipart_models.append(mm)
             else:
                 m = deepcopy(i)
                 m.set_move(self.place_offset, True, False)
@@ -860,6 +862,7 @@ class Model(object):
         m.n1 = deepcopy(self.n1)
         m.n2 = deepcopy(self.n2)
 
+        m.extruder = self.extruder
 
         m.min_scene = deepcopy(self.min_scene)
         m.max_scene = deepcopy(self.max_scene)
