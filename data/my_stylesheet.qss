@@ -509,7 +509,6 @@ QPushButton#transformation_reset_b:pressed
 
 QPushButton#transformation_reset_b:hover
 {
-    /*image: url(base_dirdata/img/gui/plusButton.png);*/
     image: url(base_dirdata/img/gui/reset_light_hover_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
