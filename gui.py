@@ -513,7 +513,7 @@ class Spline_editor(QWidget):
 
 
 class SettingsDialog(QDialog):
-    def __init__(self, controller, parent = None):
+    def __init__(self, controller, editable=True,  parent = None):
         super(SettingsDialog, self).__init__(controller.view)
 
         self.controller = controller
@@ -576,14 +576,18 @@ class SettingsDialog(QDialog):
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             Qt.Horizontal, self)
+        if not editable:
+            ok_button = buttons.button(QDialogButtonBox.Ok)
+            ok_button.setEnabled(False)
+
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
     @staticmethod
-    def get_settings_data(controller, parent = None):
+    def get_settings_data(controller, editable=True, parent = None):
         data = deepcopy(controller.settings)
-        dialog = SettingsDialog(controller, parent)
+        dialog = SettingsDialog(controller, editable, parent)
         dialog.setWindowTitle("Settings")
         result = dialog.exec_()
         data['language'] = list(controller.enumeration['language'])[dialog.language_combo.currentIndex()]
@@ -1646,6 +1650,19 @@ class PrusaControlView(QMainWindow):
 
         return msgBox.exec_()
 
+    def show_ask_multipart_model_dialog(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("Load file"))
+        msgBox.setText(self.tr("List of Stl files"))
+        msgBox.setInformativeText(self.tr("Do you want to load multiple stl files as one multipart object?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
+
+        return msgBox.exec_()
+
     def show_cancel_generating_dialog_and_load_file(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
@@ -2069,7 +2086,7 @@ class PrusaControlView(QMainWindow):
             if not model:
                 return
             model.set_extruder(widget.currentIndex()+1)
-            self.controller.recalculate_waste_tower()
+            self.controller.recalculate_wipe_tower()
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
@@ -2342,9 +2359,9 @@ class PrusaControlView(QMainWindow):
 
 
 
-    def open_settings_dialog(self):
-        data, ok = SettingsDialog.get_settings_data(self.controller, self.parent())
-        return data
+    def open_settings_dialog(self, editable=True):
+        data, ok = SettingsDialog.get_settings_data(self.controller, editable, self.parent())
+        return data, ok
 
     def open_printer_info_dialog(self):
         PrinterInfoDialog.get_printer_info_dialog(self.controller, self.parent())
@@ -2426,19 +2443,12 @@ class PrusaControlView(QMainWindow):
 
     def dropEvent(self, event):
         if event.mimeData().hasUrls():
-            for url in event.mimeData().urls():
-                #print(str())
-                self.statusBar().showMessage('Dropped file name is ' + url.toLocalFile())
-                #TODO: Add network files
-                #path = url.toLocalFile().toLocal8Bit().data()
-                path = url.toLocalFile()
-
-                print(path)
-                #if 'file:///' in path:
-                #    path = path[8:]
-                #print(str(path))
-                #path = unicode(url.toUtf8(), encoding="UTF-8")
-                #path = self.convert_file_path_to_unicode(url.path())
+            urls = [url.toLocalFile() for url in event.mimeData().urls()]
+            if len(urls) > 1:
+                self.controller.open_files(urls)
+            else:
+                path = urls[0]
+                self.statusBar().showMessage('Dropped file name is ' + path)
                 self.controller.open_file(path)
 
             event.acceptProposedAction()

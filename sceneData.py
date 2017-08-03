@@ -486,6 +486,8 @@ class AppScene(object):
         self.place_offset += np.array([0.5, 0.5, 0.])
         self.unselect_all_models()
         for i in self.copied_models:
+            if i.is_wipe_tower:
+                continue
             if i.is_multipart_model:
                 models_lst = i.multipart_parent.models
                 new_models_lst = []

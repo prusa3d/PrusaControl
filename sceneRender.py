@@ -449,7 +449,7 @@ class GLWidget(QGLWidget):
                 model.render(picking=True, blending=False)
 
         for model in self.parent.controller.scene.models:
-            if model.isVisible and model.selected:
+            if model.isVisible and model.selected and not model.is_wipe_tower:
                 self.draw_tools_helper(model, self.controller.settings, True)
 
         if self.parent.controller.status in ['edit', 'canceled']:
@@ -558,7 +558,7 @@ class GLWidget(QGLWidget):
                 self.draw_support(self.parent.controller.scene.actual_support)
 
             for model in self.parent.controller.scene.models:
-                if model.isVisible and model.selected:
+                if model.isVisible and model.selected and not model.is_wipe_tower:
                     self.draw_tools_helper(model, self.parent.controller.settings)
 
             glCallList(printing_space)

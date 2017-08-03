@@ -799,6 +799,10 @@ class Controller(QObject):
             suggest_filename += "_" + material_name[0].upper() + "_" + quality_name.upper()
             print(suggest_filename)
 
+        if self.is_multimaterial():
+            suggest_filename = suggest_filename + "_MM"
+
+
         return suggest_filename
 
 
@@ -917,8 +921,13 @@ class Controller(QObject):
 
     def open_multipart_model(self):
         data = self.view.open_model_file_dialog()
+        self.load_multipart_model(data)
+        #self.update_wipe_tower()
+
+
+    def load_multipart_model(self, lst_of_urls):
         model_lst = []
-        for path in data:
+        for path in lst_of_urls:
             model = ModelTypeStl().load(path, False)
             model.parent = self.scene
             model.is_multipart_model = True
@@ -927,18 +936,10 @@ class Controller(QObject):
 
         multiModel = sceneData.MultiModel(model_lst, self.scene)
         self.scene.multipart_models.append(multiModel)
-        
+
         self.is_model_loaded = True
 
         self.scene.normalize_group_of_models(model_lst)
-
-        #self.update_wipe_tower()
-
-        #not right way
-        #for m in model_lst:
-        #    m.pos = model_lst[0].pos
-        #    m.rot = model_lst[0].rot
-        #    m.scale = model_lst[0].scale
 
 
     def import_model(self, path, one_model=False):
@@ -988,7 +989,14 @@ class Controller(QObject):
         object_settings = self.view.open_object_settings_dialog(object_id)
 
     def open_settings(self):
-        temp_settings = self.view.open_settings_dialog()
+        if self.status in ['generating', 'generated', 'loading_gcode']:
+            editable = False
+        else:
+            editable = True
+        temp_settings, ok = self.view.open_settings_dialog(editable=editable)
+        if not ok:
+            return
+
         if not temp_settings['language'] == self.settings['language']:
             self.set_language(temp_settings['language'])
 
@@ -997,7 +1005,8 @@ class Controller(QObject):
         if self.printer_number_of_materials>1:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
             self.update_material_settings()
-            self.add_wipe_tower()
+            if not self.settings['printer'] == temp_settings['printer']:
+                self.add_wipe_tower()
         else:
             self.view.set_multimaterial_gui_off()
             self.update_material_settings()
@@ -1092,6 +1101,8 @@ class Controller(QObject):
         if object_id == 0:
             return False
         for model in self.scene.models:
+            if model.is_wipe_tower:
+                continue
             if model.selected:
                 if model.rotateXId == object_id:
                     model.scalenAxis = []
@@ -1145,8 +1156,8 @@ class Controller(QObject):
         pass
 
 
-    def recalculate_waste_tower(self):
-        print("calculating vaste tower")
+    def recalculate_wipe_tower(self):
+        print("calculating wipe tower")
         #TODO:
 
 
@@ -1868,6 +1879,8 @@ class Controller(QObject):
         self.scene.clear_scene()
         self.update_scene(True)
         self.is_model_loaded = False
+        if self.is_multimaterial():
+            self.add_wipe_tower()
         #self.view.update_scene(True)
 
     def clear_gui(self):
@@ -2020,6 +2033,57 @@ class Controller(QObject):
             url = url.replace('%20', ' ')
 
             return url
+
+    def open_ask_multipart_model_dialog(self):
+        ret = self.view.show_ask_multipart_model_dialog()
+        if ret == QMessageBox.Yes:
+            self.cancel_generation()
+            return True
+        elif ret == QMessageBox.No:
+            return False
+
+    def open_files(self, list_of_urls_tmp):
+        list_of_urls = []
+        if self.app_config.system_platform in ["Darwin"]:
+            for url in list_of_urls_tmp:
+                if url.startswith('/.file/id='):
+                    list_of_urls.append(self.get_url_from_local_fileid(url))
+                else:
+                    list_of_urls.append(url)
+        else:
+            list_of_urls = list_of_urls_tmp
+
+        extensions_lst = []
+        for url in list_of_urls:
+            urlSplited = url.split('.')
+            if len(urlSplited) == 2:
+                fileEnd = urlSplited[1]
+            elif len(urlSplited) > 2:
+                fileEnd = urlSplited[-1]
+            else:
+                fileEnd = ''
+            extensions_lst.append(fileEnd.lower())
+
+        extensions_set = set(extensions_lst)
+        if len(extensions_set) == 1:
+            if list(extensions_set)[0] in ['stl']:
+                if self.is_multimaterial():
+                    #show message of multipart model
+                    if self.open_ask_multipart_model_dialog():
+                        #load together
+                        self.load_multipart_model(list_of_urls)
+                    else:
+                        #load separately
+                        for url in list_of_urls:
+                            self.import_model(url)
+                else:
+                    #load models separately
+                    for url in list_of_urls:
+                        self.import_model(url)
+        else:
+            print("Some file mismatch")
+
+
 
     def open_file(self, url):
         '''
