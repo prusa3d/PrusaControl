@@ -60,7 +60,7 @@ class AppScene(object):
 
         self.size_x = 60.
         self.size_y = 45.
-        self.size_z = .1
+        self.size_z = 50.0
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
@@ -1304,6 +1304,7 @@ class Model(object):
         #glVertexPointerf(self.draw_mesh['vectors'])
 
     def render(self, picking=False, blending=False):
+        is_special_blending = False
         is_in_printing_space = True
 
         if not self.isVisible:
@@ -1388,10 +1389,19 @@ class Model(object):
             glEnable(GL_LIGHTING)
             #glDisable(GL_DEPTH_TEST)
             #glEnable(GL_BLEND)
+        elif is_special_blending:
+            glDisable(GL_LIGHTING)
+            #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_ONE, GL_ONE)
+            #glDisable(GL_DEPTH_TEST)
+            #glDisable(GL_CULL_FACE)
         else:
+            #glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
+            #glEnable(GL_CULL_FACE)
 
         if picking:
             glColor3ubv(self.colorId)
@@ -1407,6 +1417,9 @@ class Model(object):
                         if self.parent.controller.is_multimaterial() and not self.is_wipe_tower:
                             c = self.parent.controller.get_extruder_color(self.extruder)
                             glColor3ub(c.red(), c.green(), c.blue())
+                        elif is_special_blending:
+                            print("Mega special blending")
+                            glColor4ub(self.color[0], self.color[1], self.color[2], 50)
                         else:
                             glColor4ubv(self.color)
                     else:

@@ -1052,8 +1052,6 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
         self.materialCombo.setMaxVisibleItems(len(material_label_ls))
-        #self.materialCombo.setV
-        #view = self.materialCombo.view()
 
 
         self.qualityLabel = QLabel()
@@ -1110,7 +1108,7 @@ class PrusaControlView(QMainWindow):
         self.extruder1_c = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.extruder1_c.setStyle(QStyleFactory.create('Windows'))
-        self.extruder1_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder1_c.addItems(material_label_ls)
         self.extruder1_c.setCurrentIndex(first)
         self.extruder1_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder1_c.setObjectName("extruder1_c")
@@ -1125,7 +1123,7 @@ class PrusaControlView(QMainWindow):
         self.extruder2_c = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.extruder2_c.setStyle(QStyleFactory.create('Windows'))
-        self.extruder2_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder2_c.addItems(material_label_ls)
         self.extruder2_c.setCurrentIndex(first)
         self.extruder2_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder2_c.setObjectName("extruder2_c")
@@ -1140,7 +1138,7 @@ class PrusaControlView(QMainWindow):
         self.extruder3_c = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.extruder3_c.setStyle(QStyleFactory.create('Windows'))
-        self.extruder3_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder3_c.addItems(material_label_ls)
         self.extruder3_c.setCurrentIndex(first)
         self.extruder3_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder3_c.setObjectName("extruder3_c")
@@ -1155,7 +1153,7 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.extruder4_c.setStyle(QStyleFactory.create('Windows'))
-        self.extruder4_c.insertItems(len(material_label_ls), material_label_ls)
+        self.extruder4_c.addItems(material_label_ls)
         self.extruder4_c.setCurrentIndex(first)
         self.extruder4_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder4_c.setObjectName("extruder4_c")
@@ -2461,7 +2459,7 @@ class PrusaControlView(QMainWindow):
 
 
     def update_material_settings(self):
-        self.controller.update_material_settings()
+        self.controller.update_mm_material_settings()
 
 
 
@@ -2470,40 +2468,76 @@ class PrusaControlView(QMainWindow):
         self.update_gui_for_material()
 
     def update_gui_for_material(self, set_materials=0):
-        if set_materials:
-            self.materialCombo.clear()
-            labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
-            self.materialCombo.addItems(labels)
-            self.materialCombo.setCurrentIndex(first)
-            self.materialCombo.setMaxVisibleItems((len(labels)))
+        labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+
+        if self.controller.is_multimaterial:
+            if set_materials:
+                self.extruder1_c.clear()
+                self.extruder2_c.clear()
+                self.extruder3_c.clear()
+                self.extruder4_c.clear()
+
+                self.extruder1_c.addItems(labels)
+                self.extruder2_c.addItems(labels)
+                self.extruder3_c.addItems(labels)
+                self.extruder4_c.addItems(labels)
+
+                self.extruder1_c.setCurrentIndex(first)
+                self.extruder1_c.setMaxVisibleItems((len(labels)))
+                self.extruder2_c.setCurrentIndex(first)
+                self.extruder2_c.setMaxVisibleItems((len(labels)))
+                self.extruder3_c.setCurrentIndex(first)
+                self.extruder3_c.setMaxVisibleItems((len(labels)))
+                self.extruder4_c.setCurrentIndex(first)
+                self.extruder4_c.setMaxVisibleItems((len(labels)))
+
+            material_label = self.extruder1_c.currentText()
+
+            material_printing_settings = self.controller.get_printing_settings_for_material_by_label(material_label)
+
+            self.qualityCombo.clear()
+            material_printing_settings_quality_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
+            self.qualityCombo.addItems(material_printing_settings_quality_ls)
+            self.qualityCombo.setCurrentIndex(first)
+            self.qualityCombo.setMaxVisibleItems(len(material_printing_settings_quality_ls))
+
+            infill_value = str(material_printing_settings['infill']) + '%'
+            infill_list, first_infill = self.controller.get_infill_ls_and_index_of_default(infill_value)
+            self.infillCombo.setCurrentIndex(first_infill)
+
+        else:
+            if set_materials:
+                self.materialCombo.clear()
+                #labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+                self.materialCombo.addItems(labels)
+                self.materialCombo.setCurrentIndex(first)
+                self.materialCombo.setMaxVisibleItems((len(labels)))
+
+            # material_label = self.materialCombo.currentText()
+            material_label = self.materialCombo.currentText()
+
+            material_printing_settings = self.controller.get_printing_settings_for_material_by_label(material_label)
+            #print(str(material_printing_settings))
+
+            # update print quality widget
+            self.qualityCombo.clear()
+            material_printing_settings_quality_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
+            #print("Quality list: " + str(material_printing_settings_quality_ls))
+            self.qualityCombo.addItems(material_printing_settings_quality_ls)
+            self.qualityCombo.setCurrentIndex(first)
+            self.qualityCombo.setMaxVisibleItems(len(material_printing_settings_quality_ls))
+
+            # infill slider
+            #self.infillSlider.setValue(material_printing_settings['infill'])
+            #self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
+            #self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
+
+            #material_printing_settings_infill_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
 
 
-
-        # material_label = self.materialCombo.currentText()
-        material_label = self.materialCombo.currentText()
-
-        material_printing_settings = self.controller.get_printing_settings_for_material_by_label(material_label)
-        #print(str(material_printing_settings))
-
-        # update print quality widget
-        self.qualityCombo.clear()
-        material_printing_settings_quality_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
-        #print("Quality list: " + str(material_printing_settings_quality_ls))
-        self.qualityCombo.addItems(material_printing_settings_quality_ls)
-        self.qualityCombo.setCurrentIndex(first)
-        self.qualityCombo.setMaxVisibleItems(len(material_printing_settings_quality_ls))
-
-        # infill slider
-        #self.infillSlider.setValue(material_printing_settings['infill'])
-        #self.infillSlider.setMinimum(material_printing_settings['infillRange'][0])
-        #self.infillSlider.setMaximum(material_printing_settings['infillRange'][1])
-
-        #material_printing_settings_infill_ls, first = self.controller.get_printer_material_quality_labels_ls_by_material_label(material_label)
-
-
-        infill_value = str(material_printing_settings['infill'])+'%'
-        infill_list, first_infill = self.controller.get_infill_ls_and_index_of_default(infill_value)
-        self.infillCombo.setCurrentIndex(first_infill)
+            infill_value = str(material_printing_settings['infill'])+'%'
+            infill_list, first_infill = self.controller.get_infill_ls_and_index_of_default(infill_value)
+            self.infillCombo.setCurrentIndex(first_infill)
 
     def get_actual_printing_data(self):
         material_names = []

@@ -211,6 +211,7 @@ class Controller(QObject):
         self.message_object01 = ""
         self.message_object02 = ""
         self.message_object03 = ""
+        self.message_object04 = ""
 
         self.show_message_on_status_bar("Ready")
         self.create_messages()
@@ -259,6 +260,8 @@ class Controller(QObject):
             if self.analyze_result['brim'] and self.view.brimCheckBox.isChecked() == False:
                 self.warning_message_buffer.append(u"• " + self.message_object03)
 
+
+
     def get_warnings(self):
         messages = self.scene.get_warnings()
         self.filtrate_warning_msgs()
@@ -270,6 +273,7 @@ class Controller(QObject):
         self.message_object01 = self.tr(" is out of printable area!")
         self.message_object02 = self.tr("Scene is hard to print without support.")
         self.message_object03 = self.tr("For better adhesion turn Brim parametr on.")
+        self.message_object04 = self.tr("Incompatible materials, its possible the print will fail.")
 
 
     def check_version(self):
@@ -582,6 +586,7 @@ class Controller(QObject):
         #return [self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality'][i]['label']
         #        for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']]
         first_index = 0
+        print("get_printer_material_quality_labels_ls_by_material_name" + str(material_name))
         data = self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']
         list = [[data[quality]['label'], data[quality]["sort"], data[quality]["first"]] for quality in data]
         list = sorted(list, key=lambda a: a[1])
@@ -635,6 +640,7 @@ class Controller(QObject):
         return material_printing_setting
 
     def get_printing_settings_for_material_by_label(self, material_label):
+        print("get_printing_settings_for_material_by_label: " + str(material_label))
         printing_settings_tmp = []
         for material in self.printing_parameters.get_materials_for_printer(self.actual_printer):
             if self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]["label"] == material_label:
@@ -643,7 +649,7 @@ class Controller(QObject):
 
         return printing_settings_tmp
 
-    def update_material_settings(self):
+    def update_mm_material_settings(self):
         # get combobox materials
         soluble_material_tmp = []
 
@@ -989,6 +995,7 @@ class Controller(QObject):
         object_settings = self.view.open_object_settings_dialog(object_id)
 
     def open_settings(self):
+        is_change = False
         if self.status in ['generating', 'generated', 'loading_gcode']:
             editable = False
         else:
@@ -998,21 +1005,30 @@ class Controller(QObject):
             return
 
         if not temp_settings['language'] == self.settings['language']:
+            is_change = True
             self.set_language(temp_settings['language'])
+
+        if not temp_settings['printer'] == self.settings['printer']:
+            is_change = True
 
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
         if self.printer_number_of_materials>1:
             self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
-            self.update_material_settings()
+            self.update_mm_material_settings()
             if not self.settings['printer'] == temp_settings['printer']:
+                is_change = True
                 self.add_wipe_tower()
         else:
             self.view.set_multimaterial_gui_off()
-            self.update_material_settings()
+            self.update_mm_material_settings()
             self.remove_wipe_tower()
 
         self.settings = temp_settings
+
+        if is_change:
+            self.view.update_gui_for_material()
+
 
     def add_wipe_tower(self):
         self.scene.create_wipe_tower()
