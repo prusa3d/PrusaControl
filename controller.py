@@ -928,17 +928,26 @@ class Controller(QObject):
     def open_multipart_model(self):
         data = self.view.open_model_file_dialog()
         self.load_multipart_model(data)
-        #self.update_wipe_tower()
+        if self.is_multimaterial():
+            self.recalculate_wipe_tower()
 
 
     def load_multipart_model(self, lst_of_urls):
+        self.show_message_on_status_bar(self.tr("Loading multi part model"))
         model_lst = []
+        extruder_counter = 1
         for path in lst_of_urls:
             model = ModelTypeStl().load(path, False)
             model.parent = self.scene
             model.is_multipart_model = True
             self.scene.models.append(model)
+            model.extruder = extruder_counter
+            if extruder_counter <= 3:
+                extruder_counter +=1
+            else:
+                extruder_counter = 1
             model_lst.append(model)
+
 
         multiModel = sceneData.MultiModel(model_lst, self.scene)
         self.scene.multipart_models.append(multiModel)
@@ -958,6 +967,8 @@ class Controller(QObject):
             self.scene.automatic_models_position()
         self.scene.clear_history()
         self.scene.save_change(self.scene.models)
+        if self.is_multimaterial():
+            self.recalculate_wipe_tower()
         self.update_scene()
         self.is_model_loaded = True
         return model
@@ -1175,6 +1186,11 @@ class Controller(QObject):
     def recalculate_wipe_tower(self):
         print("calculating wipe tower")
         #TODO:
+        self.scene.size_z += 25.0
+        #self.remove_wipe_tower()
+        #self.scene.create_wipe_tower()
+        self.scene.update_wipe_tower()
+
 
 
 

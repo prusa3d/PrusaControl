@@ -60,7 +60,7 @@ class AppScene(object):
 
         self.size_x = 60.
         self.size_y = 45.
-        self.size_z = 50.0
+        self.size_z = 0.10
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
@@ -101,6 +101,17 @@ class AppScene(object):
             [1.*(size_x*.5), -1.*(size_y*.5), 1.*(size_z*.5)],
             [1.*(size_x*.5), 1.*(size_y*.5), 1.*(size_z*.5)],
             [-1.*(size_x*.5), 1.*(size_y*.5), 1.*(size_z*.5)]])
+
+        texvert = np.array([ \
+            [0., 0.],
+            [1., 0.],
+            [1., 1.],
+            [0., 1.],
+            [0., 0.],
+            [1., 0.],
+            [1., 1.],
+            [0., 1.]])
+
         # Define the 12 triangles composing the cube
         faces = np.array([ \
             [0, 3, 1],
@@ -127,17 +138,34 @@ class AppScene(object):
         cube.update_normals()
 
         m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
+
+        #m.tex = np.zeros((faces.shape[0], 3, 2), dtype=np.float32)
+
+        #for i, f in enumerate(faces):
+        #    for j in range(2):
+        #        m.tex[i][j] = texvert[f[j], :]
+
+        #print("Tex data: " + str(m.tex))
+        m.wipe_tower_texture = self.controller.view.glWidget.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle1.png")
+
         m.parent = self
         m.is_wipe_tower = True
         self.wipe_tower_model = m
 
         self.models.append(m)
 
-
     def remove_wipe_tower(self):
         if self.wipe_tower_model:
             self.models.remove(self.wipe_tower_model)
             self.wipe_tower_model = None
+
+    def update_wipe_tower(self):
+        print("update wipe tower")
+        wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
+        self.remove_wipe_tower()
+        self.create_wipe_tower()
+        self.wipe_tower_model.pos = wipe_tower_pos
+        self.controller.update_scene()
 
 
     def get_wipe_tower_possition_and_size(self):
@@ -752,6 +780,9 @@ class Model(object):
         self.n1 = []
         self.n2 = []
 
+        self.tex = np.array([])
+        self.wipe_tower_texture = None
+
         self.rotationAxis = []
         self.scaleAxis = []
 
@@ -1118,13 +1149,6 @@ class Model(object):
                                         [ 0.,  0.,  1.]]) * value
             self.is_changed = True
 
-    '''
-    def apply_scale(self):
-        self.scale_matrix = np.dot(self.scale_matrix, self.temp_scale)
-        self.temp_scale = np.array([[ 1.,  0.,  0.],
-                                        [ 0.,  1.,  0.],
-                                        [ 0.,  0.,  1.]])
-    '''
 
     def get_maximal_z(self):
         return self.max_scene[2]
@@ -1298,13 +1322,16 @@ class Model(object):
         #print("Data vectors:")
         #pprint(self.mesh.vectors)
         #glColorPointerf(self.face_colors)
+        #if self.is_wipe_tower:
+        #    glTexCoordPointerf(self.tex)
+
         glVertexPointerf(self.mesh.vectors)
 
         #glNormalPointerf(np.tile(self.draw_mesh['normals'], 3))
         #glVertexPointerf(self.draw_mesh['vectors'])
 
-    def render(self, picking=False, blending=False):
-        is_special_blending = False
+    def render(self, picking=False, gcode_preview=False):
+        is_special_blending = self.is_wipe_tower
         is_in_printing_space = True
 
         if not self.isVisible:
@@ -1376,39 +1403,62 @@ class Model(object):
         self.put_array_to_gl()
 
         glEnableClientState(GL_VERTEX_ARRAY)
-        #if not picking:
-        #    glEnableClientState(GL_COLOR_ARRAY)
+        #if self.is_wipe_tower:
+        #    glEnableClientState(GL_TEXTURE_COORD_ARRAY)
         glEnableClientState(GL_NORMAL_ARRAY)
 
         if picking:
             glDisable(GL_BLEND)
             glDisable(GL_LIGHTING)
-        elif blending:
-            #glCullFace(GL_BACK)
-            #glEnable(GL_CULL_FACE)
-            glEnable(GL_LIGHTING)
-            #glDisable(GL_DEPTH_TEST)
-            #glEnable(GL_BLEND)
-        elif is_special_blending:
+            #glDisable(GL_TEXTURE_2D)
+            glDisable(GL_TEXTURE_GEN_S)
+            glDisable(GL_TEXTURE_GEN_T)
+        elif gcode_preview:
+            glDisable(GL_BLEND)
             glDisable(GL_LIGHTING)
-            #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-            glEnable(GL_BLEND)
-            glBlendFunc(GL_ONE, GL_ONE)
+            glDisable(GL_TEXTURE_GEN_S)
+            glDisable(GL_TEXTURE_GEN_T)
+        elif self.is_wipe_tower:
+            #glEnable(GL_BLEND)
+            #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             #glDisable(GL_DEPTH_TEST)
-            #glDisable(GL_CULL_FACE)
+            #glDisable(GL_LIGHTING)
+
+            #glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
+            #glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
+
+            glEnable(GL_TEXTURE_GEN_S)
+            glEnable(GL_TEXTURE_GEN_T)
+
+
+            SplaneCoefficients = [0., 0.25, 0.25, 0.]
+            glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR)
+            glTexGenfv(GL_S, GL_EYE_PLANE, SplaneCoefficients)
+            glTexGenfv(GL_S, GL_OBJECT_PLANE, SplaneCoefficients)
+
+            TplaneCoefficients = [0.25, 0., 0, 0.]
+            glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR)
+            glTexGenfv(GL_T, GL_EYE_PLANE, TplaneCoefficients)
+            glTexGenfv(GL_T, GL_OBJECT_PLANE, TplaneCoefficients)
+
+
+            glEnable(GL_TEXTURE_2D)
+            glBindTexture(GL_TEXTURE_2D, self.wipe_tower_texture)
         else:
+            #glEnable(GL_TEXTURE_2D)
             #glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
+            glDisable(GL_TEXTURE_GEN_S)
+            glDisable(GL_TEXTURE_GEN_T)
             #glEnable(GL_CULL_FACE)
 
         if picking:
             glColor3ubv(self.colorId)
         else:
-            if blending:
+            if gcode_preview:
                 glColor4ub(175, 175, 175, 150)
-                #glColor4f(.4, .4, .4, .75)
             else:
                 if self.selected:
                     glColor4ubv(self.select_color)
@@ -1417,9 +1467,6 @@ class Model(object):
                         if self.parent.controller.is_multimaterial() and not self.is_wipe_tower:
                             c = self.parent.controller.get_extruder_color(self.extruder)
                             glColor3ub(c.red(), c.green(), c.blue())
-                        elif is_special_blending:
-                            print("Mega special blending")
-                            glColor4ub(self.color[0], self.color[1], self.color[2], 50)
                         else:
                             glColor4ubv(self.color)
                     else:
@@ -1428,10 +1475,14 @@ class Model(object):
 
         glDrawArrays(GL_TRIANGLES, 0, len(self.mesh.vectors) * 3)
 
+        glDisable(GL_TEXTURE_2D)
+
 
         glDisableClientState(GL_VERTEX_ARRAY)
         #if not picking:
         #    glDisableClientState(GL_COLOR_ARRAY)
+        #if self.is_wipe_tower:
+        #    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
 
         if self.is_in_printing_area == False:
@@ -1441,12 +1492,18 @@ class Model(object):
             glDisable(GL_DEPTH_TEST)
             glColor3ub(255, 97, 0)
             self.parent.controller.view.glWidget.renderText(0., 0., 0., u"!", font)
-        if blending:
+        if gcode_preview:
             glCullFace(GL_BACK)
             glDisable(GL_CULL_FACE)
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
+        elif self.is_wipe_tower:
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
+            glEnable(GL_LIGHTING)
+            glDisable(GL_TEXTURE_GEN_S)
+            glDisable(GL_TEXTURE_GEN_T)
         else:
             #glDisable(GL_CULL_FACE)
             #glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)

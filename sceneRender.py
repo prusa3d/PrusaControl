@@ -119,6 +119,7 @@ class GLWidget(QGLWidget):
         self.image_background = []
         self.image_hotbed = []
         self.test_img = []
+        self.wipe_tower_texture = []
 
         #tools
         self.selectTool = None
@@ -362,6 +363,8 @@ class GLWidget(QGLWidget):
         #production
         self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.undo_button, self.do_button]
 
+        #self.wipe_tower_texture = self.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle1.png")
+
         #self.tools = []
 
         self.bed = {}
@@ -453,7 +456,7 @@ class GLWidget(QGLWidget):
 
         for model in self.parent.controller.scene.models:
             if model.isVisible:
-                model.render(picking=True, blending=False)
+                model.render(picking=True, gcode_preview=False)
 
         for model in self.parent.controller.scene.models:
             if model.isVisible and model.selected and not model.is_wipe_tower:
@@ -525,34 +528,11 @@ class GLWidget(QGLWidget):
             #render solid objects, possible to edit transformation, select objects
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
-                    if model.selected and self.controller.advance_settings:
-                        if self.variable_layer_shader_ok:
-                            self.variable_layer_shader_program.bind()
-                            self.variable_layer_shader_program.setUniformValue("height_of_object", model.size[2])
-                            self.variable_layer_shader_program.setUniformValue("z_cursor", model.z_cursor*.1)
-                            self.variable_layer_shader_program.setUniformValue("z_cursor_band_width", 0.75)
-                            #self.variable_layer_shader_program.setUniformValueArray(self.z_texture)
-
-                            #glActiveTexture(GL_TEXTURE0)
-                            glBindTexture(GL_TEXTURE_2D, model.variable_texture)
-                            #glBindTexture(GL_TEXTURE_2D, self.test_img)
-                            self.variable_layer_shader_program.setUniformValue("z_texture", 0)
-                            self.variable_layer_shader_program.setUniformValue("z_to_texture_row",
-                                                                               (model.size[2]/self.controller.resolution_of_texture*self.controller.resolution_of_texture))
-                                                                               #(self.controller.resolution_of_texture * self.controller.resolution_of_texture)/(self.controller.resolution_of_texture*model.size[2]))
-                            #self.variable_layer_shader_program.setUniformValue("z_to_texture_row",
-                            #                                                   0.195)
-                            self.variable_layer_shader_program.setUniformValue("z_texture_row_to_normalized", 1./self.controller.resolution_of_texture)
-                        model.render(picking=False, blending=not model_view)
-                        if self.variable_layer_shader_ok:
-                            self.variable_layer_shader_program.release()
-                    else:
-                        if self.lightning_shader_ok:
-                            self.lightning_shader_program.bind()
-                        model.render(picking=False, blending=not model_view)
-                        if self.lightning_shader_ok:
-                            self.lightning_shader_program.release()
-
+                    if self.lightning_shader_ok and not model.is_wipe_tower:
+                        self.lightning_shader_program.bind()
+                    model.render(picking=False, gcode_preview=not model_view)
+                    if self.lightning_shader_ok and not model.is_wipe_tower:
+                        self.lightning_shader_program.release()
 
 
             if not self.controller.advance_settings:
@@ -588,7 +568,7 @@ class GLWidget(QGLWidget):
                 if model.isVisible:
                     if self.lightning_shader_ok:
                         self.lightning_shader_program.bind()
-                    model.render(picking=False, blending=not model_view)
+                    model.render(picking=False, gcode_preview=not model_view)
                     if self.lightning_shader_ok:
                         self.lightning_shader_program.release()
             '''

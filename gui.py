@@ -188,7 +188,10 @@ class Gcode_slider(QWidget):
         self.value_label.move(self.slider.width() + (int)(75*self.controller.dpi_coef), myPoint.y() - 9)
         self.add_button.move(self.slider.width() + (int)(145*self.controller.dpi_coef), myPoint.y() - 9)
 
-        self.add_button.setVisible(True)
+        if self.controller.is_multimaterial():
+            self.add_button.setVisible(False)
+        else:
+            self.add_button.setVisible(True)
         self.value_label.setVisible(True)
 
     def setRange(self, rangeMin, rangeMax):
@@ -233,7 +236,10 @@ class Gcode_slider(QWidget):
 
     def get_color_change_layers(self):
         #return [[i['value'], self.controller.gcode.data[i['value']][0][-1]] for i in self.parent.gcode_slider.points if not i['value'] == -1]
-        return [i['value'] for i in self.points if not i['value'] == -1]
+        if self.controller.is_multimaterial():
+            return []
+        else:
+            return [i['value'] for i in self.points if not i['value'] == -1]
 
 
 
