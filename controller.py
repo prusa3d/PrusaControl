@@ -928,8 +928,7 @@ class Controller(QObject):
     def open_multipart_model(self):
         data = self.view.open_model_file_dialog()
         self.load_multipart_model(data)
-        if self.is_multimaterial():
-            self.recalculate_wipe_tower()
+
 
 
     def load_multipart_model(self, lst_of_urls):
@@ -956,6 +955,9 @@ class Controller(QObject):
 
         self.scene.normalize_group_of_models(model_lst)
 
+        if self.is_multimaterial():
+            self.recalculate_wipe_tower()
+
 
     def import_model(self, path, one_model=False):
         self.view.statusBar().showMessage('Load file name: ' + path)
@@ -980,9 +982,6 @@ class Controller(QObject):
 
         #self.view.update_scene()
 
-    def update_wipe_tower(self):
-        if self.is_multimaterial():
-            self.scene.update_wipe_tower_z()
 
     def save_project(self, path):
         self.scene.check_models_name()
@@ -1186,7 +1185,7 @@ class Controller(QObject):
     def recalculate_wipe_tower(self):
         print("calculating wipe tower")
         #TODO:
-        self.scene.size_z += 25.0
+        #self.scene.wipe_tower_size_z += 25.0
         #self.remove_wipe_tower()
         #self.scene.create_wipe_tower()
         self.scene.update_wipe_tower()

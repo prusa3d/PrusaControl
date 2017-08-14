@@ -58,9 +58,9 @@ class AppScene(object):
         self.controller = controller
         self.model_position_offset = 0.1
 
-        self.size_x = 60.
-        self.size_y = 45.
-        self.size_z = 0.10
+        self.wipe_tower_size_x = 60.
+        self.wipe_tower_size_y = 45.
+        self.wipe_tower_size_z = 0.10
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
@@ -86,9 +86,9 @@ class AppScene(object):
 
 
     def create_wipe_tower(self):
-        size_x = self.size_x
-        size_y = self.size_y
-        size_z = self.size_z
+        size_x = self.wipe_tower_size_x
+        size_y = self.wipe_tower_size_y
+        size_z = self.wipe_tower_size_z
 
 
         # Define the 8 vertices of the cube
@@ -101,16 +101,6 @@ class AppScene(object):
             [1.*(size_x*.5), -1.*(size_y*.5), 1.*(size_z*.5)],
             [1.*(size_x*.5), 1.*(size_y*.5), 1.*(size_z*.5)],
             [-1.*(size_x*.5), 1.*(size_y*.5), 1.*(size_z*.5)]])
-
-        texvert = np.array([ \
-            [0., 0.],
-            [1., 0.],
-            [1., 1.],
-            [0., 1.],
-            [0., 0.],
-            [1., 0.],
-            [1., 1.],
-            [0., 1.]])
 
         # Define the 12 triangles composing the cube
         faces = np.array([ \
@@ -139,13 +129,6 @@ class AppScene(object):
 
         m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
 
-        #m.tex = np.zeros((faces.shape[0], 3, 2), dtype=np.float32)
-
-        #for i, f in enumerate(faces):
-        #    for j in range(2):
-        #        m.tex[i][j] = texvert[f[j], :]
-
-        #print("Tex data: " + str(m.tex))
         m.wipe_tower_texture = self.controller.view.glWidget.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle1.png")
 
         m.parent = self
@@ -159,12 +142,24 @@ class AppScene(object):
             self.models.remove(self.wipe_tower_model)
             self.wipe_tower_model = None
 
+    def get_size(self, model):
+        print(model.filename)
+        if model.is_multipart_model:
+            return model.multipart_parent.size
+        else:
+            return model.size
+
     def update_wipe_tower(self):
-        print("update wipe tower")
+        #get maximal z in scene
+        z_list = [self.get_size(m)[2]*10. for m in self.get_models(with_wipe_tower=False)]
+        max_z = max(z_list)
+        self.wipe_tower_size_z = max_z
+
         wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
         self.remove_wipe_tower()
         self.create_wipe_tower()
-        self.wipe_tower_model.pos = wipe_tower_pos
+        self.wipe_tower_model.pos[0] = wipe_tower_pos[0]
+        self.wipe_tower_model.pos[1] = wipe_tower_pos[1]
         self.controller.update_scene()
 
 
@@ -176,10 +171,10 @@ class AppScene(object):
         parameters['is_wipe_tower'] = int(self.controller.is_multimaterial())
 
         if self.controller.is_multimaterial():
-            parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0]-self.size_x*.05)*10. + printer_parameters['printing_space'][0]*.5)
-            parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1]-self.size_y*.05)*10. + printer_parameters['printing_space'][1]*.5)
-            parameters['wipe_size_x'] = int(self.size_x)
-            parameters['wipe_size_y'] = int(self.size_y/3)
+            parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0] - self.wipe_tower_size_x * .05) * 10. + printer_parameters['printing_space'][0] * .5)
+            parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1] - self.wipe_tower_size_y * .05) * 10. + printer_parameters['printing_space'][1] * .5)
+            parameters['wipe_size_x'] = int(self.wipe_tower_size_x)
+            parameters['wipe_size_y'] = int(self.wipe_tower_size_y / 3)
         else:
             parameters['wipe_pos_x'] = 0
             parameters['wipe_pos_y'] = 0
@@ -495,6 +490,9 @@ class AppScene(object):
                     else:
                         m.isVisible = False
 
+        if self.controller.is_multimaterial():
+            self.update_wipe_tower()
+
         #TODO: Add state to history
         self.clear_selected_models()
         self.controller.view.update_scene()
@@ -566,8 +564,11 @@ class AppScene(object):
         for m in self.models:
             m.selected = False
 
-    def get_models(self):
-        return [m for m in self.models if m.isVisible]
+    def get_models(self, with_wipe_tower=True):
+        if with_wipe_tower:
+            return [m for m in self.models if m.isVisible]
+        else:
+            return [m for m in self.models if m.isVisible and not m.is_wipe_tower]
 
     def automatic_models_position(self):
         if not len(self.get_models()) > 1:

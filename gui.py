@@ -2476,7 +2476,7 @@ class PrusaControlView(QMainWindow):
     def update_gui_for_material(self, set_materials=0):
         labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
 
-        if self.controller.is_multimaterial:
+        if self.controller.is_multimaterial():
             if set_materials:
                 self.extruder1_c.clear()
                 self.extruder2_c.clear()
