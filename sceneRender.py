@@ -566,10 +566,10 @@ class GLWidget(QGLWidget):
 
             for model in self.parent.controller.scene.models:
                 if model.isVisible:
-                    if self.lightning_shader_ok:
+                    if self.lightning_shader_ok and not model.is_wipe_tower:
                         self.lightning_shader_program.bind()
                     model.render(picking=False, gcode_preview=not model_view)
-                    if self.lightning_shader_ok:
+                    if self.lightning_shader_ok and not model.is_wipe_tower:
                         self.lightning_shader_program.release()
             '''
             glDisable(GL_CLIP_PLANE0)

@@ -202,7 +202,7 @@ class Slic3rEngineRunner(QObject):
                 self.step_max+=1
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
-        material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.actual_printer, self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'], self)
+        material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.get_actual_printer(), self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'], self)
         #print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = configparser.RawConfigParser()

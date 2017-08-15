@@ -61,12 +61,14 @@ QLabel#brim_label{
 QLabel#extruder1_l,
 QLabel#extruder2_l,
 QLabel#extruder3_l,
-QLabel#extruder4_l{
+QLabel#extruder4_l,
+QLabel#wipe_tower_l{
     margin: 0px 0px 0px 2px;
     padding: 0px 0px 0px 0px;
 }
 
 QLabel#printer_settings_l:disabled,
+QLabel#materials_settings_l:disabled,
 QLabel#infillLabel:disabled,
 QLabel#supportLabel:disabled,
 QLabel#qualityLabel:disabled,
@@ -75,7 +77,8 @@ QLabel#brim_label:disabled,
 QLabel#extruder1_l:disabled,
 QLabel#extruder2_l:disabled,
 QLabel#extruder3_l:disabled,
-QLabel#extruder4_l:disabled
+QLabel#extruder4_l:disabled,
+QLabel#wipe_tower_l:disabled
 {
 
     color: rgb(132, 132, 132);
@@ -153,7 +156,8 @@ QComboBox#extruder1_c QAbstractItemView,
 QComboBox#extruder2_c QAbstractItemView,
 QComboBox#extruder3_c QAbstractItemView,
 QComboBox#extruder4_c QAbstractItemView,
-SettingsDialog QComboBox QAbstractItemView
+SettingsDialog QComboBox QAbstractItemView,
+QComboBox#wipe_tower_c QAbstractItemView
 {
     margin: 0px 10px 0px 0px;
     padding: 0px 0px 0px 0px;
@@ -698,4 +702,8 @@ QCheckBox#lock_axis_checkbox::indicator:checked:disabled {
 
 QCheckBox#lock_axis_checkbox::indicator:unchecked:disabled {
     image: url(base_dirdata/img/gui/scalelock_off_disabled.png);
+}
+
+QCheckBox#single_material_mode_checkbox{
+    padding-top: 10px;
 }

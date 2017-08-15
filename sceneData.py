@@ -152,8 +152,11 @@ class AppScene(object):
     def update_wipe_tower(self):
         #get maximal z in scene
         z_list = [self.get_size(m)[2]*10. for m in self.get_models(with_wipe_tower=False)]
-        max_z = max(z_list)
-        self.wipe_tower_size_z = max_z
+        if z_list == []:
+            self.wipe_tower_size_z = 0.1
+        else:
+            max_z = max(z_list)
+            self.wipe_tower_size_z = max_z
 
         wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
         self.remove_wipe_tower()
@@ -168,9 +171,9 @@ class AppScene(object):
 
         parameters = {}
 
-        parameters['is_wipe_tower'] = int(self.controller.is_multimaterial())
+        parameters['is_wipe_tower'] = int(self.controller.is_multimaterial() and not self.controller.is_single_material_mode())
 
-        if self.controller.is_multimaterial():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0] - self.wipe_tower_size_x * .05) * 10. + printer_parameters['printing_space'][0] * .5)
             parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1] - self.wipe_tower_size_y * .05) * 10. + printer_parameters['printing_space'][1] * .5)
             parameters['wipe_size_x'] = int(self.wipe_tower_size_x)
@@ -490,7 +493,7 @@ class AppScene(object):
                     else:
                         m.isVisible = False
 
-        if self.controller.is_multimaterial():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             self.update_wipe_tower()
 
         #TODO: Add state to history
@@ -1414,20 +1417,28 @@ class Model(object):
             #glDisable(GL_TEXTURE_2D)
             glDisable(GL_TEXTURE_GEN_S)
             glDisable(GL_TEXTURE_GEN_T)
-        elif gcode_preview:
+        elif gcode_preview and not self.is_wipe_tower:
             glDisable(GL_BLEND)
             glDisable(GL_LIGHTING)
             glDisable(GL_TEXTURE_GEN_S)
             glDisable(GL_TEXTURE_GEN_T)
+        elif gcode_preview and self.is_wipe_tower:
+            glEnable(GL_TEXTURE_GEN_S)
+            glEnable(GL_TEXTURE_GEN_T)
+
+            SplaneCoefficients = [0., 0.25, 0.25, 0.]
+            glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR)
+            glTexGenfv(GL_S, GL_EYE_PLANE, SplaneCoefficients)
+            glTexGenfv(GL_S, GL_OBJECT_PLANE, SplaneCoefficients)
+
+            TplaneCoefficients = [0.25, 0., 0, 0.]
+            glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR)
+            glTexGenfv(GL_T, GL_EYE_PLANE, TplaneCoefficients)
+            glTexGenfv(GL_T, GL_OBJECT_PLANE, TplaneCoefficients)
+
+            glEnable(GL_TEXTURE_2D)
+            glBindTexture(GL_TEXTURE_2D, self.wipe_tower_texture)
         elif self.is_wipe_tower:
-            #glEnable(GL_BLEND)
-            #glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-            #glDisable(GL_DEPTH_TEST)
-            #glDisable(GL_LIGHTING)
-
-            #glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
-            #glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP)
-
             glEnable(GL_TEXTURE_GEN_S)
             glEnable(GL_TEXTURE_GEN_T)
 
@@ -1459,13 +1470,20 @@ class Model(object):
             glColor3ubv(self.colorId)
         else:
             if gcode_preview:
-                glColor4ub(175, 175, 175, 150)
+                if self.parent.controller.is_multimaterial() and not self.parent.controller.is_single_material_mode():
+                    if self.is_wipe_tower:
+                        glColor4ub(175, 175, 175, 150)
+                    else:
+                        c = self.parent.controller.get_extruder_color(self.extruder)
+                        glColor3ub(c.red(), c.green(), c.blue())
+                else:
+                    glColor4ub(175, 175, 175, 150)
             else:
                 if self.selected:
                     glColor4ubv(self.select_color)
                 else:
                     if self.is_in_printing_space(self.parent.controller.printing_parameters.get_printer_parameters(self.parent.controller.actual_printer)):
-                        if self.parent.controller.is_multimaterial() and not self.is_wipe_tower:
+                        if self.parent.controller.is_multimaterial() and not self.parent.controller.is_single_material_mode() and not self.is_wipe_tower:
                             c = self.parent.controller.get_extruder_color(self.extruder)
                             glColor3ub(c.red(), c.green(), c.blue())
                         else:
@@ -1493,12 +1511,18 @@ class Model(object):
             glDisable(GL_DEPTH_TEST)
             glColor3ub(255, 97, 0)
             self.parent.controller.view.glWidget.renderText(0., 0., 0., u"!", font)
-        if gcode_preview:
+        if gcode_preview and not self.is_wipe_tower:
             glCullFace(GL_BACK)
             glDisable(GL_CULL_FACE)
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
+        elif gcode_preview and self.is_wipe_tower:
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
+            glEnable(GL_LIGHTING)
+            glDisable(GL_TEXTURE_GEN_S)
+            glDisable(GL_TEXTURE_GEN_T)
         elif self.is_wipe_tower:
             glEnable(GL_DEPTH_TEST)
             glDisable(GL_BLEND)

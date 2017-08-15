@@ -87,12 +87,14 @@ class Controller(QObject):
                 'supportButton': False
         }
 
-        self.set_printer(self.settings['printer'])
+        self.actual_printer = self.settings['printer']
+        self.actual_printer_mod = ""
 
         self.enumeration = {
             'language': {
                 'cs_CZ': 'Czech',
-                'en_US': 'English'
+                'en_US': 'English',
+                'es_ES': 'Spanish'
             },
             'printer': {
                 'i3': 'i3',
@@ -189,9 +191,9 @@ class Controller(QObject):
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
         if self.printer_number_of_materials > 1:
-            self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
+            self.view.set_multimaterial_gui_on(True)
         else:
-            self.view.set_multimaterial_gui_off()
+            self.view.set_multimaterial_gui_off(True)
 
         progress_bar(97)
 
@@ -216,7 +218,9 @@ class Controller(QObject):
         self.show_message_on_status_bar("Ready")
         self.create_messages()
 
-        if self.is_multimaterial():
+        self.single_material_mode = False
+
+        if self.is_multimaterial() and not self.is_single_material_mode():
             self.add_wipe_tower()
 
     def update_object_extruders(self):
@@ -247,6 +251,43 @@ class Controller(QObject):
         else:
             return False
         return False
+
+    def set_unset_single_material_mode(self):
+        if not self.is_multimaterial():
+            return
+
+        self.single_material_mode = self.view.single_material_mode_checkbox.isChecked()
+
+        if self.single_material_mode:
+            #set single material GUI
+            print("set single material mode")
+            self.set_printer_mod(self.is_actual_printer_multimode())
+            self.view.set_multimaterial_gui_off()
+            self.remove_wipe_tower()
+            self.update_scene()
+        else:
+            #set multi material GUI
+            print("set multimaterial mode")
+            self.set_printer_mod("")
+            self.view.set_multimaterial_gui_on()
+            self.add_wipe_tower()
+            self.update_scene()
+
+
+        self.view.update_gui_for_material(1)
+
+    def is_actual_printer_multimode(self):
+        data = self.printing_parameters.get_printer_parameters(self.actual_printer)['material_mode']
+        if not data == "":
+            return data
+        else:
+            return False
+
+    def is_single_material_mode(self):
+        if self.is_multimaterial():
+            return self.single_material_mode
+        else:
+            True
 
     def set_analyze_result_messages(self, result):
         self.analyze_result = result
@@ -313,7 +354,7 @@ class Controller(QObject):
 
 
     def is_something_to_save(self):
-        models_lst = [m for m in self.scene.models if m.isVisible]
+        models_lst = self.scene.get_models(with_wipe_tower=False)
         if len(models_lst) == 0:
             return False
         else:
@@ -550,8 +591,13 @@ class Controller(QObject):
         #TODO:Add code for download firmware version
         return '1.0.1'
 
-    def get_printers_labels_ls(self):
-        return [self.printing_parameters.get_printers_parameters()[printer]["label"] for printer in self.printing_parameters.get_printers_parameters()]
+    def get_printers_labels_ls(self, only_visible=False):
+        printers = self.printing_parameters.get_printers_parameters()
+        if only_visible:
+            return [printers[printer]["label"] for printer in
+                    printers if printers[printer]['visible'] == 1]
+        else:
+            return [printers[printer]["label"] for printer in printers]
 
     def get_printers_names_ls(self):
         return self.printing_parameters.get_printers_names()
@@ -586,8 +632,7 @@ class Controller(QObject):
         #return [self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality'][i]['label']
         #        for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']]
         first_index = 0
-        print("get_printer_material_quality_labels_ls_by_material_name" + str(material_name))
-        data = self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material_name)['quality']
+        data = self.printing_parameters.get_materials_quality_for_printer(self.get_actual_printer(), material_name)['quality']
         list = [[data[quality]['label'], data[quality]["sort"], data[quality]["first"]] for quality in data]
         list = sorted(list, key=lambda a: a[1])
         for i, data in enumerate(list):
@@ -597,14 +642,14 @@ class Controller(QObject):
         return [a[0] for a in list], first_index
 
     def get_material_name_by_material_label(self, material_label):
-        data = self.printing_parameters.get_materials_for_printer(self.actual_printer)
+        data = self.printing_parameters.get_materials_for_printer(self.get_actual_printer())
         for i in data:
             if data[i]['label']==material_label:
                 return i
         return None
 
     def get_material_quality_name_by_quality_label(self, material_name, quality_label):
-        data = self.printing_parameters.get_materials_for_printer(self.actual_printer)[material_name]
+        data = self.printing_parameters.get_materials_for_printer(self.get_actual_printer())[material_name]
         for i in data["quality"]:
             if data["quality"][i]['label'] == quality_label:
                 return i
@@ -613,7 +658,7 @@ class Controller(QObject):
 
 
     def get_printer_material_quality_labels_ls_by_material_label(self, material_label):
-        materials_ls = self.printing_parameters.get_materials_for_printer(self.actual_printer)
+        materials_ls = self.printing_parameters.get_materials_for_printer(self.get_actual_printer())
         material_name = ""
         for material in materials_ls:
             if materials_ls[material]['label'] == material_label:
@@ -624,27 +669,26 @@ class Controller(QObject):
 
     def get_printer_material_quality_names_ls(self, material):
         # return [i['label'] for i in self.printing_settings['materials'][index]['quality'] if i['name'] not in ['default']]
-        data = self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)['quality']
+        data = self.printing_parameters.get_materials_quality_for_printer(self.get_actual_printer(), material)['quality']
         list = [[quality, data[quality]["sort"]] for quality in data]
         list = sorted(list, key=lambda a: a[1])
         return [a[0] for a in list]
-        #return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.actual_printer, material)['quality']]
+        #return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.get_actual_printer(), material)['quality']]
 
 
     def get_printing_settings_for_material_by_name(self, material_name):
         # material = self.printing_settings['materials'][material_index]
         printing_settings_tmp = []
-        printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.actual_printer)
+        printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.get_actual_printer())
         material_printing_setting = printing_settings_tmp[material_name]
 
         return material_printing_setting
 
     def get_printing_settings_for_material_by_label(self, material_label):
-        print("get_printing_settings_for_material_by_label: " + str(material_label))
         printing_settings_tmp = []
-        for material in self.printing_parameters.get_materials_for_printer(self.actual_printer):
-            if self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]["label"] == material_label:
-                printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.actual_printer)[material]
+        for material in self.printing_parameters.get_materials_for_printer(self.get_actual_printer()):
+            if self.printing_parameters.get_materials_for_printer(self.get_actual_printer())[material]["label"] == material_label:
+                printing_settings_tmp = self.printing_parameters.get_materials_for_printer(self.get_actual_printer())[material]
                 break
 
         return printing_settings_tmp
@@ -652,6 +696,9 @@ class Controller(QObject):
     def update_mm_material_settings(self):
         # get combobox materials
         soluble_material_tmp = []
+
+        if not self.is_multimaterial():
+            return
 
         soluble_material_tmp.append(self.get_printing_settings_for_material_by_label(self.view.extruder1_c.currentText())["soluble"])
         soluble_material_tmp.append(self.get_printing_settings_for_material_by_label(self.view.extruder2_c.currentText())["soluble"])
@@ -704,7 +751,7 @@ class Controller(QObject):
 
         #multimaterial parameters
         multimat = dict()
-        multimat["is_multimat"] = int(self.is_multimaterial())
+        multimat["is_multimat"] = int(self.is_multimaterial() and not self.is_single_material_mode())
 
         out = {}
         for param in (gui_parameters, scene_parameters, multimat):
@@ -818,6 +865,36 @@ class Controller(QObject):
     def set_printer(self, name):
         #index = [i for i, data in enumerate(self.printers) if data['name']== name]
         self.actual_printer = name
+        self.settings['printer'] = name
+
+    def set_printer_mod(self, special_mode):
+        self.actual_printer_mod = special_mode
+
+    def get_actual_printer(self):
+        if self.actual_printer_mod:
+           return self.actual_printer_mod
+        else:
+           return self.actual_printer
+
+    def change_of_wipe_tower_settings(self, value):
+        print("change of wipe tower settings: " +str(value))
+        # value draft 0 - small wipe tower 5
+        # value normal 1 - normal wipe tower 15
+        # value normal 2 - normal wipe tower 15
+        # value Soluble supports 3 - normal wipe tower 25
+
+        if value == 0:
+            self.scene.wipe_tower_size_y = 7.5 * 3.
+        elif value == 1:
+            self.scene.wipe_tower_size_y = 15 * 3.
+        elif value == 2:
+            self.scene.wipe_tower_size_y = 20 * 3.
+        elif value == 3:
+            self.scene.wipe_tower_size_y = 25 * 3.
+
+        self.recalculate_wipe_tower()
+
+
 
     def send_feedback(self):
         if self.settings['language'] == 'cs_CZ':
@@ -969,7 +1046,7 @@ class Controller(QObject):
             self.scene.automatic_models_position()
         self.scene.clear_history()
         self.scene.save_change(self.scene.models)
-        if self.is_multimaterial():
+        if self.is_multimaterial() and not self.is_single_material_mode():
             self.recalculate_wipe_tower()
         self.update_scene()
         self.is_model_loaded = True
@@ -1024,14 +1101,15 @@ class Controller(QObject):
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
         if self.printer_number_of_materials>1:
-            self.view.set_multimaterial_gui_on(self.printer_number_of_materials)
+            self.view.set_multimaterial_gui_on(True)
+            self.view.update_gui_for_material(1)
             self.update_mm_material_settings()
             if not self.settings['printer'] == temp_settings['printer']:
                 is_change = True
                 self.add_wipe_tower()
         else:
-            self.view.set_multimaterial_gui_off()
-            self.update_mm_material_settings()
+            self.view.set_multimaterial_gui_off(True)
+            self.view.update_gui_for_material(1)
             self.remove_wipe_tower()
 
         self.settings = temp_settings
@@ -1184,10 +1262,6 @@ class Controller(QObject):
 
     def recalculate_wipe_tower(self):
         print("calculating wipe tower")
-        #TODO:
-        #self.scene.wipe_tower_size_z += 25.0
-        #self.remove_wipe_tower()
-        #self.scene.create_wipe_tower()
         self.scene.update_wipe_tower()
 
 

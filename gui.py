@@ -540,7 +540,7 @@ class SettingsDialog(QDialog):
         self.printer_combo = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.printer_combo.setStyle(QStyleFactory.create('Windows'))
-        self.printer_combo.addItems(self.controller.get_printers_labels_ls())
+        self.printer_combo.addItems(self.controller.get_printers_labels_ls(only_visible=True))
         #print(self.controller.get_printers_names_ls())
         #print(self.controller.settings['printer'])
         self.printer_combo.setCurrentIndex(self.controller.get_printers_names_ls().index(self.controller.settings['printer']))
@@ -1053,7 +1053,7 @@ class PrusaControlView(QMainWindow):
         if self.controller.app_config.system_platform in ['Linux']:
             self.materialCombo.setStyle(QStyleFactory.create('Windows'))
         self.materialCombo.setObjectName('materialCombo')
-        material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+        material_label_ls, first = self.controller.get_printer_materials_labels_ls(self.controller.get_actual_printer())
         self.materialCombo.addItems(material_label_ls)
         self.materialCombo.setCurrentIndex(first)
         self.materialCombo.currentIndexChanged.connect(self.controller.update_gui)
@@ -1102,6 +1102,12 @@ class PrusaControlView(QMainWindow):
 
 
         #multimaterial settings
+        self.single_material_mode_tooltip = self.tr("Do you want to print from one material?")
+        self.single_material_mode_checkbox = QCheckBox("Single material Mode")
+        self.single_material_mode_checkbox.setObjectName("single_material_mode_checkbox")
+        self.single_material_mode_checkbox.setToolTip(self.single_material_mode_tooltip)
+        self.single_material_mode_checkbox.stateChanged.connect(self.controller.set_unset_single_material_mode)
+
         self.materials_settings_l = QLabel()
         self.materials_settings_l.setObjectName("materials_settings_l")
 
@@ -1164,6 +1170,17 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c.currentIndexChanged.connect(self.update_material_settings)
         self.extruder4_c.setObjectName("extruder4_c")
         self.extruder4_c.setMaxVisibleItems(len(material_label_ls))
+
+        self.wipe_tower_l = QLabel()
+        self.wipe_tower_l.setObjectName("wipe_tower_l")
+        self.wipe_tower_c = QComboBox()
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.wipe_tower_c.setStyle(QStyleFactory.create('Windows'))
+        self.wipe_tower_c.setObjectName("wipe_tower_c")
+        self.wipe_tower_c.addItems(self.get_list_of_wipe_tower_labels())
+        self.wipe_tower_c.setCurrentIndex(1)
+        self.wipe_tower_c.currentIndexChanged.connect(self.change_of_wipe_tower_settings)
+        self.wipe_tower_c.setMaxVisibleItems(len(self.get_list_of_wipe_tower_labels()))
         # multimaterial settings
 
 
@@ -1203,28 +1220,38 @@ class PrusaControlView(QMainWindow):
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
         printing_mm_parameters_layout = QGridLayout()
+        printing_parameters_layout = QGridLayout()
         #printing_parameters_layout.setRowMinimumHeight(0, 65)
 
         printing_mm_parameters_layout.setColumnMinimumWidth(0, 10)
-        printing_mm_parameters_layout.addWidget(self.materials_settings_l, 0, 0, 1, 3)
-        printing_mm_parameters_layout.addWidget(self.extruder1_cb, 1, 0)
-        printing_mm_parameters_layout.addWidget(self.extruder1_l, 1, 1)
-        printing_mm_parameters_layout.addWidget(self.extruder1_c, 1, 2, 1, 2)
+        printing_mm_parameters_layout.addWidget(self.single_material_mode_checkbox, 0, 1, 1, 3)
+        #printing_mm_parameters_layout.addWidget(self.single_material_mode_l, 0, 2, 1, 2)
 
-        printing_mm_parameters_layout.addWidget(self.extruder2_cb, 2, 0)
-        printing_mm_parameters_layout.addWidget(self.extruder2_l, 2, 1)
-        printing_mm_parameters_layout.addWidget(self.extruder2_c, 2, 2, 1, 2)
+        printing_mm_parameters_layout.addWidget(self.materials_settings_l, 1, 0, 1, 3)
 
-        printing_mm_parameters_layout.addWidget(self.extruder3_cb, 3, 0)
-        printing_mm_parameters_layout.addWidget(self.extruder3_l, 3, 1)
-        printing_mm_parameters_layout.addWidget(self.extruder3_c, 3, 2, 1, 2)
+        printing_mm_parameters_layout.addWidget(self.extruder1_cb, 2, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder1_l, 2, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder1_c, 2, 2, 1, 2)
 
-        printing_mm_parameters_layout.addWidget(self.extruder4_cb, 4, 0)
-        printing_mm_parameters_layout.addWidget(self.extruder4_l, 4, 1)
-        printing_mm_parameters_layout.addWidget(self.extruder4_c, 4, 2, 1, 2)
+        printing_mm_parameters_layout.addWidget(self.extruder2_cb, 3, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder2_l, 3, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder2_c, 3, 2, 1, 2)
+
+        printing_mm_parameters_layout.addWidget(self.extruder3_cb, 4, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder3_l, 4, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder3_c, 4, 2, 1, 2)
+
+        printing_mm_parameters_layout.addWidget(self.extruder4_cb, 5, 0)
+        printing_mm_parameters_layout.addWidget(self.extruder4_l, 5, 1)
+        printing_mm_parameters_layout.addWidget(self.extruder4_c, 5, 2, 1, 2)
+
+        #add size of wipe tower combobox
+        printing_mm_parameters_layout.addWidget(self.wipe_tower_l, 6, 1)
+        printing_mm_parameters_layout.addWidget(self.wipe_tower_c, 6, 2, 1, 2)
 
 
-        printing_parameters_layout = QGridLayout()
+
+
         printing_parameters_layout.addWidget(self.printer_settings_l, 6, 0, 1, 3)
         printing_parameters_layout.addWidget(self.materialLabel, 7,0)
         printing_parameters_layout.addWidget(self.materialCombo, 7, 1, 1, 3)
@@ -1317,6 +1344,12 @@ class PrusaControlView(QMainWindow):
         #print("Show all")
         self.show()
 
+    def get_list_of_wipe_tower_labels(self):
+        return [self.tr("Draft"), self.tr("Normal"), self.tr("Fine"), self.tr("Soluble supports")]
+
+    def change_of_wipe_tower_settings(self):
+        index = self.wipe_tower_c.currentIndex()
+        self.controller.change_of_wipe_tower_settings(index)
 
     def update_object_extruders_cb(self):
         actual_index = self.object_extruder_c.currentIndex()
@@ -1333,8 +1366,6 @@ class PrusaControlView(QMainWindow):
 
     def set_scale(self, scale):
         #resize window
-        print(scale)
-
         #self.setFixedSize((int)(scale * self.maximumWidth()), (int)(scale * self.maximumHeight()))
         #resize layouts with widgets
         for widget in self.centralWidget.children():
@@ -1377,7 +1408,7 @@ class PrusaControlView(QMainWindow):
 
 
     def set_default(self):
-        _, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+        _, first = self.controller.get_printer_materials_labels_ls(self.controller.get_actual_printer())
         self.materialCombo.setCurrentIndex(first)
 
         self.extruder1_c.setCurrentIndex(first)
@@ -1419,6 +1450,7 @@ class PrusaControlView(QMainWindow):
         self.materialLabel.setToolTip(self.material_tooltip)
         self.materialCombo.setToolTip(self.material_tooltip)
 
+
         self.qualityLabel.setText(self.tr("Quality"))
         self.quality_tooltip = self.tr("Select quality for printing")
         self.qualityLabel.setToolTip(self.quality_tooltip)
@@ -1441,11 +1473,14 @@ class PrusaControlView(QMainWindow):
         self.brim_label.setToolTip(self.brim_tooltip)
         self.brimCheckBox.setToolTip(self.brim_tooltip)
 
+        self.single_material_mode_tooltip = self.tr("Do you want to print from one material?")
+        self.single_material_mode_checkbox.setText(self.tr("Single material mode"))
         self.materials_settings_l.setText(self.tr("Material Settings"))
         self.extruder1_l.setText(self.tr("Extruder 1"))
         self.extruder2_l.setText(self.tr("Extruder 2"))
         self.extruder3_l.setText(self.tr("Extruder 3"))
         self.extruder4_l.setText(self.tr("Extruder 4"))
+        self.wipe_tower_l.setText(self.tr("Color quality"))
 
         self.object_group_box.setTitle(self.tr("Object settings"))
         self.object_variable_layer_box.setTitle(self.tr("Object advance settings"))
@@ -1471,37 +1506,31 @@ class PrusaControlView(QMainWindow):
         self.supportCombo.clear()
         self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere")])
 
-    def set_multimaterial_gui_on(self, number_of_materials):
+    def set_multimaterial_gui_on(self, apply_on_single_mode_switch=False):
         self.create_menu()
+
+        if apply_on_single_mode_switch:
+            self.single_material_mode_checkbox.setVisible(True)
+
         self.materials_settings_l.setVisible(True)
-        if number_of_materials==2:
-            self.extruder1_cb.setVisible(True)
-            self.extruder1_l.setVisible(True)
-            self.extruder1_c.setVisible(True)
-            self.extruder2_cb.setVisible(True)
-            self.extruder2_l.setVisible(True)
-            self.extruder2_c.setVisible(True)
 
-            self.extruder3_cb.setVisible(False)
-            self.extruder3_l.setVisible(False)
-            self.extruder3_c.setVisible(False)
-            self.extruder4_cb.setVisible(False)
-            self.extruder4_l.setVisible(False)
-            self.extruder4_c.setVisible(False)
-        elif number_of_materials==4:
-            self.extruder1_cb.setVisible(True)
-            self.extruder1_l.setVisible(True)
-            self.extruder1_c.setVisible(True)
-            self.extruder2_cb.setVisible(True)
-            self.extruder2_l.setVisible(True)
-            self.extruder2_c.setVisible(True)
 
-            self.extruder3_cb.setVisible(True)
-            self.extruder3_l.setVisible(True)
-            self.extruder3_c.setVisible(True)
-            self.extruder4_cb.setVisible(True)
-            self.extruder4_l.setVisible(True)
-            self.extruder4_c.setVisible(True)
+        self.extruder1_cb.setVisible(True)
+        self.extruder1_l.setVisible(True)
+        self.extruder1_c.setVisible(True)
+        self.extruder2_cb.setVisible(True)
+        self.extruder2_l.setVisible(True)
+        self.extruder2_c.setVisible(True)
+
+        self.extruder3_cb.setVisible(True)
+        self.extruder3_l.setVisible(True)
+        self.extruder3_c.setVisible(True)
+        self.extruder4_cb.setVisible(True)
+        self.extruder4_l.setVisible(True)
+        self.extruder4_c.setVisible(True)
+
+        self.wipe_tower_l.setVisible(True)
+        self.wipe_tower_c.setVisible(True)
 
         self.object_extruder_l.setVisible(True)
         self.object_extruder_c.setVisible(True)
@@ -1511,8 +1540,11 @@ class PrusaControlView(QMainWindow):
 
 
 
-    def set_multimaterial_gui_off(self):
+    def set_multimaterial_gui_off(self, apply_on_single_mode_switch=False):
         self.create_menu()
+
+        if apply_on_single_mode_switch:
+            self.single_material_mode_checkbox.setVisible(False)
 
         #self.printing_mm_parameters_layout
 
@@ -1532,6 +1564,9 @@ class PrusaControlView(QMainWindow):
         self.extruder4_cb.setVisible(False)
         self.extruder4_l.setVisible(False)
         self.extruder4_c.setVisible(False)
+
+        self.wipe_tower_l.setVisible(False)
+        self.wipe_tower_c.setVisible(False)
 
         self.object_extruder_l.setVisible(False)
         self.object_extruder_c.setVisible(False)
@@ -1800,14 +1835,23 @@ class PrusaControlView(QMainWindow):
         return self.object_id
 
     def enable_editing(self):
+        self.single_material_mode_checkbox.setEnabled(True)
+        self.materials_settings_l.setEnabled(True)
         self.extruder1_l.setEnabled(True)
+        self.extruder1_cb.setEnabled(True)
         self.extruder1_c.setEnabled(True)
         self.extruder2_l.setEnabled(True)
+        self.extruder2_cb.setEnabled(True)
         self.extruder2_c.setEnabled(True)
         self.extruder3_l.setEnabled(True)
+        self.extruder3_cb.setEnabled(True)
         self.extruder3_c.setEnabled(True)
         self.extruder4_l.setEnabled(True)
+        self.extruder4_cb.setEnabled(True)
         self.extruder4_c.setEnabled(True)
+
+        self.wipe_tower_l.setEnabled(True)
+        self.wipe_tower_c.setEnabled(True)
 
         self.materialCombo.setEnabled(True)
         self.qualityCombo.setEnabled(True)
@@ -1827,14 +1871,23 @@ class PrusaControlView(QMainWindow):
 
 
     def disable_editing(self):
+        self.single_material_mode_checkbox.setEnabled(False)
+        self.materials_settings_l.setEnabled(False)
         self.extruder1_l.setEnabled(False)
+        self.extruder1_cb.setEnabled(False)
         self.extruder1_c.setEnabled(False)
         self.extruder2_l.setEnabled(False)
+        self.extruder2_cb.setEnabled(False)
         self.extruder2_c.setEnabled(False)
         self.extruder3_l.setEnabled(False)
+        self.extruder3_cb.setEnabled(False)
         self.extruder3_c.setEnabled(False)
         self.extruder4_l.setEnabled(False)
+        self.extruder4_cb.setEnabled(False)
         self.extruder4_c.setEnabled(False)
+
+        self.wipe_tower_l.setEnabled(False)
+        self.wipe_tower_c.setEnabled(False)
 
         self.materialCombo.setEnabled(False)
         self.qualityCombo.setEnabled(False)
@@ -2468,19 +2521,25 @@ class PrusaControlView(QMainWindow):
         self.controller.update_mm_material_settings()
 
 
-
     def update_gui(self):
         self.controller.scene_was_changed()
         self.update_gui_for_material()
 
     def update_gui_for_material(self, set_materials=0):
-        labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
+        labels, first = self.controller.get_printer_materials_labels_ls(self.controller.get_actual_printer())
+        print("Labels of materials: " + str(labels))
+        #if self.controller.is_multimaterial():
 
-        if self.controller.is_multimaterial():
+
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             if set_materials:
+                self.extruder1_c.blockSignals(True)
                 self.extruder1_c.clear()
+                self.extruder2_c.blockSignals(True)
                 self.extruder2_c.clear()
+                self.extruder3_c.blockSignals(True)
                 self.extruder3_c.clear()
+                self.extruder4_c.blockSignals(True)
                 self.extruder4_c.clear()
 
                 self.extruder1_c.addItems(labels)
@@ -2496,6 +2555,11 @@ class PrusaControlView(QMainWindow):
                 self.extruder3_c.setMaxVisibleItems((len(labels)))
                 self.extruder4_c.setCurrentIndex(first)
                 self.extruder4_c.setMaxVisibleItems((len(labels)))
+
+                self.extruder1_c.blockSignals(False)
+                self.extruder2_c.blockSignals(False)
+                self.extruder3_c.blockSignals(False)
+                self.extruder4_c.blockSignals(False)
 
             material_label = self.extruder1_c.currentText()
 
@@ -2513,11 +2577,13 @@ class PrusaControlView(QMainWindow):
 
         else:
             if set_materials:
+                self.materialCombo.blockSignals(True)
                 self.materialCombo.clear()
                 #labels, first = self.controller.get_printer_materials_labels_ls(self.controller.actual_printer)
                 self.materialCombo.addItems(labels)
                 self.materialCombo.setCurrentIndex(first)
                 self.materialCombo.setMaxVisibleItems((len(labels)))
+                self.materialCombo.blockSignals(False)
 
             # material_label = self.materialCombo.currentText()
             material_label = self.materialCombo.currentText()
