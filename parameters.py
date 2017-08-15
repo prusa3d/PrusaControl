@@ -77,8 +77,15 @@ class PrintingParameters(object):
             #pprint(self.materials_quality_parameters[printer])
 
 
-    def get_printers_names(self):
-        return list(self.printers_parameters)
+    def get_printers_names(self, only_visible=False):
+        if only_visible:
+            unsorted =  [[printer, self.printers_parameters[printer]['sort']] for printer in self.printers_parameters if self.printers_parameters[printer]['visible'] == 1]
+            sort_list = sorted(unsorted, key=lambda mem: mem[1])
+            return [a[0] for a in sort_list]
+        else:
+            unsorted = [[printer, self.printers_parameters[printer]['sort']] for printer in self.printers_parameters]
+            sort_list = sorted(unsorted, key=lambda mem: mem[1])
+            return [a[0] for a in sort_list]
 
     def get_printers_parameters(self):
         return self.printers_parameters

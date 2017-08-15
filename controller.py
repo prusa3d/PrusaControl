@@ -594,13 +594,16 @@ class Controller(QObject):
     def get_printers_labels_ls(self, only_visible=False):
         printers = self.printing_parameters.get_printers_parameters()
         if only_visible:
-            return [printers[printer]["label"] for printer in
-                    printers if printers[printer]['visible'] == 1]
+            unsorted = [[printers[printer]["label"], [printers[printer]['sort']]] for printer in printers if printers[printer]['visible'] == 1]
+            sort_lst = sorted(unsorted, key=lambda mem: mem[1])
+            return [a[0] for a in sort_lst]
         else:
-            return [printers[printer]["label"] for printer in printers]
+            unsorted = [[printers[printer]["label"], [printers[printer]['sort']]] for printer in printers]
+            sort_lst = sorted(unsorted, key=lambda mem: mem[1])
+            return [a[0] for a in sort_lst]
 
-    def get_printers_names_ls(self):
-        return self.printing_parameters.get_printers_names()
+    def get_printers_names_ls(self, only_visible=False):
+        return self.printing_parameters.get_printers_names(only_visible)
 
     def get_printer_variations_labels_ls(self, printer_name):
         printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
@@ -1101,6 +1104,7 @@ class Controller(QObject):
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
         if self.printer_number_of_materials>1:
+            print("Multimaterialova tiskarna")
             self.view.set_multimaterial_gui_on(True)
             self.view.update_gui_for_material(1)
             self.update_mm_material_settings()
@@ -1108,6 +1112,7 @@ class Controller(QObject):
                 is_change = True
                 self.add_wipe_tower()
         else:
+            print("Ne multimaterialova tiskarna")
             self.view.set_multimaterial_gui_off(True)
             self.view.update_gui_for_material(1)
             self.remove_wipe_tower()
