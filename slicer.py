@@ -227,7 +227,7 @@ class Slic3rEngineRunner(QObject):
         self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
 
 
-        if self.controller.is_multimaterial():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             self.process = subprocess.Popen(
                 self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.prusa', '--load',
                                      self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',

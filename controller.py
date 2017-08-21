@@ -850,12 +850,14 @@ class Controller(QObject):
             suggest_filename = suggest_filename[0]
             data = self.get_actual_printing_data()
             material_name = data['material']
+
             quality_name = data['quality']
+            material_names_lst = [mat.split('_')[-1] for mat in material_name]
 
-            suggest_filename += "_" + material_name[0].upper() + "_" + quality_name.upper()
-            print(suggest_filename)
+            material_info = "_".join(material_names_lst)
+            suggest_filename += "_" + material_info.upper() + "_" + quality_name.upper()
 
-        if self.is_multimaterial():
+        if self.is_multimaterial() and not self.is_single_material_mode():
             suggest_filename = suggest_filename + "_MM"
 
 
@@ -1135,7 +1137,7 @@ class Controller(QObject):
     def generate_gcode(self):
         self.set_progress_bar(int((100. / 9.)))
         if self.scene.models:
-            if self.is_multimaterial():
+            if self.is_multimaterial() and not self.is_single_material_mode():
                 self.save_whole_scene_to_one_prusa_file(self.app_config.tmp_place + "tmp.prusa")
             else:
                 self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")

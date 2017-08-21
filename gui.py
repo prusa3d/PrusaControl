@@ -2611,7 +2611,7 @@ class PrusaControlView(QMainWindow):
 
     def get_actual_printing_data(self):
         material_names = []
-        if self.controller.is_multimaterial():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             material_labels = []
             material_labels.append(self.extruder1_c.currentText())
             material_labels.append(self.extruder2_c.currentText())
