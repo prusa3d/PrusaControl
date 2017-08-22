@@ -556,8 +556,17 @@ class AppScene(object):
                     #messages.append(text00 + filename + text01)
         return messages
 
+    def reset_wipe_tower(self):
+        self.wipe_tower_size_x = 60.
+        self.wipe_tower_size_y = 45.
+        self.wipe_tower_size_z = 0.10
+
+
     def clear_scene(self):
         del self.transformation_list
+        if self.wipe_tower_model:
+            self.wipe_tower_model = []
+            self.reset_wipe_tower()
         self.transformation_list = []
         del self.models
         self.models = []
