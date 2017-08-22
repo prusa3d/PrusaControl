@@ -597,7 +597,9 @@ class SettingsDialog(QDialog):
         data['language'] = list(controller.enumeration['language'])[dialog.language_combo.currentIndex()]
         data['printer'] = controller.get_printers_names_ls()[dialog.printer_combo.currentIndex()]
         data['printer_type'] = controller.get_printer_variations_names_ls(data['printer'])[dialog.printer_type_combo.currentIndex()]
-        controller.set_printer(data['printer'])
+
+        #controller.set_printer(data['printer'])
+
         data['debug'] = dialog.debug_checkbox.isChecked()
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
         data['analyze'] = dialog.analyze_checkbox.isChecked()
@@ -2525,7 +2527,7 @@ class PrusaControlView(QMainWindow):
 
     def update_gui_for_material(self, set_materials=0):
         labels, first = self.controller.get_printer_materials_labels_ls(self.controller.get_actual_printer())
-        print("Labels of materials: " + str(labels))
+        #print("Labels of materials: " + str(labels))
         #if self.controller.is_multimaterial():
 
 
@@ -2612,6 +2614,7 @@ class PrusaControlView(QMainWindow):
     def get_actual_printing_data(self):
         material_names = []
         if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+            print("Multimat")
             material_labels = []
             material_labels.append(self.extruder1_c.currentText())
             material_labels.append(self.extruder2_c.currentText())
@@ -2622,6 +2625,7 @@ class PrusaControlView(QMainWindow):
             for mat in material_labels:
                 material_names.append(self.controller.get_material_name_by_material_label(mat))
         else:
+            print("Singlemat")
             material_label = self.materialCombo.currentText()
             material_names = [self.controller.get_material_name_by_material_label(material_label)]
 

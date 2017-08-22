@@ -87,7 +87,7 @@ class Controller(QObject):
                 'supportButton': False
         }
 
-        self.actual_printer = self.settings['printer']
+        self.actual_printer = deepcopy(self.settings['printer'])
         self.actual_printer_mod = ""
 
         self.enumeration = {
@@ -281,7 +281,7 @@ class Controller(QObject):
         if not data == "":
             return data
         else:
-            return False
+            return ""
 
     def is_single_material_mode(self):
         if self.is_multimaterial():
@@ -757,6 +757,7 @@ class Controller(QObject):
         multimat["is_multimat"] = int(self.is_multimaterial() and not self.is_single_material_mode())
 
         out = {}
+
         for param in (gui_parameters, scene_parameters, multimat):
             out.update(param)
 
@@ -869,20 +870,22 @@ class Controller(QObject):
 
     def set_printer(self, name):
         #index = [i for i, data in enumerate(self.printers) if data['name']== name]
-        self.actual_printer = name
-        self.settings['printer'] = name
+        #print("Setting actual printer on: " + str(name))
+        self.actual_printer = deepcopy(name)
+        self.settings['printer'] = deepcopy(name)
+        self.actual_printer_mod = ""
 
     def set_printer_mod(self, special_mode):
         self.actual_printer_mod = special_mode
 
     def get_actual_printer(self):
         if self.actual_printer_mod:
-           return self.actual_printer_mod
+            return self.actual_printer_mod
         else:
-           return self.actual_printer
+            return self.actual_printer
 
     def change_of_wipe_tower_settings(self, value):
-        print("change of wipe tower settings: " +str(value))
+        #print("change of wipe tower settings: " +str(value))
         # value draft 0 - small wipe tower 5
         # value normal 1 - normal wipe tower 15
         # value normal 2 - normal wipe tower 15
@@ -1097,7 +1100,6 @@ class Controller(QObject):
             return
 
         if not temp_settings['language'] == self.settings['language']:
-            is_change = True
             self.set_language(temp_settings['language'])
 
         if not temp_settings['printer'] == self.settings['printer']:
@@ -1105,24 +1107,23 @@ class Controller(QObject):
 
         printer_settings = self.printing_parameters.get_printer_parameters(temp_settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
-        if self.printer_number_of_materials>1:
-            print("Multimaterialova tiskarna")
-            self.view.set_multimaterial_gui_on(True)
-            self.view.update_gui_for_material(1)
-            self.update_mm_material_settings()
-            if not self.settings['printer'] == temp_settings['printer']:
-                is_change = True
+
+        if is_change:
+            self.set_printer(temp_settings['printer'])
+            if self.printer_number_of_materials>1:
+                self.view.set_multimaterial_gui_on(True)
+                #self.view.update_gui_for_material(1)
+                self.update_mm_material_settings()
                 self.add_wipe_tower()
-        else:
-            print("Ne multimaterialova tiskarna")
-            self.view.set_multimaterial_gui_off(True)
+                self.update_wipe_tower()
+            else:
+                self.view.set_multimaterial_gui_off(True)
+                #self.view.update_gui_for_material(1)
+                self.remove_wipe_tower()
             self.view.update_gui_for_material(1)
-            self.remove_wipe_tower()
 
         self.settings = temp_settings
 
-        if is_change:
-            self.view.update_gui_for_material()
 
 
     def add_wipe_tower(self):
@@ -1130,6 +1131,9 @@ class Controller(QObject):
 
     def remove_wipe_tower(self):
         self.scene.remove_wipe_tower()
+
+    def update_wipe_tower(self):
+        self.scene.update_wipe_tower()
 
     def open_about(self):
         self.view.open_about_dialog()

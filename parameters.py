@@ -183,16 +183,20 @@ class PrintingParameters(object):
                 return None
         return None
 
-    def get_actual_settings(self, printer_name, printer_variation, material_names, quality_seting, slicer):
+    def get_actual_settings(self, printer_name, printer_variation, material_names, quality_settings, slicer):
         if len(material_names) > 1:
+            #print("Multi material version")
             # multimaterial version
             settings_lst = []
             for mat in material_names:
-                settings_lst.append(self.get_actual_settings_for_one_material(printer_name, printer_variation, mat, quality_seting))
+                settings_lst.append(self.get_actual_settings_for_one_material(printer_name, printer_variation, mat, quality_settings))
+            #print("Printing settings: %s %s %s %s" % (str(printer_name), str(printer_variation), str(material_names), str(quality_settings)))
             return self.connect_different_settings(slicer.multimaterial_spec_parameters, settings_lst)
         else:
+            #print("Single material version")
+            #print("Printing settings: %s %s %s %s" % (str(printer_name), str(printer_variation), str(material_names[0]), str(quality_settings)))
             # one material version
-            return self.get_actual_settings_for_one_material(printer_name, printer_variation, material_names[0], quality_seting)
+            return self.get_actual_settings_for_one_material(printer_name, printer_variation, material_names[0], quality_settings)
 
 
     def connect_different_settings(self, keys_lst, lst):
