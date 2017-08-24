@@ -1222,10 +1222,11 @@ class Controller(QObject):
     def generate_gcode(self):
         self.set_progress_bar(int((100. / 9.)))
         if self.scene.models:
-            if self.is_multimaterial() and not self.is_single_material_mode():
-                self.save_whole_scene_to_one_prusa_file(self.app_config.tmp_place + "tmp.prusa")
-            else:
-                self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")
+            self.save_whole_scene_to_one_prusa_file(self.app_config.tmp_place + "tmp.prusa")
+            #if self.is_multimaterial() and not self.is_single_material_mode():
+            #    self.save_whole_scene_to_one_prusa_file(self.app_config.tmp_place + "tmp.prusa")
+            #else:
+            #    self.scene.save_whole_scene_to_one_stl_file(self.app_config.tmp_place + "tmp.stl")
             self.slicer_manager.slice()
 
     def gcode_generated(self):

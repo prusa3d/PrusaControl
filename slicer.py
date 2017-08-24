@@ -225,19 +225,23 @@ class Slic3rEngineRunner(QObject):
 
     def slice(self):
         self.save_configuration(self.controller.app_config.tmp_place + 'prusacontrol.ini')
+        self.process = subprocess.Popen(
+                    self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.prusa', '--load',
+                                         self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
+                                         self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
+                    stdout=subprocess.PIPE)
 
-
-        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
-            self.process = subprocess.Popen(
-                self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.prusa', '--load',
-                                     self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
-                                     self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
-                stdout=subprocess.PIPE)
-        else:
-            self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
-                                    self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
-                                    self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
-                                   stdout=subprocess.PIPE)
+        #if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+        #    self.process = subprocess.Popen(
+        #        self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.prusa', '--load',
+        #                             self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
+        #                             self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
+        #        stdout=subprocess.PIPE)
+        #else:
+        #    self.process = subprocess.Popen(self.slicer_place + [self.controller.app_config.tmp_place + 'tmp.stl', '--load',
+        #                            self.controller.app_config.tmp_place + 'prusacontrol.ini', '--output',
+        #                            self.controller.app_config.tmp_place + 'out.gcode', '--dont-arrange'],
+        #                           stdout=subprocess.PIPE)
         self.check_progress()
 
     def kill(self):

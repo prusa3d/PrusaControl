@@ -140,9 +140,8 @@ class AppScene(object):
 
         printer_parameters = self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)
 
-        m.set_2d_pos(np.array([(printer_parameters['printing_space'][0]*.05)-(size_x*.05)-1.,
-                               (printer_parameters['printing_space'][1]*.05)-(size_y*.05)-1.,
-                               0.0]))
+        m.set_2d_pos([(printer_parameters['printing_space'][0]*.05)-(size_x*.05)-1.,
+                               (printer_parameters['printing_space'][1]*.05)-(size_y*.05)-1.])
 
         #m.set_2d_pos(np.array([(size_x * .05),
         #                       (size_y * .05),
@@ -188,9 +187,9 @@ class AppScene(object):
 
         if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0] - self.wipe_tower_size_x * .05) * 10. + printer_parameters['printing_space'][0] * .5)
-            parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1] - self.wipe_tower_size_y * .05) * 10. + printer_parameters['printing_space'][1] * .5)
+            parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1] - self.wipe_tower_size_y * self.wipe_tower_number_of_section * .05) * 10. + printer_parameters['printing_space'][1] * .5)
             parameters['wipe_size_x'] = int(self.wipe_tower_size_x)
-            parameters['wipe_size_y'] = int(self.wipe_tower_size_y / 3)
+            parameters['wipe_size_y'] = int(self.wipe_tower_size_y)
         else:
             parameters['wipe_pos_x'] = 0
             parameters['wipe_pos_y'] = 0
