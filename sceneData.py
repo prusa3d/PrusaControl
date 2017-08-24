@@ -59,8 +59,9 @@ class AppScene(object):
         self.model_position_offset = 0.1
 
         self.wipe_tower_size_x = 60.
-        self.wipe_tower_size_y = 45.
+        self.wipe_tower_size_y = 15.
         self.wipe_tower_size_z = 0.10
+        self.wipe_tower_number_of_section = 3
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
@@ -86,8 +87,10 @@ class AppScene(object):
 
 
     def create_wipe_tower(self):
+        n_sections = self.wipe_tower_number_of_section
+
         size_x = self.wipe_tower_size_x
-        size_y = self.wipe_tower_size_y
+        size_y = self.wipe_tower_size_y * n_sections
         size_z = self.wipe_tower_size_z
 
 
@@ -135,6 +138,16 @@ class AppScene(object):
         m.is_wipe_tower = True
         self.wipe_tower_model = m
 
+        printer_parameters = self.controller.printing_parameters.get_printer_parameters(self.controller.actual_printer)
+
+        m.set_2d_pos(np.array([(printer_parameters['printing_space'][0]*.05)-(size_x*.05)-1.,
+                               (printer_parameters['printing_space'][1]*.05)-(size_y*.05)-1.,
+                               0.0]))
+
+        #m.set_2d_pos(np.array([(size_x * .05),
+        #                       (size_y * .05),
+        #                       0.0]))
+
         self.models.append(m)
 
     def remove_wipe_tower(self):
@@ -158,11 +171,11 @@ class AppScene(object):
             max_z = max(z_list)
             self.wipe_tower_size_z = max_z
 
-        wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
+        #wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
         self.remove_wipe_tower()
         self.create_wipe_tower()
-        self.wipe_tower_model.pos[0] = wipe_tower_pos[0]
-        self.wipe_tower_model.pos[1] = wipe_tower_pos[1]
+        #self.wipe_tower_model.pos[0] = wipe_tower_pos[0]
+        #self.wipe_tower_model.pos[1] = wipe_tower_pos[1]
         self.controller.update_scene()
 
 
@@ -539,7 +552,6 @@ class AppScene(object):
         self.controller.update_scene()
         #self.automatic_models_position()
 
-    #TODO:Add brim and support message
     def get_warnings(self):
         messages = []
         text00 = self.controller.message_object00
@@ -558,8 +570,9 @@ class AppScene(object):
 
     def reset_wipe_tower(self):
         self.wipe_tower_size_x = 60.
-        self.wipe_tower_size_y = 45.
+        self.wipe_tower_size_y = 15.
         self.wipe_tower_size_z = 0.10
+        self.wipe_tower_number_of_section = 3
 
 
     def clear_scene(self):

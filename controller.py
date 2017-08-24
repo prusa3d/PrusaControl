@@ -30,6 +30,8 @@ from sceneData import AppScene, ModelTypeStl
 #from sceneRender import GLWidget
 from copy import deepcopy
 
+from itertools import compress
+
 
 #import xml.etree.cElementTree as ET
 #from zipfile import ZipFile
@@ -158,6 +160,7 @@ class Controller(QObject):
         self.over_object = False
         self.models_selected = False
         self.advance_settings = False
+        self.incompatible_materials = False
 
         self.analyze_result = {}
 
@@ -265,6 +268,7 @@ class Controller(QObject):
             self.view.set_multimaterial_gui_off()
             self.remove_wipe_tower()
             self.update_scene()
+            self.incompatible_materials = False
         else:
             #set multi material GUI
             print("set multimaterial mode")
@@ -300,6 +304,9 @@ class Controller(QObject):
 
             if self.analyze_result['brim'] and self.view.brimCheckBox.isChecked() == False:
                 self.warning_message_buffer.append(u"• " + self.message_object03)
+
+        if self.incompatible_materials:
+            self.warning_message_buffer.append(u"• " + self.message_object04)
 
 
 
@@ -697,6 +704,7 @@ class Controller(QObject):
         return printing_settings_tmp
 
     def update_mm_material_settings(self):
+        print("Update mm material settigns")
         # get combobox materials
         soluble_material_tmp = []
 
@@ -717,6 +725,78 @@ class Controller(QObject):
         else:
             self.soluble_extruder = -1
             self.set_normal_support_settings()
+
+
+        self.show_warning_if_used_materials_are_not_compatible()
+
+
+
+    def show_warning_if_used_materials_are_not_compatible(self):
+        if self.is_multimaterial() and not self.is_single_material_mode():
+            pass
+        else:
+            self.incompatible_materials = False
+            return
+        list_of_materials = [self.get_printing_settings_for_material_by_label(self.view.extruder1_c.currentText())["name"],
+                             self.get_printing_settings_for_material_by_label(self.view.extruder2_c.currentText())["name"],
+                             self.get_printing_settings_for_material_by_label(self.view.extruder3_c.currentText())["name"],
+                             self.get_printing_settings_for_material_by_label(self.view.extruder4_c.currentText())["name"]]
+
+        compatible_with_lst = []
+        # if some materials are not compatible
+        # read compatible with list for all selected materials
+        compatible_with_lst.append(
+            self.check_compatible_with_lst(self.get_printing_settings_for_material_by_label(
+                self.view.extruder1_c.currentText())["compatible_with"]))
+        compatible_with_lst.append(
+            self.check_compatible_with_lst(self.get_printing_settings_for_material_by_label(
+                self.view.extruder2_c.currentText())["compatible_with"]))
+        compatible_with_lst.append(
+            self.check_compatible_with_lst(self.get_printing_settings_for_material_by_label(
+                self.view.extruder3_c.currentText())["compatible_with"]))
+        compatible_with_lst.append(
+            self.check_compatible_with_lst(self.get_printing_settings_for_material_by_label(
+                self.view.extruder4_c.currentText())["compatible_with"]))
+
+
+        # find out which extruders are used and create filter it
+        used_extruders_tmp = set([m.extruder-1 for m in self.scene.get_models(with_wipe_tower=False)])
+        used_extruders = [i in used_extruders_tmp for i in range(0,4)]
+        #print(used_extruders_tmp)
+        #print(used_extruders)
+
+
+        show_warning = False
+        # generate warning message if some material is not compatible
+        if len(used_extruders_tmp) > 1:
+            # compare compatibility
+            #print("List compatibility: " + str(compatible_with_lst))
+            #print("List pouzitych extruderu: " + str(used_extruders))
+
+            filtrated_used_materials = list(compress(list_of_materials, used_extruders))
+            filtrated_compatible_lst = list(compress(compatible_with_lst, used_extruders))
+
+            for i, material in enumerate(filtrated_used_materials):
+                #print("Material: " + str(material))
+                compatible_materials = [ mat for o, mat in enumerate(filtrated_compatible_lst) if not i==o ]
+                #print("Compatible materials: " + str(compatible_materials))
+                for compat_mat in compatible_materials:
+                    if not material in compat_mat:
+                        #print("Nekompatibilni")
+                        show_warning = True
+
+        if show_warning:
+            self.incompatible_materials = True
+        else:
+            self.incompatible_materials = False
+        self.update_scene()
+
+
+    def check_compatible_with_lst(self, lst):
+        if lst == []:
+            return list(self.get_printer_materials_names_ls(self.get_actual_printer()))
+        else:
+            return lst
 
 
     def set_special_support_settings(self):
@@ -892,13 +972,13 @@ class Controller(QObject):
         # value Soluble supports 3 - normal wipe tower 25
 
         if value == 0:
-            self.scene.wipe_tower_size_y = 7.5 * 3.
+            self.scene.wipe_tower_size_y = 7.5
         elif value == 1:
-            self.scene.wipe_tower_size_y = 15 * 3.
+            self.scene.wipe_tower_size_y = 15
         elif value == 2:
-            self.scene.wipe_tower_size_y = 20 * 3.
+            self.scene.wipe_tower_size_y = 20
         elif value == 3:
-            self.scene.wipe_tower_size_y = 25 * 3.
+            self.scene.wipe_tower_size_y = 25
 
         self.recalculate_wipe_tower()
 
@@ -959,6 +1039,7 @@ class Controller(QObject):
             data = self.view.open_project_file_dialog()
         #logging.debug('open project file %s' %data)
         self.import_project(data)
+        self.show_warning_if_used_materials_are_not_compatible()
         self.show_message_on_status_bar(self.view.tr("Project loaded"))
 
     def save_project_file(self):
@@ -2183,19 +2264,15 @@ class Controller(QObject):
         extensions_set = set(extensions_lst)
         if len(extensions_set) == 1:
             if list(extensions_set)[0] in ['stl']:
-                if self.is_multimaterial():
-                    #show message of multipart model
-                    if self.open_ask_multipart_model_dialog():
-                        #load together
-                        self.load_multipart_model(list_of_urls)
-                    else:
-                        #load separately
-                        for url in list_of_urls:
-                            self.import_model(url)
+                #show message of multipart model
+                if self.open_ask_multipart_model_dialog():
+                    #load together
+                    self.load_multipart_model(list_of_urls)
                 else:
-                    #load models separately
+                    #load separately
                     for url in list_of_urls:
                         self.import_model(url)
+            self.show_warning_if_used_materials_are_not_compatible()
         else:
             print("Some file mismatch")
 

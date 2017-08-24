@@ -1580,8 +1580,7 @@ class PrusaControlView(QMainWindow):
         # file menu definition
         self.file_menu = self.menubar.addMenu(self.tr('&File'))
         self.file_menu.addAction(self.tr('Import model file'), self.controller.open_model_file)
-        if self.controller.is_multimaterial():
-            self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
+        self.file_menu.addAction(self.tr('Import multipart model file'), self.controller.open_multipart_model)
         self.file_menu.addAction(self.tr('Import gcode file'), self.controller.open_gcode_file)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.tr('Open project'), self.controller.open_project_file)
@@ -2143,6 +2142,7 @@ class PrusaControlView(QMainWindow):
             if not model:
                 return
             model.set_extruder(widget.currentIndex()+1)
+            self.controller.show_warning_if_used_materials_are_not_compatible()
             self.controller.recalculate_wipe_tower()
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):

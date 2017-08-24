@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from xml.dom import minidom
 
 __author__ = 'Tibor Vavra'
 
@@ -92,12 +93,12 @@ class Version_1_0(VersionAbstract):
             for model in models.findall('model'):
                 model_data = {}
                 model_data['file_name'] = model.get('name')
-                if model.find('extruder'):
-                    print("je tam extruder")
+
+                if not model.find('extruder') == None:
                     model_data['extruder'] = ast.literal_eval(model.find('extruder').text)
-                if model.find('group'):
-                    print("je tam group")
+                if not model.find('group') == None:
                     model_data['group'] = ast.literal_eval(model.find('group').text)
+
                 model_data['normalization'] = ast.literal_eval(model.find('normalization').text)
                 model_data['position'] = ast.literal_eval(model.find('position').text)
                 model_data['rotation'] = ast.literal_eval(model.find('rotation').text)
@@ -108,7 +109,6 @@ class Version_1_0(VersionAbstract):
             models_groups = {}
             groups_properties = {}
             for m in models_data:
-                print(str(m))
                 logging.debug("Jmeno souboru je: " + m['file_name'])
 
                 tmp = scene.controller.app_config.tmp_place
@@ -123,24 +123,30 @@ class Version_1_0(VersionAbstract):
                     model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
                 else:
                     model = ModelTypeStl.load_from_mesh(mesh, filename=m['file_name'], normalize=not m['normalization'])
+
                 if 'extruder' in m:
                     model.extruder = int(m['extruder'])
 
                 if 'group' in m:
-                    print("group")
                     model.is_multipart_model = True
+                    model.parent = scene
                     if m['group'] in models_groups:
                         models_groups[m['group']].append(model)
                     else:
                         models_groups[m['group']] = []
                         models_groups[m['group']].append(model)
 
-                    groups_properties[m['group']]['pos'] = numpy.array(m['position'])
-                    groups_properties[m['group']]['rot'] = numpy.array(m['rotation']) *0.1
-                    groups_properties[m['group']]['scale'] = numpy.array(m['scale'])
+                    if m['group'] in groups_properties:
+                        groups_properties[m['group']]['pos'] = numpy.array(m['position']) * 0.1
+                        groups_properties[m['group']]['rot'] = numpy.array(m['rotation'])
+                        groups_properties[m['group']]['scale'] = numpy.array(m['scale'])
+                    else:
+                        groups_properties[m['group']] = {}
+                        groups_properties[m['group']]['pos'] = numpy.array(m['position']) * 0.1
+                        groups_properties[m['group']]['rot'] = numpy.array(m['rotation'])
+                        groups_properties[m['group']]['scale'] = numpy.array(m['scale'])
 
                 else:
-                    print("ne group")
                     model.rot = numpy.array(m['rotation'])
                     model.pos = numpy.array(m['position'])
                     model.pos *= 0.1
@@ -150,14 +156,13 @@ class Version_1_0(VersionAbstract):
 
                 scene.models.append(model)
 
-            for group in models_groups:
-                print("Vytvarim multimodel")
-                print("List modelu: " +str(models_groups[group]))
 
+            for group in models_groups:
                 mm = MultiModel(models_groups[group], scene)
                 mm.pos = groups_properties[group]['pos']
                 mm.rot = groups_properties[group]['rot']
                 mm.scale = groups_properties[group]['scale']
+
                 scene.multipart_models.append(mm)
 
 
@@ -206,7 +211,8 @@ class Version_1_0(VersionAbstract):
 
             #save xml file to new created zip file
             newXml = ET.tostring(root)
-            zip_fh.writestr(self.xmlFilename, newXml)
+            nice_formated_xml = minidom.parseString(newXml).toprettyxml(indent="   ")
+            zip_fh.writestr(self.xmlFilename, nice_formated_xml)
 
             #write stl files to zip file
             for model in scene.models:
