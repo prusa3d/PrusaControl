@@ -1117,6 +1117,7 @@ class PrusaControlView(QMainWindow):
         self.extruder1_cb.clicked.connect(self.controller.open_color_pick_dialog1)
         self.extruder1_l = QLabel()
         self.extruder1_l.setObjectName("extruder1_l")
+
         self.extruder1_c = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.extruder1_c.setStyle(QStyleFactory.create('Windows'))
@@ -1171,9 +1172,12 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c.setObjectName("extruder4_c")
         self.extruder4_c.setMaxVisibleItems(len(material_label_ls))
 
+        self.wipe_tower_tooltip = self.tr("Amount of material in wipe tower, material clearing")
         self.wipe_tower_l = QLabel()
         self.wipe_tower_l.setObjectName("wipe_tower_l")
+        self.wipe_tower_l.setToolTip(self.wipe_tower_tooltip)
         self.wipe_tower_c = QComboBox()
+        self.wipe_tower_c.setToolTip(self.wipe_tower_tooltip)
         if self.controller.app_config.system_platform in ['Linux']:
             self.wipe_tower_c.setStyle(QStyleFactory.create('Windows'))
         self.wipe_tower_c.setObjectName("wipe_tower_c")
@@ -1480,7 +1484,11 @@ class PrusaControlView(QMainWindow):
         self.extruder2_l.setText(self.tr("Extruder 2"))
         self.extruder3_l.setText(self.tr("Extruder 3"))
         self.extruder4_l.setText(self.tr("Extruder 4"))
-        self.wipe_tower_l.setText(self.tr("Color quality"))
+        self.wipe_tower_tooltip = self.tr("Amount of material in wipe tower, material clearing")
+        self.wipe_tower_l.setText(self.tr("Wipe amount"))
+        self.wipe_tower_c.setToolTip(self.wipe_tower_tooltip)
+        self.wipe_tower_l.setToolTip(self.wipe_tower_tooltip)
+
 
         self.object_group_box.setTitle(self.tr("Object settings"))
         self.object_variable_layer_box.setTitle(self.tr("Object advance settings"))
@@ -1865,7 +1873,7 @@ class PrusaControlView(QMainWindow):
         self.supportLabel.setEnabled(True)
         self.brim_label.setEnabled(True)
 
-        for a in self.edit_menu.actions():
+        for a in self.file_menu.actions() + self.edit_menu.actions() + self.settings_menu.actions():
             a.setEnabled(True)
 
 
@@ -1901,7 +1909,7 @@ class PrusaControlView(QMainWindow):
         self.supportLabel.setEnabled(False)
         self.brim_label.setEnabled(False)
 
-        for a in self.edit_menu.actions():
+        for a in self.file_menu.actions() + self.edit_menu.actions() + self.settings_menu.actions():
             a.setEnabled(False)
 
 
@@ -2144,6 +2152,7 @@ class PrusaControlView(QMainWindow):
             model.set_extruder(widget.currentIndex()+1)
             self.controller.show_warning_if_used_materials_are_not_compatible()
             self.controller.recalculate_wipe_tower()
+            self.controller.actualize_extruder_set()
 
     def set_position_on_object(self, widget, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():

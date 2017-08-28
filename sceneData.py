@@ -45,7 +45,7 @@ def timing(f):
         time1 = time.time()
         ret = f(*args)
         time2 = time.time()
-        print('%s function took %0.3f ms' % (f.func_name, (time2-time1)*1000.0))
+        print('%s function took %0.3f ms' % (f.__name__, (time2-time1)*1000.0))
         return ret
     return wrap
 
@@ -169,6 +169,10 @@ class AppScene(object):
         else:
             max_z = max(z_list)
             self.wipe_tower_size_z = max_z
+
+        #update number of section by number of used extruders -1
+        extruders_set = set([m.extruder for m in self.get_models(with_wipe_tower=False)])
+        self.wipe_tower_number_of_section = len(extruders_set) - 1
 
         #wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
         self.remove_wipe_tower()
@@ -327,7 +331,9 @@ class AppScene(object):
 
         return area
 
+
     @staticmethod
+    @timing
     def normalize_group_of_models(models_lst):
         #it takes list of models, concate them, calculate mass point, set it to boundingSphereCenter and normalize
         m = Mesh(np.concatenate([m.get_mesh(False, False, False).data for m in models_lst]))
@@ -353,23 +359,20 @@ class AppScene(object):
         max_l = np.linalg.norm(m.max_)
         min_l = np.linalg.norm(m.min_)
 
+        models_lst[0].multipart_parent.size = size
+        models_lst[0].multipart_parent.size_origin = size_origin
+
+        models_lst[0].multipart_parent.min = min
+        models_lst[0].multipart_parent.max = max
+
+        if max_l > min_l:
+            models_lst[0].multipart_parent.boundingSphereSize = max_l
+        else:
+            models_lst[0].multipart_parent.boundingSphereSize = min_l
 
         for obj in models_lst:
-            obj.multipart_parent.size = size
-            obj.multipart_parent.size_origin = size_origin
-
-            obj.multipart_parent.min = min
-            obj.multipart_parent.max = max
-
-            if max_l > min_l:
-                obj.multipart_parent.boundingSphereSize = max_l
-            else:
-                obj.multipart_parent.boundingSphereSize = min_l
-
             obj.boundingSphereCenter = bounding_center
             obj.mesh.vectors = obj.mesh.vectors + r
-
-
 
             obj.pos = np.array([0., 0., 0.])
             obj.pos[2] -= min[2]
@@ -378,11 +381,7 @@ class AppScene(object):
             #obj.zeroPoint = deepcopy(bounding_center)
             #obj.zeroPoint[2] = deepcopy(min[2])
 
-            print("Zero point: " + str(obj.zeroPoint))
-
             #obj.pos = np.array([.0, .0, .0]) - obj.zeroPoint
-            print("Possition: " + str(obj.pos))
-
             #obj.zeroPoint += r
 
             obj.min = deepcopy(min)
@@ -1046,7 +1045,7 @@ class Model(object):
             self.is_in_printing_area = False
             return False
 
-    #@timing
+    @timing
     def get_mesh(self, transform=True, generate_gcode=False, default_scale=True):
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 

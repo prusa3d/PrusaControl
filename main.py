@@ -20,7 +20,7 @@ import platform
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = False
+DEBUG = True
 
 class EventLoopRunner(QObject):
     finished = pyqtSignal()
@@ -185,5 +185,8 @@ if __name__ == '__main__':
         #cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
     else:
         logging.basicConfig(filename=os.path.expanduser("~" + log_path + "prusacontrol.log"), format=FORMAT, filemode='w', level=logging.WARNING)
-    
-    main()
+
+    if DEBUG:
+        cProfile.runctx('main()', globals(), locals(), 'prusacontrol.profile')
+    else:
+        main()

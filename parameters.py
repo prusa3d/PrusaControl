@@ -6,7 +6,8 @@ import os
 import platform
 import tempfile
 import sys
-from urllib.request import urlopen
+
+from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
 from configparser import ConfigParser, RawConfigParser
@@ -325,8 +326,8 @@ class AppParameters(object):
 
         # Check connections and update flag
         if is_internet_on and self.config.getboolean('settings', 'automatic_update_parameters'):
-            self.download_new_settings_files()
-            self.check_versions()
+            if self.download_new_settings_files():
+                self.check_versions()
 
         if is_internet_on:
             self.check_new_version_of_prusacontrol()
@@ -392,24 +393,37 @@ class AppParameters(object):
     #@timing
     def download_new_settings_files(self):
         printers_data = {}
-        r = urlopen(self.json_settings_url + self.printers_filename)
-        with open(self.tmp_place+self.printers_filename, 'wb') as out_file:
-            #shutil.copyfileobj(r, out_file)
-            out_file.write(r.read())
+        req = Request(self.json_settings_url + self.printers_filename)
+        try:
+            r = urlopen(req)
+        except HTTPError as e:
+            logging.error("prusacontrol-settings repository is not reachable")
+            print('Error code: ', e.code)
+            return False
+        except URLError as e:
+            print('We failed to reach a server.')
+            print('Reason: ', e.reason)
+            return False
+        else:
 
-        with open(self.tmp_place+self.printers_filename, 'r') as in_file:
-            printers_data = json.load(in_file)
-            materials_files_list = [printers_data['printers'][i]['material_parameters_file'] for i in
+            with open(self.tmp_place+self.printers_filename, 'wb') as out_file:
+                #shutil.copyfileobj(r, out_file)
+                out_file.write(r.read())
+
+            with open(self.tmp_place+self.printers_filename, 'r') as in_file:
+                printers_data = json.load(in_file)
+                materials_files_list = [printers_data['printers'][i]['material_parameters_file'] for i in
                                     printers_data['printers'] if i not in ['default']]
 
-        if materials_files_list == []:
-            logging.error("No internet connection or different network problem")
-            return
+            if materials_files_list == []:
+                logging.error("No internet connection or different network problem")
+                return
 
-        for i in materials_files_list:
-            r = urlopen(self.json_settings_url + i)
-            with open(self.tmp_place+i, 'wb') as out_file:
-                out_file.write(r.read())
+            for i in materials_files_list:
+                r = urlopen(self.json_settings_url + i)
+                with open(self.tmp_place+i, 'wb') as out_file:
+                    out_file.write(r.read())
+        return True
 
     def check_versions(self):
         old = self.user_folder + self.printers_filename

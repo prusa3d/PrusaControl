@@ -331,6 +331,39 @@ class Controller(QObject):
                 self.open_web_browser(self.app_config.prusacontrol_update_page)
 
 
+    def actualize_extruder_set(self):
+        if self.is_multimaterial() and not self.is_single_material_mode():
+            pass
+        else:
+            return
+
+        extruders_set = list(set([ m.extruder for m in self.scene.get_models(with_wipe_tower=False)]))
+
+        if 1 in extruders_set:
+            self.view.extruder1_l.setStyleSheet("font-weight: bold;")
+        else:
+            self.view.extruder1_l.setStyleSheet("font-weight: normal;")
+
+        if 2 in extruders_set:
+            self.view.extruder2_l.setStyleSheet("font-weight: bold;")
+        else:
+            self.view.extruder2_l.setStyleSheet("font-weight: normal;")
+
+        if 3 in extruders_set:
+            self.view.extruder3_l.setStyleSheet("font-weight: bold;")
+        else:
+            self.view.extruder3_l.setStyleSheet("font-weight: normal;")
+
+        if 4 in extruders_set:
+            self.view.extruder4_l.setStyleSheet("font-weight: bold;")
+        else:
+            self.view.extruder4_l.setStyleSheet("font-weight: normal;")
+
+
+
+
+
+
     def exit_event(self):
         if self.status in ['loading_gcode']:
             self.analyzer.cancel_analyz()
@@ -1040,6 +1073,7 @@ class Controller(QObject):
         #logging.debug('open project file %s' %data)
         self.import_project(data)
         self.show_warning_if_used_materials_are_not_compatible()
+        self.actualize_extruder_set()
         self.show_message_on_status_bar(self.view.tr("Project loaded"))
 
     def save_project_file(self):
@@ -1450,6 +1484,7 @@ class Controller(QObject):
     def delete_selected_objects(self):
         self.scene.delete_selected_models()
         self.view.close_object_settings_panel()
+        self.actualize_extruder_set()
 
     def do_function(self):
         self.view.glWidget.do_button.press_button()
@@ -2277,6 +2312,7 @@ class Controller(QObject):
         else:
             print("Some file mismatch")
 
+        self.actualize_extruder_set()
 
 
     def open_file(self, url):
@@ -2326,7 +2362,6 @@ class Controller(QObject):
                     return
             self.read_gcode(url)
 
-
-
+        self.actualize_extruder_set()
 
 
