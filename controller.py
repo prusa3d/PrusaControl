@@ -217,6 +217,7 @@ class Controller(QObject):
         self.message_object02 = ""
         self.message_object03 = ""
         self.message_object04 = ""
+        self.message_object05 = ""
 
         self.show_message_on_status_bar("Ready")
         self.create_messages()
@@ -308,6 +309,9 @@ class Controller(QObject):
         if self.incompatible_materials:
             self.warning_message_buffer.append(u"• " + self.message_object04)
 
+        if self.scene.is_collision_of_wipe_tower_and_objects():
+            self.warning_message_buffer.append(u"• " + self.message_object05)
+
 
 
     def get_warnings(self):
@@ -322,6 +326,7 @@ class Controller(QObject):
         self.message_object02 = self.tr("Scene is hard to print without support.")
         self.message_object03 = self.tr("For better adhesion turn Brim parametr on.")
         self.message_object04 = self.tr("Incompatible materials, its possible the print will fail.")
+        self.message_object05 = self.tr("Collision of wipe tower and object.")
 
 
     def check_version(self):
@@ -337,7 +342,13 @@ class Controller(QObject):
         else:
             return
 
-        extruders_set = list(set([ m.extruder for m in self.scene.get_models(with_wipe_tower=False)]))
+        extruders_set_tmp = list(set([ m.extruder for m in self.scene.get_models(with_wipe_tower=False)]))
+
+        if self.view.get_support_option() >=1 :
+            extruders_set_tmp.append(self.soluble_extruder)
+            extruders_set = list(extruders_set_tmp)
+        else:
+            extruders_set = list(extruders_set_tmp)
 
         if 1 in extruders_set:
             self.view.extruder1_l.setStyleSheet("font-weight: bold;")
@@ -761,6 +772,7 @@ class Controller(QObject):
 
 
         self.show_warning_if_used_materials_are_not_compatible()
+        self.actualize_extruder_set()
 
 
 
@@ -794,6 +806,10 @@ class Controller(QObject):
 
         # find out which extruders are used and create filter it
         used_extruders_tmp = set([m.extruder-1 for m in self.scene.get_models(with_wipe_tower=False)])
+
+        if self.view.get_support_option() >=1 :
+            used_extruders_tmp.append(self.soluble_extruder)
+
         used_extruders = [i in used_extruders_tmp for i in range(0,4)]
         #print(used_extruders_tmp)
         #print(used_extruders)
@@ -1007,11 +1023,11 @@ class Controller(QObject):
         if value == 0:
             self.scene.wipe_tower_size_y = 7.5
         elif value == 1:
-            self.scene.wipe_tower_size_y = 15
+            self.scene.wipe_tower_size_y = 15.
         elif value == 2:
-            self.scene.wipe_tower_size_y = 20
+            self.scene.wipe_tower_size_y = 20.
         elif value == 3:
-            self.scene.wipe_tower_size_y = 25
+            self.scene.wipe_tower_size_y = 25.
 
         self.recalculate_wipe_tower()
 

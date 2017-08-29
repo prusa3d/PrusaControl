@@ -80,13 +80,16 @@ class AppScene(object):
 
         self.analyze_result_data_tmp = []
 
-        self.is_waste_tower = False
-        self.place_of_waste_tower = np.array([.0, .0, .0])
+        self.is_wipe_tower = False
         self.wipe_tower_model = []
+        self.is_wipe_tower_position_manual = False
 
 
 
     def create_wipe_tower(self):
+        if self.wipe_tower_number_of_section == 0:
+            return
+
         n_sections = self.wipe_tower_number_of_section
 
         size_x = self.wipe_tower_size_x
@@ -174,11 +177,15 @@ class AppScene(object):
         extruders_set = set([m.extruder for m in self.get_models(with_wipe_tower=False)])
         self.wipe_tower_number_of_section = len(extruders_set) - 1
 
-        #wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
+
+        wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
         self.remove_wipe_tower()
         self.create_wipe_tower()
-        #self.wipe_tower_model.pos[0] = wipe_tower_pos[0]
-        #self.wipe_tower_model.pos[1] = wipe_tower_pos[1]
+
+        if self.is_wipe_tower_position_manual:
+            self.wipe_tower_model.pos[0] = wipe_tower_pos[0]
+            self.wipe_tower_model.pos[1] = wipe_tower_pos[1]
+
         self.controller.update_scene()
 
 
@@ -298,6 +305,16 @@ class AppScene(object):
                 break
 
 
+    def is_collision_of_wipe_tower_and_objects(self):
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+            pass
+        else:
+            return False
+
+        wipe_tower = self.wipe_tower_model
+        if wipe_tower.intersection_model_list_model_(self.get_models(with_wipe_tower=False)):
+            return True
+        return False
 
 
 
@@ -1129,6 +1146,10 @@ class Model(object):
 
     def set_move(self, vector, add=True, place_on_zero=False):
         vector = np.array(vector)
+
+        if self.is_wipe_tower:
+            self.parent.is_wipe_tower_position_manual = True
+
         if self.is_multipart_model:
             if add:
                 self.multipart_parent.pos += vector

@@ -119,7 +119,6 @@ class Slic3rEngineRunner(QObject):
             ['support_material', 'support_on_off', self.support1_transform],
             ['support_material_buildplate_only', 'support_build_plate', self.support2_transform],
             ['overhangs', 'overhangs', self.support3_transform],
-
             ['support_material_extruder', 'support_material_extruder', self.support4_transform],
             ['support_material_interface_extruder', 'support_material_interface_extruder', self.str_transform],
 
@@ -143,39 +142,41 @@ class Slic3rEngineRunner(QObject):
         return "%s" % str(int(in_value)*10)
 
     def support1_transform(self, in_value):
+        print("Support transform 1: " + str(in_value))
         if in_value == 0:   #None
             return "0"
-        elif in_value == 1: #Build plate only
+        elif in_value >= 1: #Build plate only
             return "1"
-        elif in_value == 2: #Everywhere
-            return "1"
-        else:
-            return "0"
         return "0"
 
     def support2_transform(self, in_value):
+        print("Support transform 2: " + str(in_value))
         if in_value == 0:   #None
             return "0"
         elif in_value == 1: #Build plate only
             return "1"
         elif in_value == 2: #Everywhere
+            return "0"
+        elif in_value == 3: #Build plate only with interface
+            return "1"
+        elif in_value == 4: #Everywhere with interface
             return "0"
         else:
             return "0"
         return "0"
 
     def support3_transform(self, in_value):
+        print("Support transform 3: " + str(in_value))
         if in_value == 0:   #None
             return "0"
-        elif in_value == 1: #Build plate only
-            return "1"
-        elif in_value == 2: #Everywhere
+        elif in_value >= 1: #other support options
             return "1"
         else:
             return "1"
         return "0"
 
     def support4_transform(self, in_value):
+        print("Support transform 4: " + str(in_value))
         #support material extruder
         [a, b] = in_value
         if b == 0:   #None
