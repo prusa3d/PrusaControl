@@ -86,7 +86,7 @@ class GLWidget(QGLWidget):
         self.yRot = 0
         self.zRot = 0
         self.zoom = 0
-        self.camera_position = numpy.array([0., 0. ,0.])
+        self.camera_target = numpy.array([0., 0. , 0.])
 
         self.lightning_shader_ok = False
 
@@ -447,19 +447,18 @@ class GLWidget(QGLWidget):
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
+        glTranslatef(-self.camera_target[0], -self.camera_target[1], -self.camera_target[2])
 
         glDisable(GL_LIGHTING)
         glDisable(GL_BLEND)
 
         glDisable(GL_MULTISAMPLE)
 
-        for model in self.parent.controller.scene.models:
-            if model.isVisible:
-                model.render(picking=True, gcode_preview=False)
+        for model in self.parent.controller.scene.get_models(with_wipe_tower=True, sort=True):
+            model.render(picking=True, gcode_preview=False)
 
-        for model in self.parent.controller.scene.models:
-            if model.isVisible and model.selected and not model.is_wipe_tower:
+        for model in self.parent.controller.scene.get_models(with_wipe_tower=False, sort=True):
+            if model.selected:
                 self.draw_tools_helper(model, self.controller.settings, True)
 
         if self.parent.controller.status in ['edit', 'canceled']:
@@ -508,9 +507,9 @@ class GLWidget(QGLWidget):
         glRotated(self.xRot / 16.0, 1.0, 0.0, 0.0)
         glRotated(self.zRot / 16.0, 0.0, 0.0, 1.0)
 
-        glTranslatef(-self.camera_position[0], -self.camera_position[1], -self.camera_position[2])
+        glTranslatef(-self.camera_target[0], -self.camera_target[1], -self.camera_target[2])
 
-        #print("Camera position and Zoom and X Angle: " + str(self.camera_position[2]) + ';' + str(self.zoom) + ';' + str(self.xRot))
+        #print("Camera position and Zoom and X Angle: " + str(self.camera_target[2]) + ';' + str(self.zoom) + ';' + str(self.xRot))
 
 
 
@@ -526,13 +525,12 @@ class GLWidget(QGLWidget):
         if model_view:
 
             #render solid objects, possible to edit transformation, select objects
-            for model in self.parent.controller.scene.models:
-                if model.isVisible:
-                    if self.lightning_shader_ok and not model.is_wipe_tower:
-                        self.lightning_shader_program.bind()
-                    model.render(picking=False, gcode_preview=not model_view)
-                    if self.lightning_shader_ok and not model.is_wipe_tower:
-                        self.lightning_shader_program.release()
+            for model in self.parent.controller.scene.get_models(with_wipe_tower=True, sort=True):
+                if self.lightning_shader_ok and not model.is_wipe_tower:
+                    self.lightning_shader_program.bind()
+                model.render(picking=False, gcode_preview=not model_view)
+                if self.lightning_shader_ok and not model.is_wipe_tower:
+                    self.lightning_shader_program.release()
 
 
             if not self.controller.advance_settings:
@@ -544,8 +542,8 @@ class GLWidget(QGLWidget):
                 print("Support height: " + str(self.parent.controller.scene.actual_support['height']))
                 self.draw_support(self.parent.controller.scene.actual_support)
 
-            for model in self.parent.controller.scene.models:
-                if model.isVisible and model.selected and not model.is_wipe_tower:
+            for model in self.parent.controller.scene.get_models(with_wipe_tower=False, sort=True):
+                if model.selected:
                     self.draw_tools_helper(model, self.parent.controller.settings)
 
             glCallList(printing_space)
@@ -564,13 +562,12 @@ class GLWidget(QGLWidget):
             glEnable(GL_CLIP_PLANE0)
             '''
 
-            for model in self.parent.controller.scene.models:
-                if model.isVisible:
-                    if self.lightning_shader_ok and not model.is_wipe_tower:
-                        self.lightning_shader_program.bind()
-                    model.render(picking=False, gcode_preview=not model_view)
-                    if self.lightning_shader_ok and not model.is_wipe_tower:
-                        self.lightning_shader_program.release()
+            for model in self.parent.controller.scene.get_models(with_wipe_tower=True, sort=True):
+                if self.lightning_shader_ok and not model.is_wipe_tower:
+                    self.lightning_shader_program.bind()
+                model.render(picking=False, gcode_preview=not model_view)
+                if self.lightning_shader_ok and not model.is_wipe_tower:
+                    self.lightning_shader_program.release()
             '''
             glDisable(GL_CLIP_PLANE0)
             '''
@@ -1316,7 +1313,7 @@ class GLWidget(QGLWidget):
 
         return (rayStart, rayEnd)
 
-    def get_camera_direction(self, event):
+    def get_camera_direction(self, event=None):
         matModelView = glGetDoublev(GL_MODELVIEW_MATRIX )
         matProjection = glGetDoublev(GL_PROJECTION_MATRIX)
         viewport = glGetIntegerv( GL_VIEWPORT )

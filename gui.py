@@ -817,6 +817,15 @@ class PrusaControlView(QMainWindow):
 
         self.filename_label = QLabel("", self.object_group_box)
         self.filename_label.setObjectName("filename_label")
+        self.filename_c = QComboBox(self.object_group_box)
+        if self.controller.app_config.system_platform in ['Linux']:
+            self.filename_c.setStyle(QStyleFactory.create('Windows'))
+        self.filename_c.setObjectName("filename_c")
+        self.filename_c.setVisible(False)
+        #TODO: Add logic for selecting different part from combobox
+        #TODO: Add css style for this combobox
+
+
         self.position_l = QLabel("", self.object_group_box)
         self.position_l.setObjectName("position_l")
         self.edit_pos_x = QSpinBox(self.object_group_box)
@@ -1188,7 +1197,8 @@ class PrusaControlView(QMainWindow):
         # multimaterial settings
 
 
-        self.object_group_box.setLayout(self.create_object_settings_layout())
+        self.object_settings_layout = self.create_object_settings_layout()
+        self.object_group_box.setLayout(self.object_settings_layout)
         self.object_group_box.setEnabled(False)
         self.transformation_reset_b = QPushButton("", self.object_group_box)
         if self.controller.app_config.system_platform in ["Darwin"]:
@@ -1336,7 +1346,8 @@ class PrusaControlView(QMainWindow):
         self.qualityCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
         #self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
         #self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
-        self.supportCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
+        #self.supportCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
+        self.supportCombo.currentIndexChanged.connect(self.controller.actualize_extruder_set)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
         #print("created all widgets")
@@ -1996,14 +2007,26 @@ class PrusaControlView(QMainWindow):
     def set_gui_for_object(self, object_id, scale_units_perc=True):
         mesh_tmp = self.controller.get_object_by_id(object_id)
         extruder_index = 0
+        models_names_lst = []
 
         if not mesh_tmp:
             return
+
         if mesh_tmp.is_multipart_model:
             mesh = mesh_tmp.multipart_parent
             print("Group ID: " + str(mesh.group_id))
+            self.object_settings_layout.addWidget(self.filename_c, 0, 1, 1, 2)
+            self.filename_c.setVisible(True)
+            self.filename_label.setVisible(False)
+            models_names_lst = [m.filename for m in mesh.models]
+            self.filename_c.addItems(models_names_lst)
+
         else:
             mesh = mesh_tmp
+            self.filename_c.setVisible(False)
+            self.filename_label.setVisible(True)
+            self.object_settings_layout.addWidget(self.filename_label, 0, 1, 1, 2)
+
         self.object_group_box.setEnabled(True)
         self.object_id = object_id
 
@@ -2013,6 +2036,7 @@ class PrusaControlView(QMainWindow):
 
         self.filename_label.setText(mesh_tmp.filename)
         self.filename_label.setToolTip(mesh_tmp.filename)
+
         self.edit_pos_x.setDisabled(True)
         self.edit_pos_x.setValue(mesh.pos[0]*10)
         self.edit_pos_x.setDisabled(False)
@@ -2302,6 +2326,8 @@ class PrusaControlView(QMainWindow):
         self.name_l.setFixedHeight((int)(22*self.controller.dpi_coef))
         object_settings_layout.addWidget(self.filename_label, 0, 1, 1, 2)
         self.filename_label.setFixedHeight((int)(22*self.controller.dpi_coef))
+        object_settings_layout.addWidget(self.filename_c, 0, 2, 1, 1)
+        self.filename_c.setFixedHeight((int)(22*self.controller.dpi_coef))
 
         self.object_extruder_l.setFixedHeight((int)(22*self.controller.dpi_coef))
         self.object_extruder_c.setFixedHeight((int)(22*self.controller.dpi_coef))
@@ -2667,9 +2693,11 @@ class PrusaControlView(QMainWindow):
                 }
         return data
 
+    def get_support_option(self):
+        return self.supportCombo.currentIndex()
 
     def add_camera_position(self, vec):
-        self.glWidget.camera_position += vec
+        self.glWidget.camera_target += vec
 
     def set_x_rotation(self, angle):
         self.glWidget.set_x_rotation(angle)

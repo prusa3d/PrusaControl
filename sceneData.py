@@ -135,7 +135,7 @@ class AppScene(object):
 
         m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
 
-        m.wipe_tower_texture = self.controller.view.glWidget.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle1.png")
+        m.wipe_tower_texture = self.controller.view.glWidget.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle2.png")
 
         m.parent = self
         m.is_wipe_tower = True
@@ -604,11 +604,23 @@ class AppScene(object):
         for m in self.models:
             m.selected = False
 
-    def get_models(self, with_wipe_tower=True):
+    def get_models(self, with_wipe_tower=True, sort=False):
         if with_wipe_tower:
-            return [m for m in self.models if m.isVisible]
+            model_lst = [m for m in self.models if m.isVisible]
         else:
-            return [m for m in self.models if m.isVisible and not m.is_wipe_tower]
+            model_lst = [m for m in self.models if m.isVisible and not m.is_wipe_tower]
+
+        if sort:
+            cam_pos, _, _, _ = self.controller.view.glWidget.get_camera_direction()
+            final_model_lst = sorted(model_lst, key=lambda model: np.linalg.norm(model.get_pos() - cam_pos), reverse=True)
+        else:
+            final_model_lst = model_lst
+
+
+        return final_model_lst
+
+
+
 
     def automatic_models_position(self):
         if not len(self.get_models()) > 1:
@@ -1104,6 +1116,12 @@ class Model(object):
 
         return Mesh(data)
 
+    def get_pos(self):
+        if self.is_multipart_model:
+            return self.multipart_parent.pos
+        else:
+            return self.pos
+
     def normalize_object(self):
         #vektor od nuly po boundingSphereCenter, tedy rozdil ktery je potreba pricist ke vsem souradnicim
         r = np.array([.0, .0, .0]) - np.array(self.boundingSphereCenter)
@@ -1349,7 +1367,8 @@ class Model(object):
         self.max_scene = self.max + self.pos
 
 
-
+    def sort_triangles(self, cam_pos):
+        self.mesh
 
 
     def recalc_bounding_sphere(self):
@@ -1480,6 +1499,11 @@ class Model(object):
             glEnable(GL_TEXTURE_2D)
             glBindTexture(GL_TEXTURE_2D, self.wipe_tower_texture)
         elif self.is_wipe_tower:
+            glEnable(GL_BLEND)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            glDisable(GL_LIGHTING)
+            glDisable(GL_DEPTH_TEST)
+
             glEnable(GL_TEXTURE_GEN_S)
             glEnable(GL_TEXTURE_GEN_T)
 
@@ -1574,6 +1598,7 @@ class Model(object):
             #glDisable(GL_CULL_FACE)
             #glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE)
             #glCullFace(GL_FRONT)
+            glEnable(GL_DEPTH_TEST)
             glDisable(GL_BLEND)
             glEnable(GL_LIGHTING)
             glEnable(GL_DEPTH_TEST)
