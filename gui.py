@@ -822,8 +822,11 @@ class PrusaControlView(QMainWindow):
             self.filename_c.setStyle(QStyleFactory.create('Windows'))
         self.filename_c.setObjectName("filename_c")
         self.filename_c.setVisible(False)
+
+        self.filename_c.currentIndexChanged.connect(lambda: self.select_model_by_filename(self.filename_c.currentText()))
         #TODO: Add logic for selecting different part from combobox
-        #TODO: Add css style for this combobox
+
+
 
 
         self.position_l = QLabel("", self.object_group_box)
@@ -1984,6 +1987,21 @@ class PrusaControlView(QMainWindow):
         self.set_scale_widgets(mesh)
 
 
+    def select_model_by_filename(self, filename):
+        mesh_tmp = self.controller.get_object_by_id(self.object_id)
+        if filename == mesh_tmp.filename:
+            return
+
+        if mesh_tmp.is_multipart_model:
+            parent = mesh_tmp.multipart_parent
+            parts_lst = [[m.filename, m.id] for m in parent.models]
+            for model in parts_lst:
+                if filename == model[0]:
+                    self.controller.unselect_objects()
+                    self.controller.select_object(model[1])
+                    #self.set_gui_for_object(model[1])
+
+
 
     def update_object_settings(self, object_id):
         if self.is_setting_panel_opened:
@@ -2014,12 +2032,19 @@ class PrusaControlView(QMainWindow):
 
         if mesh_tmp.is_multipart_model:
             mesh = mesh_tmp.multipart_parent
-            print("Group ID: " + str(mesh.group_id))
+
             self.object_settings_layout.addWidget(self.filename_c, 0, 1, 1, 2)
             self.filename_c.setVisible(True)
             self.filename_label.setVisible(False)
+
+            mesh_tmp_filename = mesh_tmp.filename
             models_names_lst = [m.filename for m in mesh.models]
+
+            self.filename_c.blockSignals(True)
+            self.filename_c.clear()
             self.filename_c.addItems(models_names_lst)
+            self.filename_c.setCurrentIndex(models_names_lst.index(mesh_tmp_filename))
+            self.filename_c.blockSignals(False)
 
         else:
             mesh = mesh_tmp
@@ -2162,6 +2187,10 @@ class PrusaControlView(QMainWindow):
 
     def close_object_settings_panel(self):
         self.is_setting_panel_opened = False
+        self.filename_c.setVisible(False)
+        self.filename_label.setVisible(True)
+        self.object_settings_layout.addWidget(self.filename_label, 0, 1, 1, 2)
+
         self.object_group_box.setDisabled(True)
         self.clear_object_settings_panel()
         self.object_id = 0

@@ -1367,8 +1367,8 @@ class Model(object):
         self.max_scene = self.max + self.pos
 
 
-    def sort_triangles(self, cam_pos):
-        self.mesh
+    #def sort_triangles(self, cam_pos):
+    #    self.mesh
 
 
     def recalc_bounding_sphere(self):

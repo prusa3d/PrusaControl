@@ -173,7 +173,9 @@ QComboBox#wipe_tower_c QAbstractItemView
 
 
 /*TEST*/
-QComboBox#object_extruder_c, QComboBox#combobox_scale_units {
+QComboBox#object_extruder_c,
+QComboBox#combobox_scale_units,
+QComboBox#filename_c {
     height: 22px;
     margin: 0px 0px 0px 0px;
     padding: 0px 0px 1px 3px;
@@ -183,56 +185,77 @@ QComboBox#object_extruder_c, QComboBox#combobox_scale_units {
     border-radius: 5px;
 }
 
-QComboBox#object_extruder_c:hover, QComboBox#combobox_scale_units:hover {
+QComboBox#object_extruder_c:hover,
+QComboBox#combobox_scale_units:hover,
+QComboBox#filename_c:hover {
     border: 1px solid rgb(255, 255, 255);
     color: rgb(255, 255, 255);
 }
 
-QComboBox#object_extruder_c:disabled, QComboBox#combobox_scale_units:disabled {
+QComboBox#object_extruder_c:disabled,
+QComboBox#combobox_scale_units:disabled,
+QComboBox#filename_c:disabled {
     color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
     border: 1px solid rgb(96, 96, 96);
 }
 
-QComboBox#object_extruder_c:editable, QComboBox#combobox_scale_units:editable {
+QComboBox#object_extruder_c:editable,
+QComboBox#combobox_scale_units:editable,
+QComboBox#filename_c:editable {
     background: transparent;
 }
 
-QComboBox#object_extruder_c:!editable, QComboBox#object_extruder_c::drop-down:editable,
-QComboBox#combobox_scale_units:!editable, QComboBox#combobox_scale_units::drop-down:editable{
+QComboBox#object_extruder_c:!editable,
+QComboBox#object_extruder_c::drop-down:editable,
+QComboBox#combobox_scale_units:!editable,
+QComboBox#combobox_scale_units::drop-down:editable,
+QComboBox#filename_c:!editable,
+QQComboBox#filename_c::drop-down:editable{
 
 }
 
 /* QComboBox gets the "on" state when the popup is open */
 QComboBox#object_extruder_c:!editable:on, QComboBox#object_extruder_c::drop-down:editable:on,
-QComboBox#combobox_scale_units:!editable:on, QComboBox#combobox_scale_units::drop-down:editable:on{
+QComboBox#combobox_scale_units:!editable:on, QComboBox#combobox_scale_units::drop-down:editable:on,
+QComboBox#filename_c:!editable:on, QComboBox#filename_c::drop-down:editable:on
+{
 
 }
 
-QComboBox#object_extruder_c:on, QComboBox#combobox_scale_units:on { /* shift the text when the popup opens */
+QComboBox#object_extruder_c:on,
+QComboBox#combobox_scale_units:on,
+QComboBox#filename_c:on { /* shift the text when the popup opens */
 
 }
 
-QComboBox#object_extruder_c::drop-down, QComboBox#combobox_scale_units::drop-down {
+QComboBox#object_extruder_c::drop-down, QComboBox#combobox_scale_units::drop-down, QComboBox#filename_c::drop-down {
     border-radius: 5px;
     background-color:rgb(132, 132, 132);
     color:rgb(255, 255, 255);
 }
 
-QComboBox#object_extruder_c::drop-down:disabled, QComboBox#combobox_scale_units::drop-down:disabled {
+QComboBox#object_extruder_c::drop-down:disabled,
+QComboBox#combobox_scale_units::drop-down:disabled,
+QComboBox#filename_c::drop-won:disabled {
     color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
     border: 1px solid rgb(96, 96, 96);
     border-radius: 5px;
 }
 
-QComboBox#object_extruder_c::down-arrow, QComboBox#combobox_scale_units::down-arrow {
+QComboBox#object_extruder_c::down-arrow,
+QComboBox#combobox_scale_units::down-arrow,
+QComboBox#filename_c::down-arrow
+{
     image: url(base_dirdata/img/gui/arrow_dropdownmenu_bright.png);
     width: 13px;
     height: 13px;
 }
 
-QComboBox#object_extruder_c::down-arrow:disabled, QComboBox#combobox_scale_units::down-arrow:disabled  {
+QComboBox#object_extruder_c::down-arrow:disabled,
+QComboBox#combobox_scale_units::down-arrow:disabled,
+QComboBox#filename_c::down-arrow:disabled  {
     color: rgb(112, 112, 112);
     background-color:rgb(96, 96, 96);
     image: url(base_dirdata/img/gui/arrow_dropdownmenu_bright.png);
@@ -240,11 +263,13 @@ QComboBox#object_extruder_c::down-arrow:disabled, QComboBox#combobox_scale_units
     height: 13px;
 }
 
-QComboBox#object_extruder_c::down-arrow:on { /* shift the arrow when popup is open */
+QComboBox#object_extruder_c::down-arrow:on,
+QComboBox#filename_c::down-arrow:on { /* shift the arrow when popup is open */
 
 }
 
-QComboBox#combobox_scale_units QAbstractItemView {
+QComboBox#combobox_scale_units QAbstractItemView,
+QComboBox#filename_c QAbstractItemView {
     background-color:rgb(132, 132, 132);
     selection-background-color: rgb(255, 97, 0);
     /*selection-color: rgb(25, 25, 25);*/

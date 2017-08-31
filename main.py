@@ -20,7 +20,7 @@ import platform
 
 __author__ = 'Tibor Vavra'
 
-DEBUG = True
+DEBUG = False
 
 class EventLoopRunner(QObject):
     finished = pyqtSignal()
