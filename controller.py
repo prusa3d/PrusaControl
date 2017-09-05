@@ -1144,6 +1144,7 @@ class Controller(QObject):
     def open_multipart_model(self):
         data = self.view.open_model_file_dialog()
         self.load_multipart_model(data)
+        self.actualize_extruder_set()
 
 
 
@@ -1888,6 +1889,7 @@ class Controller(QObject):
 
                         new_scale = numpy.abs(new_scale)
                         model.set_scale_abs(new_scale[0], new_scale[1], new_scale[2])
+                        self.update_wipe_tower()
 
                         #self.last_l = l
 
@@ -2329,6 +2331,7 @@ class Controller(QObject):
             print("Some file mismatch")
 
         self.actualize_extruder_set()
+
 
 
     def open_file(self, url):

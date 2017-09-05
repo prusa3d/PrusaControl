@@ -135,7 +135,7 @@ class AppScene(object):
 
         m = ModelTypeStl.load_from_mesh(cube, "maximal wipe tower")
 
-        m.wipe_tower_texture = self.controller.view.glWidget.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle2.png")
+        m.wipe_tower_texture = self.controller.view.glWidget.texture_from_png(self.controller.app_config.local_path + "data/img/LineAngle3.png")
 
         m.parent = self
         m.is_wipe_tower = True
@@ -1901,14 +1901,24 @@ class MultiModel(Model):
             m.is_multipart_model = True
             m.multipart_parent = self
 
+        self.update_min_max()
+
     def update_min_max(self):
         max_lst = []
         min_lst = []
         for m in self.models:
-
             m.min_scene = m.min + m.pos + self.pos
+            min_lst.append((m.min))
 
             m.max_scene = m.max + m.pos + self.pos
+            max_lst.append(m.max)
+
+        self.min = np.min(min_lst)
+        self.max = np.max(max_lst)
+
+        self.min_scene = self.pos + self.min
+        self.max_scene = self.pos + self.max
+
 
 
 
