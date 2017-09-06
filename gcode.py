@@ -248,6 +248,7 @@ class GcodeParserRunner(QObject):
         self.z_hop = False
         self.last_point = np.array([0.0, 0.0, 0.0])
         self.actual_point = np.array([0.0, 0.0, 0.0])
+        self.absolute_coordinates = True
 
         self.printing_time = 0.0
         self.filament_length = 0.0
@@ -275,15 +276,25 @@ class GcodeParserRunner(QObject):
 
             line = in_stream.readLine()
             bits = line.split(';', 1)
+            bits_len = len(bits)
+
             if bits[0] == '':
                 line_number+=1
+                if bits_len > 1:
+                    if bits[0] == '' and bits[1] == "END gcode for filament":
+                        break
                 continue
+
             if 'G1 ' in bits[0]:
                 self.parse_g1_line_new(bits, line_number)
             elif 'G4' in bits[0]:
                 self.parse_g4_line(bits, line_number)
             elif 'T0' in bits[0] or 'T1' in bits[0] or 'T2' in bits[0] or 'T3' in bits[0]:
                 self.parse_t_line(bits, line_number)
+            elif 'G90' in bits[0]:
+                self.absolute_coordinates = True
+            elif 'G91' in bits[0]:
+                self.absolute_coordinates = False
             else:
                 if DEBUG:
                     print("Nezpracovano: " + str(bits))
@@ -379,11 +390,15 @@ class GcodeParserRunner(QObject):
 
         line = text.split(' ')
         line = list(filter(None, line))
+        line_len = len(line)
 
         comment_line = comment.split(' ')
         comment_line = list(filter(None, comment_line))
 
-        self.tool_change_data.append(int(data[0][1:]))
+        if 'T?' in line[0]:
+            return
+        else:
+            self.tool_change_data.append(int(line[0][1:]))
 
 
     #only G4 lines
@@ -397,13 +412,16 @@ class GcodeParserRunner(QObject):
 
         line = text.split(' ')
         line = list(filter(None, line))
+        line_len = len(line)
 
         comment_line = comment.split(' ')
         comment_line = list(filter(None, comment_line))
 
-        if 'S' in line[1]:
-            self.sleep_data.append(float(line[1][1:]))
-            #set sleep
+        if line_len > 1:
+            if 'S' in line[1]:
+                self.sleep_data.append(float(line[1][1:]))
+                #set sleep
+
 
 
 
@@ -696,8 +714,12 @@ class GcodeParserRunner(QObject):
             # Set of Z axis
             # G1 Z1.850 F7200.000 ; lift Z
             new_z = float(line[1][1:])
-            self.actual_z = "%.2f" % new_z
-            self.last_point = np.array([self.last_point[0], self.last_point[1], new_z])
+            if self.absolute_coordinates:
+                self.actual_z = "%.2f" % new_z
+                self.last_point = np.array([self.last_point[0], self.last_point[1], new_z])
+            else:
+                self.actual_z = "%.2f" % (self.last_point[2] + new_z)
+                self.last_point = np.array([self.last_point[0], self.last_point[1], self.last_point[2] + new_z])
             return
         elif 'F' in line[1]:
             # Set of feed rate(speed mm/m)

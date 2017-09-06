@@ -61,7 +61,7 @@ class AppScene(object):
         self.wipe_tower_size_x = 60.
         self.wipe_tower_size_y = 15.
         self.wipe_tower_size_z = 0.10
-        self.wipe_tower_number_of_section = 3
+        self.wipe_tower_number_of_section = 0
 
         self.sceneZero = [.0, .0, .0]
         self.models = []
@@ -83,11 +83,12 @@ class AppScene(object):
         self.is_wipe_tower = False
         self.wipe_tower_model = []
         self.is_wipe_tower_position_manual = False
+        self.wipe_tower_pos = np.array([0.0, 0.0, 0.0])
 
 
 
     def create_wipe_tower(self):
-        if self.wipe_tower_number_of_section == 0:
+        if self.wipe_tower_number_of_section == 0 or len(self.get_models(with_wipe_tower=False)) == 0:
             return
 
         n_sections = self.wipe_tower_number_of_section
@@ -177,14 +178,14 @@ class AppScene(object):
         extruders_set = set([m.extruder for m in self.get_models(with_wipe_tower=False)])
         self.wipe_tower_number_of_section = len(extruders_set) - 1
 
+        if self.wipe_tower_model:
+            self.wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
 
-        wipe_tower_pos = deepcopy(self.wipe_tower_model.pos)
         self.remove_wipe_tower()
         self.create_wipe_tower()
-
-        if self.is_wipe_tower_position_manual:
-            self.wipe_tower_model.pos[0] = wipe_tower_pos[0]
-            self.wipe_tower_model.pos[1] = wipe_tower_pos[1]
+        if self.is_wipe_tower_position_manual and self.wipe_tower_model:
+            self.wipe_tower_model.pos[0] = self.wipe_tower_pos[0]
+            self.wipe_tower_model.pos[1] = self.wipe_tower_pos[1]
 
         self.controller.update_scene()
 
@@ -196,7 +197,7 @@ class AppScene(object):
 
         parameters['is_wipe_tower'] = int(self.controller.is_multimaterial() and not self.controller.is_single_material_mode())
 
-        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode() and self.wipe_tower_model:
             parameters['wipe_pos_x'] = int((self.wipe_tower_model.pos[0] - self.wipe_tower_size_x * .05) * 10. + printer_parameters['printing_space'][0] * .5)
             parameters['wipe_pos_y'] = int((self.wipe_tower_model.pos[1] - self.wipe_tower_size_y * self.wipe_tower_number_of_section * .05) * 10. + printer_parameters['printing_space'][1] * .5)
             parameters['wipe_size_x'] = int(self.wipe_tower_size_x)
@@ -309,6 +310,9 @@ class AppScene(object):
         if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             pass
         else:
+            return False
+
+        if not self.wipe_tower_model:
             return False
 
         wipe_tower = self.wipe_tower_model
@@ -587,7 +591,7 @@ class AppScene(object):
         self.wipe_tower_size_x = 60.
         self.wipe_tower_size_y = 15.
         self.wipe_tower_size_z = 0.10
-        self.wipe_tower_number_of_section = 3
+        self.wipe_tower_number_of_section = 0
 
 
     def clear_scene(self):
@@ -990,6 +994,17 @@ class Model(object):
             self.multipart_parent.update_min_max()
             self.multipart_parent.place_on_zero()
 
+        elif self.is_wipe_tower:
+            printer_parameters = self.parent.controller.printing_parameters.get_printer_parameters(
+                self.parent.controller.actual_printer)
+
+            size_x = self.parent.wipe_tower_size_x
+            size_y = self.parent.wipe_tower_size_y * self.parent.wipe_tower_number_of_section
+
+            self.pos[0] = (printer_parameters['printing_space'][0]*.05)-(size_x*.05)-1.
+            self.pos[1] = (printer_parameters['printing_space'][1]*.05)-(size_y*.05)-1.
+
+            self.parent.is_wipe_tower_position_manual = False
         else:
             self.scale[0] = 1.
             self.scale[1] = 1.

@@ -352,23 +352,31 @@ class Controller(QObject):
 
         if 1 in extruders_set:
             self.view.extruder1_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder1_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder1_l.setStyleSheet("font-weight: normal;")
+            self.view.extruder1_l.setToolTip("")
 
         if 2 in extruders_set:
             self.view.extruder2_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder2_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder2_l.setStyleSheet("font-weight: normal;")
+            self.view.extruder2_l.setToolTip("")
 
         if 3 in extruders_set:
             self.view.extruder3_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder3_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder3_l.setStyleSheet("font-weight: normal;")
+            self.view.extruder3_l.setToolTip("")
 
         if 4 in extruders_set:
             self.view.extruder4_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder4_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder4_l.setStyleSheet("font-weight: normal;")
+            self.view.extruder4_l.setToolTip("")
 
 
 
@@ -2295,14 +2303,17 @@ class Controller(QObject):
 
     def open_files(self, list_of_urls_tmp):
         list_of_urls = []
+        list_of_urls_tmp2 = []
         if self.app_config.system_platform in ["Darwin"]:
             for url in list_of_urls_tmp:
                 if url.startswith('/.file/id='):
-                    list_of_urls.append(self.get_url_from_local_fileid(url))
+                    list_of_urls_tmp2.append(self.get_url_from_local_fileid(url))
                 else:
-                    list_of_urls.append(url)
+                    list_of_urls_tmp2.append(url)
         else:
-            list_of_urls = list_of_urls_tmp
+            list_of_urls_tmp2 = list_of_urls_tmp
+
+        list_of_urls = sorted(list_of_urls_tmp2)
 
         extensions_lst = []
         for url in list_of_urls:
@@ -2328,7 +2339,7 @@ class Controller(QObject):
                         self.import_model(url)
             self.show_warning_if_used_materials_are_not_compatible()
         else:
-            print("Some file mismatch")
+            self.view.statusBar().showMessage("Some files mismatch")
 
         self.actualize_extruder_set()
 

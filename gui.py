@@ -3,6 +3,7 @@ from PIL.ImageEnhance import Color
 from PyQt4.QtGui import QColor
 from PyQt4.QtGui import QColorDialog
 from PyQt4.QtGui import QStandardItem
+from PyQt4.uic.properties import QtCore
 
 __author__ = 'Tibor Vavra'
 
@@ -1184,6 +1185,8 @@ class PrusaControlView(QMainWindow):
         self.extruder4_c.setObjectName("extruder4_c")
         self.extruder4_c.setMaxVisibleItems(len(material_label_ls))
 
+        self.used_extruder_tooltip = self.tr("Extruder is used")
+
         self.wipe_tower_tooltip = self.tr("Amount of material in wipe tower, material clearing")
         self.wipe_tower_l = QLabel()
         self.wipe_tower_l.setObjectName("wipe_tower_l")
@@ -1363,7 +1366,7 @@ class PrusaControlView(QMainWindow):
         self.show()
 
     def get_list_of_wipe_tower_labels(self):
-        return [self.tr("Draft"), self.tr("Normal"), self.tr("Fine"), self.tr("Soluble supports")]
+        return [self.tr("Reduced"), self.tr("Normal"), self.tr("Increased"), self.tr("Soluble Supports")]
 
     def change_of_wipe_tower_settings(self):
         index = self.wipe_tower_c.currentIndex()
@@ -1503,6 +1506,8 @@ class PrusaControlView(QMainWindow):
         self.wipe_tower_c.setToolTip(self.wipe_tower_tooltip)
         self.wipe_tower_l.setToolTip(self.wipe_tower_tooltip)
 
+        self.used_extruder_tooltip = self.tr("Extruder is used")
+
 
         self.object_group_box.setTitle(self.tr("Object settings"))
         self.object_variable_layer_box.setTitle(self.tr("Object advance settings"))
@@ -1519,9 +1524,17 @@ class PrusaControlView(QMainWindow):
 
 
     def set_special_support_settings(self):
+        item_lst = [[self.tr("None"), self.tr("None")],
+                    [self.tr("Build plate only"), self.tr("Build plate only")],
+                    [self.tr("Everywhere"), self.tr("Everywhere")],
+                    [self.tr("Build plate only, soluble interface"), self.tr("Build plate only with soluble interface")],
+                    [self.tr("Everywhere, soluble interface"), self.tr("Everywhere with soluble interface")]]
+
         print("GUI set special support settings")
         self.supportCombo.clear()
-        self.supportCombo.addItems([self.tr("None"), self.tr("Build plate only"), self.tr("Everywhere"), self.tr("Build plate only with soluble interface"), self.tr("Everywhere with soluble interface")])
+        for i in item_lst:
+            self.supportCombo.addItem(i[0], i[1])
+
 
     def set_normal_support_settings(self):
         print("GUI set normal support settings")
@@ -1649,9 +1662,13 @@ class PrusaControlView(QMainWindow):
 
     def reset_transformation_on_object(self, object_id):
         self.controller.reset_transformation_on_object(object_id)
-        self.update_position_widgets(object_id)
-        self.update_rotate_widgets(object_id)
-        self.update_scale_widgets(object_id)
+        mesh = self.controller.get_object_by_id(object_id)
+        if mesh.is_wipe_tower:
+            self.update_position_widgets(object_id)
+        else:
+            self.update_position_widgets(object_id)
+            self.update_rotate_widgets(object_id)
+            self.update_scale_widgets(object_id)
         self.update_scene()
 
     def show_new_version_message(self):
@@ -2624,6 +2641,12 @@ class PrusaControlView(QMainWindow):
                 self.extruder2_c.blockSignals(False)
                 self.extruder3_c.blockSignals(False)
                 self.extruder4_c.blockSignals(False)
+
+            self.wipe_tower_c.blockSignals(True)
+            self.wipe_tower_c.clear()
+            self.wipe_tower_c.addItems(self.get_list_of_wipe_tower_labels())
+            self.wipe_tower_c.setCurrentIndex(1)
+            self.wipe_tower_c.blockSignals(False)
 
             material_label = self.extruder1_c.currentText()
 
