@@ -17,7 +17,7 @@ from PyQt4.QtCore import QThread
 from PyQt4.QtCore import pyqtSignal
 
 
-DEBUG = False
+DEBUG = True
 
 class GCode(object):
 
@@ -243,7 +243,7 @@ class GcodeParserRunner(QObject):
         self.tool_change_data = []
         self.data_keys = set()
         self.actual_z = '0.0'
-        self.speed = 0.0
+        self.speed = 1500.0
         self.extrusion = 0.0
         self.z_hop = False
         self.last_point = np.array([0.0, 0.0, 0.0])
@@ -295,6 +295,8 @@ class GcodeParserRunner(QObject):
                 self.absolute_coordinates = True
             elif 'G91' in bits[0]:
                 self.absolute_coordinates = False
+            elif 'G92' in bits[0]:
+                self.parse_g92_line(bits, line_number)
             else:
                 if DEBUG:
                     print("Nezpracovano: " + str(bits))
@@ -347,18 +349,23 @@ class GcodeParserRunner(QObject):
         speed_vect = np.array([i[3] for i in all_data])
 
         vect_vect = b_vect - a_vect
+        #print("vect_vect: " + str(vect_vect.tolist()))
         leng_vect = np.linalg.norm(vect_vect, axis=1)
+        #print("leng_vect: " + str(leng_vect.tolist()))
         time_vect = np.divide(leng_vect, speed_vect)
         time_of_print = np.sum(time_vect)
 
+        print("Time of print0: " + str(time_of_print))
+
         #Magic constant :-)
         time_of_print *= 1.1
+        print("Time of print1: " + str(time_of_print))
 
         sum_of_sleep = np.sum(self.sleep_data)
         print("Sum of sleep: " + str(sum_of_sleep))
         time_of_print += sum_of_sleep
 
-        print("Time of print: " +str(time_of_print))
+        print("Time of print2: " +str(time_of_print))
 
         #speed is in mm/min => mm/sec
         return time_of_print*60.
@@ -733,9 +740,18 @@ class GcodeParserRunner(QObject):
             # G1 X121.899 Y107.591 E-0.97707 ; wipe and retract
             # G1 X179.750 F7000
             # G1 X240.250 E1.9299
+            # G1 X60 Y60 Z1 F1000.0
+
+            if line_len == 5:
+                if 'X' in line[1] and 'Y' in line[2] and 'Z' in line[3] and 'F' in line[4]:
+                    self.speed = np.float(line[4][1:])
+                    self.actual_point = np.array([np.float(line[1][1:]), self.actual_point[1], np.float(self.actual_z)])
+                else:
+                    if DEBUG:
+                        print("Nezpracovano: " + str(line) + ' ' + str(comment_line))
 
 
-            if line_len == 4:
+            elif line_len == 4:
 
                 if 'E' in line[2] and 'F' in line[3]:
                     # G1 X181.500 E0.0217 F2900
@@ -829,6 +845,32 @@ class GcodeParserRunner(QObject):
                 print("Nezpracovano: " + str(line) + ' ' + str(comment_line))
 
         return
+
+
+    def parse_g92_line(self, data, line_number):
+        # get raw line data and line_number to know position in file
+        # data is list from line from file devided by ;
+        # [0] data and [1] is comment
+
+        if len(data)>1:
+            text = data[0]
+            comment = data[1]
+        else:
+            text = data[0]
+            comment = ""
+
+        line = text.split(' ')
+        line = list(filter(None, line))
+        line_len = len(line)
+
+        #print(comment)
+        comment_line = comment.split(' ')
+        comment_line = list(filter(None, comment_line))
+        comment_line_len = len(comment_line)
+
+        if 'E' in line[1]:
+            self.extrusion = np.float(line[1][1:])
+
 
 
 
