@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from pprint import pprint
 from xml.dom import minidom
 
 __author__ = 'Tibor Vavra'
@@ -153,6 +154,7 @@ class Version_1_0(VersionAbstract):
                     model.scale = numpy.array(m['scale'])
                     model.update_min_max()
                     model.parent = scene
+                    model.update_min_max()
 
                 scene.models.append(model)
 
@@ -164,6 +166,8 @@ class Version_1_0(VersionAbstract):
                 mm.scale = groups_properties[group]['scale']
 
                 scene.multipart_models.append(mm)
+
+                mm.update_min_max()
 
 
 
@@ -186,14 +190,14 @@ class Version_1_0(VersionAbstract):
                 if model.isVisible and not model.is_wipe_tower:
                     if model.is_multipart_model:
                         model_tmp = model.multipart_parent
-                        pos = deepcopy(model.pos)
-                        pos += model_tmp.pos
+                        #pos = deepcopy(model.pos)
+                        pos = deepcopy(model_tmp.pos)
                         pos *= 10.
                         model_element = ET.SubElement(models_tag, "model", name=model.filename)
                         ET.SubElement(model_element, "extruder").text = str(model.extruder)
                         if model.is_multipart_model:
                             ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
-                        ET.SubElement(model_element, "normalization").text = str(model.normalization_flag)
+                        ET.SubElement(model_element, "normalization").text = str(deepcopy(model.normalization_flag))
                         ET.SubElement(model_element, "position").text = str(pos.tolist())
                         ET.SubElement(model_element, "rotation").text = str(model_tmp.rot.tolist())
                         ET.SubElement(model_element, "scale").text = str(model_tmp.scale.tolist())

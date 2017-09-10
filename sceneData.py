@@ -91,6 +91,11 @@ class AppScene(object):
         if self.wipe_tower_number_of_section == 0 or len(self.get_models(with_wipe_tower=False)) == 0:
             return
 
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+            pass
+        else:
+            return
+
         n_sections = self.wipe_tower_number_of_section
 
         size_x = self.wipe_tower_size_x
@@ -175,7 +180,13 @@ class AppScene(object):
             self.wipe_tower_size_z = max_z
 
         #update number of section by number of used extruders -1
-        extruders_set = set([m.extruder for m in self.get_models(with_wipe_tower=False)])
+        extruders_set_tmp = list(set([m.extruder for m in self.get_models(with_wipe_tower=False)]))
+        if self.controller.view.get_support_option() >=1 :
+            extruders_set_tmp.append(self.controller.soluble_extruder)
+            extruders_set = list(extruders_set_tmp)
+        else:
+            extruders_set = list(extruders_set_tmp)
+
         self.wipe_tower_number_of_section = len(extruders_set) - 1
 
         if self.wipe_tower_model:
@@ -186,6 +197,9 @@ class AppScene(object):
         if self.is_wipe_tower_position_manual and self.wipe_tower_model:
             self.wipe_tower_model.pos[0] = self.wipe_tower_pos[0]
             self.wipe_tower_model.pos[1] = self.wipe_tower_pos[1]
+
+        if self.wipe_tower_model:
+            self.wipe_tower_model.update_min_max()
 
         self.controller.update_scene()
 
@@ -383,8 +397,14 @@ class AppScene(object):
         models_lst[0].multipart_parent.size = size
         models_lst[0].multipart_parent.size_origin = size_origin
 
+        max_bs = []
+
+
         models_lst[0].multipart_parent.min = min
         models_lst[0].multipart_parent.max = max
+
+        models_lst[0].multipart_parent.pos = np.array([0., 0., 0.])
+        models_lst[0].multipart_parent.pos[2] -= min[2]
 
         if max_l > min_l:
             models_lst[0].multipart_parent.boundingSphereSize = max_l
@@ -396,7 +416,7 @@ class AppScene(object):
             obj.mesh.vectors = obj.mesh.vectors + r
 
             obj.pos = np.array([0., 0., 0.])
-            obj.pos[2] -= min[2]
+            #obj.pos[2] -= min[2]
 
             obj.zeroPoint = np.array([0., 0., 0.])
             #obj.zeroPoint = deepcopy(bounding_center)
@@ -408,6 +428,9 @@ class AppScene(object):
             obj.min = deepcopy(min)
             obj.max = deepcopy(max)
 
+            max_bs.append(obj.max_bs)
+
+
             #obj.min_scene = obj.min + obj.pos
             #obj.max_scene = obj.max + obj.pos
 
@@ -416,6 +439,10 @@ class AppScene(object):
             obj.normalization_flag = True
 
             #obj.normalize_object()
+
+        models_lst[0].multipart_parent.max_bs = np.max(max_bs)
+
+        models_lst[0].multipart_parent.update_min_max()
 
         return True
 
@@ -554,12 +581,21 @@ class AppScene(object):
                 new_models_lst = []
                 for model in models_lst:
                     m = deepcopy(model)
-                    m.set_move(self.place_offset, True, False)
+                    #m.set_move(self.place_offset, True, False)
                     self.last_selected_object = m.id
                     self.models.append(m)
                     new_models_lst.append(m)
                 mm = MultiModel(new_models_lst, self)
+
                 mm.pos = i.multipart_parent.pos + self.place_offset
+                mm.scale = deepcopy(i.multipart_parent.scale)
+                mm.rot = deepcopy(i.multipart_parent.rot)
+                mm.size = deepcopy(i.multipart_parent.size)
+                mm.size_origin = deepcopy(i.multipart_parent.size_origin)
+                mm.old_scale = deepcopy(i.multipart_parent.old_scale)
+
+
+                mm.update_min_max()
                 self.multipart_models.append(mm)
             else:
                 m = deepcopy(i)
@@ -627,7 +663,7 @@ class AppScene(object):
 
 
     def automatic_models_position(self):
-        if not len(self.get_models()) > 1:
+        if not len(self.get_models(with_wipe_tower=False)) > 1:
             #TODO:Add placing of first model(MultiModel model)
             return
         #sort objects over size of bounding sphere
@@ -635,11 +671,20 @@ class AppScene(object):
         #self.models = sorted(self.models, key=lambda k: k.boundingSphereSize, reverse=True)
         self.models = sorted(self.models, key=lambda k: np.sqrt(k.size.dot(k.size)), reverse=True)
 
+        placed = []
         #null position of all objects
-        for m in self.get_models():
+        for m in self.get_models(with_wipe_tower=False):
             #Set possition by fce
             zer = np.array([.0, .0, .0])
-            m.set_2d_pos(zer)
+            if m.is_multipart_model:
+                if m.multipart_parent.group_id in placed:
+                    continue
+                else:
+                    m.set_2d_pos(zer)
+                    placed.append(m.multipart_parent.group_id)
+            else:
+                m.set_2d_pos(zer)
+
             #m.pos[0] = zer[0]
             #m.pos[1] = zer[1]
 
@@ -648,62 +693,108 @@ class AppScene(object):
 
         #place biggest object(first one) on center
         #place next object in array on place around center(in clockwise direction) on place zero(center) + 1st object size/2 + 2nd object size/2 + offset
-        if self.models_are_same():
+        if self.models_are_same(with_wipe_tower=False):
             #grid placing algoritm
-            self.place_objects_in_grid()
+            placed_groups = []
+            self.place_objects_in_grid(placed_groups, False)
         else:
             placed_groups = []
-            for i, m in enumerate(self.get_models()):
+            for i, m in enumerate(self.get_models(with_wipe_tower=False)):
                 self.find_new_position(i, m, placed_groups)
 
         self.save_change(self.models)
 
-    def place_objects_in_grid(self):
-        number_x = np.floor(np.sqrt(len(self.get_models())))
-        #real_x = real_y = np.sqrt(len(self.get_models()))
-        m_0 = self.get_models()[0]
-        min = deepcopy(m_0.pos)
-        max = deepcopy(m_0.pos)
-        size = deepcopy(m_0.size) #deepcopy(m_0.max - m_0.min)
-        all_pos = np.array([])
+    def place_objects_in_grid(self, placed_groups, with_wipe_tower):
+        m_0 = self.get_models(with_wipe_tower=with_wipe_tower)[0]
+
+        if m_0.is_multipart_model:
+            #multimodel version
+            number_of_groups = len(
+                set([m.multipart_parent.group_id for m in self.get_models(with_wipe_tower) if m.is_multipart_model]))
+            number_x = np.floor(np.sqrt(number_of_groups))
+
+            size = deepcopy(m_0.multipart_parent.size) #deepcopy(m_0.max - m_0.min)
+
+            i=0
+            for m in self.get_models(with_wipe_tower):
+                if m.is_multipart_model:
+                    if m.multipart_parent.group_id in placed_groups:
+                        continue
+
+                x = i // number_x
+                y = i - (x * number_x)
+
+                #m.multipart_parent.pos[0] = ((size[0] + self.model_position_offset) * x) - self.model_position_offset
+                #m.multipart_parent.pos[1] = ((size[1] + self.model_position_offset) * y) - self.model_position_offset
+
+                m.set_2d_pos([((size[0] + self.model_position_offset) * x) - self.model_position_offset,
+                              ((size[1] + self.model_position_offset) * y) - self.model_position_offset])
+
+                placed_groups.append(m.multipart_parent.group_id)
+                i+=1
+
+            all_pos = np.array([m.multipart_parent.pos for m in self.get_models(with_wipe_tower)])
+
+            min = np.min(all_pos, axis=0)
+            max = np.max(all_pos, axis=0)
+
+            x_center = (max[0] - min[0]) * .5
+            y_center = (max[1] - min[1]) * .5
+
+            placed_groups = []
+
+            for m in self.get_models(with_wipe_tower=with_wipe_tower):
+                if m.multipart_parent.group_id in placed_groups:
+                    m.multipart_parent.update_min_max_quick_for_move()
+                    continue
+                else:
+                    m.multipart_parent.pos[0] -= x_center
+                    m.multipart_parent.pos[1] -= y_center
+                    placed_groups.append(m.multipart_parent.group_id)
+                    m.multipart_parent.update_min_max_quick_for_move()
+
+        else:
+            #just models version
+            number_x = np.floor(np.sqrt(len(self.get_models(with_wipe_tower=with_wipe_tower))))
+            size = deepcopy(m_0.size)  # deepcopy(m_0.max - m_0.min)
+
+            for i, m in enumerate(self.get_models(with_wipe_tower=with_wipe_tower)):
+                x = i // number_x
+                y = i - (x * number_x)
+
+                m.set_2d_pos([((size[0] + self.model_position_offset) * x) - self.model_position_offset,
+                              ((size[1] + self.model_position_offset) * y) - self.model_position_offset])
 
 
-        for i, m in enumerate(self.get_models()):
-            x = i // number_x
-            y = i - (x * number_x)
+            all_pos = np.array([deepcopy(m.pos) for m in self.get_models(with_wipe_tower=with_wipe_tower)])
 
-            m.pos[0] = ((size[0] + self.model_position_offset) * x) - self.model_position_offset
-            m.pos[1] = ((size[1] + self.model_position_offset) * y) - self.model_position_offset
+            min = np.min(all_pos, axis=0)
+            max = np.max(all_pos, axis=0)
 
+            x_center = (max[0] - min[0]) * .5
+            y_center = (max[1] - min[1]) * .5
 
-        all_pos = np.array([m.pos for m in self.get_models()])
+            for m in self.get_models(with_wipe_tower=with_wipe_tower):
+                m.pos[0] -= x_center
+                m.pos[1] -= y_center
+                m.update_min_max()
 
-        min = np.min(all_pos, axis=0)
-        max = np.max(all_pos, axis=0)
-
-        x_center = (max[0] - min[0]) * .5
-        y_center = (max[1] - min[1]) * .5
-
-        for m in self.get_models():
-            m.pos[0] -= x_center
-            m.pos[1] -= y_center
-            m.update_min_max()
 
 
     def find_new_position(self, index, model, placed_groups):
         position_vector = [.0, .0]
         pos = np.array([.0,.0,.0])
         if index == 0:
-            if self.get_models()[0].is_multipart_model:
-                placed_groups.append(self.get_models()[0].multipart_parent.group_id)
-            self.get_models()[0].set_2d_pos(position_vector)
+            if self.get_models(with_wipe_tower=False)[0].is_multipart_model:
+                placed_groups.append(self.get_models(with_wipe_tower=False)[0].multipart_parent.group_id)
+            self.get_models(with_wipe_tower=False)[0].set_2d_pos(position_vector)
             #self.get_models()[0].pos[0] = position_vector[0]
             #self.get_models()[0].pos[1] = position_vector[1]
 
             #self.get_models()[0].max_scene = self.get_models()[0].max + self.get_models()[0].pos
             #self.get_models()[0].min_scene = self.get_models()[0].min + self.get_models()[0].pos
             return
-        scene_tmp = self.get_models()[:index]
+        scene_tmp = self.get_models(with_wipe_tower=False)[:index]
         if index > 0:
             if model.is_multipart_model:
                 if model.multipart_parent.group_id in placed_groups:
@@ -720,6 +811,7 @@ class AppScene(object):
                         if model.is_multipart_model:
                             placed_groups.append(model.multipart_parent.group_id)
                         return
+
 
                 for angle in range(0, 360, 5):
                     #this angels are tried
@@ -740,30 +832,41 @@ class AppScene(object):
 
 
     #TODO:test models names, datas, scale, rotate...
-    def models_are_same(self):
-        default_filename = self.get_models()[0].filename
-        default_scale = self.get_models()[0].scale
-        default_rot = self.get_models()[0].rot
+    def models_are_same(self, with_wipe_tower=True):
+        default_filename = self.get_name(self.get_models(with_wipe_tower)[0])
+        default_scale = self.get_scale(self.get_models(with_wipe_tower)[0])
+        default_rot = self.get_rot(self.get_models(with_wipe_tower)[0])
 
-        for m in self.get_models():
-            if not(default_filename == m.filename):
-                print("Neni stejny nazev")
-                print("Filename 0: " + str(default_filename))
-                print("Filename: " + str(m.filename))
-                return False
-            if not(np.array_equal(default_scale, m.scale)):
-                print("Neni stejny scale")
-                print("Scale 0: " + str(default_scale))
-                print("Scale: " + str(m.scale))
-                return False
-            if not(np.array_equal(default_rot, m.rot)):
-                print("Neni stejna rotace")
-                print("Rotation 0: " + str(default_rot))
-                print("Rotation: " + str(m.rot))
+        for m in self.get_models(with_wipe_tower):
+            if not(default_filename == self.get_name(m)):
                 return False
 
+            if not(np.array_equal(default_scale, self.get_scale(m))):
+                return False
+
+            if not(np.array_equal(default_rot, self.get_rot(m))):
+                return False
 
         return True
+
+    def get_name(self, model):
+        if model.is_multipart_model:
+            return sorted([m.filename for m in model.multipart_parent.models])
+        else:
+            return model.filename
+
+    def get_scale(self, model):
+        if model.is_multipart_model:
+            return model.multipart_parent.scale
+        else:
+            return model.scale
+
+    def get_rot(self, model):
+        if model.is_multipart_model:
+            return model.multipart_parent.rot
+        else:
+            return model.rot
+
 
     def get_whole_scene_in_one_mesh(self, gcode_generate=False):
         return Mesh(np.concatenate([i.get_mesh(True, gcode_generate).data for i in self.models if i.isVisible]))
@@ -966,6 +1069,8 @@ class Model(object):
         m.boundingMinimalPoint = deepcopy(self.boundingMinimalPoint)
         m.zeroPoint = deepcopy(self.zeroPoint)
 
+        m.normalization_flag = deepcopy(self.normalization_flag)
+
         m.temp_mesh = deepcopy(self.mesh)
         return m
 
@@ -1020,7 +1125,7 @@ class Model(object):
             self.update_min_max()
             self.place_on_zero()
 
-
+        self.parent.controller.update_wipe_tower()
 
 
     def calculate_normal_groups(self):
@@ -1167,7 +1272,10 @@ class Model(object):
             self.multipart_parent.pos[0] = vector[0]
             self.multipart_parent.pos[1] = vector[1]
 
-            self.multipart_parent.update_min_max()
+            #self.multipart_parent.min_scene = self.multipart_parent.min + self.multipart_parent.pos
+            #self.multipart_parent.max_scene = self.multipart_parent.max + self.multipart_parent.pos
+
+            self.multipart_parent.update_min_max_quick_for_move()
         else:
             self.pos[0] = vector[0]
             self.pos[1] = vector[1]
@@ -1190,7 +1298,8 @@ class Model(object):
                 self.multipart_parent.pos = vector
 
             #TODO:
-            self.multipart_parent.update_min_max()
+            #self.multipart_parent.update_min_max()
+            self.multipart_parent.update_min_max_quick_for_move()
 
 
             if place_on_zero:
@@ -1301,6 +1410,7 @@ class Model(object):
             self.multipart_parent.scale[2] = z
 
             self.multipart_parent.update_min_max_quick_change_of_scale()
+
             self.multipart_parent.place_on_zero()
 
         else:
@@ -1334,8 +1444,36 @@ class Model(object):
     def update_min_max(self):
         #self.temp_mesh = deepcopy(self.mesh)
         if self.is_multipart_model:
-            ##?
-            self.multipart_parent.update_min_max()
+            rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.multipart_parent.rot[0])
+            ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.multipart_parent.rot[1])
+            rz_matrix = Mesh.rotation_matrix([0.0, 0.0, 1.0], self.multipart_parent.rot[2])
+
+            rotation_matrix = np.dot(np.dot(rx_matrix, ry_matrix), rz_matrix)
+
+            scale_matrix = np.array([[1., 0., 0.],
+                                     [0., 1., 0.],
+                                     [0., 0., 1.]]) * self.multipart_parent.scale
+
+            final_rotation = rotation_matrix
+            final_scale = scale_matrix
+            # final_matrix = np.dot(final_rotation, final_scale)
+            final_matrix = np.dot(final_scale, final_rotation)
+
+            for i in range(3):
+                self.temp_mesh.vectors[:, i] = self.mesh.vectors[:, i].dot(final_matrix)
+
+            # self.temp_mesh.normals = self.mesh.normals.dot(final_rotation)
+
+            self.temp_mesh.update_min()
+            self.temp_mesh.update_max()
+            self.min = self.temp_mesh.min_
+            self.max = self.temp_mesh.max_
+
+            self.size = self.max - self.min
+            self.max_bs = np.linalg.norm(self.size[:2]) * 0.5
+
+            self.min_scene = self.min + self.multipart_parent.pos
+            self.max_scene = self.max + self.multipart_parent.pos
         else:
             rx_matrix = Mesh.rotation_matrix([1.0, 0.0, 0.0], self.rot[0])
             ry_matrix = Mesh.rotation_matrix([0.0, 1.0, 0.0], self.rot[1])
@@ -1363,6 +1501,7 @@ class Model(object):
             self.max = self.temp_mesh.max_
 
             self.size = self.max - self.min
+            self.max_bs = np.linalg.norm(self.size[:2]) * 0.5
 
             self.min_scene = self.min + self.pos
             self.max_scene = self.max + self.pos
@@ -1377,6 +1516,7 @@ class Model(object):
         self.min *= diff_scale
 
         self.size = self.max - self.min
+        self.max_bs = np.linalg.norm(self.size[:2]) *0.5
 
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
@@ -1420,15 +1560,23 @@ class Model(object):
         if self.parent.controller.settings['debug']:
             glPointSize(5.0)
             glColor3f(1., .0, .0)
+
+            if self.is_multipart_model:
+                min_scene = self.multipart_parent.min_scene
+                max_scene = self.multipart_parent.max_scene
+            else:
+                min_scene = self.min_scene
+                max_scene = self.max_scene
+
             glBegin(GL_POINTS)
-            glVertex3f(self.min_scene[0], self.min_scene[1], self.min_scene[2])
-            glVertex3f(self.max_scene[0], self.min_scene[1], self.min_scene[2])
-            glVertex3f(self.min_scene[0], self.max_scene[1], self.min_scene[2])
-            glVertex3f(self.min_scene[0], self.min_scene[1], self.max_scene[2])
-            glVertex3f(self.max_scene[0], self.min_scene[1], self.max_scene[2])
-            glVertex3f(self.max_scene[0], self.max_scene[1], self.min_scene[2])
-            glVertex3f(self.min_scene[0], self.max_scene[1], self.max_scene[2])
-            glVertex3f(self.max_scene[0], self.max_scene[1], self.max_scene[2])
+            glVertex3f(min_scene[0], min_scene[1], min_scene[2])
+            glVertex3f(max_scene[0], min_scene[1], min_scene[2])
+            glVertex3f(min_scene[0], max_scene[1], min_scene[2])
+            glVertex3f(min_scene[0], min_scene[1], max_scene[2])
+            glVertex3f(max_scene[0], min_scene[1], max_scene[2])
+            glVertex3f(max_scene[0], max_scene[1], min_scene[2])
+            glVertex3f(min_scene[0], max_scene[1], max_scene[2])
+            glVertex3f(max_scene[0], max_scene[1], max_scene[2])
             glEnd()
 
             glColor3f(.0, .0, 1.)
@@ -1437,9 +1585,12 @@ class Model(object):
             glEnd()
 
         if self.is_multipart_model:
-            glTranslatef(self.multipart_parent.pos[0] + self.pos[0],
-                         self.multipart_parent.pos[1] + self.pos[1],
-                         self.multipart_parent.pos[2] + self.pos[2])
+            #glTranslatef(self.multipart_parent.pos[0] + self.pos[0],
+            #             self.multipart_parent.pos[1] + self.pos[1],
+            #             self.multipart_parent.pos[2] + self.pos[2])
+            glTranslatef(self.multipart_parent.pos[0],
+                         self.multipart_parent.pos[1],
+                         self.multipart_parent.pos[2])
         else:
             glTranslatef(self.pos[0], self.pos[1], self.pos[2])
 
@@ -1585,12 +1736,11 @@ class Model(object):
         glDisableClientState(GL_NORMAL_ARRAY)
 
         if self.is_in_printing_area == False:
-            font = self.parent.controller.view.font
-            font.setPointSize(35)
+            #font = self.parent.controller.view.font
+            #font.setPointSize(35)
             glDisable(GL_LIGHTING)
             glDisable(GL_DEPTH_TEST)
             glColor3ub(255, 97, 0)
-            self.parent.controller.view.glWidget.renderText(0., 0., 0., u"!", font)
         if gcode_preview and not self.is_wipe_tower:
             glCullFace(GL_BACK)
             glDisable(GL_CULL_FACE)
@@ -1916,24 +2066,36 @@ class MultiModel(Model):
             m.is_multipart_model = True
             m.multipart_parent = self
 
-        self.update_min_max()
+        #self.update_min_max()
 
+    #TODO:Nekde tady to je
     def update_min_max(self):
         max_lst = []
         min_lst = []
+
         for m in self.models:
-            m.min_scene = m.min + m.pos + self.pos
+            m.update_min_max()
+            #m.min_scene = m.min + self.pos
             min_lst.append((m.min))
 
-            m.max_scene = m.max + m.pos + self.pos
+            #m.max_scene = m.max + self.pos
             max_lst.append(m.max)
 
-        self.min = np.min(min_lst)
-        self.max = np.max(max_lst)
+        self.min = np.min(min_lst, axis=0)
+        self.max = np.max(max_lst, axis=0)
 
         self.min_scene = self.pos + self.min
         self.max_scene = self.pos + self.max
 
+        self.size = self.max - self.min
+
+    def update_min_max_quick_for_move(self):
+        for m in self.models:
+            m.min_scene = m.min + self.pos
+            m.max_scene = m.max + self.pos
+
+        self.max_scene = self.max + self.pos
+        self.min_scene = self.min + self.pos
 
 
 
@@ -1950,24 +2112,39 @@ class MultiModel(Model):
         self.min_scene = self.min + self.pos
         self.max_scene = self.max + self.pos
 
+    """
+    def set_2d_pos(self, vector):
+        vector = np.array(vector)
+        self.pos[0] = vector[0]
+        self.pos[1] = vector[1]
+
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
+    """
 
     def place_on_zero(self):
         #TODO:bug with place on zero
+        #self.update_min_max()
+
         min = self.min_scene
         max = self.max_scene
-        pos = self.pos
+
+        pos = deepcopy(self.pos)
 
         if min[2] < 0.0:
             diff = min[2] * -1.0
+            print("Mensi nez 0.0: " + str(diff))
             pos[2] += diff
             self.pos = pos
         elif min[2] > 0.0:
             diff = min[2] * -1.0
+            print("Vetsi nez 0.0: " + str(diff))
             pos[2] += diff
             self.pos = pos
 
-        self.min_scene = self.min + pos
-        self.max_scene = self.max + pos
+        self.min_scene = self.min + self.pos
+        self.max_scene = self.max + self.pos
+
 
 
 

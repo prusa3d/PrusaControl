@@ -935,8 +935,10 @@ class GLWidget(QGLWidget):
         if model.is_multipart_model:
             pos = model.multipart_parent.pos + model.pos
             model = model.multipart_parent
+            #max_bs =
         else:
             pos = model.pos
+            #max_bs = model.max_bs
 
         if self.rotateTool.is_pressed():
             self.draw_rotation_circle(model, rotateColors, pos, model.max_bs, picking)

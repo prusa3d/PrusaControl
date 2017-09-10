@@ -1115,7 +1115,7 @@ class PrusaControlView(QMainWindow):
 
 
         #multimaterial settings
-        self.single_material_mode_tooltip = self.tr("Do you want to print from one material?")
+        self.single_material_mode_tooltip = self.tr("Do you want to print only from one material?")
         self.single_material_mode_checkbox = QCheckBox("Single material Mode")
         self.single_material_mode_checkbox.setObjectName("single_material_mode_checkbox")
         self.single_material_mode_checkbox.setToolTip(self.single_material_mode_tooltip)
@@ -1494,7 +1494,7 @@ class PrusaControlView(QMainWindow):
         self.brim_label.setToolTip(self.brim_tooltip)
         self.brimCheckBox.setToolTip(self.brim_tooltip)
 
-        self.single_material_mode_tooltip = self.tr("Do you want to print from one material?")
+        self.single_material_mode_tooltip = self.tr("Do you want to print only from one material?")
         self.single_material_mode_checkbox.setText(self.tr("Single material mode"))
         self.materials_settings_l.setText(self.tr("Material Settings"))
         self.extruder1_l.setText(self.tr("Extruder 1"))
@@ -1608,6 +1608,8 @@ class PrusaControlView(QMainWindow):
 
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
+
+        self.set_normal_support_settings()
 
 
     def create_menu(self):
@@ -1805,7 +1807,10 @@ class PrusaControlView(QMainWindow):
         if self.place_on_zero.isChecked():
             self.edit_pos_z.setDisabled(True)
             model = self.controller.get_object_by_id(self.object_id)
-            model.place_on_zero()
+            if model.is_multipart_model:
+                model.multipart_parent.place_on_zero()
+            else:
+                model.place_on_zero()
             self.update_position_widgets(self.object_id)
             self.update_scene()
         else:
@@ -2241,6 +2246,7 @@ class PrusaControlView(QMainWindow):
             if not model:
                 return
             model.set_rot(np.deg2rad(x), np.deg2rad(y), np.deg2rad(z), False, True, place_on_zero)
+            self.controller.update_wipe_tower()
             self.controller.update_scene()
             self.controller.make_analyze()
 
@@ -2356,6 +2362,7 @@ class PrusaControlView(QMainWindow):
                 else:
                     model.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
 
+            self.controller.update_wipe_tower()
         #self.update_object_settings(self.object_id)
         self.controller.update_scene()
 

@@ -264,7 +264,7 @@ class Controller(QObject):
 
         if self.single_material_mode:
             #set single material GUI
-            print("set single material mode")
+            #print("set single material mode")
             self.set_printer_mod(self.is_actual_printer_multimode())
             self.view.set_multimaterial_gui_off()
             self.remove_wipe_tower()
@@ -272,10 +272,11 @@ class Controller(QObject):
             self.incompatible_materials = False
         else:
             #set multi material GUI
-            print("set multimaterial mode")
+            #print("set multimaterial mode")
             self.set_printer_mod("")
             self.view.set_multimaterial_gui_on()
-            self.add_wipe_tower()
+            self.change_of_wipe_tower_settings(1)
+            self.update_wipe_tower()
             self.update_scene()
 
 
@@ -308,6 +309,7 @@ class Controller(QObject):
 
         if self.incompatible_materials:
             self.warning_message_buffer.append(u"• " + self.message_object04)
+
 
         if self.scene.is_collision_of_wipe_tower_and_objects():
             self.warning_message_buffer.append(u"• " + self.message_object05)
@@ -379,6 +381,7 @@ class Controller(QObject):
             self.view.extruder4_l.setToolTip("")
 
 
+        self.update_wipe_tower()
 
 
 
@@ -528,7 +531,7 @@ class Controller(QObject):
 
 
     def read_gcode(self, filename = ''):
-        print("reading gcode")
+        #print("reading gcode")
         if filename:
             self.gcode = GCode(filename, self, self.set_gcode, self.set_saved_gcode)
         else:
@@ -548,7 +551,7 @@ class Controller(QObject):
 
 
     def set_gcode(self):
-        print("Set gcode")
+        #print("Set gcode")
         if not self.gcode.is_loaded:
             return
         self.status = 'generated'
@@ -592,7 +595,7 @@ class Controller(QObject):
         self.status = 'generated'
 
     def check_rotation_helper(self, event):
-        print("check rotation")
+        #print("check rotation")
         id = self.get_id_under_cursor(event)
         if self.is_some_tool_under_cursor(id):
             self.view.update_scene()
@@ -756,7 +759,7 @@ class Controller(QObject):
         return printing_settings_tmp
 
     def update_mm_material_settings(self):
-        print("Update mm material settigns")
+        #print("Update mm material settigns")
         # get combobox materials
         soluble_material_tmp = []
 
@@ -958,7 +961,7 @@ class Controller(QObject):
         self.disable_generate_button()
         self.set_generate_button()
         self.set_progress_bar(0)
-        print("Cancel gcode loading end")
+        #print("Cancel gcode loading end")
 
 
     #TODO:Better way
@@ -1179,6 +1182,7 @@ class Controller(QObject):
         self.is_model_loaded = True
 
         self.scene.normalize_group_of_models(model_lst)
+        multiModel.update_min_max()
 
         if self.is_multimaterial():
             self.recalculate_wipe_tower()
@@ -1203,6 +1207,9 @@ class Controller(QObject):
 
     def import_project(self, path):
         project_file = ProjectFile(self.scene, path)
+
+        if self.is_multimaterial() and not self.is_single_material_mode():
+            self.recalculate_wipe_tower()
         self.update_scene()
 
         #self.view.update_scene()
@@ -1334,7 +1341,7 @@ class Controller(QObject):
         self.cursor_over_object = False
 
     def is_some_tool_under_cursor(self, object_id):
-        print("Is some tool under cursor")
+        #print("Is some tool under cursor")
         for tool in self.tools:
             if tool.id == object_id:
                 return True
@@ -1413,7 +1420,7 @@ class Controller(QObject):
 
 
     def recalculate_wipe_tower(self):
-        print("calculating wipe tower")
+        #print("calculating wipe tower")
         self.scene.update_wipe_tower()
 
 
@@ -1430,18 +1437,18 @@ class Controller(QObject):
             return False
 
     def is_object_already_selected(self, object_id):
-        print("is_object_already_selected")
+        #print("is_object_already_selected")
         for model in self.scene.models:
             #object founded
             if object_id == model.id:
-                print("Je model oznaceny: " + str(model.selected))
+                #print("Je model oznaceny: " + str(model.selected))
                 if model.selected:
                     #object is selected
-                    print("return True")
+                    #print("return True")
                     return True
                 else:
                     #object is not selected
-                    print("return False")
+                    #print("return False")
                     return False
         #No object with id in scene.models
         return None
@@ -1768,12 +1775,12 @@ class Controller(QObject):
             for model in self.scene.models:
                 if model.selected:
                     if model.is_multipart_model:
-                        pos = deepcopy(model.multipart_parent.pos)
-                        pos[2] = 0.
+                        #pos = deepcopy(model.multipart_parent.pos)
+                        #pos[2] = 0.
                         self.original_scale = deepcopy(model.multipart_parent.scale)
                     else:
-                        pos = deepcopy(model.pos)
-                        pos[2] = 0.
+                        #pos = deepcopy(model.pos)
+                        #pos[2] = 0.
                         self.original_scale = deepcopy(model.scale)
 
 
@@ -1859,15 +1866,17 @@ class Controller(QObject):
                             self.view.update_rotate_widgets(model.id)
                             self.scene_was_changed()
             elif self.tool == 'scale':
-                # print("scale function")
+                #print("scale function")
                 ray_start, ray_end = self.view.get_cursor_position(event)
                 # camera_pos, direction, _, _ = self.view.get_camera_direction(event)
                 for model in self.scene.models:
                     if model.selected:
                         if model.is_multipart_model:
                             pos = deepcopy(model.multipart_parent.pos)
+                            model_size_origin = deepcopy(model.multipart_parent.size_origin)
                         else:
                             pos = deepcopy(model.pos)
+                            model_size_origin = deepcopy(model.size_origin)
 
                         pos[2] = 0.
                         new_scale_point = numpy.array(sceneData.intersection_ray_plane(ray_start, ray_end))
@@ -1876,11 +1885,11 @@ class Controller(QObject):
                         l = numpy.linalg.norm(new_scale_vect)
                         l -= .5
 
-                        new_size = self.original_scale * model.size_origin
+                        new_size = self.original_scale * model_size_origin
                         new_size[2] = 0.
                         new_size *= .5
 
-                        origin_size = deepcopy(model.size_origin)
+                        origin_size = deepcopy(model_size_origin)
                         origin_size[2] = 0.
                         origin_size *= .5
 
@@ -1897,7 +1906,7 @@ class Controller(QObject):
 
                         new_scale = numpy.abs(new_scale)
                         model.set_scale_abs(new_scale[0], new_scale[1], new_scale[2])
-                        self.update_wipe_tower()
+
 
                         #self.last_l = l
 
@@ -1905,7 +1914,7 @@ class Controller(QObject):
                         self.scene_was_changed()
         #Move function
         elif self.settings['toolButtons']['supportButton']:
-            print("support function")
+            #print("support function")
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
@@ -1914,7 +1923,7 @@ class Controller(QObject):
         elif not self.tool_helper_press_event_flag \
                 and self.mouse_press_event_flag \
                 and self.cursor_over_object:
-            print("move function")
+            #print("move function")
             newRayStart, newRayEnd = self.view.get_cursor_position(event)
             res = sceneData.intersection_ray_plane(newRayStart, newRayEnd)
             if res is not None:
@@ -1997,13 +2006,22 @@ class Controller(QObject):
             self.old_angle = 0.0
             for model in self.scene.models:
                 if model.selected:
-                    model.update_min_max()
-                    if not self.tool == 'scale':
-                        model.recalc_bounding_sphere()
-                    models_list.append(model)
+                    if model.is_multipart_model:
+                        model.multipart_parent.update_min_max()
+                        if not self.tool == 'scale':
+                            model.multipart_parent.recalc_bounding_sphere()
+                        #TODO: add history for operations
+                    else:
+                        model.update_min_max()
+                        if not self.tool == 'scale':
+                            model.recalc_bounding_sphere()
+                        models_list.append(model)
             if models_list and self.mouse_move_event_flag:
                 self.scene.save_change(self.scene.models)
                 #self.scene.save_change(models_list)
+
+            self.update_wipe_tower()
+
         self.tool = ''
         self.res_old = numpy.array([0.,0.,0.])
 
