@@ -17,7 +17,7 @@ from PyQt4.QtCore import QThread
 from PyQt4.QtCore import pyqtSignal
 
 
-DEBUG = True
+DEBUG = False
 
 class GCode(object):
 
