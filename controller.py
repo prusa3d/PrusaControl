@@ -353,28 +353,29 @@ class Controller(QObject):
             extruders_set = list(extruders_set_tmp)
 
         if 1 in extruders_set:
-            self.view.extruder1_l.setStyleSheet("font-weight: bold;")
+            #self.view.extruder1_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder1_l.setStyleSheet("QLabel { font-weight: bold;}")
             self.view.extruder1_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder1_l.setStyleSheet("font-weight: normal;")
             self.view.extruder1_l.setToolTip("")
 
         if 2 in extruders_set:
-            self.view.extruder2_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder2_l.setStyleSheet("QLabel { font-weight: bold;}")
             self.view.extruder2_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder2_l.setStyleSheet("font-weight: normal;")
             self.view.extruder2_l.setToolTip("")
 
         if 3 in extruders_set:
-            self.view.extruder3_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder3_l.setStyleSheet("QLabel { font-weight: bold;}")
             self.view.extruder3_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder3_l.setStyleSheet("font-weight: normal;")
             self.view.extruder3_l.setToolTip("")
 
         if 4 in extruders_set:
-            self.view.extruder4_l.setStyleSheet("font-weight: bold;")
+            self.view.extruder4_l.setStyleSheet("QLabel { font-weight: bold;}")
             self.view.extruder4_l.setToolTip(self.view.used_extruder_tooltip)
         else:
             self.view.extruder4_l.setStyleSheet("font-weight: normal;")
@@ -1026,10 +1027,9 @@ class Controller(QObject):
 
     def change_of_wipe_tower_settings(self, value):
         #print("change of wipe tower settings: " +str(value))
-        # value draft 0 - small wipe tower 5
+        # value reduce 0 - small wipe tower 5
         # value normal 1 - normal wipe tower 15
-        # value normal 2 - normal wipe tower 15
-        # value Soluble supports 3 - normal wipe tower 25
+        # value increase/soluble 2 - bigger wipe tower 20
 
         if value == 0:
             self.scene.wipe_tower_size_y = 7.5
@@ -1037,8 +1037,7 @@ class Controller(QObject):
             self.scene.wipe_tower_size_y = 15.
         elif value == 2:
             self.scene.wipe_tower_size_y = 20.
-        elif value == 3:
-            self.scene.wipe_tower_size_y = 25.
+
 
         self.recalculate_wipe_tower()
 
@@ -1261,7 +1260,7 @@ class Controller(QObject):
                 self.view.set_multimaterial_gui_on(True)
                 #self.view.update_gui_for_material(1)
                 self.update_mm_material_settings()
-                self.add_wipe_tower()
+                #self.add_wipe_tower()
                 self.update_wipe_tower()
             else:
                 self.view.set_multimaterial_gui_off(True)
@@ -2156,6 +2155,7 @@ class Controller(QObject):
         self.scene.clear_scene()
         self.update_scene(True)
         self.is_model_loaded = False
+        self.scene.is_wipe_tower_position_manual = False
         if self.is_multimaterial():
             self.add_wipe_tower()
         #self.view.update_scene(True)

@@ -1366,7 +1366,7 @@ class PrusaControlView(QMainWindow):
         self.show()
 
     def get_list_of_wipe_tower_labels(self):
-        return [self.tr("Reduced"), self.tr("Normal"), self.tr("Increased"), self.tr("Soluble Supports")]
+        return [self.tr("Reduced"), self.tr("Normal"), self.tr("Increased/Soluble")]
 
     def change_of_wipe_tower_settings(self):
         index = self.wipe_tower_c.currentIndex()
@@ -1525,8 +1525,8 @@ class PrusaControlView(QMainWindow):
 
     def set_special_support_settings(self):
         item_lst = [[self.tr("None"), self.tr("None")],
-                    [self.tr("Build plate only"), self.tr("Build plate only")],
-                    [self.tr("Everywhere"), self.tr("Everywhere")],
+                    [self.tr("Build plate only, soluble"), self.tr("Build plate only, soluble")],
+                    [self.tr("Everywhere, soluble"), self.tr("Everywhere, soluble")],
                     [self.tr("Build plate only, soluble interface"), self.tr("Build plate only with soluble interface")],
                     [self.tr("Everywhere, soluble interface"), self.tr("Everywhere with soluble interface")]]
 
@@ -2253,9 +2253,14 @@ class PrusaControlView(QMainWindow):
     def set_scale_on_object(self, widget, active_axis, object_id, x, y, z, place_on_zero):
         if widget.hasFocus():
             self.controller.scene_was_changed()
-            model = self.controller.get_object_by_id(object_id)
-            if not model:
+            model_tmp = self.controller.get_object_by_id(object_id)
+            if not model_tmp:
                 return
+            if model_tmp.is_multipart_model:
+                model = model_tmp.multipart_parent
+            else:
+                model = model_tmp
+
             if self.scale_units == '%':
                 if self.lock_scale_axis:
 
@@ -2300,7 +2305,7 @@ class PrusaControlView(QMainWindow):
                     y_recalc = y
                     z_recalc = z
 
-                model.set_scale_abs(x_recalc * .01, y_recalc * .01, z_recalc * .01)
+                model_tmp.set_scale_abs(x_recalc * .01, y_recalc * .01, z_recalc * .01)
 
             else:
                 #mm
@@ -2358,9 +2363,9 @@ class PrusaControlView(QMainWindow):
                     z_recalc *= .1
 
                     #print("Vystupni parametry pro mm: %s %s %s" % (str(x_recalc), str(y_recalc), str(z_recalc)))
-                    model.set_scale_abs(x_recalc, y_recalc, z_recalc)
+                    model_tmp.set_scale_abs(x_recalc, y_recalc, z_recalc)
                 else:
-                    model.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
+                    model_tmp.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
 
             self.controller.update_wipe_tower()
         #self.update_object_settings(self.object_id)
