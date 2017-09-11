@@ -571,12 +571,17 @@ class AppScene(object):
             m.selected = False
 
     def paste_selected_objects(self):
+        copied_mm_models = []
         self.place_offset += np.array([0.5, 0.5, 0.])
         self.unselect_all_models()
         for i in self.copied_models:
             if i.is_wipe_tower:
                 continue
             if i.is_multipart_model:
+                if i.multipart_parent.group_id in copied_mm_models:
+                    continue
+                else:
+                    copied_mm_models.append(i.multipart_parent.group_id)
                 models_lst = i.multipart_parent.models
                 new_models_lst = []
                 for model in models_lst:
