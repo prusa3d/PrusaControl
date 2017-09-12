@@ -1559,6 +1559,7 @@ class PrusaControlView(QMainWindow):
 
         if apply_on_single_mode_switch:
             self.single_material_mode_checkbox.setVisible(True)
+            self.single_material_mode_checkbox.setChecked(False)
 
         self.materials_settings_l.setVisible(True)
 

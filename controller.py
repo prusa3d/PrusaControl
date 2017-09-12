@@ -194,6 +194,7 @@ class Controller(QObject):
         printer_settings = self.printing_parameters.get_printer_parameters(self.settings['printer'])
         self.printer_number_of_materials = printer_settings['multimaterial']
         if self.printer_number_of_materials > 1:
+            self.single_material_mode = False
             self.view.set_multimaterial_gui_on(True)
         else:
             self.view.set_multimaterial_gui_off(True)
