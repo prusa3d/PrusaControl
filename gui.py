@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PIL.ImageEnhance import Color
-from PyQt4.QtGui import QColor
+from PyQt4.QtGui import QColor, QScrollArea
 from PyQt4.QtGui import QColorDialog
 from PyQt4.QtGui import QStandardItem
 from PyQt4.uic.properties import QtCore
@@ -23,7 +23,9 @@ from PyQt4.QtCore import Qt, SIGNAL, QSettings, QFile, QIODevice, QVariant, QEve
 from PyQt4.QtGui import QFont, QFontDatabase, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QMainWindow, \
 QMessageBox, QProgressBar, QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, \
 QPainter, QPainterPath, QPen, QSlider, QStyleOptionSlider, QDialog, QDialogButtonBox, \
-QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog, QStyleFactory
+QComboBox, QCheckBox, QApplication, QSpinBox, QDoubleSpinBox, QFileDialog, QStyleFactory, \
+QScrollArea
+
 from PyQt4.QtOpenGL import QGLWidget
 
 import projectFile
@@ -543,6 +545,7 @@ class SettingsDialog(QDialog):
             self.printer_combo.setStyle(QStyleFactory.create('Windows'))
         self.printer_combo.addItems(self.controller.get_printers_labels_ls(only_visible=True))
         self.printer_combo.setCurrentIndex(self.controller.get_printers_names_ls(only_visible=True).index(self.controller.settings['printer']))
+        self.printer_combo.currentIndexChanged.connect(self.update_printer_variations)
 
         self.printer_type_label = QLabel(self.tr("Printer variation"))
         self.printer_type_combo = QComboBox()
@@ -589,6 +592,13 @@ class SettingsDialog(QDialog):
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
+    def update_printer_variations(self):
+        self.printer_type_combo.clear()
+        self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.get_printers_names_ls(only_visible=True)[self.printer_combo.currentIndex()]))
+        self.printer_type_combo.setCurrentIndex(0)
+
+
+
     @staticmethod
     def get_settings_data(controller, editable=True, parent = None):
         data = deepcopy(controller.settings)
@@ -596,7 +606,7 @@ class SettingsDialog(QDialog):
         dialog.setWindowTitle("Settings")
         result = dialog.exec_()
         data['language'] = list(controller.enumeration['language'])[dialog.language_combo.currentIndex()]
-        data['printer'] = controller.get_printers_names_ls()[dialog.printer_combo.currentIndex()]
+        data['printer'] = controller.get_printers_names_ls(only_visible=True)[dialog.printer_combo.currentIndex()]
         data['printer_type'] = controller.get_printer_variations_names_ls(data['printer'])[dialog.printer_type_combo.currentIndex()]
 
         #controller.set_printer(data['printer'])
@@ -1054,7 +1064,10 @@ class PrusaControlView(QMainWindow):
         #self.right_panel_layout.setMargin(0)
         #self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
 
-        #QtGui.QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
+        #self.scroll_area = QScrollArea()
+        #self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
+        #self.scroll_area.setWidget(self.right_panel)
+
         #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
 
         self.printer_settings_l = QLabel()

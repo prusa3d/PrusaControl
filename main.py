@@ -74,6 +74,7 @@ class EventLoopRunner(QObject):
         self.version_label = QLabel(self.version, self.splash)
         self.version_label.setObjectName("version_label")
         self.version_label.move(620, 647)
+        self.version_label.setFixedWidth(100)
 
         self.splash.show()
 

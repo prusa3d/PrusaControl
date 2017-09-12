@@ -34,8 +34,9 @@ def timing(f):
 
 
 class PrintingParameters(object):
-    def __init__(self, app_config):
+    def __init__(self, app_config, controller= None):
         self.application_parameters = app_config
+        self.controller = controller
 
         self.all_printers_parameters = {}
         self.all_materials_quality_parameters = {}
@@ -48,7 +49,8 @@ class PrintingParameters(object):
         self.all_printers_parameters = self.read_printers_parameters(self.application_parameters.printers_parameters_file)['printers']
 
         #apply default printer type settings
-        #print("Printer type before: " + str(self.all_printers_parameters['default']['printer_type']))
+        #print("Printer type before:")
+        #pprint(self.all_printers_parameters['default']['printer_type'])
         out = dict(self.apply_default_parameters(self.all_printers_parameters['default']['printer_type']))
         self.all_printers_parameters['default']['printer_type'] = out
         #apply default printer settings
@@ -79,12 +81,13 @@ class PrintingParameters(object):
 
 
     def get_printers_names(self, only_visible=False):
-        if only_visible:
-            unsorted =  [[printer, self.printers_parameters[printer]['sort']] for printer in self.printers_parameters if self.printers_parameters[printer]['visible'] == 1]
+        printers = self.printers_parameters
+        if only_visible and 'visible' in printers[list(printers.keys())[0]]:
+            unsorted =  [[printer, printers[printer]['sort']] for printer in printers if printers[printer]['visible'] == 1]
             sort_list = sorted(unsorted, key=lambda mem: mem[1])
             return [a[0] for a in sort_list]
         else:
-            unsorted = [[printer, self.printers_parameters[printer]['sort']] for printer in self.printers_parameters]
+            unsorted = [[printer, printers[printer]['sort']] for printer in printers]
             sort_list = sorted(unsorted, key=lambda mem: mem[1])
             return [a[0] for a in sort_list]
 
@@ -191,8 +194,30 @@ class PrintingParameters(object):
             settings_lst = []
             for mat in material_names:
                 settings_lst.append(self.get_actual_settings_for_one_material(printer_name, printer_variation, mat, quality_settings))
-            #print("Printing settings: %s %s %s %s" % (str(printer_name), str(printer_variation), str(material_names), str(quality_settings)))
-            return self.connect_different_settings(slicer.multimaterial_spec_parameters, settings_lst)
+
+            multimaterial_settings =  self.connect_different_settings(slicer.multimaterial_spec_parameters, settings_lst)
+            #print("Material settings:")
+            #pprint(multimaterial_settings)
+
+            if self.controller:
+                if self.controller.soluble_extruder > -1:
+                    # detect if soluble material is used
+                    # if yes use it for update multimaterial_settings
+                    #soluble_material_settings = self.controller.get_printing_settings_for_material_in_extruder(self.controller.soluble_extruder)
+                    soluble_material_settings = self.get_actual_settings_for_one_material(printer_name, printer_variation, material_names[self.controller.soluble_extruder-1], quality_settings)
+                    #print("Soluble material settings:")
+                    #pprint(soluble_material_settings)
+
+                    #soluble_material_settings_shorted = {key:soluble_material_settings[key] for key in slicer.support_parameters if key in soluble_material_settings}
+                    soluble_material_settings_shorted = {key:soluble_material_settings[key] for key in slicer.support_parameters}
+                    multimaterial_settings_change = deepcopy(multimaterial_settings)
+                    multimaterial_settings_change.update(soluble_material_settings_shorted)
+                    return multimaterial_settings_change
+                else:
+                    #normal materials
+                    return multimaterial_settings
+
+            return multimaterial_settings
         else:
             #print("Single material version")
             #print("Printing settings: %s %s %s %s" % (str(printer_name), str(printer_variation), str(material_names[0]), str(quality_settings)))
@@ -210,7 +235,6 @@ class PrintingParameters(object):
             out[key] = [mat[key] for mat in lst if key in mat]
 
         return out
-
 
 
     def read_printers_parameters(self, filename):

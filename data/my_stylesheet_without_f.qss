@@ -647,6 +647,15 @@ QCheckBox {
     spacing: 5px;
 }
 
+
+QCheckBox#single_material_mode_checkbox{
+    color: white;
+}
+
+QCheckBox#single_material_mode_checkbox:disabled{
+    color: rgb(132, 132, 132);
+}
+
 QCheckBox::indicator {
     width: 42px;
     height: 17px;
@@ -660,8 +669,15 @@ QCheckBox#brimCheckBox::indicator:unchecked {
     image: url(base_dirdata/img/gui/checkbox_dark_off.png);
 }
 
+QCheckBox#single_material_mode_checkbox::indicator:unchecked {
+    image: url(base_dirdata/img/gui/checkbox_dark_off.png);
+}
 
 QCheckBox#brimCheckBox::indicator:unchecked:hover {
+    image: url(base_dirdata/img/gui/checkbox_dark_off_hover.png);
+}
+
+QCheckBox#single_material_mode_checkbox::indicator:unchecked:hover {
     image: url(base_dirdata/img/gui/checkbox_dark_off_hover.png);
 }
 
@@ -695,6 +711,11 @@ QCheckBox#brimCheckBox::indicator:unchecked:disabled {
     image: url(base_dirdata/img/gui/checkbox_dark_off_disabled.png);
 }
 
+
+QCheckBox#single_material_mode_checkbox::indicator:unchecked:disabled {
+    image: url(base_dirdata/img/gui/checkbox_dark_off_disabled.png);
+    color: rgb(132, 132, 132);
+}
 
 QCheckBox#lock_axis_checkbox{
     spacing: 5px;

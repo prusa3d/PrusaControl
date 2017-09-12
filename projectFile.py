@@ -185,7 +185,6 @@ class Version_1_0(VersionAbstract):
             ET.SubElement(root, "zero").text = str(zero.tolist())
             models_tag = ET.SubElement(root, "models")
 
-            #TODO:
             models_from_scene = [m for m in scene.get_models(with_wipe_tower=False)]
             single_part_models = [m for m in models_from_scene if not m.is_multipart_model]
             multipart_models = [m for m in models_from_scene if m.is_multipart_model]

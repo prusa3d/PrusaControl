@@ -64,7 +64,7 @@ class Controller(QObject):
 
         self.app_config = AppParameters(self, local_path)
 
-        self.printing_parameters = PrintingParameters(self.app_config)
+        self.printing_parameters = PrintingParameters(self.app_config, self)
         progress_bar(30)
 
         self.analyzer = Analyzer(self)
@@ -656,7 +656,7 @@ class Controller(QObject):
 
     def get_printers_labels_ls(self, only_visible=False):
         printers = self.printing_parameters.get_printers_parameters()
-        if only_visible:
+        if only_visible and 'visible' in printers[list(printers.keys())[0]]:
             unsorted = [[printers[printer]["label"], [printers[printer]['sort']]] for printer in printers if printers[printer]['visible'] == 1]
             sort_lst = sorted(unsorted, key=lambda mem: mem[1])
             return [a[0] for a in sort_lst]
@@ -740,6 +740,19 @@ class Controller(QObject):
         list = sorted(list, key=lambda a: a[1])
         return [a[0] for a in list]
         #return [i for i in self.printing_parameters.get_materials_quality_for_printer(self.get_actual_printer(), material)['quality']]
+
+    def get_printing_settings_for_material_in_extruder(self, extruder_number):
+        if extruder_number in [1, 2, 3, 4]:
+            if extruder_number == 1:
+                return self.get_printing_settings_for_material_by_label(self.view.extruder1_c.currentText())
+            elif extruder_number == 2:
+                return self.get_printing_settings_for_material_by_label(self.view.extruder2_c.currentText())
+            elif extruder_number == 3:
+                return self.get_printing_settings_for_material_by_label(self.view.extruder3_c.currentText())
+            elif extruder_number == 4:
+                return self.get_printing_settings_for_material_by_label(self.view.extruder4_c.currentText())
+        else:
+            return None
 
 
     def get_printing_settings_for_material_by_name(self, material_name):

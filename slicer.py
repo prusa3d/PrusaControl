@@ -51,6 +51,22 @@ class Slic3rEngineRunner(QObject):
     send_message = pyqtSignal(str)
     send_gcodedata = pyqtSignal(GCode)
 
+    support_parameters = ["support_material_angle",
+                            "support_material_buildplate_only",
+                            "support_material_contact_distance",
+                            "support_material_enforce_layers",
+                            "support_material_extruder",
+                            "support_material_extrusion_width",
+                            "support_material_interface_extruder",
+                            "support_material_interface_layers",
+                            "support_material_interface_spacing",
+                            "support_material_interface_speed",
+                            "support_material_pattern",
+                            "support_material_spacing",
+                            "support_material_threshold",
+                            "support_material_with_sheath",
+                            "support_material_xy_spacing"]
+
     multimaterial_spec_parameters = ["bridge_fan_speed",
                         "cooling",
                         "deretract_speed",
@@ -204,7 +220,7 @@ class Slic3rEngineRunner(QObject):
 
         #material_printing_data = self.controller.get_printing_parameters_for_material_quality(actual_printing_data['material'], actual_printing_data['quality'])
         material_printing_data = self.controller.printing_parameters.get_actual_settings(self.controller.get_actual_printer(), self.controller.settings['printer_type'], actual_printing_data['material'], actual_printing_data['quality'], self)
-        #print("All settings: " + str(material_printing_data))
+        print("All settings: " + str(material_printing_data))
         new_parameters = self.translate_dictionary(material_printing_data, actual_printing_data)
         new_config = configparser.RawConfigParser()
         new_config.add_section('settings')
