@@ -1586,6 +1586,8 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(False)
         self.materialLabel.setVisible(False)
 
+        self.color_change_l.setVisible(False)
+
 
 
     def set_multimaterial_gui_off(self, apply_on_single_mode_switch=False):
@@ -1621,6 +1623,8 @@ class PrusaControlView(QMainWindow):
 
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
+
+        self.color_change_l.setVisible(True)
 
         self.set_normal_support_settings()
 
