@@ -185,32 +185,49 @@ class Version_1_0(VersionAbstract):
             ET.SubElement(root, "zero").text = str(zero.tolist())
             models_tag = ET.SubElement(root, "models")
 
+            #TODO:
+            models_from_scene = [m for m in scene.get_models(with_wipe_tower=False)]
+            single_part_models = [m for m in models_from_scene if not m.is_multipart_model]
+            multipart_models = [m for m in models_from_scene if m.is_multipart_model]
 
-            for model in scene.models:
-                if model.isVisible and not model.is_wipe_tower:
+            multipart_groups = {}
+            for m in multipart_models:
+                if m.multipart_parent.group_id in multipart_groups:
+                    multipart_groups[m.multipart_parent.group_id].append(m)
+                else:
+                    multipart_groups[m.multipart_parent.group_id] = []
+                    multipart_groups[m.multipart_parent.group_id].append(m)
+
+            multipart_groups_sorted = []
+            for g in multipart_groups:
+                multipart_groups_sorted = multipart_groups_sorted + sorted(multipart_groups[g], key=lambda model: model.filename)
+
+            models_from_scene_sorted = single_part_models + multipart_groups_sorted
+
+            for model in models_from_scene_sorted:
+                if model.is_multipart_model:
+                    model_tmp = model.multipart_parent
+                    #pos = deepcopy(model.pos)
+                    pos = deepcopy(model_tmp.pos)
+                    pos *= 10.
+                    model_element = ET.SubElement(models_tag, "model", name=model.filename)
+                    ET.SubElement(model_element, "extruder").text = str(model.extruder)
                     if model.is_multipart_model:
-                        model_tmp = model.multipart_parent
-                        #pos = deepcopy(model.pos)
-                        pos = deepcopy(model_tmp.pos)
-                        pos *= 10.
-                        model_element = ET.SubElement(models_tag, "model", name=model.filename)
-                        ET.SubElement(model_element, "extruder").text = str(model.extruder)
-                        if model.is_multipart_model:
-                            ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
-                        ET.SubElement(model_element, "normalization").text = str(deepcopy(model.normalization_flag))
-                        ET.SubElement(model_element, "position").text = str(pos.tolist())
-                        ET.SubElement(model_element, "rotation").text = str(model_tmp.rot.tolist())
-                        ET.SubElement(model_element, "scale").text = str(model_tmp.scale.tolist())
-                    else:
-                        pos = model.pos*10.
-                        model_element = ET.SubElement(models_tag, "model", name=model.filename)
-                        ET.SubElement(model_element, "extruder").text = str(model.extruder)
-                        if model.is_multipart_model:
-                            ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
-                        ET.SubElement(model_element, "normalization").text = str(model.normalization_flag)
-                        ET.SubElement(model_element, "position").text = str(pos.tolist())
-                        ET.SubElement(model_element, "rotation").text = str(model.rot.tolist())
-                        ET.SubElement(model_element, "scale").text = str(model.scale.tolist())
+                        ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
+                    ET.SubElement(model_element, "normalization").text = str(deepcopy(model.normalization_flag))
+                    ET.SubElement(model_element, "position").text = str(pos.tolist())
+                    ET.SubElement(model_element, "rotation").text = str(model_tmp.rot.tolist())
+                    ET.SubElement(model_element, "scale").text = str(model_tmp.scale.tolist())
+                else:
+                    pos = model.pos*10.
+                    model_element = ET.SubElement(models_tag, "model", name=model.filename)
+                    ET.SubElement(model_element, "extruder").text = str(model.extruder)
+                    if model.is_multipart_model:
+                        ET.SubElement(model_element, "group").text = str(model.multipart_parent.group_id)
+                    ET.SubElement(model_element, "normalization").text = str(model.normalization_flag)
+                    ET.SubElement(model_element, "position").text = str(pos.tolist())
+                    ET.SubElement(model_element, "rotation").text = str(model.rot.tolist())
+                    ET.SubElement(model_element, "scale").text = str(model.scale.tolist())
 
 
             #save xml file to new created zip file
