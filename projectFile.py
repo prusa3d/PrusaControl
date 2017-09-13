@@ -232,8 +232,8 @@ class Version_1_0(VersionAbstract):
 
 
             #save xml file to new created zip file
-            newXml = ET.tostring(root)
-            nice_formated_xml = minidom.parseString(newXml).toprettyxml(indent="   ")
+            newXml = ET.tostring(root, encoding="utf-8")
+            nice_formated_xml = minidom.parseString(newXml).toprettyxml(indent="   ", encoding="utf-8")
             zip_fh.writestr(self.xmlFilename, nice_formated_xml)
 
             #write stl files to zip file
