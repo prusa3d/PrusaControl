@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US">
+<TS version="2.0" language="de_DE">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -25,105 +25,120 @@
 <context>
     <name>Controller</name>
     <message>
-        <location filename="controller.py" line="1832"/>
+        <location filename="controller.py" line="2282"/>
         <source>Generating perimeters</source>
         <translation>Generiere Perimeter</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1833"/>
+        <location filename="controller.py" line="2283"/>
         <source>Processing triangulated mesh</source>
         <translation>Verarbeite trianguliertes Gitternetz</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1834"/>
+        <location filename="controller.py" line="2284"/>
         <source>Infilling layers</source>
         <translation>Generiere Innenraum-Füllung</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1835"/>
+        <location filename="controller.py" line="2285"/>
         <source>Preparing infill</source>
         <translation>Bereite Innenraum-Füllung vor</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1836"/>
+        <location filename="controller.py" line="2286"/>
         <source>Generating skirt</source>
         <translation>Generiere Umrandungsschürze</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1837"/>
+        <location filename="controller.py" line="2287"/>
         <source>Exporting G-code to</source>
         <translation>Exportiere GCode nach</translation>
     </message>
     <message>
-        <location filename="controller.py" line="1838"/>
+        <location filename="controller.py" line="2288"/>
         <source>Done. Process took</source>
         <translation>Fertig. Prozess dauerte</translation>
     </message>
     <message>
-        <location filename="controller.py" line="241"/>
+        <location filename="controller.py" line="337"/>
         <source>Object </source>
         <translation>Objekt</translation>
     </message>
     <message>
-        <location filename="controller.py" line="242"/>
+        <location filename="controller.py" line="338"/>
         <source> is out of printable area!</source>
         <translation> ist außerhalb des druckbaren Bereiches!</translation>
     </message>
     <message>
-        <location filename="controller.py" line="243"/>
+        <location filename="controller.py" line="339"/>
         <source>Scene is hard to print without support.</source>
         <translation>Szene ist ohne Stützstrukturen schwierig zu drucken.</translation>
     </message>
     <message>
-        <location filename="controller.py" line="244"/>
+        <location filename="controller.py" line="340"/>
         <source>For better adhesion turn Brim parametr on.</source>
         <translation>Für bessere Haftung aktiviere Krempe.</translation>
     </message>
     <message>
-        <location filename="controller.py" line="620"/>
+        <location filename="controller.py" line="899"/>
         <source>Hollow/Shell - </source>
         <translation>Hohl/Hülle - </translation>
     </message>
     <message>
-        <location filename="controller.py" line="621"/>
+        <location filename="controller.py" line="900"/>
         <source>Sparse - </source>
         <translation>Leichter - </translation>
     </message>
     <message>
-        <location filename="controller.py" line="622"/>
+        <location filename="controller.py" line="901"/>
         <source>Light - </source>
         <translation>Leicht - </translation>
     </message>
     <message>
-        <location filename="controller.py" line="623"/>
+        <location filename="controller.py" line="902"/>
         <source>Standard - </source>
         <translation>Standard - </translation>
     </message>
     <message>
-        <location filename="controller.py" line="624"/>
+        <location filename="controller.py" line="903"/>
         <source>Dense - </source>
         <translation>Dicht - </translation>
     </message>
     <message>
-        <location filename="controller.py" line="625"/>
+        <location filename="controller.py" line="904"/>
         <source>Denser - </source>
         <translation>Dichter - </translation>
     </message>
     <message>
-        <location filename="controller.py" line="626"/>
+        <location filename="controller.py" line="905"/>
         <source>Solid - </source>
         <translation>Festkörper - </translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="341"/>
+        <source>Incompatible materials, its possible the print will fail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="342"/>
+        <source>Collision of wipe tower and object.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="controller.py" line="1191"/>
+        <source>Loading multi part model</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>FirmwareUpdateDialog</name>
     <message>
-        <location filename="gui.py" line="597"/>
+        <location filename="gui.py" line="636"/>
         <source>Open file</source>
         <translation>Öffne Datei</translation>
     </message>
     <message>
-        <location filename="gui.py" line="599"/>
+        <location filename="gui.py" line="638"/>
         <source>Update</source>
         <translation>Aktualisiere</translation>
     </message>
@@ -131,32 +146,32 @@
 <context>
     <name>GLWidget</name>
     <message>
-        <location filename="sceneRender.py" line="276"/>
+        <location filename="sceneRender.py" line="287"/>
         <source>Scale tool</source>
         <translation>Skalierungs Werkzeug</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="284"/>
+        <location filename="sceneRender.py" line="295"/>
         <source>Place on face tool</source>
         <translation>Place on face tool</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="291"/>
+        <location filename="sceneRender.py" line="302"/>
         <source>Rotate tool</source>
         <translation>Rotations Werkzeug</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="297"/>
+        <location filename="sceneRender.py" line="308"/>
         <source>Arrange tool</source>
         <translation>Automatisch ausrichten</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="303"/>
+        <location filename="sceneRender.py" line="314"/>
         <source>Multiplication tool</source>
         <translation>Multiplikations Werkzeug</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="320"/>
+        <location filename="sceneRender.py" line="331"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
@@ -176,12 +191,12 @@
         <translation>Filament:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="310"/>
+        <location filename="sceneRender.py" line="321"/>
         <source>Support tool</source>
         <translation>Stützstruktur Werkzeug</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="326"/>
+        <location filename="sceneRender.py" line="337"/>
         <source>Redo</source>
         <translation>Wiederherstellen</translation>
     </message>
@@ -191,12 +206,12 @@
         <translation>Geschätzte Zeit:</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="717"/>
+        <location filename="sceneRender.py" line="708"/>
         <source>WARNING</source>
         <translation>WARNUNG</translation>
     </message>
     <message>
-        <location filename="sceneRender.py" line="793"/>
+        <location filename="sceneRender.py" line="790"/>
         <source>PRINT INFO</source>
         <translation>DRUCK INFORMATIONEN</translation>
     </message>
@@ -209,12 +224,12 @@
 <context>
     <name>Gcode_slider</name>
     <message>
-        <location filename="gui.py" line="77"/>
+        <location filename="gui.py" line="90"/>
         <source>Add color change point</source>
         <translation>Füge Farbwechselpunkt ein</translation>
     </message>
     <message>
-        <location filename="gui.py" line="118"/>
+        <location filename="gui.py" line="133"/>
         <source>Delete color change point</source>
         <translation>Entferne Farbwechselpunkt</translation>
     </message>
@@ -235,108 +250,108 @@
 <context>
     <name>PrusaControlView</name>
     <message>
-        <location filename="gui.py" line="1386"/>
+        <location filename="gui.py" line="1643"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1387"/>
+        <location filename="gui.py" line="1644"/>
         <source>Import model file</source>
         <translation>Importiere Objekt Datei</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1392"/>
+        <location filename="gui.py" line="1648"/>
         <source>Open project</source>
         <translation>Öffne Projekt</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1393"/>
+        <location filename="gui.py" line="1649"/>
         <source>Save project</source>
         <translation>Speichere Projekt</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1395"/>
+        <location filename="gui.py" line="1651"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1397"/>
+        <location filename="gui.py" line="1653"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1420"/>
+        <location filename="gui.py" line="1676"/>
         <source>&amp;Settings</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1421"/>
+        <location filename="gui.py" line="1677"/>
         <source>PrusaControl settings</source>
         <translation>PrusaControl Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1425"/>
+        <location filename="gui.py" line="1681"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1427"/>
+        <location filename="gui.py" line="1683"/>
         <source>Prusa Online</source>
         <translation>Prusa Shop</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1429"/>
+        <location filename="gui.py" line="1685"/>
         <source>Send feedback</source>
         <translation>Feedback einreichen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1431"/>
+        <location filename="gui.py" line="1687"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1262"/>
+        <location filename="gui.py" line="1465"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1264"/>
+        <location filename="gui.py" line="1467"/>
         <source>Position</source>
         <translation>Position</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1265"/>
+        <location filename="gui.py" line="1468"/>
         <source>Rotation</source>
         <translation>Drehung</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1266"/>
+        <location filename="gui.py" line="1469"/>
         <source>Scale</source>
         <translation>Skalierung</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1268"/>
+        <location filename="gui.py" line="1471"/>
         <source>In what units you want to scale?</source>
         <translation>In welcher Einheit möchtest du skalieren?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1271"/>
+        <location filename="gui.py" line="1474"/>
         <source>Lock of scaling axis</source>
         <translation>Skalierungsachse sperren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1274"/>
+        <location filename="gui.py" line="1477"/>
         <source>Automatic placing of models
  on printing bed in Z axis</source>
         <translation>Automatische Platzierung von Objekten auf der Druckfläche in Z Achse</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1276"/>
+        <location filename="gui.py" line="1479"/>
         <source>Units</source>
         <translation>Einheiten</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1270"/>
+        <location filename="gui.py" line="1473"/>
         <source>Lock axes</source>
         <translation>Achsen sperren</translation>
     </message>
@@ -346,97 +361,97 @@
         <translation type="obsolete">Auf Bett platzieren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1278"/>
+        <location filename="gui.py" line="1481"/>
         <source>Advance Settings</source>
         <translation>Erweiterte Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1279"/>
+        <location filename="gui.py" line="1482"/>
         <source>Basic Settings</source>
         <translation>Einfache Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1282"/>
+        <location filename="gui.py" line="1485"/>
         <source>Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1284"/>
+        <location filename="gui.py" line="1487"/>
         <source>Printer settings</source>
         <translation>Drucker Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1286"/>
+        <location filename="gui.py" line="1489"/>
         <source>Material</source>
         <translation>Material</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1287"/>
+        <location filename="gui.py" line="1490"/>
         <source>Select material for printing</source>
         <translation>Wähle Material für den Druck.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1291"/>
+        <location filename="gui.py" line="1495"/>
         <source>Quality</source>
         <translation>Qualität</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1292"/>
+        <location filename="gui.py" line="1496"/>
         <source>Select quality for printing</source>
         <translation>Wähle Qualität für den Druck, bessere Qualität bedeutet längere Druckzeit.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="2335"/>
+        <location filename="gui.py" line="2837"/>
         <source>Infill</source>
         <translation>Innenraum-Füllung</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1297"/>
+        <location filename="gui.py" line="1501"/>
         <source>Select how much space inside of model have to be filled</source>
         <translation>Wähle wie viel Platz innerhalb des Objekts gefüllt werden soll</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1301"/>
+        <location filename="gui.py" line="1505"/>
         <source>Support</source>
         <translation>Stützstrukturen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1304"/>
+        <location filename="gui.py" line="1562"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1304"/>
+        <location filename="gui.py" line="1562"/>
         <source>Build plate only</source>
         <translation>Nur vom Druckbett ausgehend</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1304"/>
+        <location filename="gui.py" line="1562"/>
         <source>Everywhere</source>
         <translation>Überall</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1302"/>
+        <location filename="gui.py" line="1506"/>
         <source>Select what kind of supports do you need, if any</source>
         <translation>Wähle welche Art von Stützstrukturen du brauchst, falls nötig</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1309"/>
+        <location filename="gui.py" line="1513"/>
         <source>Brim</source>
         <translation>Krempe</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1308"/>
+        <location filename="gui.py" line="1512"/>
         <source>Do you need better adhesive of model and printing bed?</source>
         <translation>Benötigst du bessere Haftung zwischen Objekt und Druckbett?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1319"/>
+        <location filename="gui.py" line="1532"/>
         <source>Object settings</source>
         <translation>Objekt-Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1320"/>
+        <location filename="gui.py" line="1533"/>
         <source>Object advance settings</source>
         <translation>Erweiterte Objekt-Einstellungen</translation>
     </message>
@@ -446,12 +461,12 @@
         <translation type="obsolete">Vorschau</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1612"/>
+        <location filename="gui.py" line="1888"/>
         <source>Generate</source>
         <translation>Generieren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1613"/>
+        <location filename="gui.py" line="1889"/>
         <source>Generate scene with actual options to gcode file</source>
         <translation>Generiere Szene mit aktuellen Einstellungen als GCode Datei</translation>
     </message>
@@ -461,82 +476,82 @@
         <translation type="obsolete">PrusaControl</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1600"/>
+        <location filename="gui.py" line="1876"/>
         <source>Save G-Code</source>
         <translation>Speichere G-Code</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1601"/>
+        <location filename="gui.py" line="1877"/>
         <source>Save generated gcode file</source>
         <translation>Speichere generierte GCode Datei</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1608"/>
+        <location filename="gui.py" line="1884"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1605"/>
+        <location filename="gui.py" line="1881"/>
         <source>Cancel of generating gcode file</source>
         <translation>Generierung von GCode Datei abbrechen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1263"/>
+        <location filename="gui.py" line="1466"/>
         <source>Extruder</source>
         <translation>Extruder</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1273"/>
+        <location filename="gui.py" line="1476"/>
         <source>Place on bed</source>
         <translation>Auf Druckbett Platzieren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1281"/>
+        <location filename="gui.py" line="1484"/>
         <source>And color change</source>
         <translation>Füge Farbwechsel hinzu</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1313"/>
+        <location filename="gui.py" line="1519"/>
         <source>Material Settings</source>
         <translation>Material Einstellungen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1314"/>
+        <location filename="gui.py" line="1520"/>
         <source>Extruder 1</source>
         <translation>Extruder 1</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1315"/>
+        <location filename="gui.py" line="1521"/>
         <source>Extruder 2</source>
         <translation>Extruder 2</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1316"/>
+        <location filename="gui.py" line="1522"/>
         <source>Extruder 3</source>
         <translation>Extruder 3</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1317"/>
+        <location filename="gui.py" line="1523"/>
         <source>Extruder 4</source>
         <translation>Extruder 4</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1321"/>
+        <location filename="gui.py" line="1534"/>
         <source>Gcode preview</source>
         <translation>Gcode Vorschau</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1323"/>
+        <location filename="gui.py" line="1536"/>
         <source>Reset transformations</source>
         <translation>Transformationen Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1389"/>
+        <location filename="gui.py" line="1645"/>
         <source>Import multipart model file</source>
         <translation>Multipart Objekt-Datei importieren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1401"/>
+        <location filename="gui.py" line="1657"/>
         <source>&amp;Edit</source>
         <translation>&amp;Ändern</translation>
     </message>
@@ -566,112 +581,112 @@
         <translation type="obsolete">Löschen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1426"/>
+        <location filename="gui.py" line="1682"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1444"/>
+        <location filename="gui.py" line="1704"/>
         <source>New version</source>
         <translation>Neue Version</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1445"/>
+        <location filename="gui.py" line="1705"/>
         <source>New version is out!</source>
         <translation>Neue Version verfügbar!</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1446"/>
+        <location filename="gui.py" line="1706"/>
         <source>Do you want to download new version?</source>
         <translation>Möchtest du die neue Version von PrusaControl herunterladen?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1463"/>
+        <location filename="gui.py" line="1723"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1459"/>
+        <location filename="gui.py" line="1719"/>
         <source>Scene is not saved.</source>
         <translation>Szene ist nicht gespeichert.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1460"/>
+        <location filename="gui.py" line="1720"/>
         <source>Do you want to save your changes?</source>
         <translation>Möchtest du deine Änderungen speichern?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1474"/>
+        <location filename="gui.py" line="1734"/>
         <source>Exit</source>
         <translation>Beenden</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1488"/>
+        <location filename="gui.py" line="1748"/>
         <source>GCode is in generating process.</source>
         <translation>GCode wird gerade generiert.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1476"/>
+        <location filename="gui.py" line="1736"/>
         <source>Do you want to cancel generating of GCode and exit?</source>
         <translation>Möchtest du die Generierung des GCodes abbrechen und Beenden?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1500"/>
+        <location filename="gui.py" line="1773"/>
         <source>Load file</source>
         <translation>Datei laden</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1489"/>
+        <location filename="gui.py" line="1749"/>
         <source>Do you want to cancel generating of GCode and load file?</source>
         <translation>Möchtest du die Generierung des GCodes abbrechen und die Datei laden?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1501"/>
+        <location filename="gui.py" line="1774"/>
         <source>GCode file is in loading process.</source>
         <translation>GCode Datei wird gerade geladen.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1502"/>
+        <location filename="gui.py" line="1775"/>
         <source>Do you want to cancel loading of GCode file and load this file?</source>
         <translation>Möchtest du das Laden der GCode Datei abbrechen und die Datei laden?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1513"/>
+        <location filename="gui.py" line="1786"/>
         <source>Scene not empty</source>
         <translation>Szene ist nicht leer</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1514"/>
+        <location filename="gui.py" line="1787"/>
         <source>Some objects are in scene</source>
         <translation>Es gibt einige Objekte in der Szene</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1515"/>
+        <location filename="gui.py" line="1788"/>
         <source>Do you want to clear scene and load GCode file?</source>
         <translation>Möchtest du die Szene leeren und die GCode Datei laden?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1526"/>
+        <location filename="gui.py" line="1799"/>
         <source>GCode is generated</source>
         <translation>GCode wird generiert</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1527"/>
+        <location filename="gui.py" line="1800"/>
         <source>Scene is generated to GCode</source>
         <translation>GCode wird aus Szene generiert</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1528"/>
+        <location filename="gui.py" line="1801"/>
         <source>Do you want to close GCode preview and import new file?</source>
         <translation>Möchtest du die GCode Vorschau schließen und die neue Datei importieren?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1539"/>
+        <location filename="gui.py" line="1812"/>
         <source>Open project file</source>
         <translation>Projekt-Datei öffnen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1540"/>
+        <location filename="gui.py" line="1813"/>
         <source>In scene are some objects</source>
         <translation>Es befinden sich einige Objekte in der Szene</translation>
     </message>
@@ -681,115 +696,195 @@
         <translation type="obsolete">Möchtest du die Projekt-Datei in die aktuelle Szene laden?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1609"/>
+        <location filename="gui.py" line="1885"/>
         <source>Cancel of saving gcode file</source>
         <translation>GCode Datei speichern abbrechen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1617"/>
+        <location filename="gui.py" line="1893"/>
         <source>Cancel file read</source>
         <translation>Datei lesen abbrechen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1618"/>
+        <location filename="gui.py" line="1894"/>
         <source>Cancel of reading file</source>
         <translation>Datei lesen abbrechen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1531"/>
+        <location filename="gui.py" line="1804"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1532"/>
+        <location filename="gui.py" line="1805"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1464"/>
+        <location filename="gui.py" line="1724"/>
         <source>Discard</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1390"/>
+        <location filename="gui.py" line="1646"/>
         <source>Import gcode file</source>
         <translation>GCode Datei importieren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1402"/>
+        <location filename="gui.py" line="1658"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1403"/>
+        <location filename="gui.py" line="1659"/>
         <source>Redo</source>
         <translation>Wiederherstellen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1405"/>
+        <location filename="gui.py" line="1661"/>
         <source>Copy</source>
         <translation>Kopieren</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1406"/>
+        <location filename="gui.py" line="1662"/>
         <source>Paste</source>
         <translation>Einfügen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1407"/>
+        <location filename="gui.py" line="1663"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1541"/>
+        <location filename="gui.py" line="1814"/>
         <source>Do you want to open project file and clear actual scene?</source>
         <translation>Möchtest du die Projekt-Datei öffnen und die aktuelle Szene leeren?</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1542"/>
+        <location filename="gui.py" line="1815"/>
         <source>Open</source>
         <translation>Öffnen</translation>
     </message>
     <message>
-        <location filename="gui.py" line="1543"/>
+        <location filename="gui.py" line="1816"/>
         <source>Insert</source>
         <translation>Einfügen</translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1517"/>
+        <source>Do you want to print only from one material?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1529"/>
+        <source>Extruder is used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1524"/>
+        <source>Amount of material in wipe tower, material clearing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1389"/>
+        <source>Reduced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1389"/>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1389"/>
+        <source>Increased/Soluble</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1518"/>
+        <source>Single material mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1525"/>
+        <source>Wipe amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1548"/>
+        <source>Build plate only, soluble</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1549"/>
+        <source>Everywhere, soluble</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1550"/>
+        <source>Build plate only, soluble interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1550"/>
+        <source>Build plate only with soluble interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1551"/>
+        <source>Everywhere, soluble interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1551"/>
+        <source>Everywhere with soluble interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1761"/>
+        <source>List of Stl files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="1762"/>
+        <source>Do you want to load multiple stl files as one multipart object?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="gui.py" line="512"/>
+        <location filename="gui.py" line="533"/>
         <source>Language</source>
         <translation>Sprache</translation>
     </message>
     <message>
-        <location filename="gui.py" line="519"/>
+        <location filename="gui.py" line="542"/>
         <source>Printer model</source>
         <translation>Drucker Modell</translation>
     </message>
     <message>
-        <location filename="gui.py" line="526"/>
+        <location filename="gui.py" line="550"/>
         <source>Printer variation</source>
         <translation>Drucker Variante</translation>
     </message>
     <message>
-        <location filename="gui.py" line="531"/>
+        <location filename="gui.py" line="557"/>
         <source>Debug</source>
         <translation>Debug</translation>
     </message>
     <message>
-        <location filename="gui.py" line="534"/>
+        <location filename="gui.py" line="560"/>
         <source>Automatic placing</source>
         <translation>Automatische Platzierung</translation>
     </message>
     <message>
-        <location filename="gui.py" line="537"/>
+        <location filename="gui.py" line="563"/>
         <source>Analyzer</source>
         <translation>Analyse</translation>
     </message>
     <message>
-        <location filename="gui.py" line="540"/>
+        <location filename="gui.py" line="566"/>
         <source>Auto update parameters</source>
         <translation>Automatische Aktualisierungsparameter</translation>
     </message>
@@ -799,32 +894,43 @@
     <message>
         <location filename="gui.py" line="640"/>
         <source>Created by Tibor Vavra for Prusa Research s.r.o.</source>
-        <translation>Entwickelt von Tibor Vávra für Prusa Research s.r.o.</translation>
+        <translation type="obsolete">Entwickelt von Tibor Vávra für Prusa Research s.r.o.</translation>
     </message>
     <message>
-        <location filename="gui.py" line="642"/>
+        <location filename="gui.py" line="683"/>
         <source>PrusaControl version is </source>
         <translation>PrusaControl Version ist </translation>
     </message>
     <message>
-        <location filename="gui.py" line="643"/>
+        <location filename="gui.py" line="684"/>
         <source>Slic3r engine version is </source>
         <translation>Slic3r Engine Version ist </translation>
     </message>
     <message>
-        <location filename="gui.py" line="668"/>
+        <location filename="gui.py" line="709"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="gui.py" line="684"/>
+        <location filename="gui.py" line="725"/>
         <source>Your printer is</source>
         <translation>Dein Drucker ist</translation>
     </message>
     <message>
-        <location filename="gui.py" line="686"/>
+        <location filename="gui.py" line="727"/>
         <source>Version of firmware is</source>
         <translation>Firmware Version ist</translation>
+    </message>
+    <message>
+        <location filename="gui.py" line="679"/>
+        <source>PrusaControl
+Tibor Vavra, Prusa Research
+Dominik Cisar, Prusa Research
+
+Slic3r engine
+Vojtech Bubnik, Prusa Research
+Alessandro Ranellucci</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -851,17 +957,17 @@
 <context>
     <name>self.view</name>
     <message>
-        <location filename="controller.py" line="416"/>
+        <location filename="controller.py" line="563"/>
         <source>GCode saved</source>
         <translation>GCode gespeichert</translation>
     </message>
     <message>
-        <location filename="controller.py" line="800"/>
+        <location filename="controller.py" line="1132"/>
         <source>Project loaded</source>
         <translation>Projekt geladen</translation>
     </message>
     <message>
-        <location filename="controller.py" line="813"/>
+        <location filename="controller.py" line="1145"/>
         <source>Project was saved</source>
         <translation>Projekt wurde gespeichert</translation>
     </message>

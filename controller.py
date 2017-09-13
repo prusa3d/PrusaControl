@@ -96,7 +96,8 @@ class Controller(QObject):
             'language': {
                 'cs_CZ': 'Czech',
                 'en_US': 'English',
-                'es_ES': 'Spanish'
+                'es_ES': 'Spanish',
+		'de_DE': 'Germany'
             },
             'printer': {
                 'i3': 'i3',
