@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from PIL.ImageEnhance import Color
 from PyQt4.QtGui import QColor, QScrollArea, QLayout
 from PyQt4.QtGui import QColorDialog
 from PyQt4.QtGui import QStandardItem
-from PyQt4.uic.properties import QtCore
 
 __author__ = 'Tibor Vavra'
 
