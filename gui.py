@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PIL.ImageEnhance import Color
-from PyQt4.QtGui import QColor, QScrollArea
+from PyQt4.QtGui import QColor, QScrollArea, QLayout
 from PyQt4.QtGui import QColorDialog
 from PyQt4.QtGui import QStandardItem
 from PyQt4.uic.properties import QtCore
@@ -1064,8 +1064,9 @@ class PrusaControlView(QMainWindow):
         #self.right_panel_layout.setMargin(0)
         #self.right_panel_layout.setContentsMargins(0, 0, 0, 0)
 
-        #self.scroll_area = QScrollArea()
-        #self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
+        self.scroll_area = QScrollArea(self)
+
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
         #self.scroll_area.setWidget(self.right_panel)
 
         #QAbstractScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff )
@@ -1343,7 +1344,13 @@ class PrusaControlView(QMainWindow):
         #mainLayout.setMargin(0)
         #mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.addWidget(self.glWidget)
-        mainLayout.addWidget(self.right_panel)
+        mainLayout.addWidget(self.scroll_area)
+        #mainLayout.addWidget(self.right_panel)
+        self.scroll_area.setWidget(self.right_panel)
+        self.scroll_area.setAutoFillBackground(True)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFixedWidth(self.right_panel.width())
+        self.scroll_area.show()
 
         self.centralWidget.setLayout(mainLayout)
         self.setCentralWidget(self.centralWidget)
@@ -2385,6 +2392,8 @@ class PrusaControlView(QMainWindow):
                 else:
                     model_tmp.set_scale_abs((x/model.size_origin[0])*0.1, (y/model.size_origin[1])*.1, (z/model.size_origin[2])*.1)
 
+
+            #model.update_min_max()
             self.controller.update_wipe_tower()
         #self.update_object_settings(self.object_id)
         self.controller.update_scene()

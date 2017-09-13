@@ -131,6 +131,7 @@ class Version_1_0(VersionAbstract):
                 if 'group' in m:
                     model.is_multipart_model = True
                     model.parent = scene
+                    model.normalization_flag = m['normalization']
                     if m['group'] in models_groups:
                         models_groups[m['group']].append(model)
                     else:
@@ -155,6 +156,7 @@ class Version_1_0(VersionAbstract):
                     model.update_min_max()
                     model.parent = scene
                     model.update_min_max()
+                    model.normalization_flag = m['normalization']
 
                 scene.models.append(model)
 

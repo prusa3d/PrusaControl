@@ -367,8 +367,9 @@ class AppScene(object):
         return area
 
 
+
+    #@timing
     @staticmethod
-    @timing
     def normalize_group_of_models(models_lst):
         #it takes list of models, concate them, calculate mass point, set it to boundingSphereCenter and normalize
         m = Mesh(np.concatenate([m.get_mesh(False, False, False).data for m in models_lst]))
@@ -413,7 +414,7 @@ class AppScene(object):
 
         for obj in models_lst:
             obj.boundingSphereCenter = bounding_center
-            obj.mesh.vectors = obj.mesh.vectors + r
+            obj.mesh.vectors += r
 
             obj.pos = np.array([0., 0., 0.])
             #obj.pos[2] -= min[2]
@@ -1176,13 +1177,16 @@ class Model(object):
         self.is_changed = True
 
     def is_in_printing_space(self, printer):
-        min = self.min_scene
-        max = self.max_scene
+        if self.is_multipart_model:
+            min = deepcopy(self.multipart_parent.min_scene)
+            max = deepcopy(self.multipart_parent.max_scene)
+        else:
+            min = deepcopy(self.min_scene)
+            max = deepcopy(self.max_scene)
 
         if max[0] <= (printer['printing_space'][0]*.05) and min[0] >= (printer['printing_space'][0]*-.05):
                 if max[1] <= (printer['printing_space'][1]*.05) and min[1] >= (printer['printing_space'][1]*-.05):
                     if max[2] <= printer['printing_space'][2]*0.1 and min[2] >= -0.1:
-                        #print("Max[2] " + str(max[2]))
                         #print("Printing space[2] " + str(printer['printing_space'][2]))
                         self.is_in_printing_area = True
                         return True
@@ -1199,7 +1203,7 @@ class Model(object):
             self.is_in_printing_area = False
             return False
 
-    @timing
+    #@timing
     def get_mesh(self, transform=True, generate_gcode=False, default_scale=True):
         data = np.zeros(len(self.mesh.vectors), dtype=Mesh.dtype)
 
