@@ -117,17 +117,17 @@
     <message>
         <location filename="controller.py" line="341"/>
         <source>Incompatible materials, its possible the print will fail.</source>
-        <translation type="unfinished"></translation>
+        <translation>Materiales incompatibles, es posible que la impresión falle.</translation>
     </message>
     <message>
         <location filename="controller.py" line="342"/>
         <source>Collision of wipe tower and object.</source>
-        <translation type="unfinished"></translation>
+        <translation>Colisión de la torre de limpiado y del objeto.</translation>
     </message>
     <message>
         <location filename="controller.py" line="1191"/>
         <source>Loading multi part model</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargando modelo de piezas múltiples </translation>
     </message>
 </context>
 <context>
@@ -773,82 +773,82 @@
     <message>
         <location filename="gui.py" line="1517"/>
         <source>Do you want to print only from one material?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿ Quieres imprimir desde un solo material ?</translation>
     </message>
     <message>
         <location filename="gui.py" line="1529"/>
         <source>Extruder is used</source>
-        <translation type="unfinished"></translation>
+        <translation>Extruder en uso</translation>
     </message>
     <message>
         <location filename="gui.py" line="1524"/>
         <source>Amount of material in wipe tower, material clearing</source>
-        <translation type="unfinished"></translation>
+        <translation>Cantidad de material en la torre de limpiado, limpiando material</translation>
     </message>
     <message>
         <location filename="gui.py" line="1389"/>
         <source>Reduced</source>
-        <translation type="unfinished"></translation>
+        <translation>Reducido</translation>
     </message>
     <message>
         <location filename="gui.py" line="1389"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <location filename="gui.py" line="1389"/>
         <source>Increased/Soluble</source>
-        <translation type="unfinished"></translation>
+        <translation>Incrementado/Soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1518"/>
         <source>Single material mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo solo un material</translation>
     </message>
     <message>
         <location filename="gui.py" line="1525"/>
         <source>Wipe amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Cantidad limpiada</translation>
     </message>
     <message>
         <location filename="gui.py" line="1548"/>
         <source>Build plate only, soluble</source>
-        <translation type="unfinished"></translation>
+        <translation>Construir solo plato, soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1549"/>
         <source>Everywhere, soluble</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas partes, soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1550"/>
         <source>Build plate only, soluble interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Construir solo el plato, interfaz soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1550"/>
         <source>Build plate only with soluble interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Construir solo el plato, interfaz soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1551"/>
         <source>Everywhere, soluble interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas partes, interfaz soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1551"/>
         <source>Everywhere with soluble interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas partes, interfaz soluble</translation>
     </message>
     <message>
         <location filename="gui.py" line="1761"/>
         <source>List of Stl files</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista de archivos Stl</translation>
     </message>
     <message>
         <location filename="gui.py" line="1762"/>
         <source>Do you want to load multiple stl files as one multipart object?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿ Quiere cargar múltiples archivos stl como un solo objeto multi-piezas ?</translation>
     </message>
 </context>
 <context>
