@@ -1,6 +1,6 @@
 {
   "info": {
-    "version": 2.3
+    "version": 3.0
   },
   "printers": {
     "i3_mk2": {
@@ -20,9 +20,127 @@
         200
       ],
       "material_parameters_file": "materials_i3_mk2.json",
-      "sort": 0,
+      "sort": 1,
       "parameters": {
-        "retract_lift": 0.6
+        "retract_lift": 0.6,
+        "start_gcode": "M115 U3.0.12 ; tell printer latest fw version\\nM83  ; extruder relative mode\\nM104 S[first_layer_temperature] ; set extruder temp\\nM140 S[first_layer_bed_temperature] ; set bed temp\\nM190 S[first_layer_bed_temperature] ; wait for bed temp\\nM109 S[first_layer_temperature] ; wait for extruder temp\\nG28 W ; home all without mesh bed level\\nG80 ; mesh bed leveling\\nG1 Y-3.0 F1000.0 ; go outside pritn area\\nG1 X60.0 E9.0  F1000.0 ; intro line\\nG1 X100.0 E12.5  F1000.0 ; intro line",
+        "end_gcode": "G4 ; wait\\nM104 S0 ; turn off temperature\\nM140 S0 ; turn off heatbed\\nM107 ; turn off fan\\nG1 X0 Y200; home X axis\\nM84 ; disable motors"
+      }
+    },
+    "i3_mk2mm": {
+      "name": "i3_mk2mm",
+      "label": "Original Prusa i3 MK2 MM",
+      "model": "data/models/PrintBed03.obj",
+      "multimaterial": 4,
+      "model_offset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "texture": "data/img/PrintBed04.png",
+      "texture_from_below": "data/img/PrintBed04_GRID.png",
+      "printing_space": [
+        250,
+        210,
+        200
+      ],
+      "material_parameters_file": "materials_i3_mk2mm.json",
+      "material_mode": "i3_mk2mm_single",
+      "sort": 2,
+      "printer_type": {
+        "0.4mm": {
+          "name": "0.4mm",
+          "label": "Nozzle 0.4mm",
+          "parameters": {
+            "nozzle_diameter": 0.4
+          }
+        },
+        "0.6mm": {
+          "name": "0.6mm",
+          "label": "Nozzle 0.6mm",
+          "parameters": {
+            "nozzle_diameter": 0.6,
+            "perimeters" : 2,
+            "support_material_contact_distance" : 0.25,
+            "external_perimeter_extrusion_width": 0.6,
+            "extrusion_width": 0.67,
+            "perimeter_extrusion_width": 0.65,
+            "infill_extrusion_width": 0.7,
+            "solid_infill_extrusion_width": 0.65,
+            "top_infill_extrusion_width": 0.57,
+            "first_layer_extrusion_width" : 0.65,
+            "support_material_extrusion_width" : 0.55,
+            "support_material_xy_spacing" : "150%",
+            "retract_lift": 0.8,
+            "extrusion_multiplier": 1.15            
+          }
+        }
+      },
+      "parameters": {
+        "retract_lift": 0.6,
+        "retract_length": 4,
+        "retract_speed": 50,
+        "start_gcode": "M115 U3.0.12 ; tell printer latest fw version\\n; Start G-Code sequence START\\nT[initial_tool]\\nM104 S[first_layer_temperature] ; set extruder temp\\nM140 S[first_layer_bed_temperature] ; set bed temp\\nM190 S[first_layer_bed_temperature] ; wait for bed temp\\nM109 S[first_layer_temperature] ; wait for extruder temp\\nG21 ; set units to millimeters\\nG90 ; use absolute coordinates\\nM83 ; use relative distances for extrusion\\nG28 W\\nG80\\nG92 E0.0\\nM203 E100\\nM92 E140\\nG92 E0.0",
+        "end_gcode": "M107 ; fan off\\nM104 S0 ; turn off temperature\\nM140 S0 ; turn off heatbed\\nG28 X0  ; home X axis\\nM84  ; disable motors"
+      }
+    },
+    "i3_mk2mm_single": {
+      "name": "i3_mk2mm_single",
+      "label": "Original Prusa i3 MK2 MM Single Mode",
+      "model": "data/models/PrintBed03.obj",
+      "multimaterial": 1,
+      "visible": 0,
+      "material_mode": "i3_mk2mm",
+      "model_offset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "texture": "data/img/PrintBed04.png",
+      "texture_from_below": "data/img/PrintBed04_GRID.png",
+      "printing_space": [
+        250,
+        210,
+        200
+      ],
+      "material_parameters_file": "materials_i3_mk2.json",
+      "sort": 3,
+      "printer_type": {
+        "0.4mm": {
+          "name": "0.4mm",
+          "label": "Nozzle 0.4mm",
+          "parameters": {
+            "nozzle_diameter": 0.4,
+            "retract_length": 4
+          }
+        },
+        "0.6mm": {
+          "name": "0.6mm",
+          "label": "Nozzle 0.6mm",
+          "parameters": {
+            "nozzle_diameter": 0.6,
+            "retract_length": 4,
+            "perimeters" : 2,
+            "support_material_contact_distance" : 0.25,
+            "external_perimeter_extrusion_width": 0.6,
+            "extrusion_width": 0.67,
+            "perimeter_extrusion_width": 0.65,
+            "infill_extrusion_width": 0.7,
+            "solid_infill_extrusion_width": 0.65,
+            "top_infill_extrusion_width": 0.57,
+            "first_layer_extrusion_width" : 0.65,
+            "support_material_extrusion_width" : 0.55,
+            "retract_lift": 0.8,
+            "extrusion_multiplier": 1.15            
+          }
+        }
+      },
+      "parameters": {
+        "retract_lift": 0.6,
+        "retract_length": 4,
+        "retract_speed": 50,
+        "start_gcode": "M115 U3.0.12 ; tell printer latest fw version\\n; Start G-Code sequence START\\nT?\\nM104 S[first_layer_temperature]\\nM140 S[first_layer_bed_temperature]\\nM109 S[first_layer_temperature]\\nM190 S[first_layer_bed_temperature]\\nG21 ; set units to millimeters\\nG90 ; use absolute coordinates\\nM83 ; use relative distances for extrusion\\nG28 W\\nG80\\nG92 E0.0\\nM203 E100\\nM92 E140\\nG1 Z0.250 F7200.000\\nG1 X50.0 E80.0  F1000.0\\nG1 X160.0 E20.0  F1000.0\\nG1 Z0.200 F7200.000\\nG1 X220.0 E13 F1000.0\\nG1 X240.0 E0 F1000.0\\nG1 E-4 F1000.0\\nG92 E0.0",
+        "end_gcode": "G1 E-4 F2100.00000\\nG91\\nG1 Z1 F7200.000\\nG90\\nG1 X245 Y1\\nG1 X240 E4\\nG1 F4000\\nG1 X190 E2.7\\nG1 F4600\\nG1 X110 E2.8\\nG1 F5200\\nG1 X40 E3 \\n G1 E-15.0000 F5000\\nG1 E-50.0000 F5400\\nG1 E-15.0000 F3000\\nG1 E-12.0000 F2000\\nG1 F1600\\nG1 X0 Y1 E3.0000\\nG1 X50 Y1 E-5.0000\\nG1 F2000\\nG1 X0 Y1 E5.0000\\nG1 X50 Y1 E-5.0000\\nG1 F2400\\nG1 X0 Y1 E5.0000\\nG1 X50 Y1 E-5.0000\\nG1 F2400\\nG1 X0 Y1 E5.0000\\nG1 X50 Y1 E-3.0000\\nG4 S0\\nM107 ; fan off\\nM104 S0 ; turn off temperature\\nM140 S0 ; turn off heatbed\\nG28 X0  ; home X axis\\nM84     ; disable motors"
       }
     },
     "default": {
@@ -30,6 +148,8 @@
       "label": "",
       "model": "data/models/mk2_heatbed.stl",
       "multimaterial": 1,
+      "visible": 1,
+      "material_mode": "",
       "model_offset": [
         0.0,
         1.1,
@@ -44,8 +164,8 @@
       ],
       "parameters": {
         "gcode_flavor": "reprap",
-        "start_gcode": "M83  ; extruder relative mode\\nM104 S[first_layer_temperature] ; set extruder temp\\nM140 S[first_layer_bed_temperature] ; set bed temp\\nM190 S[first_layer_bed_temperature] ; wait for bed temp\\nM109 S[first_layer_temperature] ; wait for extruder temp\\nG28 W ; home all without mesh bed level\\nG80 ; mesh bed leveling\\nG1 Y-3.0 F1000.0 ; go outside pritn area\\nG1 X60.0 E9.0  F1000.0 ; intro line\\nG1 X100.0 E12.5  F1000.0 ; intro line",
-        "end_gcode": "M104 S0 ; turn off temperature\\nM140 S0 ; turn off heatbed\\nM107 ; turn off fan\\nG1 X0 Y200; home X axis\\nM84 ; disable motors",
+        "start_gcode": "M115 U3.0.12 ; tell printer latest fw version\\nM83  ; extruder relative mode\\nM104 S[first_layer_temperature] ; set extruder temp\\nM140 S[first_layer_bed_temperature] ; set bed temp\\nM190 S[first_layer_bed_temperature] ; wait for bed temp\\nM109 S[first_layer_temperature] ; wait for extruder temp\\nG28 W ; home all without mesh bed level\\nG80 ; mesh bed leveling\\nG1 Y-3.0 F1000.0 ; go outside pritn area\\nG1 X60.0 E9.0  F1000.0 ; intro line\\nG1 X100.0 E12.5  F1000.0 ; intro line",
+        "end_gcode": "G4 ; wait\\nM104 S0 ; turn off temperature\\nM140 S0 ; turn off heatbed\\nM107 ; turn off fan\\nG1 X0 Y200; home X axis\\nM84 ; disable motors",
         "bed_shape": "0x0,250x0,250x210,0x210",
         "before_layer_gcode": "",
         "extruder_offset": "0x0",
@@ -59,7 +179,7 @@
         "retract_length": 0.8,
         "retract_length_toolchange": 3,
         "retract_lift": 0.6,
-        "retract_lift_above": 1,
+        "retract_lift_above": 0,
         "retract_lift_below": 199,
         "retract_restart_extra": 0,
         "retract_restart_extra_toolchange": 0,
@@ -90,7 +210,7 @@
           "label": "Nozzle 0.25mm",
           "parameters": {
             "nozzle_diameter": 0.25,
-            "retract_length": 0.8,
+            "retract_length": 1,
             "retract_speed": 50,
             "external_perimeter_extrusion_width": 0.25,
             "extrusion_width": 0.25,
@@ -99,7 +219,10 @@
             "solid_infill_extrusion_width": 0.25,
             "first_layer_extrusion_width" : 0.25,
             "top_infill_extrusion_width": 0.25,
-            "support_material_extrusion_width" : 0.18
+            "max_volumetric_speed" : 0.7,
+            "support_material_spacing" : 1.5,
+            "support_material_xy_spacing" : "120%",
+            "support_material_extrusion_width" : 0.22
           }
         },
         "0.6mm": {
@@ -107,19 +230,19 @@
           "label": "Nozzle 0.6mm",
           "parameters": {
             "nozzle_diameter": 0.6,
-            "layer_height": 0.3,
             "perimeters" : 2,
-            "top_solid_layers" : 3,
-            "bottom_solid_layers": 3,
-            "external_perimeter_extrusion_width": 0.61,
+            "support_material_contact_distance" : 0.25,
+            "external_perimeter_extrusion_width": 0.6,
             "extrusion_width": 0.67,
             "perimeter_extrusion_width": 0.65,
-            "infill_extrusion_width": 0.75,
+            "infill_extrusion_width": 0.7,
             "solid_infill_extrusion_width": 0.65,
-            "top_infill_extrusion_width": 0.60,
+            "top_infill_extrusion_width": 0.57,
             "first_layer_extrusion_width" : 0.65,
-            "infill_overlap" : "15%",
-            "extrusion_multiplier": 1.1            
+            "support_material_extrusion_width" : 0.55,
+            "support_material_xy_spacing" : "150%",
+            "retract_lift": 0.8,
+            "extrusion_multiplier": 1.15            
           }
         },
         "default": {
