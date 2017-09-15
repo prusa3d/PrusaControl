@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import platform
+import shutil
 import tempfile
 import sys
 
@@ -348,13 +349,15 @@ class AppParameters(object):
 
         is_internet_on = self.internet_on()
 
+        if is_internet_on:
+            self.check_new_version_of_prusacontrol()
+
         # Check connections and update flag
         if is_internet_on and self.config.getboolean('settings', 'automatic_update_parameters'):
             if self.download_new_settings_files():
                 self.check_versions()
 
-        if is_internet_on:
-            self.check_new_version_of_prusacontrol()
+
 
 
     @staticmethod
@@ -479,6 +482,46 @@ class AppParameters(object):
                 if old_material_version:
                     if new_material_version > old_material_version:
                         copyfile(self.tmp_place + i, self.user_folder + i)
+                    else:
+                        self.use_default_files()
+                else:
+                    self.use_default_files()
+            else:
+                self.use_default_files()
+
+    def use_default_files(self):
+        #delete .prusacontrol
+        try:
+            shutil.rmtree(self.user_folder)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
+
+        #copy default files from data folder
+        try:
+            os.makedirs(self.user_folder)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
+        try:
+            copyfile(self.data_folder + self.printers_filename, self.user_folder + self.printers_filename)
+        except Error as e:
+            logging.debug('Error: %s' % e)
+        except IOError as e:
+            logging.debug('Error: %s' % e.strerror)
+
+        printers_data = json.load(open(self.user_folder + self.printers_filename, 'r'))
+        materials_files_list = [printers_data['printers'][i]['material_parameters_file'] for i in
+                                printers_data['printers'] if i not in ['default']]
+
+        for i in materials_files_list:
+            try:
+                copyfile(self.data_folder + i, self.user_folder + i)
+            except Error as e:
+                logging.debug('Error: %s' % e)
+            except IOError as e:
+                logging.debug('Error: %s' % e.strerror)
+
 
     def check_new_version_of_prusacontrol(self):
         #download json file with actual version
@@ -511,9 +554,13 @@ class AppParameters(object):
         return None
 
     def get_materials_info(self, json_path):
-        with open(json_path, 'r') as in_file:
-            printers_data = json.load(in_file)
-            return printers_data['info']['version']
+        try:
+            with open(json_path, 'r') as in_file:
+                printers_data = json.load(in_file)
+                return printers_data['info']['version']
+        except FileNotFoundError:
+            logging.error("Something is wrong with configuration files, delete all, use defaults")
+
         return None
 
 
