@@ -843,16 +843,30 @@ class GLWidget(QGLWidget):
         #for layer_data in layer_datas:
         #( brim, perimetry,  infill, support, colorchange)
         for p in layer_data:
-            if color_change:
-                color = [255, 255, 255]
-            elif 'E-sk' in p[2]:
-                color = [255, 255, 255]
-            elif 'E-su' in p[2]:
-                color = [88, 117, 69]
-            elif 'E-i' in p[2]:
-                color = [ 255,158, 60]
-            elif 'E-p' in p[2]:
-                color = [247, 108, 49]
+            if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+                if p[5] == 0:
+                    c = self.controller.get_extruder_color(1)
+                    color = [c.red(), c.green(), c.blue()]
+                elif p[5] == 1:
+                    c = self.controller.get_extruder_color(2)
+                    color = [c.red(), c.green(), c.blue()]
+                elif p[5] == 2:
+                    c = self.controller.get_extruder_color(3)
+                    color = [c.red(), c.green(), c.blue()]
+                elif p[5] == 3:
+                    c = self.controller.get_extruder_color(4)
+                    color = [c.red(), c.green(), c.blue()]
+            else:
+                if color_change:
+                    color = [255, 255, 255]
+                elif 'E-sk' in p[2]:
+                    color = [255, 255, 255]
+                elif 'E-su' in p[2]:
+                    color = [88, 117, 69]
+                elif 'E-i' in p[2]:
+                    color = [ 255,158, 60]
+                elif 'E-p' in p[2]:
+                    color = [247, 108, 49]
 
             if 'E' in p[2]:
                 glColor3ub(color[0], color[1], color[2])

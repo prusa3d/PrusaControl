@@ -243,6 +243,7 @@ class GcodeParserRunner(QObject):
         self.tool_change_data = []
         self.data_keys = set()
         self.actual_z = '0.0'
+        self.actual_tool = 0
         self.speed = 1500.0
         self.extrusion = 0.0
         self.z_hop = False
@@ -315,7 +316,7 @@ class GcodeParserRunner(QObject):
         for i in self.data:
             layer_flag = 'M'
             for l in self.data[i]:
-                _start, _end, flag, _speed, _extr, _line = l
+                _start, _end, flag, _speed, _extrusion, _extruder, _line = l
                 if flag in ['E', 'E-sk', 'E-su', 'E-i', 'E-p']:
                     layer_flag = 'E'
                     break
@@ -406,6 +407,7 @@ class GcodeParserRunner(QObject):
             return
         else:
             self.tool_change_data.append(int(line[0][1:]))
+            self.actual_tool = int(line[0][1:])
 
 
     #only G4 lines
@@ -463,7 +465,7 @@ class GcodeParserRunner(QObject):
                 # Move point
                 self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
                 if self.last_point.any():
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[3][1:]), line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[3][1:]), self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -490,7 +492,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -517,7 +519,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, np.float(line[3][1:]), self.extrusion, line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, np.float(line[3][1:]), self.extrusion, self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -527,7 +529,7 @@ class GcodeParserRunner(QObject):
                 self.actual_point[1] = np.float(line[1][1:])
 
                 if self.last_point:
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[2][1:]), line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[2][1:]), self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -544,7 +546,7 @@ class GcodeParserRunner(QObject):
                 self.actual_point[1] = np.float(line[1][1:])
                 self.extrusion = np.float(line[2][1:])
 
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, line_number=line_number)
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, self.actual_tool, line_number=line_number)
                 self.last_point = np.array(self.actual_point)
 
             elif 'X' in line[1]:
@@ -561,7 +563,7 @@ class GcodeParserRunner(QObject):
 
                 self.actual_point[0] = np.float(line[1][1:])
 
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, line_number=line_number)
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, self.actual_tool, line_number=line_number)
                 self.last_point = np.array(self.actual_point)
 
             elif DEBUG:
@@ -587,7 +589,7 @@ class GcodeParserRunner(QObject):
                 #
                 self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
                 if self.last_point.any():
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[3][1:]), line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[3][1:]), self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -616,7 +618,7 @@ class GcodeParserRunner(QObject):
                     else:
                         type = 'M'
 
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion, self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -643,7 +645,7 @@ class GcodeParserRunner(QObject):
                             type = 'E'
                     else:
                         type = 'M'
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, np.float(line[3][1:]), self.extrusion, line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, type, np.float(line[3][1:]), self.extrusion, self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -653,7 +655,7 @@ class GcodeParserRunner(QObject):
                 self.actual_point[1] = np.float(line[1][1:])
 
                 if self.last_point.any():
-                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[2][1:]), line_number=line_number)
+                    self.add_line(self.last_point, self.actual_point, self.actual_z, 'M', np.float(line[2][1:]), self.actual_tool, line_number=line_number)
                     self.last_point = np.array(self.actual_point)
                 else:
                     self.last_point = np.array(self.actual_point)
@@ -670,7 +672,7 @@ class GcodeParserRunner(QObject):
                 self.actual_point[1] = np.float(line[1][1:])
                 self.extrusion = np.float(line[2][1:])
 
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, line_number=line_number)
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, self.actual_tool, line_number=line_number)
                 self.last_point = np.array(self.actual_point)
 
             elif 'X' in line[1]:
@@ -687,7 +689,7 @@ class GcodeParserRunner(QObject):
 
                 self.actual_point[0] = np.float(line[1][1:])
 
-                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion,
+                self.add_line(self.last_point, self.actual_point, self.actual_z, 'E', speed, self.extrusion, self.actual_tool,
                               line_number=line_number)
                 self.last_point = np.array(self.actual_point)
 
@@ -801,7 +803,7 @@ class GcodeParserRunner(QObject):
 
             if self.last_point.any():
                 self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion,
-                              line_number=line_number)
+                              self.actual_tool, line_number=line_number)
                 self.last_point = np.array(self.actual_point)
             else:
                 self.last_point = np.array(self.actual_point)
@@ -828,7 +830,7 @@ class GcodeParserRunner(QObject):
 
             if self.last_point.any():
                 self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion,
-                              line_number=line_number)
+                              self.actual_tool, line_number=line_number)
                 self.last_point = np.array(self.actual_point)
             else:
                 self.last_point = np.array(self.actual_point)
@@ -874,7 +876,7 @@ class GcodeParserRunner(QObject):
 
 
 
-    def add_line(self, first_point, second_point, actual_z, type, speed=0., extrusion=0., line_number = -1):
+    def add_line(self, first_point, second_point, actual_z, type, speed=0., extrusion=0., extruder=0, line_number = -1):
         #print("Add line: " + str(first_point) + ' ' + str(second_point) + ' type: ' + str(type) + ' ' + str(line_number))
 
         key = deepcopy(actual_z)
@@ -884,12 +886,14 @@ class GcodeParserRunner(QObject):
                                    deepcopy(type),
                                    deepcopy(speed),
                                    deepcopy(extrusion),
+                                   deepcopy(extruder),
                                    deepcopy(line_number)])
             self.all_data.append([deepcopy(first_point),
                                   deepcopy(second_point),
                                   deepcopy(type),
                                   deepcopy(speed),
                                   deepcopy(extrusion),
+                                  deepcopy(extruder),
                                   deepcopy(line_number)])
         else:
             self.data_keys.add(key)
@@ -899,12 +903,14 @@ class GcodeParserRunner(QObject):
                                    deepcopy(type),
                                    deepcopy(speed),
                                    deepcopy(extrusion),
+                                   deepcopy(extruder),
                                    deepcopy(line_number)])
             self.all_data.append([deepcopy(first_point),
                                   deepcopy(second_point),
                                   deepcopy(type),
                                   deepcopy(speed),
                                   deepcopy(extrusion),
+                                  deepcopy(extruder),
                                   deepcopy(line_number)])
 
 

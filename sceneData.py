@@ -875,7 +875,7 @@ class AppScene(object):
 
 
     def get_whole_scene_in_one_mesh(self, gcode_generate=False):
-        return Mesh(np.concatenate([i.get_mesh(True, gcode_generate).data for i in self.models if i.isVisible]))
+        return Mesh(np.concatenate([m.get_mesh(True, gcode_generate).data for m in self.get_models()]))
 
     def save_whole_scene_to_one_stl_file(self, filename):
         whole_scene = self.get_whole_scene_in_one_mesh(True)
@@ -1714,8 +1714,9 @@ class Model(object):
                     if self.is_wipe_tower:
                         glColor4ub(175, 175, 175, 150)
                     else:
-                        c = self.parent.controller.get_extruder_color(self.extruder)
-                        glColor3ub(c.red(), c.green(), c.blue())
+                        #c = self.parent.controller.get_extruder_color(self.extruder)
+                        #glColor3ub(c.red(), c.green(), c.blue())
+                        glColor4ub(175, 175, 175, 150)
                 else:
                     glColor4ub(175, 175, 175, 150)
             else:
