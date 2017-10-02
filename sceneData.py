@@ -56,7 +56,7 @@ class AppScene(object):
     '''
     def __init__(self, controller):
         self.controller = controller
-        self.model_position_offset = 0.1
+        self.model_position_offset = 0.25
 
         self.wipe_tower_size_x = 60.
         self.wipe_tower_size_y = 15.
