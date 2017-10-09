@@ -282,6 +282,8 @@ class AppParameters(object):
         #    self.version = "0.1"
 
         self.json_settings_url = "https://raw.githubusercontent.com/prusa3d/PrusaControl-settings/master/"
+        #self.json_settings_url = "https://raw.githubusercontent.com/tibor-vavra/PrusaControl-settings/master/"
+
         self.printers_filename = "printers.json"
 
         self.prusacontrol_url = "http://www.prusacontrol.org/"
@@ -310,7 +312,7 @@ class AppParameters(object):
             self.data_folder = self.local_path + "data/"
             self.tmp_place = tempfile.gettempdir() + '/'
             self.config_path = os.path.expanduser("~/Library/Application Support/PrusaControl/PrusaControl.cfg")
-            self.user_folder = os.path.expanduser("~/Library/Application Support/PrusaControl/")
+            self.user_folder = os.path.expanduser("~/Library/Application Support/PrusaControl/data/")
             self.default_printers_parameters_file = os.path.expanduser(self.data_folder + self.printers_filename)
             self.printers_parameters_file = self.user_folder + self.printers_filename
             self.config.readfp(open(self.local_path + 'data/defaults.cfg'))
@@ -345,7 +347,6 @@ class AppParameters(object):
         self.config.read(self.config_path)
 
         self.first_run()
-
 
         is_internet_on = self.internet_on()
 
@@ -477,15 +478,13 @@ class AppParameters(object):
 
         for i in new_material_list:
             new_material_version = self.get_materials_info(self.tmp_place + i)
-            old_material_version = self.get_materials_info(self.user_folder+i)
+            old_material_version = self.get_materials_info(self.user_folder + i)
             if new_material_version:
                 if old_material_version:
                     if new_material_version > old_material_version:
                         copyfile(self.tmp_place + i, self.user_folder + i)
-                    else:
-                        self.use_default_files()
                 else:
-                    self.use_default_files()
+                    copyfile(self.tmp_place + i, self.user_folder + i)
             else:
                 self.use_default_files()
 
