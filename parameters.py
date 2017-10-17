@@ -8,8 +8,10 @@ import shutil
 import tempfile
 import sys
 
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
+#from urllib.request import Request, urlopen
+#from urllib.error import URLError, HTTPError
+import certifi
+import urllib3
 
 from configparser import ConfigParser, RawConfigParser
 from copy import deepcopy
@@ -262,6 +264,8 @@ class PrintingParameters(object):
 
 class AppParameters(object):
     def __init__(self, controller=None, local_path=''):
+        self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+
         self.local_path = local_path
         self.controller = controller
         self.system_platform = platform.system()
@@ -270,16 +274,10 @@ class AppParameters(object):
 
         self.config = ConfigParser()
 
-        # read from version.txt
-        #try:
+        # read from v.txt
         with open(self.local_path + "data/v.txt", 'r') as version_file:
             self.version_full = version_file.read()
             self.version = self.strip_version_string(self.version_full)
-                #print("in version file: " + self.version)
-        #except Exception as e:
-        #    print("Chyba:" + str(e.args))
-        #    self.version_full = "0.1-1001"
-        #    self.version = "0.1"
 
         self.json_settings_url = "https://raw.githubusercontent.com/prusa3d/PrusaControl-settings/master/"
         #self.json_settings_url = "https://raw.githubusercontent.com/tibor-vavra/PrusaControl-settings/master/"
@@ -378,9 +376,13 @@ class AppParameters(object):
 
     def internet_on(self):
         try:
-            urlopen('https://google.com')
-            return True
-        except URLError as err:
+            r = self.http.request('GET', 'https://google.com')
+            if r.status == 200:
+                return True
+            else:
+                return False
+        except urllib3.exceptions.NewConnectionError:
+            print('Connection failed.')
             return False
 
     def first_run(self):
@@ -421,14 +423,15 @@ class AppParameters(object):
     #@timing
     def download_new_settings_files(self):
         printers_data = {}
-        req = Request(self.json_settings_url + self.printers_filename)
+        #req = Request(self.json_settings_url + self.printers_filename)
         try:
-            r = urlopen(req)
-        except HTTPError as e:
+            r = self.http.request('GET', self.json_settings_url + self.printers_filename)
+
+        except urllib3.exceptions.NewConnectionError as e:
             logging.error("prusacontrol-settings repository is not reachable")
             print('Error code: ', e.code)
             return False
-        except URLError as e:
+        except urllib3.exceptions.HTTPError as e:
             print('We failed to reach a server.')
             print('Reason: ', e.reason)
             return False
@@ -436,7 +439,7 @@ class AppParameters(object):
 
             with open(self.tmp_place+self.printers_filename, 'wb') as out_file:
                 #shutil.copyfileobj(r, out_file)
-                out_file.write(r.read())
+                out_file.write(r.data)
 
             with open(self.tmp_place+self.printers_filename, 'r') as in_file:
                 printers_data = json.load(in_file)
@@ -448,9 +451,9 @@ class AppParameters(object):
                 return
 
             for i in materials_files_list:
-                r = urlopen(self.json_settings_url + i)
+                r_mat = self.http.request('GET', self.json_settings_url + i)
                 with open(self.tmp_place+i, 'wb') as out_file:
-                    out_file.write(r.read())
+                    out_file.write(r_mat.data)
         return True
 
     def check_versions(self):
@@ -525,13 +528,14 @@ class AppParameters(object):
     def check_new_version_of_prusacontrol(self):
         #download json file with actual version
         try:
-            r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
-        except HTTPError as e:
+            #r = urlopen(self.prusacontrol_url + self.prusacontrol_version_file)
+            r = self.http.request('GET', self.prusacontrol_url + self.prusacontrol_version_file)
+        except urllib3.exceptions.HTTPError as e:
             return None
-        except URLError as e:
+        except urllib3.exceptions.NewConnectionError as e:
             return None
         else:
-            data = r.read()
+            data = r.data
             if data:
                 if self.is_higher(self.strip_version_string(data)):
                     self.is_version_actual = False
