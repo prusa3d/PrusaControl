@@ -3,6 +3,8 @@ from copy import deepcopy
 from pprint import pprint
 from xml.dom import minidom
 
+import unicodedata
+
 __author__ = 'Tibor Vavra'
 
 import ast
@@ -171,7 +173,10 @@ class Version_1_0(VersionAbstract):
 
                 mm.update_min_max()
 
-
+    def remove_accents(str, input_str):
+        nfkd_form = unicodedata.normalize('NFKD', input_str)
+        stripped = u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+        return stripped
 
     def save(self, scene, filename):
         printing_space =  scene.controller.printing_parameters.get_printer_parameters(scene.controller.actual_printer)
@@ -186,6 +191,11 @@ class Version_1_0(VersionAbstract):
             ET.SubElement(root, "version").text=self.get_version()
             ET.SubElement(root, "zero").text = str(zero.tolist())
             models_tag = ET.SubElement(root, "models")
+
+            #this 3 lines are for slic3r, it cant handle diacritics in files inside zip file
+            for m in scene.models:
+                m.filename = self.remove_accents(m.filename)
+            scene.check_models_name()
 
             models_from_scene = [m for m in scene.get_models(with_wipe_tower=False)]
             single_part_models = [m for m in models_from_scene if not m.is_multipart_model]
