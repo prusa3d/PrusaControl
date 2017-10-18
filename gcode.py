@@ -770,6 +770,7 @@ class GcodeParserRunner(QObject):
                 elif 'F' in line[3]:
                     # G1 X119.731 Y110.014 F7200.000 ; move to first perimeter point
                     self.speed = np.float(line[3][1:])
+                    self.extrusion = 0.
                     self.actual_point = np.array([np.float(line[1][1:]), np.float(line[2][1:]), np.float(self.actual_z)])
 
             elif line_len == 3:
