@@ -75,7 +75,7 @@ class GCode(object):
         for i in layers_keys_lst:
             line = self.data[i]
             for o in line:
-                _a, _b, type, _speed, _extr, line_n = o
+                _a, _b, type, _speed, _extr, _extruder, line_n = o
                 if 'E' in type:
                     lines_number.append(line_n)
                     break
