@@ -382,8 +382,12 @@ class AppParameters(object):
             else:
                 return False
         except urllib3.exceptions.NewConnectionError:
-            print('Connection failed.')
+            logging.warning('Connection failed.')
             return False
+        except urllib3.exceptions.MaxRetryError:
+            logging.warning('Connection failed.')
+            return False
+
 
     def first_run(self):
         #check is there settings files in user folders
