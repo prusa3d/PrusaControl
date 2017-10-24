@@ -313,18 +313,24 @@ class GcodeParserRunner(QObject):
 
         ###
         self.non_extruding_layers = []
+
         for i in self.data:
             layer_flag = 'M'
             for l in self.data[i]:
                 _start, _end, flag, _speed, _extrusion, _extruder, _line = l
-                if flag in ['E', 'E-sk', 'E-su', 'E-i', 'E-p']:
+                if flag >= 1.0:
                     layer_flag = 'E'
                     break
             if layer_flag == 'M':
                 self.non_extruding_layers.append(i)
 
+
+
         for i in self.non_extruding_layers:
             self.data.pop(i, None)
+
+        #print("data after:")
+        #pprint(len(self.data))
 
         self.data_keys = set()
         self.data_keys = set(self.data)
@@ -409,7 +415,7 @@ class GcodeParserRunner(QObject):
             self.tool_change_data.append(int(line[0][1:]))
             self.actual_tool = int(line[0][1:])
 
-
+    '''
     #only G4 lines
     def parse_g4_line(self, data, line_number):
         if len(data)>1:
@@ -697,6 +703,31 @@ class GcodeParserRunner(QObject):
                 print("Nezpracovano: " + str(line) +' ' +str(comment_line))
 
         return
+    '''
+    @staticmethod
+    def type_convert(type):
+        if type == 0.0:
+            type_out = "M"  #Move type
+
+        elif type == 1.0:
+            type_out = "E"  # Extrusion type
+
+        elif type == 2.0:
+            type_out = "E-i"  # Extrusion-infill type
+
+        elif type == 3.0:
+            type_out = "E-p"  # Extrusion-perimeter type
+
+        elif type == 4.0:
+            type_out = "E-su"  # Extrusion-support type
+
+        elif type == 5.0:
+            type_out = "E-sk"  # Extrusion-support type
+
+        else:
+            type_out = "E"
+
+        return type_out
 
     def parse_g1_line_new(self, data, line_number):
         # get raw line data and line_number to know position in file
@@ -788,19 +819,19 @@ class GcodeParserRunner(QObject):
             if self.extrusion > 0.:
                 if comment_line_len > 0:
                     if 'infill' in comment_line[0]:
-                        type = 'E-i'
+                        type = 2.0
                     elif 'perimeter' in comment_line[0]:
-                        type = 'E-p'
+                        type = 3.0
                     elif 'support' in comment_line[0] and 'material' in comment_line[1]:
-                        type = 'E-su'
+                        type = 4.0
                     elif 'skirt' in comment_line[0]:
-                        type = 'E-sk'
+                        type = 5.0
                     else:
-                        type = 'E'
+                        type = 1.0
                 else:
-                    type = 'E'
+                    type = 1.0
             else:
-                type = 'M'
+                type = 0.0
 
             if self.last_point.any():
                 self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion,
@@ -825,9 +856,9 @@ class GcodeParserRunner(QObject):
             self.actual_point = np.array([self.actual_point[0], np.float(line[1][1:]), self.actual_point[2]])
 
             if self.extrusion > 0.:
-                type = 'E'
+                type = 1.0
             else:
-                type = 'M'
+                type = 0.0
 
             if self.last_point.any():
                 self.add_line(self.last_point, self.actual_point, self.actual_z, type, self.speed, self.extrusion,
@@ -879,6 +910,8 @@ class GcodeParserRunner(QObject):
 
     def add_line(self, first_point, second_point, actual_z, type, speed=0., extrusion=0., extruder=0, line_number = -1):
         #print("Add line: " + str(first_point) + ' ' + str(second_point) + ' type: ' + str(type) + ' ' + str(line_number))
+        #print("actual data:")
+        #print(self.data_keys)
 
         key = deepcopy(actual_z)
         if key in self.data_keys:

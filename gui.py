@@ -549,6 +549,7 @@ class SettingsDialog(QDialog):
         self.printer_type_combo = QComboBox()
         if self.controller.app_config.system_platform in ['Linux']:
             self.printer_type_combo.setStyle(QStyleFactory.create('Windows'))
+        ##
         self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
         self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
 

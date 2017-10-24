@@ -859,16 +859,16 @@ class GLWidget(QGLWidget):
             else:
                 if color_change:
                     color = [255, 255, 255]
-                elif 'E-sk' in p[2]:
+                elif p[2] == 5.0:
                     color = [255, 255, 255]
-                elif 'E-su' in p[2]:
+                elif p[2] == 4.0:
                     color = [88, 117, 69]
-                elif 'E-i' in p[2]:
+                elif p[2] == 2.0:
                     color = [ 255,158, 60]
-                elif 'E-p' in p[2]:
+                elif p[2] == 3.0:
                     color = [247, 108, 49]
 
-            if 'E' in p[2]:
+            if p[2] >= 1.0:
                 glColor3ub(color[0], color[1], color[2])
                 glVertex3f(p[0][0] * .1, p[0][1] * .1, p[0][2] * .1)
                 glVertex3f(p[1][0] * .1, p[1][1] * .1, p[1][2] * .1)
@@ -1385,7 +1385,7 @@ class GLWidget(QGLWidget):
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, image_hotbed)
 
-        glEnable(GL_LIGHTING)
+        #glEnable(GL_LIGHTING)
 
         #glShadeModel(GL_SMOOTH)
         glCullFace(GL_FRONT_AND_BACK)

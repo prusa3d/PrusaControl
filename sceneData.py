@@ -710,6 +710,7 @@ class AppScene(object):
 
         self.save_change(self.models)
 
+    #TODO: Find bigger size and rotate of 90deg if Y is bigger then X
     def place_objects_in_grid(self, placed_groups, with_wipe_tower):
         m_0 = self.get_models(with_wipe_tower=with_wipe_tower)[0]
 
@@ -843,6 +844,7 @@ class AppScene(object):
         default_scale = self.get_scale(self.get_models(with_wipe_tower)[0])
         default_rot = self.get_rot(self.get_models(with_wipe_tower)[0])
 
+        #TODO: names are problem, look on data
         for m in self.get_models(with_wipe_tower):
             if not(default_filename == self.get_name(m)):
                 return False
