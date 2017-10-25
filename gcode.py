@@ -415,7 +415,7 @@ class GcodeParserRunner(QObject):
             self.tool_change_data.append(int(line[0][1:]))
             self.actual_tool = int(line[0][1:])
 
-    '''
+
     #only G4 lines
     def parse_g4_line(self, data, line_number):
         if len(data)>1:
@@ -439,7 +439,7 @@ class GcodeParserRunner(QObject):
 
 
 
-
+    '''
     #only G1 lines
     def parse_g1_line(self, data, line_number):
         if len(data)>1:
