@@ -672,13 +672,21 @@ class Controller(QObject):
 
     def get_printer_variations_labels_ls(self, printer_name):
         printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
-        #print("Nastaveni tiskaren: ")
-        #pprint(printer_settings)
-        return [printer_settings["printer_type"][printer_type]["label"] for printer_type in printer_settings["printer_type"]]
+        if 'sort' in printer_settings["printer_type"][list(printer_settings["printer_type"])[0]]:
+            unsorted = [[printer_settings["printer_type"][printer_type]["label"], [printer_settings["printer_type"][printer_type]['sort']]] for printer_type in printer_settings["printer_type"]]
+            sort_lst = sorted(unsorted, key=lambda mem: mem[1])
+            return [mem[0] for mem in sort_lst]
+        else:
+            return [printer_settings["printer_type"][printer_type]["label"] for printer_type in printer_settings["printer_type"]]
 
     def get_printer_variations_names_ls(self, printer_name):
         printer_settings = self.printing_parameters.get_printer_parameters(printer_name)
-        return list(printer_settings["printer_type"])
+        if 'sort' in printer_settings["printer_type"][list(printer_settings["printer_type"])[0]]:
+            unsorted = [[printer_settings["printer_type"][printer_type]["name"], [printer_settings["printer_type"][printer_type]['sort']]] for printer_type in printer_settings["printer_type"]]
+            sort_lst = sorted(unsorted, key=lambda mem: mem[1])
+            return [mem[0] for mem in sort_lst]
+        else:
+            return list(printer_settings["printer_type"])
 
     def get_printer_materials_names_ls(self, printer_name):
         #return self.printing_settings['materials']
