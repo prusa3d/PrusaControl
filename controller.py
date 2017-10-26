@@ -596,6 +596,7 @@ class Controller(QObject):
         self.view.gcode_slider.init_points()
         self.set_gcode_view()
         self.status = 'generated'
+        self.app.alert(self.view, 0)
 
     def check_rotation_helper(self, event):
         #print("check rotation")
