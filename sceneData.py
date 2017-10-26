@@ -838,15 +838,13 @@ class AppScene(object):
                 position_vector[1] += model.boundingSphereSize*.1
 
 
-    #TODO:test models names, datas, scale, rotate...
     def models_are_same(self, with_wipe_tower=True):
-        default_filename = self.get_name(self.get_models(with_wipe_tower)[0])
+        default_data = self.get_data(self.get_models(with_wipe_tower)[0])
         default_scale = self.get_scale(self.get_models(with_wipe_tower)[0])
         default_rot = self.get_rot(self.get_models(with_wipe_tower)[0])
 
-        #TODO: names are problem, look on data
         for m in self.get_models(with_wipe_tower):
-            if not(default_filename == self.get_name(m)):
+            if not(np.array_equal(default_data, self.get_data(m))):
                 return False
 
             if not(np.array_equal(default_scale, self.get_scale(m))):
@@ -857,11 +855,13 @@ class AppScene(object):
 
         return True
 
-    def get_name(self, model):
+
+    def get_data(self, model):
         if model.is_multipart_model:
-            return sorted([m.filename for m in model.multipart_parent.models])
+            #small hack, compare just first model data of multimodel
+            return model.multipart_parent.models[0].mesh.vectors
         else:
-            return model.filename
+            return model.mesh.vectors
 
     def get_scale(self, model):
         if model.is_multipart_model:
