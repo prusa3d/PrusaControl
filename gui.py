@@ -550,8 +550,10 @@ class SettingsDialog(QDialog):
         if self.controller.app_config.system_platform in ['Linux']:
             self.printer_type_combo.setStyle(QStyleFactory.create('Windows'))
         ##
-        self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.actual_printer))
-        self.printer_type_combo.setCurrentIndex(self.controller.get_printer_variations_names_ls(self.controller.actual_printer).index(self.controller.settings['printer_type']))
+        labels, _f = self.controller.get_printer_variations_labels_ls(self.controller.actual_printer)
+        self.printer_type_combo.addItems(labels)
+        names, _ = self.controller.get_printer_variations_names_ls(self.controller.actual_printer)
+        self.printer_type_combo.setCurrentIndex(names.index(self.controller.settings['printer_type']))
 
         self.debug_checkbox = QCheckBox(self.tr("Debug"))
         self.debug_checkbox.setChecked(self.controller.settings['debug'])
@@ -593,8 +595,9 @@ class SettingsDialog(QDialog):
 
     def update_printer_variations(self):
         self.printer_type_combo.clear()
-        self.printer_type_combo.addItems(self.controller.get_printer_variations_labels_ls(self.controller.get_printers_names_ls(only_visible=True)[self.printer_combo.currentIndex()]))
-        self.printer_type_combo.setCurrentIndex(0)
+        labels_lst, first = self.controller.get_printer_variations_labels_ls(self.controller.get_printers_names_ls(only_visible=True)[self.printer_combo.currentIndex()])
+        self.printer_type_combo.addItems(labels_lst)
+        self.printer_type_combo.setCurrentIndex(first)
 
 
 
@@ -606,9 +609,8 @@ class SettingsDialog(QDialog):
         result = dialog.exec_()
         data['language'] = list(controller.enumeration['language'])[dialog.language_combo.currentIndex()]
         data['printer'] = controller.get_printers_names_ls(only_visible=True)[dialog.printer_combo.currentIndex()]
-        data['printer_type'] = controller.get_printer_variations_names_ls(data['printer'])[dialog.printer_type_combo.currentIndex()]
-
-        #controller.set_printer(data['printer'])
+        printer_variations, _f = controller.get_printer_variations_names_ls(data['printer'])
+        data['printer_type'] = printer_variations[dialog.printer_type_combo.currentIndex()]
 
         data['debug'] = dialog.debug_checkbox.isChecked()
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
