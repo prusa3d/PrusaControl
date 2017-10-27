@@ -395,7 +395,17 @@ class AppParameters(object):
         # if yes no first run
         if os.path.exists(printer_file_config):
             #print("printers.json is existing ")
-            return
+            old_printers_res = self.get_printers_info(printer_file_config)
+            default_printers_res = self.get_printers_info(self.data_folder + self.printers_filename)
+            if old_printers_res and default_printers_res:
+                old_version, _ = old_printers_res
+                default_version, _ = default_printers_res
+                if default_version > old_version:
+                    self.use_default_files()
+                else:
+                    return
+            else:
+                return
         # else copy from data folder to user folder
         else:
             #print("printers.json is not existing, first run ")
