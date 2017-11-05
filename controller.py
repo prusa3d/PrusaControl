@@ -567,7 +567,7 @@ class Controller(QObject):
 
         self.set_gcode_slider(min, max, min_l, max_l)
 
-        self.gcode_layer = self.gcode.data_keys[0]
+        self.gcode_layer = self.gcode.data_keys[1]
 
         self.view.gcode_label.setText(self.gcode.data_keys[0])
         self.view.gcode_slider.setValue(float(self.gcode.data_keys[0]))
@@ -1097,6 +1097,8 @@ class Controller(QObject):
 
     def set_generate_button(self):
         self.view.set_generate_button()
+        if not self.scene.is_scene_printable():
+            self.disable_generate_button()
 
     def update_gui(self):
         self.view.update_gui()
@@ -2191,6 +2193,7 @@ class Controller(QObject):
         self.is_model_loaded = False
         self.scene.is_wipe_tower_position_manual = False
         if self.is_multimaterial():
+            self.actualize_extruder_set()
             self.add_wipe_tower()
         #self.view.update_scene(True)
 

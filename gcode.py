@@ -76,7 +76,7 @@ class GCode(object):
             line = self.data[i]
             for o in line:
                 _a, _b, type, _speed, _extr, _extruder, line_n = o
-                if 'E' in type:
+                if type >= 1.0:
                     lines_number.append(line_n)
                     break
 
@@ -103,15 +103,15 @@ class GCode(object):
         self.gcode_parser_thread.start()
 
 
-    def read_in_realtime(self):
-        print("Read in realtime")
+    def read_in_realtime(self, update_progressbar=False, progressbar_func=None):
         self.gcode_parser.set_data_keys.connect(self.set_data_keys)
         self.gcode_parser.set_data.connect(self.set_data)
         self.gcode_parser.set_all_data.connect(self.set_all_data)
         self.gcode_parser.set_printing_time.connect(self.set_printig_time)
-        self.gcode_parser.update_progressbar=False
+        if update_progressbar and progressbar_func:
+            self.gcode_parser.update_progressbar = update_progressbar
+            self.gcode_parser.set_update_progress.connect(progressbar_func)
 
-        print("start read procedure")
         self.gcode_parser.load_gcode_file()
 
         self.is_loaded = True
@@ -914,6 +914,7 @@ class GcodeParserRunner(QObject):
         #print(self.data_keys)
 
         key = deepcopy(actual_z)
+        '''
         if key in self.data_keys:
             self.data[key].append([deepcopy(first_point),
                                    deepcopy(second_point),
@@ -946,7 +947,25 @@ class GcodeParserRunner(QObject):
                                   deepcopy(extrusion),
                                   deepcopy(extruder),
                                   deepcopy(line_number)])
+        '''
+        if not key in self.data_keys:
+            self.data_keys.add(key)
+            self.data[key] = []
 
+        self.data[key].append(np.array([first_point,
+                               second_point,
+                               type,
+                               speed,
+                               extrusion,
+                               extruder,
+                               line_number]))
+        self.all_data.append(np.array([first_point,
+                              second_point,
+                              type,
+                              speed,
+                              extrusion,
+                              extruder,
+                              line_number]))
 
 
 

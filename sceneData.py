@@ -669,7 +669,7 @@ class AppScene(object):
 
 
     def automatic_models_position(self):
-        if not len(self.get_models(with_wipe_tower=False)) > 1:
+        if not len(self.get_models(with_wipe_tower=False)) >= 1:
             #TODO:Add placing of first model(MultiModel model)
             return
         #sort objects over size of bounding sphere

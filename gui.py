@@ -189,7 +189,7 @@ class Gcode_slider(QWidget):
         self.value_label.move(self.slider.width() + (int)(75*self.controller.dpi_coef), myPoint.y() - 9)
         self.add_button.move(self.slider.width() + (int)(145*self.controller.dpi_coef), myPoint.y() - 9)
 
-        if self.controller.is_multimaterial():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             self.add_button.setVisible(False)
         else:
             self.add_button.setVisible(True)
@@ -237,7 +237,7 @@ class Gcode_slider(QWidget):
 
     def get_color_change_layers(self):
         #return [[i['value'], self.controller.gcode.data[i['value']][0][-1]] for i in self.parent.gcode_slider.points if not i['value'] == -1]
-        if self.controller.is_multimaterial():
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
             return []
         else:
             return [i['value'] for i in self.points if not i['value'] == -1]
@@ -437,29 +437,29 @@ class Spline_editor(QWidget):
 
 
     def plus_value(self):
-        print("Slider plus")
+        #print("Slider plus")
         #TODO:read value from slider and increment quality for this layer
         slider_value = (self.number_of_ticks) - self.slider.value()
-        print(slider_value)
+        #print(slider_value)
         for n, p in enumerate(self.data):
             if n == slider_value:
                 if self.data[n] <= 0.99:
                     self.data[n] += 0.2
-        print(self.data)
+        #print(self.data)
         self.repaint()
         self.mesh.recalculate_texture()
         self.controller.update_scene()
 
     def minus_value(self):
-        print("Slider minus")
+        #print("Slider minus")
         # TODO:read value from slider and decrease quality for this layer
         slider_value = (self.number_of_ticks) - self.slider.value()
-        print(slider_value)
+        #print(slider_value)
         for n, p in enumerate(self.data):
             if n == slider_value:
                 if self.data[n] >= -0.99:
                     self.data[n] -= 0.2
-        print(self.data)
+        #print(self.data)
         self.repaint()
         self.mesh.recalculate_texture()
         self.controller.update_scene()
@@ -521,7 +521,7 @@ class Spline_editor(QWidget):
 
 class SettingsDialog(QDialog):
     def __init__(self, controller, editable=True,  parent = None):
-        super(SettingsDialog, self).__init__(controller.view)
+        super(SettingsDialog, self).__init__(controller.view, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
 
         self.controller = controller
 
@@ -1043,8 +1043,19 @@ class PrusaControlView(QMainWindow):
         # Gcode view layout
         #self.gcode_view_layout = QtGui.QVBoxLayout()
 
-        self.color_change_l = QLabel()
-        self.color_change_l.setObjectName("color_change_l")
+        #self.color_change_l = QLabel()
+        #self.color_change_l.setObjectName("color_change_l")
+
+        self.gcode_help_l= QLabel("?", self.gcode_group_box)
+        if self.controller.app_config.system_platform in ["Darwin"]:
+            self.gcode_help_l.setStyle(QStyleFactory.create("Macintosh"))
+        else:
+            self.gcode_help_l.setFixedHeight((int)(19 * self.controller.dpi_coef))
+            self.gcode_help_l.setFixedWidth((int)(19 * self.controller.dpi_coef))
+        self.gcode_help_l.setObjectName("gcode_help_l")
+        self.gcode_help_l.setToolTip("<img src=':img.png'>")
+
+
 
         self.gcode_slider = self.create_slider(self.set_gcode_slider, 0, 0, 100 ,Qt.Vertical, Gcode_slider)
         self.gcode_slider.setObjectName("gcode_slider")
@@ -1332,6 +1343,9 @@ class PrusaControlView(QMainWindow):
         self.transformation_reset_b.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
                                          (int)(13 * self.controller.dpi_coef))
 
+        self.gcode_help_l.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
+                               (int)(13 * self.controller.dpi_coef))
+
         #print("create gcode panel")
         self.gcode_panel = QWidget()
         self.gcode_label = QLabel("0")
@@ -1414,9 +1428,9 @@ class PrusaControlView(QMainWindow):
             if not type(widget) is QHBoxLayout and \
                 not type(widget) is QPropertyAnimation and \
                 not type(widget) is sceneRender.GLWidget:
-                print(str(type(widget)))
-                print(scale* widget.maximumWidth())
-                print(scale * widget.maximumHeight())
+                #print(str(type(widget)))
+                #print(scale* widget.maximumWidth())
+                #print(scale * widget.maximumHeight())
                 widget.setFixedSize((int)(scale * widget.maximumWidth()), (int)(scale * widget.maximumHeight()))
 
 
@@ -1482,7 +1496,7 @@ class PrusaControlView(QMainWindow):
         self.advance_settings_b.setText(self.tr("Advance Settings"))
         self.basic_settings_b.setText(self.tr("Basic Settings"))
 
-        self.color_change_l.setText(self.tr("And color change"))
+        #self.color_change_l.setText(self.tr("And color change"))
         self.gcode_back_b.setText(self.tr("Back"))
 
         self.printer_settings_l.setText(self.tr("Printer settings"))
@@ -1595,7 +1609,7 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(False)
         self.materialLabel.setVisible(False)
 
-        self.color_change_l.setVisible(False)
+        #self.color_change_l.setVisible(False)
 
 
 
@@ -1633,7 +1647,7 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
 
-        self.color_change_l.setVisible(True)
+        #self.color_change_l.setVisible(True)
 
         self.set_normal_support_settings()
 
@@ -2502,7 +2516,7 @@ class PrusaControlView(QMainWindow):
         gcode_view_layout.setRowStretch(2, 0)
         gcode_view_layout.setRowStretch(3, 2)
 
-        gcode_view_layout.addWidget(self.color_change_l, 1, 0)
+        #gcode_view_layout.addWidget(self.color_change_l, 1, 0)
         gcode_view_layout.addWidget(self.gcode_slider, 2, 0, 3, 3)
         #gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
 

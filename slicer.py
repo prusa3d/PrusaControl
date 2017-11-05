@@ -265,9 +265,10 @@ class Slic3rEngineRunner(QObject):
         self.process.kill()
 
     def check_progress(self):
-        self.step = 1
+        self.step = 16
+        step_coef = 50./(len(self.controller.scene.get_models(False))*3.)
         while self.is_running is True:
-            self.step+=1
+            self.step+=(1.*step_coef)
             if self.process.returncode == -signal.SIGSEGV:
                 self.send_message.emit("Slic3r engine crash")
                 break
@@ -277,14 +278,14 @@ class Slic3rEngineRunner(QObject):
             if not line:
                 continue
             if 'Done.' in parsed_line[0]:
-                self.step_increased.emit(95)
+                self.step_increased.emit(75)
                 self.send_message.emit("Generating G-code preview")
-                self.gcode.read_in_realtime()
+
+                self.gcode.read_in_realtime(True, self.set_gcode_progressbar)
                 self.send_gcodedata.emit(self.gcode)
                 self.send_message.emit("")
             elif 'Filament' in parsed_line[0] and 'required:' in parsed_line[1]:
                 filament_str = str(parsed_line[2] + ' ' + parsed_line[3])
-                print(filament_str)
                 self.filament_info.emit(filament_str)
                 self.finished.emit()
                 #self.step_increased.emit(100)
@@ -294,7 +295,13 @@ class Slic3rEngineRunner(QObject):
                 if text[0] == 'Exporting':
                     text = text[:2]
                 self.send_message.emit(" ".join(text))
-            self.step_increased.emit(int((self.step / 12.) * 100))
+            self.step_increased.emit(int(self.step))
+
+    def set_gcode_progressbar(self, value):
+        start = 75
+        final = int(((value+0.001)/100.)*25.)
+        self.step_increased.emit(start+final)
+
 
     def end(self):
         self.end_callback()
