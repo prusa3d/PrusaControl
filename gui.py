@@ -2539,6 +2539,11 @@ class PrusaControlView(QMainWindow):
         self.set_save_gcode_button()
         self.object_group_box.setVisible(False)
         self.gcode_group_box.setVisible(True)
+        if self.controller.is_multimaterial() and not self.controller.is_single_material_mode():
+            self.gcode_help_b.setVisible(False)
+        else:
+            self.gcode_help_b.setVisible(True)
+
         self.progressBar.setVisible(False)
         self.gcode_back_b.setVisible(True)
         self.controller.view.update_scene()
