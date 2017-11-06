@@ -357,6 +357,8 @@ class GLWidget(QGLWidget):
 
         self.tool_background = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png")
         self.popup_widget = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/popup_window.png")
+        self.color_change_help = self.texture_from_png(
+            self.controller.app_config.local_path + "data/img/gui/help.png")
 
 
         #self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
@@ -600,6 +602,7 @@ class GLWidget(QGLWidget):
             glDisable(GL_BLEND)
 
         self.draw_warning_window()
+        self.draw_help_window()
 
         if self.controller.status in ['generated', 'saving_gcode']:
             self.draw_information_window()
@@ -647,6 +650,67 @@ class GLWidget(QGLWidget):
         glEnable(GL_LIGHTING)
         glPopMatrix()
 
+    def draw_help_window(self):
+        #set camera view
+        if self.controller.show_gcode_help():
+            glMatrixMode(GL_PROJECTION)
+            glPushMatrix()
+            glLoadIdentity()
+            viewport = glGetIntegerv(GL_VIEWPORT)
+            glOrtho(0.0, viewport[2], 0.0, viewport[3], -1.0, 1.0)
+            glMatrixMode(GL_MODELVIEW)
+            glPushMatrix()
+
+            sW = viewport[2] * 1.0
+            sH = viewport[3] * 1.0
+
+            glLoadIdentity()
+            glEnable(GL_BLEND)
+            glDisable(GL_LIGHTING)
+            glDisable(GL_DEPTH_TEST)
+            glEnable(GL_TEXTURE_2D)
+
+            #draw frame for warning messages
+            position = [-445, 150]
+
+            position_x = sW - abs(position[0] * self.controller.dpi_coef) if position[
+                                                                                 0] * self.controller.dpi_coef < 0 else \
+            position[0] * self.controller.dpi_coef
+            position_y = sH - abs(position[1] * self.controller.dpi_coef) if position[
+                                                                                 1] * self.controller.dpi_coef < 0 else \
+            position[1] * self.controller.dpi_coef
+
+            size_w = 420 * self.controller.dpi_coef
+            size_h = 300 * self.controller.dpi_coef
+
+            coef_sH = size_h
+            coef_sW = size_w
+
+            glBindTexture(GL_TEXTURE_2D, self.color_change_help)
+            glColor4f(1.0, 1.0, 1.0, 0.80)
+            glBegin(GL_QUADS)
+            glTexCoord2f(0, 0)
+            glVertex3f(position_x, position_y, 0)
+            glTexCoord2f(0, 1)
+            glVertex3f(position_x, (position_y + coef_sH), 0)
+            glTexCoord2f(1, 1)
+            glVertex3f((position_x + coef_sW), (position_y + coef_sH), 0)
+            glTexCoord2f(1, 0)
+            glVertex3f((position_x + coef_sW), position_y, 0)
+            glEnd()
+
+            glDisable(GL_TEXTURE_2D)
+
+            glColor4f(1.,1.,1.,1.)
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_BLEND)
+
+            glPopMatrix()
+
+            glMatrixMode(GL_PROJECTION)
+            glPopMatrix()
+
+            glMatrixMode(GL_MODELVIEW)
 
     def draw_warning_window(self):
         #set camera view
@@ -684,7 +748,7 @@ class GLWidget(QGLWidget):
             coef_sW = size_w
 
             glBindTexture(GL_TEXTURE_2D, self.popup_widget)
-            glColor4f(0.1, 0.1, 0.1, .75)
+            glColor4f(1., 1., 1., .8)
             glBegin(GL_QUADS)
             glTexCoord2f(0, 0)
             glVertex3f(position_x, position_y, 0)
@@ -767,7 +831,7 @@ class GLWidget(QGLWidget):
             coef_sW = size_w
 
             glBindTexture(GL_TEXTURE_2D, self.popup_widget)
-            glColor4f(0.1, 0.1, 0.1, .75)
+            glColor4f(1., 1., 1.0, .8)
             glBegin(GL_QUADS)
             glTexCoord2f(0, 0)
             glVertex3f(position_x, position_y, 0)

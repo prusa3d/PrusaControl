@@ -265,8 +265,9 @@ class Slic3rEngineRunner(QObject):
         self.process.kill()
 
     def check_progress(self):
+        #self.gcode.set_running_variable(self.is_running)
         self.step = 16
-        step_coef = 50./(len(self.controller.scene.get_models(False))*3.)
+        step_coef = 40./(len(self.controller.scene.get_models(False))*7.)
         while self.is_running is True:
             self.step+=(1.*step_coef)
             if self.process.returncode == -signal.SIGSEGV:
@@ -281,9 +282,10 @@ class Slic3rEngineRunner(QObject):
                 self.step_increased.emit(75)
                 self.send_message.emit("Generating G-code preview")
 
-                self.gcode.read_in_realtime(True, self.set_gcode_progressbar)
-                self.send_gcodedata.emit(self.gcode)
+                if self.gcode.read_in_realtime(True, self.set_gcode_progressbar):
+                    self.send_gcodedata.emit(self.gcode)
                 self.send_message.emit("")
+                return
             elif 'Filament' in parsed_line[0] and 'required:' in parsed_line[1]:
                 filament_str = str(parsed_line[2] + ' ' + parsed_line[3])
                 self.filament_info.emit(filament_str)
@@ -326,11 +328,14 @@ class OwnSlicerEngine(SlicerEngineAbstract):
     pass
 
 
-class SlicerEngineManager(object):
+class SlicerEngineManager(QObject):
     '''
     SlicerEngineManager is class designed for managing slicers engine and prepare parameters
     '''
+    cancel_signal = pyqtSignal()
+
     def __init__(self, controller):
+        super(SlicerEngineManager, self).__init__()
         self.controller = controller
         self.slice_thread = None
         self.slice_engine = Slic3rEngineRunner(self.controller)
@@ -348,12 +353,15 @@ class SlicerEngineManager(object):
         self.slice_engine.send_message.connect(self.controller.slicing_message)
         self.slice_engine.send_gcodedata.connect(self.controller.set_gcode_instance)
 
+        self.cancel_signal.connect(self.slice_engine.gcode.gcode_parser.cancel_parsing)
+
         self.slice_thread.start()
 
     def cancel(self):
         logging.debug("Thread canceling")
         if self.slice_engine and self.slice_thread:
             self.slice_engine.is_running = False
+            self.cancel_signal.emit()
             self.slice_engine.kill()
             self.slice_thread.quit()
             self.slice_thread.wait()

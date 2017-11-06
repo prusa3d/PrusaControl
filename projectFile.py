@@ -247,7 +247,7 @@ class Version_1_0(VersionAbstract):
             zip_fh.writestr(self.xmlFilename, nice_formated_xml)
 
             #write stl files to zip file
-            for model in scene.models:
+            for model in models_from_scene_sorted:
                 if model.isVisible and not model.is_wipe_tower:
                     #transform data to stl file
                     mesh = model.get_mesh(False, False)

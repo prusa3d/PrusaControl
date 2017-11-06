@@ -1046,14 +1046,16 @@ class PrusaControlView(QMainWindow):
         #self.color_change_l = QLabel()
         #self.color_change_l.setObjectName("color_change_l")
 
-        self.gcode_help_l= QLabel("?", self.gcode_group_box)
+        self.gcode_help_b= QPushButton("?", self.gcode_group_box)
         if self.controller.app_config.system_platform in ["Darwin"]:
-            self.gcode_help_l.setStyle(QStyleFactory.create("Macintosh"))
+            self.gcode_help_b.setStyle(QStyleFactory.create("Macintosh"))
         else:
-            self.gcode_help_l.setFixedHeight((int)(19 * self.controller.dpi_coef))
-            self.gcode_help_l.setFixedWidth((int)(19 * self.controller.dpi_coef))
-        self.gcode_help_l.setObjectName("gcode_help_l")
-        self.gcode_help_l.setToolTip("<img src=':img.png'>")
+            self.gcode_help_b.setFixedHeight((int)(19 * self.controller.dpi_coef))
+            self.gcode_help_b.setFixedWidth((int)(19 * self.controller.dpi_coef))
+        self.gcode_help_b.setObjectName("gcode_help_b")
+        self.gcode_help_b.pressed.connect(self.controller.set_gcode_help_button_pressed)
+        self.gcode_help_b.released.connect(self.controller.set_gcode_help_button_released)
+        #self.gcode_help_b.setToolTip("<img src=':img.png'>")
 
 
 
@@ -1343,7 +1345,7 @@ class PrusaControlView(QMainWindow):
         self.transformation_reset_b.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
                                          (int)(13 * self.controller.dpi_coef))
 
-        self.gcode_help_l.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
+        self.gcode_help_b.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
                                (int)(13 * self.controller.dpi_coef))
 
         #print("create gcode panel")
@@ -2258,6 +2260,12 @@ class PrusaControlView(QMainWindow):
         self.object_id = 0
         self.glWidget.setFocusPolicy(Qt.StrongFocus)
 
+    def disable_object_settings_panel(self):
+        self.clear_object_settings_panel()
+        self.filename_c.setVisible(False)
+        self.filename_label.setVisible(True)
+        self.object_settings_layout.addWidget(self.filename_label, 0, 1, 1, 2)
+        self.object_group_box.setDisabled(True)
 
     def set_extruder_on_object(self, widget, object_id):
         if widget.hasFocus():

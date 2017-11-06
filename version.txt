@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(0, 9, 2, 297),
-    prodvers=(0, 9, 2, 297),
+    filevers=(0, 9, 2, 407),
+    prodvers=(0, 9, 2, 407),
     mask=0x3f,
     flags=0x0,
     OS=0x4,
@@ -16,10 +16,10 @@ VSVersionInfo(
         u'040904b0',
         [StringStruct(u'CompanyName', u'Prusa Research, s.r.o.'),
         StringStruct(u'ProductName', u'PrusaControl'),
-        StringStruct(u'ProductVersion', u'0, 9, 2, 297'),
+        StringStruct(u'ProductVersion', u'0, 9, 2, 407'),
         StringStruct(u'InternalName', u'PrusaControl'),
         StringStruct(u'OriginalFilename', u'PrusaControl.exe'),
-        StringStruct(u'FileVersion', u'0, 9, 2, 297'),
+        StringStruct(u'FileVersion', u'0, 9, 2, 407'),
         StringStruct(u'FileDescription', u'PrusaControl'),
         StringStruct(u'LegalCopyright', u'Copyright 2017 Prusa Research s.r.o.'),
         StringStruct(u'LegalTrademarks', u''),])

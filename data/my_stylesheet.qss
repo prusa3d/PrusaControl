@@ -365,7 +365,7 @@ QLabel#gcode_slider_point_label{
     background-color: transparent;
 }
 
-QLabel#color_change_l{
+QLabel#gcode_help_l{
     color: rgb(255, 255, 255);
     background-color:rgb(77, 77, 77);
     font-family: 'Titillium Web';
@@ -552,6 +552,51 @@ QPushButton#transformation_reset_b:hover
 QPushButton#transformation_reset_b:disabled
 {
     image: url(base_dirdata/img/gui/reset_light_dissabled_s.png);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    padding: 0px;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
+QPushButton#gcode_help_b,
+QPushButton#gcode_help_b:flat
+{
+    image: url(base_dirdata/img/gui/help_light_normal_s.png);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    padding: 0px;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
+QPushButton#gcode_help_b:pressed
+{
+    image: url(base_dirdata/img/gui/help_light_on_s.png);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    padding: 0px;
+    height: 19px;
+    width: 19px;
+    border-width: 1px;
+}
+
+QPushButton#gcode_help_b:hover
+{
+    image: url(base_dirdata/img/gui/help_light_hover_s.png);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    padding: 0px;
+    height: 19px;
+    width: 19px;
+    border-width: 0px;
+}
+
+QPushButton#gcode_help_b:disabled
+{
+    image: url(base_dirdata/img/gui/help_light_dissabled_s.png);
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;

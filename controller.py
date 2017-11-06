@@ -92,6 +92,8 @@ class Controller(QObject):
         self.actual_printer = deepcopy(self.settings['printer'])
         self.actual_printer_mod = ""
 
+        self.gcode_help_button_pressed = False
+
         self.enumeration = {
             'language': {
                 'cs_CZ': 'Czech',
@@ -976,9 +978,10 @@ class Controller(QObject):
 
         elif self.status == 'generating':
             #generating in progress
-            self.view.enable_editing()
             self.cancel_generation()
+            self.cancel_gcode_loading()
             self.status = 'canceled'
+            self.view.enable_editing()
             self.set_generate_button()
 
         elif self.status == 'loading_gcode':
@@ -990,7 +993,8 @@ class Controller(QObject):
 
 
     def cancel_gcode_loading(self):
-        self.gcode.cancel_parsing_gcode()
+        if self.gcode:
+            self.gcode.cancel_parsing_gcode()
         self.gcode = None
         self.status = 'canceled'
         self.disable_generate_button()
@@ -1114,6 +1118,19 @@ class Controller(QObject):
 
     def open_printer_info(self):
         self.view.open_printer_info_dialog()
+
+    def set_gcode_help_button_pressed(self):
+        self.gcode_help_button_pressed = True
+        self.update_scene()
+
+    def set_gcode_help_button_released(self):
+        self.gcode_help_button_pressed = False
+        self.update_scene()
+
+    def show_gcode_help(self):
+        if self.render_status == 'gcode_view' and self.gcode_help_button_pressed:
+            return True
+        return False
 
     def open_update_firmware(self):
         self.view.open_firmware_dialog()
@@ -1703,6 +1720,8 @@ class Controller(QObject):
                         if self.settings['toolButtons']['rotateButton'] or self.settings['toolButtons']['scaleButton']:
                             self.unselect_objects()
                         self.select_object(object_id)
+                        #disable object edit gui, its not possible for group
+                        self.view.disable_object_settings_panel()
                         self.cursor_over_object = True
                     elif self.is_object_already_selected(object_id) and self.is_some_tool_active():
                         #print("object already selected and tool placeonface is on")

@@ -51,6 +51,9 @@ class GCode(object):
         self.gcode_copy = GcodeCopyRunner(self.filename, "", color_change_lst=self.color_change_data)
         self.gcode_copy_thread = QThread()
 
+    def set_running_variable(self, variable):
+        if self.gcode_parser:
+            self.gcode_parser.is_running = variable
 
     def cancel_parsing_gcode(self):
         print("Cancel presset")
@@ -62,6 +65,8 @@ class GCode(object):
             self.data = {}
             self.all_data = []
             self.data_keys = []
+        elif self.gcode_parser and self.gcode_parser.is_running==True:
+            self.gcode_parser.is_running = False
         self.controller.set_progress_bar(0)
 
     def cancel_writing_gcode(self):
@@ -112,9 +117,11 @@ class GCode(object):
             self.gcode_parser.update_progressbar = update_progressbar
             self.gcode_parser.set_update_progress.connect(progressbar_func)
 
-        self.gcode_parser.load_gcode_file()
-
-        self.is_loaded = True
+        if self.gcode_parser.load_gcode_file():
+            self.is_loaded = True
+            return True
+        else:
+            return False
 
 
     def set_printig_time(self, time):
@@ -255,6 +262,8 @@ class GcodeParserRunner(QObject):
         self.filament_length = 0.0
 
 
+    def cancel_parsing(self):
+        self.is_running = False
 
     def load_gcode_file(self):
         file = QFile(self.filename)
@@ -264,7 +273,9 @@ class GcodeParserRunner(QObject):
         counter = 0
         line = 0
         line_number = 0
-        while not in_stream.atEnd() and self.is_running is True:
+        while not in_stream.atEnd():
+            if self.is_running == False:
+                return False
 
             if self.update_progressbar:
                 if counter==10000:
@@ -307,6 +318,7 @@ class GcodeParserRunner(QObject):
 
         if self.is_running is False and self.update_progressbar is True:
             self.set_update_progress.emit(0)
+            return False
 
         self.printing_time = self.calculate_time_of_print()
         self.filament_length = 0.0  # self.calculate_length_of_filament()
@@ -343,6 +355,7 @@ class GcodeParserRunner(QObject):
         self.set_printing_time.emit(self.printing_time)
 
         self.finished.emit()
+        return True
 
 
     def calculate_time_of_print(self):
