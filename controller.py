@@ -569,6 +569,7 @@ class Controller(QObject):
 
         self.set_gcode_slider(min, max, min_l, max_l)
 
+        #What layer had to be show at start
         self.gcode_layer = self.gcode.data_keys[1]
 
         self.view.gcode_label.setText(self.gcode.data_keys[0])
@@ -1125,6 +1126,7 @@ class Controller(QObject):
 
     def set_gcode_help_button_released(self):
         self.gcode_help_button_pressed = False
+        self.view.gcode_help_b.setChecked(False)
         self.update_scene()
 
     def show_gcode_help(self):

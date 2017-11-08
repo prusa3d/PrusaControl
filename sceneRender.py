@@ -244,7 +244,7 @@ class GLWidget(QGLWidget):
             self.zRot = angle
             #print("Z rot: " + str(self.zRot))
 
-    def texture_from_png(self, filename):
+    def texture_from_png(self, filename, gen_mipmap=True):
         mode_to_bpp = {'1':1, 'L':8, 'P':8, 'RGB':24, 'RGBA':32, 'CMYK':32, 'YCbCr':24, 'I':32, 'F':32}
 
         img = open(filename)
@@ -263,7 +263,7 @@ class GLWidget(QGLWidget):
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
 
 
-        if bool(glGenerateMipmap):
+        if bool(glGenerateMipmap) and gen_mipmap:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
             glTexImage2D(GL_TEXTURE_2D, 0, type, img.size[0], img.size[1], 0, type, GL_UNSIGNED_BYTE, img_data)
@@ -358,7 +358,7 @@ class GLWidget(QGLWidget):
         self.tool_background = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/tool_mask.png")
         self.popup_widget = self.texture_from_png(self.controller.app_config.local_path + "data/img/gui/popup_window.png")
         self.color_change_help = self.texture_from_png(
-            self.controller.app_config.local_path + "data/img/gui/help.png")
+            self.controller.app_config.local_path + "data/img/gui/help.png", False)
 
 
         #self.tools = [self.scaleTool, self.rotateTool, self.organize_tool, self.multiply_tool, self.support_tool, self.undo_button, self.do_button]
@@ -671,7 +671,7 @@ class GLWidget(QGLWidget):
             glEnable(GL_TEXTURE_2D)
 
             #draw frame for warning messages
-            position = [-445, 150]
+            position = [-575, 150]
 
             position_x = sW - abs(position[0] * self.controller.dpi_coef) if position[
                                                                                  0] * self.controller.dpi_coef < 0 else \
@@ -680,8 +680,8 @@ class GLWidget(QGLWidget):
                                                                                  1] * self.controller.dpi_coef < 0 else \
             position[1] * self.controller.dpi_coef
 
-            size_w = 420 * self.controller.dpi_coef
-            size_h = 300 * self.controller.dpi_coef
+            size_w = 550 * self.controller.dpi_coef
+            size_h = 377 * self.controller.dpi_coef
 
             coef_sH = size_h
             coef_sW = size_w

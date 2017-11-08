@@ -583,6 +583,18 @@ QPushButton#gcode_help_b:pressed
     border-width: 1px;
 }
 
+QPushButton#gcode_help_b:checked
+{
+    image: url(base_dirdata/img/gui/help_light_on_s.png);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    padding: 0px;
+    height: 19px;
+    width: 19px;
+    border-width: 1px;
+}
+
+
 QPushButton#gcode_help_b:hover
 {
     image: url(base_dirdata/img/gui/help_light_hover_s.png);

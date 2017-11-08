@@ -1047,14 +1047,15 @@ class PrusaControlView(QMainWindow):
         #self.color_change_l.setObjectName("color_change_l")
 
         self.gcode_help_b= QPushButton("?", self.gcode_group_box)
+        self.gcode_help_b.setCheckable(True)
         if self.controller.app_config.system_platform in ["Darwin"]:
             self.gcode_help_b.setStyle(QStyleFactory.create("Macintosh"))
         else:
             self.gcode_help_b.setFixedHeight((int)(19 * self.controller.dpi_coef))
             self.gcode_help_b.setFixedWidth((int)(19 * self.controller.dpi_coef))
         self.gcode_help_b.setObjectName("gcode_help_b")
-        self.gcode_help_b.pressed.connect(self.controller.set_gcode_help_button_pressed)
-        self.gcode_help_b.released.connect(self.controller.set_gcode_help_button_released)
+        self.gcode_help_b.clicked.connect(self.controller.set_gcode_help_button_pressed)
+        #self.gcode_help_b.released.connect(self.controller.set_gcode_help_button_released)
         #self.gcode_help_b.setToolTip("<img src=':img.png'>")
 
 
@@ -1867,6 +1868,11 @@ class PrusaControlView(QMainWindow):
 
                     self.controller.select_tool_helper(event)
                     self.update_scene()
+
+        if event.type() == QEvent.MouseButtonPress:
+            if (event.buttons() == Qt.LeftButton or event.buttons() == Qt.RightButton) and self.controller.show_gcode_help():
+                self.controller.set_gcode_help_button_released()
+
         return QMainWindow.eventFilter(self, source, event)
 
 
