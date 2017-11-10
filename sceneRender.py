@@ -681,7 +681,7 @@ class GLWidget(QGLWidget):
             position[1] * self.controller.dpi_coef
 
             size_w = 550 * self.controller.dpi_coef
-            size_h = 377 * self.controller.dpi_coef
+            size_h = 413 * self.controller.dpi_coef
 
             coef_sH = size_h
             coef_sW = size_w
@@ -701,9 +701,29 @@ class GLWidget(QGLWidget):
 
             glDisable(GL_TEXTURE_2D)
 
-            glColor4f(1.,1.,1.,1.)
             glEnable(GL_DEPTH_TEST)
             glDisable(GL_BLEND)
+
+            glColor4f(1., 1., 1., 1.)
+            font = self.controller.view.font
+            if self.controller.app_config.system_platform in ['Darwin']:
+                font_size = 14
+                space = 2.
+            else:
+                if self.controller.dpi_scale == 2:
+                    font_size = 9 * self.controller.dpi_coef
+                    space = 2.
+                else:
+                    font_size = 13 * self.controller.dpi_coef
+                    space = 2.5
+
+            font.setPointSize(font_size)
+
+            self.renderText(position_x + 4.*self.controller.dpi_coef, sH - position_y - size_h + font_size + (4.*self.controller.dpi_coef),
+                            self.tr("Add stops at specific layer heights where you can manually"), font)
+            self.renderText(position_x + 4.*self.controller.dpi_coef, sH - position_y - size_h + font_size*space*self.controller.dpi_coef + (4.*self.controller.dpi_coef),
+                            self.tr("change filament. Learn more about Colorprint at prusaprinters."), font)
+
 
             glPopMatrix()
 
@@ -850,13 +870,19 @@ class GLWidget(QGLWidget):
             if self.controller.app_config.system_platform in ['Darwin']:
                 font.setPointSize(19)
             else:
-                font.setPointSize(17 *self.controller.dpi_coef - self.controller.dpi_scale)
+                if self.controller.dpi_scale == 2:
+                    font.setPointSize(15 * self.controller.dpi_coef - self.controller.dpi_scale)
+                else:
+                    font.setPointSize(17 *self.controller.dpi_coef - self.controller.dpi_scale)
             self.renderText(position_x + 8, sH - position_y - size_h + 30, self.tr("PRINT INFO"), font)
 
             if self.controller.app_config.system_platform in ['Darwin']:
                 font.setPointSize(11)
             else:
-                font.setPointSize(9 *self.controller.dpi_coef - self.controller.dpi_scale)
+                if self.controller.dpi_scale == 2:
+                    font.setPointSize(7 * self.controller.dpi_coef - self.controller.dpi_scale)
+                else:
+                    font.setPointSize(9 *self.controller.dpi_coef - self.controller.dpi_scale)
 
             #header = '{:>20}{:>10}{:>14}'.format(' ', 'time:', 'filament:')
             #print(header)

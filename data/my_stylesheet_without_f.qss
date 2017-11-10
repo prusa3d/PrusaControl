@@ -362,7 +362,7 @@ QLabel#color_change_l{
     background-color:rgb(77, 77, 77);
     font-family: 'Titillium Web';
     height: 16px;
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 
@@ -509,6 +509,7 @@ QPushButton#transformation_reset_b:flat
     background-color: transparent;
     color: rgb(255, 255, 255);
     padding: 0px;
+    /*margin-right: 8px;*/
     height: 19px;
     width: 19px;
     border-width: 0px;

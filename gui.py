@@ -1043,8 +1043,8 @@ class PrusaControlView(QMainWindow):
         # Gcode view layout
         #self.gcode_view_layout = QtGui.QVBoxLayout()
 
-        #self.color_change_l = QLabel()
-        #self.color_change_l.setObjectName("color_change_l")
+        self.color_change_l = QLabel()
+        self.color_change_l.setObjectName("color_change_l")
 
         self.gcode_help_b= QPushButton("?", self.gcode_group_box)
         self.gcode_help_b.setCheckable(True)
@@ -1342,12 +1342,9 @@ class PrusaControlView(QMainWindow):
         #self.right_panel.setMinimumWidth((int)(250*self.controller.dpi_coef))
         #self.right_panel.setMaximumWidth((int)(275*self.controller.dpi_coef))
 
-        #print("Sirka praveho panelu: " + str(self.right_panel.width()))
-        self.transformation_reset_b.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
-                                         (int)(13 * self.controller.dpi_coef))
-
-        self.gcode_help_b.move((int)((self.right_panel.width() - 27) * self.controller.dpi_coef),
-                               (int)(13 * self.controller.dpi_coef))
+        print("Sirka praveho panelu: " + str(self.right_panel.width()))
+        self.transformation_reset_b.move((int)(self.right_panel.width() - 27*self.controller.dpi_coef), 13)
+        self.gcode_help_b.move((int)(self.right_panel.width() - 27*self.controller.dpi_coef), 13)
 
         #print("create gcode panel")
         self.gcode_panel = QWidget()
@@ -1499,7 +1496,7 @@ class PrusaControlView(QMainWindow):
         self.advance_settings_b.setText(self.tr("Advance Settings"))
         self.basic_settings_b.setText(self.tr("Basic Settings"))
 
-        #self.color_change_l.setText(self.tr("And color change"))
+        self.color_change_l.setText(self.tr("And color change"))
         self.gcode_back_b.setText(self.tr("Back"))
 
         self.printer_settings_l.setText(self.tr("Printer settings"))
@@ -1612,7 +1609,7 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(False)
         self.materialLabel.setVisible(False)
 
-        #self.color_change_l.setVisible(False)
+        self.color_change_l.setVisible(False)
 
 
 
@@ -1650,7 +1647,7 @@ class PrusaControlView(QMainWindow):
         self.materialCombo.setVisible(True)
         self.materialLabel.setVisible(True)
 
-        #self.color_change_l.setVisible(True)
+        self.color_change_l.setVisible(True)
 
         self.set_normal_support_settings()
 
@@ -2530,7 +2527,7 @@ class PrusaControlView(QMainWindow):
         gcode_view_layout.setRowStretch(2, 0)
         gcode_view_layout.setRowStretch(3, 2)
 
-        #gcode_view_layout.addWidget(self.color_change_l, 1, 0)
+        gcode_view_layout.addWidget(self.color_change_l, 1, 0)
         gcode_view_layout.addWidget(self.gcode_slider, 2, 0, 3, 3)
         #gcode_view_layout.addWidget(self.gcode_back_b, 4, 0, 1, 3)
 

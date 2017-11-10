@@ -173,6 +173,9 @@ class Controller(QObject):
         self.dpi_coef = app.desktop().logicalDpiX() / 96.
         self.dpi_scale = 0 if self.dpi_coef == 1.0 else 2
 
+        print("Dpi coef: " + str(self.dpi_coef))
+        print("Dpi scale: " + str(self.dpi_scale))
+
         self.translator = QTranslator()
         self.set_language(self.settings['language'])
         progress_bar(40)

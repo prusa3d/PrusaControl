@@ -26,6 +26,14 @@ QLabel#version_label{
     color: rgb(225, 225, 225);
 }
 
+QLabel#color_change_l{
+    color: rgb(255, 255, 255);
+    background-color:rgb(77, 77, 77);
+    font-family: 'Titillium Web';
+    height: 16px;
+    font-weight: bold;
+}
+
 QMessageBox#msgBox{
     font-family: 'Titillium Web';
     background-color:rgb(103, 103, 103);
