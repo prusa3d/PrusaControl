@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="add texture to wipe tower with generative mapping, actualize size of wipe tower">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+    <list default="true" id="db581126-0943-4cd2-b416-f9161affc380" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/img/gui/help.png" afterPath="$PROJECT_DIR$/data/img/gui/help.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/PrusaControl_Win.spec" afterPath="$PROJECT_DIR$/PrusaControl_Win.spec" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/controller.py" afterPath="$PROJECT_DIR$/controller.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/v.txt" afterPath="$PROJECT_DIR$/data/v.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gui.py" afterPath="$PROJECT_DIR$/gui.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/version.txt" afterPath="$PROJECT_DIR$/version.txt" />
     </list>
     <ignored path="PrusaControll.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -26,7 +24,7 @@
     <SUITE FILE_PATH="coverage/prusacontrol_new$test_configuration.coverage" NAME="test_configuration Coverage Results" MODIFIED="1479316817692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$benchy_mega_test.coverage" NAME="benchy_mega_test Coverage Results" MODIFIED="1487683553019" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$gcode_test.coverage" NAME="gcode_test Coverage Results" MODIFIED="1487179077457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$main.coverage" NAME="main Coverage Results" MODIFIED="1505230471043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$main.coverage" NAME="main Coverage Results" MODIFIED="1510332311935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$cone_test.coverage" NAME="cone_test Coverage Results" MODIFIED="1487173377734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$test_configuration_2.coverage" NAME="cone_test Coverage Results" MODIFIED="1479489936792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$make_exe.coverage" NAME="make_exe Coverage Results" MODIFIED="1491305613752" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -34,8 +32,8 @@
     <SUITE FILE_PATH="coverage/prusacontrol_new$jehlan_test.coverage" NAME="jehlan_test Coverage Results" MODIFIED="1487233517218" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$cubes_test.coverage" NAME="cubes_test Coverage Results" MODIFIED="1490364939557" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$cube_gcode_test.coverage" NAME="cube_gcode_test Coverage Results" MODIFIED="1487177909422" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/prusacontrol_new$Version.coverage" NAME="Version Coverage Results" MODIFIED="1496842934063" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$cube_test.coverage" NAME="cube_test Coverage Results" MODIFIED="1488205854366" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/prusacontrol_new$Version.coverage" NAME="Version Coverage Results" MODIFIED="1510332410652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$big_gcode_test.coverage" NAME="big_gcode_test Coverage Results" MODIFIED="1486464554677" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/prusacontrol_new$benchy_test.coverage" NAME="benchy_test Coverage Results" MODIFIED="1489673831983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -54,60 +52,69 @@
     <favorites_list name="PrusaControll" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5529979">
+    <splitter split-orientation="horizontal" split-proportion="0.8280354">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="controller.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/controller.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="1284" column="45" lean-forward="false" selection-start-line="1284" selection-start-column="45" selection-end-line="1284" selection-end-column="45" />
+                  <folding>
+                    <element signature="e#28101#28629#0" expanded="false" />
+                    <element signature="e#29465#29789#0" expanded="false" />
+                    <element signature="e#31765#34969#0" expanded="false" />
+                    <element signature="e#35026#35164#0" expanded="false" />
+                    <element signature="e#35219#35259#0" expanded="false" />
+                    <element signature="e#35312#35351#0" expanded="false" />
+                    <element signature="e#35421#36019#0" expanded="false" />
+                    <element signature="e#36065#36099#0" expanded="false" />
+                    <element signature="e#36149#36647#0" expanded="false" />
+                    <element signature="e#36703#36921#0" expanded="false" />
+                    <marker date="1510304143702" expanded="true" signature="11450:13281" ph="..." />
+                    <marker date="1510304143702" expanded="true" signature="47501:47547" ph="..." />
+                    <marker date="1510304143702" expanded="true" signature="47501:47615" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="slicer.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/slicer.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="4930">
+                  <caret line="306" column="24" lean-forward="false" selection-start-line="306" selection-start-column="24" selection-end-line="306" selection-end-column="24" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="init.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/init.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="221">
+                  <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
           <file leaf-file-name="gcode.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/gcode.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                <state relative-caret-position="4420">
+                  <caret line="273" column="16" lean-forward="false" selection-start-line="273" selection-start-column="16" selection-end-line="273" selection-end-column="16" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="parameters.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/parameters.py">
+          <file leaf-file-name="sceneRender.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/sceneRender.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3009">
-                  <caret line="194" column="30" lean-forward="true" selection-start-line="194" selection-start-column="30" selection-end-line="194" selection-end-column="30" />
+                <state relative-caret-position="302">
+                  <caret line="711" column="17" lean-forward="true" selection-start-line="711" selection-start-column="17" selection-end-line="711" selection-end-column="17" />
                   <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="projectFile.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/projectFile.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="301">
-                  <caret line="181" column="36" lean-forward="true" selection-start-line="181" selection-start-column="36" selection-end-line="181" selection-end-column="36" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="controller.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/controller.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="420">
-                  <caret line="194" column="42" lean-forward="true" selection-start-line="194" selection-start-column="42" selection-end-line="194" selection-end-column="42" />
-                  <folding>
-                    <element signature="e#25617#25818#0" expanded="false" />
-                    <element signature="e#25916#26155#0" expanded="false" />
-                    <element signature="e#26255#26633#0" expanded="false" />
-                    <element signature="e#26706#27234#0" expanded="false" />
-                    <element signature="e#28070#28394#0" expanded="false" />
-                    <element signature="e#30370#33574#0" expanded="false" />
-                    <element signature="e#33631#33769#0" expanded="false" />
-                    <element signature="e#33824#33864#0" expanded="false" />
-                    <element signature="e#33917#33956#0" expanded="false" />
-                    <element signature="e#34026#34624#0" expanded="false" />
-                    <element signature="e#34670#34704#0" expanded="false" />
-                    <element signature="e#34754#35252#0" expanded="false" />
-                    <element signature="e#35308#35526#0" expanded="false" />
-                    <marker date="1505230320283" expanded="true" signature="11272:13103" ph="..." />
-                  </folding>
                 </state>
               </provider>
             </entry>
@@ -115,18 +122,8 @@
           <file leaf-file-name="gui.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/gui.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="360">
-                  <caret line="1553" column="33" lean-forward="true" selection-start-line="1553" selection-start-column="33" selection-end-line="1553" selection-end-column="33" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/main.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="119">
-                  <caret line="7" column="42" lean-forward="true" selection-start-line="7" selection-start-column="42" selection-end-line="7" selection-end-column="42" />
+                <state relative-caret-position="23001">
+                  <caret line="1355" column="32" lean-forward="false" selection-start-line="1355" selection-start-column="32" selection-end-line="1355" selection-end-column="32" />
                   <folding />
                 </state>
               </provider>
@@ -136,58 +133,41 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="sceneData.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/sceneData.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="233">
-                  <caret line="157" column="0" lean-forward="true" selection-start-line="157" selection-start-column="0" selection-end-line="157" selection-end-column="0" />
-                  <folding>
-                    <marker date="1505122549598" expanded="true" signature="29679:29781" ph="..." />
-                    <marker date="1505122549598" expanded="true" signature="30430:30532" ph="..." />
-                    <marker date="1505122549598" expanded="true" signature="59992:60097" ph="..." />
-                    <marker date="1505122549598" expanded="true" signature="60232:60245" ph="..." />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="controller.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/controller.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-                  <folding>
-                    <marker date="1505230320283" expanded="true" signature="11272:13103" ph="..." />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="slicer.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/slicer.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="349">
-                  <caret line="53" column="22" lean-forward="false" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="22" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="gui.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/gui.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="391">
-                  <caret line="27" column="0" lean-forward="true" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+                <state relative-caret-position="25381">
+                  <caret line="1495" column="49" lean-forward="false" selection-start-line="1495" selection-start-column="49" selection-end-line="1495" selection-end-column="49" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="my_stylesheet.qss" pinned="false" current-in-tab="true">
+          <file leaf-file-name="my_stylesheet.qss" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/data/my_stylesheet.qss">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="308">
-                  <caret line="724" column="54" lean-forward="true" selection-start-line="724" selection-start-column="54" selection-end-line="724" selection-end-column="54" />
+                <state relative-caret-position="136">
+                  <caret line="8" column="24" lean-forward="false" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="my_stylesheet_without_f.qss" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/data/my_stylesheet_without_f.qss">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="6188">
+                  <caret line="364" column="26" lean-forward="false" selection-start-line="364" selection-start-column="26" selection-end-line="364" selection-end-column="26" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="sceneRender.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/sceneRender.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="17">
+                  <caret line="710" column="26" lean-forward="false" selection-start-line="710" selection-start-column="26" selection-end-line="710" selection-end-column="26" />
                   <folding />
                 </state>
               </provider>
@@ -208,36 +188,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
+      <find>is_running</find>
+      <find>slice_engine</find>
+      <find>warni</find>
+      <find>set_gcode_help_button_pressed</find>
+      <find>reset_light</find>
       <find>reset</find>
-      <find>update_wipe_tower</find>
-      <find>tool</find>
-      <find>paste</find>
-      <find>bold</find>
-      <find>Increa</find>
-      <find>Everz</find>
-      <find>solubl</find>
-      <find>multi</find>
-      <find>scroll</find>
-      <find>soluble</find>
-      <find>solu</find>
-      <find>PrintingParameters</find>
-      <find>slice.</find>
-      <find>slice.suppo</find>
-      <find>slice.support_parameters</find>
-      <find>todo</find>
-      <find>ppri</find>
+      <find>multimater</find>
+      <find>read_in_realtime</find>
+      <find>multimateri</find>
+      <find>LINEAR</find>
+      <find>texture_from_png</find>
+      <find>event</find>
+      <find>help_win</find>
+      <find>load_gcode</find>
+      <find>gcode</find>
+      <find>gcode_help</find>
+      <find>dpi_coe</find>
       <find>right</find>
-      <find>scro</find>
-      <find>right_panel</find>
-      <find>Label</find>
-      <find>get_material</find>
-      <find>che</find>
-      <find>Gcode</find>
-      <find>Gcode preview</find>
-      <find>color_change_l</find>
-      <find>multim</find>
+      <find>rese</find>
+      <find>object</find>
+      <find>gcode_help_b</find>
+      <find>slice</find>
+      <find>progres</find>
+      <find>help</find>
       <find>color</find>
-      <find>settings</find>
+      <find>color_change_l</find>
+      <find>color_</find>
+      <find>self.color_change_l</find>
+      <find>G92 E0.0</find>
+      <find>\\nG92 E0.0</find>
     </findStrings>
     <dirStrings>
       <dir>C:\projects\prusacontrol_new</dir>
@@ -259,11 +239,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/data/materials_i3_mk2.json" />
-        <option value="$PROJECT_DIR$/.gcode" />
-        <option value="$PROJECT_DIR$/data/shader.vert" />
-        <option value="$PROJECT_DIR$/data/shader.frag" />
-        <option value="$PROJECT_DIR$/data/lightning.vert" />
         <option value="$PROJECT_DIR$/data/lightning.frag" />
         <option value="$PROJECT_DIR$/data/defaults.cfg" />
         <option value="$PROJECT_DIR$/data/combobox_light.css" />
@@ -279,7 +254,6 @@
         <option value="$PROJECT_DIR$/data/shaders/variable_height_slic3r.frag" />
         <option value="$PROJECT_DIR$/data_dev/prusacontrol_actual.json" />
         <option value="$PROJECT_DIR$/data_dev/prusacontrol_actual.info" />
-        <option value="$PROJECT_DIR$/version.txt" />
         <option value="$PROJECT_DIR$/data/my_stylesheet.css" />
         <option value="$PROJECT_DIR$/data/my_stylesheet_zaloha.qss" />
         <option value="$PROJECT_DIR$/rthook_pyqt4.py" />
@@ -293,23 +267,29 @@
         <option value="$PROJECT_DIR$/glButton.py" />
         <option value="$PROJECT_DIR$/init.py" />
         <option value="$PROJECT_DIR$/doc/translation" />
-        <option value="$PROJECT_DIR$/data/v.txt" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/doc/compilation" />
         <option value="$USER_HOME$/.prusacontrol/materials_i3_mk2.json" />
         <option value="$USER_HOME$/.prusacontrol/materials_i3_mk2mm.json" />
         <option value="$PROJECT_DIR$/PrusaControl_Win.spec" />
-        <option value="$PROJECT_DIR$/gcode.py" />
-        <option value="$PROJECT_DIR$/sceneRender.py" />
-        <option value="$PROJECT_DIR$/sceneData.py" />
-        <option value="$PROJECT_DIR$/slicer.py" />
-        <option value="$PROJECT_DIR$/projectFile.py" />
-        <option value="$PROJECT_DIR$/parameters.py" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/data/my_stylesheet.qss" />
-        <option value="$PROJECT_DIR$/data/my_stylesheet_without_f.qss" />
+        <option value="$PROJECT_DIR$/projectFile.py" />
+        <option value="$PROJECT_DIR$/data/materials_i3_mk2.json" />
+        <option value="$PROJECT_DIR$/data/printers.json" />
+        <option value="$PROJECT_DIR$/parameters.py" />
+        <option value="$PROJECT_DIR$/sceneData.py" />
+        <option value="$PROJECT_DIR$/gcode.py" />
+        <option value="$PROJECT_DIR$/data/materials_i3_mk3.json" />
+        <option value="$PROJECT_DIR$/slicer.py" />
         <option value="$PROJECT_DIR$/controller.py" />
         <option value="$PROJECT_DIR$/gui.py" />
+        <option value="$PROJECT_DIR$/data/my_stylesheet.qss" />
+        <option value="$PROJECT_DIR$/data/my_stylesheet_without_f.qss" />
+        <option value="$PROJECT_DIR$/data/materials_i3_mk2 (4).json" />
+        <option value="$PROJECT_DIR$/data/materials_i3_mk2 (6).json" />
+        <option value="$PROJECT_DIR$/sceneRender.py" />
+        <option value="$PROJECT_DIR$/version.txt" />
+        <option value="$PROJECT_DIR$/data/v.txt" />
       </list>
     </option>
   </component>
@@ -320,9 +300,9 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="width" value="1280" />
-    <option name="height" value="1092" />
+    <option name="x" value="-7" />
+    <option name="width" value="1294" />
+    <option name="height" value="1407" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -342,7 +322,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -359,14 +338,14 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/prusacontrol.profile" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../send_to_octoprint" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="618" />
@@ -388,15 +367,15 @@
     <property name="typescript-compiler-editor-notification" value="false" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\projects\prusacontrol_new\data\shaders" />
+      <recent name="C:\projects\prusacontrol_new\data\new_parameters" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\projects\prusacontrol_new\data" />
       <recent name="C:\projects\prusacontrol_new" />
       <recent name="C:\projects\prusacontrol_new\data\shaders" />
       <recent name="$PROJECT_DIR$" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\projects\prusacontrol_new\data\shaders" />
-      <recent name="C:\projects\prusacontrol_new\data\new_parameters" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -411,7 +390,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.Version">
     <configuration name="Unittests in PrusaControll" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -923,216 +902,6 @@
       <option name="presentableId" value="Default" />
       <updated>1450082551851</updated>
     </task>
-    <task id="LOCAL-00133" summary="revert some changes for speed up of reading gcode, be solved by other way...">
-      <created>1496648636060</created>
-      <option name="number" value="00133" />
-      <option name="presentableId" value="LOCAL-00133" />
-      <option name="project" value="LOCAL" />
-      <updated>1496648636063</updated>
-    </task>
-    <task id="LOCAL-00134" summary="Upraven buildovaci config tak aby vysledny build zabiral mene">
-      <created>1496652774817</created>
-      <option name="number" value="00134" />
-      <option name="presentableId" value="LOCAL-00134" />
-      <option name="project" value="LOCAL" />
-      <updated>1496652774817</updated>
-    </task>
-    <task id="LOCAL-00135" summary="doplnena podminka formatovani pro OsX a Windows">
-      <created>1496653196987</created>
-      <option name="number" value="00135" />
-      <option name="presentableId" value="LOCAL-00135" />
-      <option name="project" value="LOCAL" />
-      <updated>1496653196987</updated>
-    </task>
-    <task id="LOCAL-00136" summary="a jeste drobna chyba">
-      <created>1496653354732</created>
-      <option name="number" value="00136" />
-      <option name="presentableId" value="LOCAL-00136" />
-      <option name="project" value="LOCAL" />
-      <updated>1496653354732</updated>
-    </task>
-    <task id="LOCAL-00137" summary="jeste pridan exclude pro lib2to3">
-      <created>1496654636506</created>
-      <option name="number" value="00137" />
-      <option name="presentableId" value="LOCAL-00137" />
-      <option name="project" value="LOCAL" />
-      <updated>1496654636507</updated>
-    </task>
-    <task id="LOCAL-00138" summary="velka cistka">
-      <created>1496657585652</created>
-      <option name="number" value="00138" />
-      <option name="presentableId" value="LOCAL-00138" />
-      <option name="project" value="LOCAL" />
-      <updated>1496657585652</updated>
-    </task>
-    <task id="LOCAL-00139" summary="oprava color change">
-      <created>1496754019298</created>
-      <option name="number" value="00139" />
-      <option name="presentableId" value="LOCAL-00139" />
-      <option name="project" value="LOCAL" />
-      <updated>1496754019299</updated>
-    </task>
-    <task id="LOCAL-00140" summary="hodne drobnych uprav pro zverejneni repozitare, pridani licence a pod...">
-      <created>1496843288036</created>
-      <option name="number" value="00140" />
-      <option name="presentableId" value="LOCAL-00140" />
-      <option name="project" value="LOCAL" />
-      <updated>1496843288037</updated>
-    </task>
-    <task id="LOCAL-00141" summary="doplneno aktualni nastaveni pro preklady">
-      <created>1496848212551</created>
-      <option name="number" value="00141" />
-      <option name="presentableId" value="LOCAL-00141" />
-      <option name="project" value="LOCAL" />
-      <updated>1496848212551</updated>
-    </task>
-    <task id="LOCAL-00142" summary="Add info to readme.md file">
-      <created>1496919952891</created>
-      <option name="number" value="00142" />
-      <option name="presentableId" value="LOCAL-00142" />
-      <option name="project" value="LOCAL" />
-      <updated>1496919952891</updated>
-    </task>
-    <task id="LOCAL-00143" summary="Add key features to readme.md">
-      <created>1496920533831</created>
-      <option name="number" value="00143" />
-      <option name="presentableId" value="LOCAL-00143" />
-      <option name="project" value="LOCAL" />
-      <updated>1496920533831</updated>
-    </task>
-    <task id="LOCAL-00144" summary="add icons for osx platform">
-      <created>1496996498797</created>
-      <option name="number" value="00144" />
-      <option name="presentableId" value="LOCAL-00144" />
-      <option name="project" value="LOCAL" />
-      <updated>1496996498798</updated>
-    </task>
-    <task id="LOCAL-00145" summary="changes in code where is solving path of file dropped on osx platform(workaround on cocoa bug)">
-      <created>1497952715301</created>
-      <option name="number" value="00145" />
-      <option name="presentableId" value="LOCAL-00145" />
-      <option name="project" value="LOCAL" />
-      <updated>1497952715302</updated>
-    </task>
-    <task id="LOCAL-00146" summary="code clearing, add some small changes for same visual look on windows and osx, update of readme">
-      <created>1497964470854</created>
-      <option name="number" value="00146" />
-      <option name="presentableId" value="LOCAL-00146" />
-      <option name="project" value="LOCAL" />
-      <updated>1497964470854</updated>
-    </task>
-    <task id="LOCAL-00147" summary="add new icon format png(for linux version) and remove old icon and data_dev folder with old one">
-      <created>1498144436320</created>
-      <option name="number" value="00147" />
-      <option name="presentableId" value="LOCAL-00147" />
-      <option name="project" value="LOCAL" />
-      <updated>1498144436320</updated>
-    </task>
-    <task id="LOCAL-00148" summary="Add rules for creating new translations.">
-      <created>1499690985390</created>
-      <option name="number" value="00148" />
-      <option name="presentableId" value="LOCAL-00148" />
-      <option name="project" value="LOCAL" />
-      <updated>1499690985390</updated>
-    </task>
-    <task id="LOCAL-00149" summary="update documentation for creating binary bundle">
-      <created>1499764174619</created>
-      <option name="number" value="00149" />
-      <option name="presentableId" value="LOCAL-00149" />
-      <option name="project" value="LOCAL" />
-      <updated>1499764174624</updated>
-    </task>
-    <task id="LOCAL-00150" summary="delete of old and not actual event graph, redesign of documentation">
-      <created>1499764499679</created>
-      <option name="number" value="00150" />
-      <option name="presentableId" value="LOCAL-00150" />
-      <option name="project" value="LOCAL" />
-      <updated>1499764499679</updated>
-    </task>
-    <task id="LOCAL-00151" summary="add wipe tower and some rework for it">
-      <created>1501247328119</created>
-      <option name="number" value="00151" />
-      <option name="presentableId" value="LOCAL-00151" />
-      <option name="project" value="LOCAL" />
-      <updated>1501247328120</updated>
-    </task>
-    <task id="LOCAL-00152" summary="some debug of mm printing">
-      <created>1501495490998</created>
-      <option name="number" value="00152" />
-      <option name="presentableId" value="LOCAL-00152" />
-      <option name="project" value="LOCAL" />
-      <updated>1501495490999</updated>
-    </task>
-    <task id="LOCAL-00153" summary="solve bug with wipe tower on single material print, solve problem with gcode saving">
-      <created>1501512067147</created>
-      <option name="number" value="00153" />
-      <option name="presentableId" value="LOCAL-00153" />
-      <option name="project" value="LOCAL" />
-      <updated>1501512067147</updated>
-    </task>
-    <task id="LOCAL-00154" summary="add changes of gui for MM, new buttons and change of rendering">
-      <created>1501664653588</created>
-      <option name="number" value="00154" />
-      <option name="presentableId" value="LOCAL-00154" />
-      <option name="project" value="LOCAL" />
-      <updated>1501664653589</updated>
-    </task>
-    <task id="LOCAL-00155" summary="clearing of qss files">
-      <created>1501668248413</created>
-      <option name="number" value="00155" />
-      <option name="presentableId" value="LOCAL-00155" />
-      <option name="project" value="LOCAL" />
-      <updated>1501668248413</updated>
-    </task>
-    <task id="LOCAL-00156" summary="solve bug with creating copy of multipart model">
-      <created>1501683026787</created>
-      <option name="number" value="00156" />
-      <option name="presentableId" value="LOCAL-00156" />
-      <option name="project" value="LOCAL" />
-      <updated>1501683026789</updated>
-    </task>
-    <task id="LOCAL-00157" summary="change of drag and drop multiple files for multipart model, solve bug in reset of scene with wipe tower, disable copy wipe tower, lot of small changes with wipe tower and GUI">
-      <created>1501774814155</created>
-      <option name="number" value="00157" />
-      <option name="presentableId" value="LOCAL-00157" />
-      <option name="project" value="LOCAL" />
-      <updated>1501774814158</updated>
-    </task>
-    <task id="LOCAL-00158" summary="solve bug with change of printer model no change of material list in comboboxes">
-      <created>1502199590248</created>
-      <option name="number" value="00158" />
-      <option name="presentableId" value="LOCAL-00158" />
-      <option name="project" value="LOCAL" />
-      <updated>1502199590249</updated>
-    </task>
-    <task id="LOCAL-00159" summary="add texture to wipe tower with generative mapping, actualize size of wipe tower">
-      <created>1502458794005</created>
-      <option name="number" value="00159" />
-      <option name="presentableId" value="LOCAL-00159" />
-      <option name="project" value="LOCAL" />
-      <updated>1502458794005</updated>
-    </task>
-    <task id="LOCAL-00160" summary="automatic updating of wipe tower">
-      <created>1502707344951</created>
-      <option name="number" value="00160" />
-      <option name="presentableId" value="LOCAL-00160" />
-      <option name="project" value="LOCAL" />
-      <updated>1502707344952</updated>
-    </task>
-    <task id="LOCAL-00161" summary="change of GUI for multimaterial, add single mode and add some changes to logic of selecting printer settings">
-      <created>1502808073102</created>
-      <option name="number" value="00161" />
-      <option name="presentableId" value="LOCAL-00161" />
-      <option name="project" value="LOCAL" />
-      <updated>1502808073103</updated>
-    </task>
-    <task id="LOCAL-00162" summary="bug with filtrated printers list, add sorting">
-      <created>1502811119539</created>
-      <option name="number" value="00162" />
-      <option name="presentableId" value="LOCAL-00162" />
-      <option name="project" value="LOCAL" />
-      <updated>1502811119539</updated>
-    </task>
     <task id="LOCAL-00163" summary="solve problem with single material mode name of new gcode(wrong materials in suggested filename)">
       <created>1503308697985</created>
       <option name="number" value="00163" />
@@ -1266,7 +1035,217 @@
       <option name="project" value="LOCAL" />
       <updated>1505230119978</updated>
     </task>
-    <option name="localTasksCounter" value="182" />
+    <task id="LOCAL-00182" summary="small bug with single material mode switching">
+      <created>1505230568407</created>
+      <option name="number" value="00182" />
+      <option name="presentableId" value="LOCAL-00182" />
+      <option name="project" value="LOCAL" />
+      <updated>1505230568407</updated>
+    </task>
+    <task id="LOCAL-00183" summary="add scroll area">
+      <created>1505301626249</created>
+      <option name="number" value="00183" />
+      <option name="presentableId" value="LOCAL-00183" />
+      <option name="project" value="LOCAL" />
+      <updated>1505301626251</updated>
+    </task>
+    <task id="LOCAL-00184" summary="small cleanup for build on linux platform">
+      <created>1505317893546</created>
+      <option name="number" value="00184" />
+      <option name="presentableId" value="LOCAL-00184" />
+      <option name="project" value="LOCAL" />
+      <updated>1505317893582</updated>
+    </task>
+    <task id="LOCAL-00185" summary="add coding to xml project file">
+      <created>1505321185352</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
+      <option name="project" value="LOCAL" />
+      <updated>1505321185352</updated>
+    </task>
+    <task id="LOCAL-00186" summary="comment print of settings before slicing">
+      <created>1505380887033</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
+      <option name="project" value="LOCAL" />
+      <updated>1505380887033</updated>
+    </task>
+    <task id="LOCAL-00187" summary="update of version file">
+      <created>1505395058862</created>
+      <option name="number" value="00187" />
+      <option name="presentableId" value="LOCAL-00187" />
+      <option name="project" value="LOCAL" />
+      <updated>1505395058869</updated>
+    </task>
+    <task id="LOCAL-00188" summary="update of version file">
+      <created>1505463059024</created>
+      <option name="number" value="00188" />
+      <option name="presentableId" value="LOCAL-00188" />
+      <option name="project" value="LOCAL" />
+      <updated>1505463059025</updated>
+    </task>
+    <task id="LOCAL-00189" summary="update of version file and solve bug with german language label">
+      <created>1505464577993</created>
+      <option name="number" value="00189" />
+      <option name="presentableId" value="LOCAL-00189" />
+      <option name="project" value="LOCAL" />
+      <updated>1505464577993</updated>
+    </task>
+    <task id="LOCAL-00190" summary="update of version file">
+      <created>1505465534716</created>
+      <option name="number" value="00190" />
+      <option name="presentableId" value="LOCAL-00190" />
+      <option name="project" value="LOCAL" />
+      <updated>1505465534716</updated>
+    </task>
+    <task id="LOCAL-00191" summary="add save mechanism to proces of upgrading json files">
+      <created>1505492046979</created>
+      <option name="number" value="00191" />
+      <option name="presentableId" value="LOCAL-00191" />
+      <option name="project" value="LOCAL" />
+      <updated>1505492046979</updated>
+    </task>
+    <task id="LOCAL-00192" summary="update of version file">
+      <created>1505495016592</created>
+      <option name="number" value="00192" />
+      <option name="presentableId" value="LOCAL-00192" />
+      <option name="project" value="LOCAL" />
+      <updated>1505495016593</updated>
+    </task>
+    <task id="LOCAL-00193" summary="add coloring of gcode visualization for multimaterial print">
+      <created>1506002909100</created>
+      <option name="number" value="00193" />
+      <option name="presentableId" value="LOCAL-00193" />
+      <option name="project" value="LOCAL" />
+      <updated>1506002909100</updated>
+    </task>
+    <task id="LOCAL-00194" summary="change of model position offset to 0.25mm">
+      <created>1506956290000</created>
+      <option name="number" value="00194" />
+      <option name="presentableId" value="LOCAL-00194" />
+      <option name="project" value="LOCAL" />
+      <updated>1506956290001</updated>
+    </task>
+    <task id="LOCAL-00195" summary="clear of diacritics in models filename saved to .prusa file, Slic3r(wxWidgets) have bug with reading utf-8 filenames from zip file. This is workaround.">
+      <created>1508254052141</created>
+      <option name="number" value="00195" />
+      <option name="presentableId" value="LOCAL-00195" />
+      <option name="project" value="LOCAL" />
+      <updated>1508254052142</updated>
+    </task>
+    <task id="LOCAL-00196" summary="small bug with reading gcode(visualization of travel move as extrusion)">
+      <created>1508319157929</created>
+      <option name="number" value="00196" />
+      <option name="presentableId" value="LOCAL-00196" />
+      <option name="project" value="LOCAL" />
+      <updated>1508319157930</updated>
+    </task>
+    <task id="LOCAL-00197" summary="small bug created by visualisation of multimaterial gcode">
+      <created>1508339724842</created>
+      <option name="number" value="00197" />
+      <option name="presentableId" value="LOCAL-00197" />
+      <option name="project" value="LOCAL" />
+      <updated>1508339724842</updated>
+    </task>
+    <task id="LOCAL-00198" summary="bug with no internet, new exception handling">
+      <created>1508483921959</created>
+      <option name="number" value="00198" />
+      <option name="presentableId" value="LOCAL-00198" />
+      <option name="project" value="LOCAL" />
+      <updated>1508483921961</updated>
+    </task>
+    <task id="LOCAL-00199" summary="update of version file, add new printer model files, small change in gcode loader code">
+      <created>1508848187137</created>
+      <option name="number" value="00199" />
+      <option name="presentableId" value="LOCAL-00199" />
+      <option name="project" value="LOCAL" />
+      <updated>1508848187138</updated>
+    </task>
+    <task id="LOCAL-00200" summary="comment on wrong place make function invisible, stupid bug">
+      <created>1508921164095</created>
+      <option name="number" value="00200" />
+      <option name="presentableId" value="LOCAL-00200" />
+      <option name="project" value="LOCAL" />
+      <updated>1508921164096</updated>
+    </task>
+    <task id="LOCAL-00201" summary="add sorting of printer_types by sort key">
+      <created>1508942922967</created>
+      <option name="number" value="00201" />
+      <option name="presentableId" value="LOCAL-00201" />
+      <option name="project" value="LOCAL" />
+      <updated>1508942922967</updated>
+    </task>
+    <task id="LOCAL-00202" summary="add first item option for printer_type">
+      <created>1509010355877</created>
+      <option name="number" value="00202" />
+      <option name="presentableId" value="LOCAL-00202" />
+      <option name="project" value="LOCAL" />
+      <updated>1509010355877</updated>
+    </task>
+    <task id="LOCAL-00203" summary="solve problem with auto placing same model on heatbed after slicing">
+      <created>1509033316721</created>
+      <option name="number" value="00203" />
+      <option name="presentableId" value="LOCAL-00203" />
+      <option name="project" value="LOCAL" />
+      <updated>1509033316721</updated>
+    </task>
+    <task id="LOCAL-00204" summary="add blinking of program button in task bar after slicing is complete if window is inactive">
+      <created>1509034173937</created>
+      <option name="number" value="00204" />
+      <option name="presentableId" value="LOCAL-00204" />
+      <option name="project" value="LOCAL" />
+      <updated>1509034173937</updated>
+    </task>
+    <task id="LOCAL-00205" summary="update config files if in instalation folder is higher version">
+      <created>1509098400920</created>
+      <option name="number" value="00205" />
+      <option name="presentableId" value="LOCAL-00205" />
+      <option name="project" value="LOCAL" />
+      <updated>1509098400921</updated>
+    </task>
+    <task id="LOCAL-00206" summary="fix bugs: percent of generation, placing of one object, add color change to single mode of mmm print">
+      <created>1509912152852</created>
+      <option name="number" value="00206" />
+      <option name="presentableId" value="LOCAL-00206" />
+      <option name="project" value="LOCAL" />
+      <updated>1509912152853</updated>
+    </task>
+    <task id="LOCAL-00207" summary="fix bugs: add help screen for colorchange, some change on percent calculation, fix problem with cancelation of gcode generating">
+      <created>1509980378298</created>
+      <option name="number" value="00207" />
+      <option name="presentableId" value="LOCAL-00207" />
+      <option name="project" value="LOCAL" />
+      <updated>1509980378299</updated>
+    </task>
+    <task id="LOCAL-00208" summary="just disable colorchange help image in mm print">
+      <created>1509982477996</created>
+      <option name="number" value="00208" />
+      <option name="presentableId" value="LOCAL-00208" />
+      <option name="project" value="LOCAL" />
+      <updated>1509982477996</updated>
+    </task>
+    <task id="LOCAL-00209" summary="update version files">
+      <created>1509982562063</created>
+      <option name="number" value="00209" />
+      <option name="presentableId" value="LOCAL-00209" />
+      <option name="project" value="LOCAL" />
+      <updated>1509982562063</updated>
+    </task>
+    <task id="LOCAL-00210" summary="small changes in flow showing of help screen for colorchange">
+      <created>1510138601141</created>
+      <option name="number" value="00210" />
+      <option name="presentableId" value="LOCAL-00210" />
+      <option name="project" value="LOCAL" />
+      <updated>1510138601143</updated>
+    </task>
+    <task id="LOCAL-00211" summary="tweaking of small details of colorchange help screen, add actual printing settings">
+      <created>1510330985221</created>
+      <option name="number" value="00211" />
+      <option name="presentableId" value="LOCAL-00211" />
+      <option name="project" value="LOCAL" />
+      <updated>1510330985222</updated>
+    </task>
+    <option name="localTasksCounter" value="212" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1287,51 +1266,28 @@
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32840466" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32833466" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49727628" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17316693" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25814137" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.53822154" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.09451946" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49609983" sideWeight="0.5015886" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49609983" sideWeight="0.49841145" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1728201" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1584591" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.53967005" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.07545671" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.4918919" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30109206" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32975337" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39625585" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32962668" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30109206" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
     </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32840466" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32833466" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.119142175" sideWeight="0.5081081" order="4" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49727628" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42256808" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5385214" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12748213" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.4918919" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3011673" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295099" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39766538" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32975337" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -1366,61 +1322,41 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="change of drag and drop multiple files for multipart model, solve bug in reset of scene with wipe tower, disable copy wipe tower, lot of small changes with wipe tower and GUI" />
-    <MESSAGE value="solve bug with change of printer model no change of material list in comboboxes" />
-    <MESSAGE value="add texture to wipe tower with generative mapping, actualize size of wipe tower" />
-    <MESSAGE value="automatic updating of wipe tower" />
-    <MESSAGE value="change of GUI for multimaterial, add single mode and add some changes to logic of selecting printer settings" />
-    <MESSAGE value="bug with filtrated printers list, add sorting" />
-    <MESSAGE value="solve problem with single material mode name of new gcode(wrong materials in suggested filename)" />
-    <MESSAGE value="solve some problems with changing of printer model and single mode" />
-    <MESSAGE value="solve problem with reset scene with wipe tower" />
-    <MESSAGE value="solve problem with .prusa format-loading of multiparts objects make them single objects, reading extruder info too&#10;add compatible_with to material options to detect incompatible choice of materials in multimaterial print and write warning to user" />
-    <MESSAGE value="sove bug with placing of wipe tower" />
-    <MESSAGE value="add change of wipe tower, change of label for wipe tower size, add bold label for used extruders, add tooltip, add disable of menu when generating is hitted" />
-    <MESSAGE value="solve small problem with supports, add warning with collision of wipe tower and objects" />
-    <MESSAGE value="add sorting of objects, add blending wipe tower, add new combobox with objects names" />
-    <MESSAGE value="add new combobox for model selection" />
-    <MESSAGE value="redesign gcode read function, estimate time calculation for mm" />
-    <MESSAGE value="some changes of creating wipe tower and managing of her size, position etc..." />
-    <MESSAGE value="solve problem with gcode reading function" />
-    <MESSAGE value="lots of small bug fixtures, everything about multipart models and some small gui connection with wipe tower" />
-    <MESSAGE value="solve problem with multiplication of multipart models with copy function" />
-    <MESSAGE value="disable debug mode for reading gcode file" />
-    <MESSAGE value="some changes in GUI" />
-    <MESSAGE value="add sorting of models in groups by filename" />
-    <MESSAGE value="solve some visual bugs, update of special soluble support parameters if used soluble supports," />
-    <MESSAGE value="disable label in gcode group box" />
-    <option name="LAST_COMMIT_MESSAGE" value="disable label in gcode group box" />
+    <option name="LOCAL_CHANGES_DETAILS_PREVIEW_SHOWN" value="true" />
+    <MESSAGE value="small cleanup for build on linux platform" />
+    <MESSAGE value="add coding to xml project file" />
+    <MESSAGE value="comment print of settings before slicing" />
+    <MESSAGE value="update of version file and solve bug with german language label" />
+    <MESSAGE value="add save mechanism to proces of upgrading json files" />
+    <MESSAGE value="update of version file" />
+    <MESSAGE value="add coloring of gcode visualization for multimaterial print" />
+    <MESSAGE value="change of model position offset to 0.25mm" />
+    <MESSAGE value="clear of diacritics in models filename saved to .prusa file, Slic3r(wxWidgets) have bug with reading utf-8 filenames from zip file. This is workaround." />
+    <MESSAGE value="small bug with reading gcode(visualization of travel move as extrusion)" />
+    <MESSAGE value="small bug created by visualisation of multimaterial gcode" />
+    <MESSAGE value="bug with no internet, new exception handling" />
+    <MESSAGE value="update of version file, add new printer model files, small change in gcode loader code" />
+    <MESSAGE value="comment on wrong place make function invisible, stupid bug" />
+    <MESSAGE value="add sorting of printer_types by sort key" />
+    <MESSAGE value="add first item option for printer_type" />
+    <MESSAGE value="solve problem with auto placing same model on heatbed after slicing" />
+    <MESSAGE value="add blinking of program button in task bar after slicing is complete if window is inactive" />
+    <MESSAGE value="update config files if in instalation folder is higher version" />
+    <MESSAGE value="fix bugs: percent of generation, placing of one object, add color change to single mode of mmm print" />
+    <MESSAGE value="fix bugs: add help screen for colorchange, some change on percent calculation, fix problem with cancelation of gcode generating" />
+    <MESSAGE value="just disable colorchange help image in mm print" />
+    <MESSAGE value="update version files" />
+    <MESSAGE value="small changes in flow showing of help screen for colorchange" />
+    <MESSAGE value="tweaking of small details of colorchange help screen, add actual printing settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="tweaking of small details of colorchange help screen, add actual printing settings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/controller.py</url>
-          <line>2012</line>
-          <option name="timeStamp" value="63" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/controller.py</url>
-          <line>1880</line>
-          <option name="timeStamp" value="65" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="68" />
+      <option name="time" value="88" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data/img/scale_n.png" />
-    <entry file="file://$PROJECT_DIR$/data/img/select_ns.png" />
-    <entry file="file://$PROJECT_DIR$/data/img/placeonface.png" />
-    <entry file="file://$PROJECT_DIR$/data/img/tool_background.png" />
-    <entry file="file://$PROJECT_DIR$/data/img/gui/tool_mask.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/img/splashscreen.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -1436,24 +1372,10 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/printers.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="27" column="16" lean-forward="false" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/linux.spec" />
     <entry file="file://$PROJECT_DIR$/setup_osx.py" />
     <entry file="file://$PROJECT_DIR$/main_osx.py" />
     <entry file="file://$PROJECT_DIR$/utilities.py" />
-    <entry file="file://$PROJECT_DIR$/analyzer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/glButton.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -1469,13 +1391,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/version.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="11" lean-forward="false" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
@@ -1487,13 +1402,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="19" column="43" lean-forward="false" selection-start-line="19" selection-start-column="43" selection-end-line="19" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/v.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="24" lean-forward="false" selection-start-line="0" selection-start-column="24" selection-end-line="0" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -1551,13 +1459,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/init.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="18" lean-forward="false" selection-start-line="5" selection-start-column="18" selection-end-line="5" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/dev/Python/Python35/Lib/site-packages/numpy/linalg/linalg.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="37485">
@@ -1579,13 +1480,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/materials_i3_mk2.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1768">
-          <caret line="119" column="29" lean-forward="true" selection-start-line="119" selection-start-column="29" selection-end-line="119" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.prusacontrol/materials_i3_mk2.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
@@ -1593,13 +1487,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.prusacontrol/materials_i3_mk2mm.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="742" column="35" lean-forward="false" selection-start-line="742" selection-start-column="35" selection-end-line="742" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/.prusacontrol/materials_i3_mk2mm.json" />
     <entry file="file://$USER_HOME$/.prusacontrol/printers.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -1625,115 +1513,172 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="418">
           <caret line="1022" column="8" lean-forward="false" selection-start-line="1022" selection-start-column="8" selection-end-line="1022" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+    <entry file="file://$PROJECT_DIR$/analyzer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="527">
-          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="2601">
+          <caret line="156" column="70" lean-forward="false" selection-start-line="156" selection-start-column="70" selection-end-line="156" selection-end-column="70" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sceneData.py">
+    <entry file="file://C:/dev/Python/Python35/Lib/site-packages/urllib3/connectionpool.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
-          <caret line="157" column="0" lean-forward="true" selection-start-line="157" selection-start-column="0" selection-end-line="157" selection-end-column="0" />
-          <folding>
-            <marker date="1505122549598" expanded="true" signature="29679:29781" ph="..." />
-            <marker date="1505122549598" expanded="true" signature="30430:30532" ph="..." />
-            <marker date="1505122549598" expanded="true" signature="59992:60097" ph="..." />
-            <marker date="1505122549598" expanded="true" signature="60232:60245" ph="..." />
-          </folding>
+        <state relative-caret-position="585">
+          <caret line="837" column="25" lean-forward="false" selection-start-line="837" selection-start-column="25" selection-end-line="837" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/projectFile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="181" column="36" lean-forward="true" selection-start-line="181" selection-start-column="36" selection-end-line="181" selection-end-column="36" />
-          <folding />
+        <state relative-caret-position="583">
+          <caret line="51" column="12" lean-forward="false" selection-start-line="51" selection-start-column="12" selection-end-line="51" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/slicer.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="53" column="22" lean-forward="false" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="22" />
+        <state relative-caret-position="2584">
+          <caret line="166" column="0" lean-forward="false" selection-start-line="166" selection-start-column="0" selection-end-line="166" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parameters.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7565">
+          <caret line="465" column="0" lean-forward="false" selection-start-line="465" selection-start-column="0" selection-end-line="465" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="807" column="26" lean-forward="false" selection-start-line="807" selection-start-column="26" selection-end-line="807" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/materials_i3_mk2.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="50">
+          <caret line="2" column="18" lean-forward="false" selection-start-line="2" selection-start-column="15" selection-end-line="2" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/materials_i3_mk2mm.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="4" column="16" lean-forward="false" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/materials_i3_mk3.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="10" lean-forward="false" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/init.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gcode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="4420">
+          <caret line="273" column="16" lean-forward="false" selection-start-line="273" selection-start-column="16" selection-end-line="273" selection-end-column="16" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parameters.py">
+    <entry file="file://$PROJECT_DIR$/slicer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3009">
-          <caret line="194" column="30" lean-forward="true" selection-start-line="194" selection-start-column="30" selection-end-line="194" selection-end-column="30" />
+        <state relative-caret-position="4930">
+          <caret line="306" column="24" lean-forward="false" selection-start-line="306" selection-start-column="24" selection-end-line="306" selection-end-column="24" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/my_stylesheet_without_f.qss">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="54" column="26" lean-forward="true" selection-start-line="54" selection-start-column="26" selection-end-line="54" selection-end-column="26" />
+        <state relative-caret-position="6188">
+          <caret line="364" column="26" lean-forward="false" selection-start-line="364" selection-start-column="26" selection-end-line="364" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/my_stylesheet.qss">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="724" column="54" lean-forward="true" selection-start-line="724" selection-start-column="54" selection-end-line="724" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="42" lean-forward="true" selection-start-line="7" selection-start-column="42" selection-end-line="7" selection-end-column="42" />
+        <state relative-caret-position="136">
+          <caret line="8" column="24" lean-forward="false" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="1553" column="33" lean-forward="true" selection-start-line="1553" selection-start-column="33" selection-end-line="1553" selection-end-column="33" />
+        <state relative-caret-position="23001">
+          <caret line="1355" column="32" lean-forward="false" selection-start-line="1355" selection-start-column="32" selection-end-line="1355" selection-end-column="32" />
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/printers.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2533">
+          <caret line="149" column="581" lean-forward="false" selection-start-line="149" selection-start-column="570" selection-end-line="149" selection-end-column="581" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/materials_i3_mk2 (4).json" />
+    <entry file="file://$PROJECT_DIR$/data/materials_i3_mk2 (6).json" />
     <entry file="file://$PROJECT_DIR$/controller.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="194" column="42" lean-forward="true" selection-start-line="194" selection-start-column="42" selection-end-line="194" selection-end-column="42" />
+        <state relative-caret-position="0">
+          <caret line="1284" column="45" lean-forward="false" selection-start-line="1284" selection-start-column="45" selection-end-line="1284" selection-end-column="45" />
           <folding>
-            <element signature="e#25617#25818#0" expanded="false" />
-            <element signature="e#25916#26155#0" expanded="false" />
-            <element signature="e#26255#26633#0" expanded="false" />
-            <element signature="e#26706#27234#0" expanded="false" />
-            <element signature="e#28070#28394#0" expanded="false" />
-            <element signature="e#30370#33574#0" expanded="false" />
-            <element signature="e#33631#33769#0" expanded="false" />
-            <element signature="e#33824#33864#0" expanded="false" />
-            <element signature="e#33917#33956#0" expanded="false" />
-            <element signature="e#34026#34624#0" expanded="false" />
-            <element signature="e#34670#34704#0" expanded="false" />
-            <element signature="e#34754#35252#0" expanded="false" />
-            <element signature="e#35308#35526#0" expanded="false" />
-            <marker date="1505230320283" expanded="true" signature="11272:13103" ph="..." />
+            <element signature="e#28101#28629#0" expanded="false" />
+            <element signature="e#29465#29789#0" expanded="false" />
+            <element signature="e#31765#34969#0" expanded="false" />
+            <element signature="e#35026#35164#0" expanded="false" />
+            <element signature="e#35219#35259#0" expanded="false" />
+            <element signature="e#35312#35351#0" expanded="false" />
+            <element signature="e#35421#36019#0" expanded="false" />
+            <element signature="e#36065#36099#0" expanded="false" />
+            <element signature="e#36149#36647#0" expanded="false" />
+            <element signature="e#36703#36921#0" expanded="false" />
+            <marker date="1510304143702" expanded="true" signature="11450:13281" ph="..." />
+            <marker date="1510304143702" expanded="true" signature="47501:47547" ph="..." />
+            <marker date="1510304143702" expanded="true" signature="47501:47615" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/version.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="15" lean-forward="true" selection-start-line="9" selection-start-column="15" selection-end-line="9" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/v.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="24" lean-forward="true" selection-start-line="0" selection-start-column="24" selection-end-line="0" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sceneRender.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="302">
+          <caret line="711" column="17" lean-forward="true" selection-start-line="711" selection-start-column="17" selection-end-line="711" selection-end-column="17" />
+          <folding />
         </state>
       </provider>
     </entry>
