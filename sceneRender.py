@@ -870,19 +870,13 @@ class GLWidget(QGLWidget):
             if self.controller.app_config.system_platform in ['Darwin']:
                 font.setPointSize(19)
             else:
-                if self.controller.dpi_scale == 2:
-                    font.setPointSize(15 * self.controller.dpi_coef - self.controller.dpi_scale)
-                else:
-                    font.setPointSize(17 *self.controller.dpi_coef - self.controller.dpi_scale)
+                font.setPointSize(17 * self.controller.dpi_coef - self.controller.dpi_scale)
             self.renderText(position_x + 8, sH - position_y - size_h + 30, self.tr("PRINT INFO"), font)
 
             if self.controller.app_config.system_platform in ['Darwin']:
                 font.setPointSize(11)
             else:
-                if self.controller.dpi_scale == 2:
-                    font.setPointSize(7 * self.controller.dpi_coef - self.controller.dpi_scale)
-                else:
-                    font.setPointSize(9 *self.controller.dpi_coef - self.controller.dpi_scale)
+                font.setPointSize(9 * self.controller.dpi_coef - self.controller.dpi_scale)
 
             #header = '{:>20}{:>10}{:>14}'.format(' ', 'time:', 'filament:')
             #print(header)

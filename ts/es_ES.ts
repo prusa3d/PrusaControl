@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="es_ES" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="es_ES">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -17,7 +18,7 @@
     <name>AppScene</name>
     <message>
         <location filename="sceneData.py" line="312"/>
-        <source>&#xe2;&#x80;&#xa2; Object %s... is out of printable area!</source>
+        <source>â¢ Object %s... is out of printable area!</source>
         <translation type="obsolete">â¢ Objeto %s... fuera del área de impresión!</translation>
     </message>
 </context>
@@ -222,12 +223,12 @@
     <message>
         <location filename="sceneRender.py" line="722"/>
         <source>Add stops at specific layer heights where you can manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Add stops at specific layer heights where you can manually</translation>
     </message>
     <message>
         <location filename="sceneRender.py" line="724"/>
         <source>change filament. Learn more about Colorprint at prusaprinters.</source>
-        <translation type="unfinished"></translation>
+        <translation>change filament. Learn more about Colorprint at prusaprinters.org</translation>
     </message>
 </context>
 <context>
@@ -566,28 +567,28 @@
     </message>
     <message>
         <location filename="gui.py" line="1350"/>
-        <source>Undo<byte value="x9"/>Ctrl+Z</source>
-        <translation type="obsolete">Deshacer<byte value="x9"/>Ctrl+Z</translation>
+        <source>Undo	Ctrl+Z</source>
+        <translation type="obsolete">Deshacer	Ctrl+Z</translation>
     </message>
     <message>
         <location filename="gui.py" line="1351"/>
-        <source>Redo<byte value="x9"/>Ctrl+Y</source>
-        <translation type="obsolete">Rehacer<byte value="x9"/>Ctrl+Y</translation>
+        <source>Redo	Ctrl+Y</source>
+        <translation type="obsolete">Rehacer	Ctrl+Y</translation>
     </message>
     <message>
         <location filename="gui.py" line="1353"/>
-        <source>Copy<byte value="x9"/>Ctrl+C</source>
-        <translation type="obsolete">Copiar<byte value="x9"/>Ctrl+C</translation>
+        <source>Copy	Ctrl+C</source>
+        <translation type="obsolete">Copiar	Ctrl+C</translation>
     </message>
     <message>
         <location filename="gui.py" line="1354"/>
-        <source>Paste<byte value="x9"/>Ctrl+V</source>
-        <translation type="obsolete">Pegar<byte value="x9"/>Ctrl+V</translation>
+        <source>Paste	Ctrl+V</source>
+        <translation type="obsolete">Pegar	Ctrl+V</translation>
     </message>
     <message>
         <location filename="gui.py" line="1355"/>
-        <source>Delete<byte value="x9"/>Del</source>
-        <translation type="obsolete">Borrar<byte value="x9"/>Del</translation>
+        <source>Delete	Del</source>
+        <translation type="obsolete">Borrar	Del</translation>
     </message>
     <message>
         <location filename="gui.py" line="1697"/>

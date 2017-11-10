@@ -228,7 +228,7 @@
     <message>
         <location filename="sceneRender.py" line="724"/>
         <source>change filament. Learn more about Colorprint at prusaprinters.</source>
-        <translation>materiál. Více informací o Colorprintu na prusaprinters.</translation>
+        <translation>materiál. Více informací o Colorprintu na prusaprinters.org</translation>
     </message>
 </context>
 <context>
