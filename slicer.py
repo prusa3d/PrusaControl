@@ -51,6 +51,7 @@ class Slic3rEngineRunner(QObject):
     send_message = pyqtSignal(str)
     send_gcodedata = pyqtSignal(GCode)
 
+    #support parameters for soluble materials, list of parameters which will be used from soluble materials
     support_parameters = ["support_material_angle",
                             "support_material_buildplate_only",
                             "support_material_contact_distance",
@@ -65,7 +66,8 @@ class Slic3rEngineRunner(QObject):
                             "support_material_spacing",
                             "support_material_threshold",
                             "support_material_with_sheath",
-                            "support_material_xy_spacing"]
+                            "support_material_xy_spacing",
+                            "support_material_synchronize_layers"]
 
     multimaterial_spec_parameters = ["bridge_fan_speed",
                         "cooling",
