@@ -344,6 +344,9 @@ class Controller(QObject):
             if ret == QMessageBox.Yes:
                 self.open_web_browser(self.app_config.prusacontrol_update_page)
 
+    def actualize_extruders(self):
+        self.show_warning_if_used_materials_are_not_compatible()
+        self.actualize_extruder_set()
 
     def actualize_extruder_set(self):
         if self.is_multimaterial() and not self.is_single_material_mode():
@@ -857,10 +860,10 @@ class Controller(QObject):
 
 
         # find out which extruders are used and create filter it
-        used_extruders_tmp = set([m.extruder-1 for m in self.scene.get_models(with_wipe_tower=False)])
+        used_extruders_tmp = list(set([m.extruder-1 for m in self.scene.get_models(with_wipe_tower=False)]))
 
         if self.view.get_support_option() >=1 :
-            used_extruders_tmp.append(self.soluble_extruder)
+            used_extruders_tmp.append(self.soluble_extruder-1)
 
         used_extruders = [i in used_extruders_tmp for i in range(0,4)]
         #print(used_extruders_tmp)

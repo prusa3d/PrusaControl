@@ -1388,7 +1388,7 @@ class PrusaControlView(QMainWindow):
         #self.infillSlider.valueChanged.connect(self.controller.scene_was_changed)
         #self.supportCheckBox.clicked.connect(self.controller.scene_was_changed)
         #self.supportCombo.currentIndexChanged.connect(self.controller.scene_was_changed)
-        self.supportCombo.currentIndexChanged.connect(self.controller.actualize_extruder_set)
+        self.supportCombo.currentIndexChanged.connect(self.controller.actualize_extruders)
         self.brimCheckBox.clicked.connect(self.controller.scene_was_changed)
 
         #print("created all widgets")
