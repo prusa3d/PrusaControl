@@ -13,7 +13,7 @@ import sys
 import certifi
 import urllib3
 
-from configparser import ConfigParser, RawConfigParser
+from configparser import ConfigParser, RawConfigParser, MissingSectionHeaderError
 from copy import deepcopy
 from pprint import pprint
 
@@ -342,7 +342,11 @@ class AppParameters(object):
         #print(self.config_path)
 
 
-        self.config.read(self.config_path)
+        try:
+            self.config.read(self.config_path)
+        except MissingSectionHeaderError:
+            logging.error("Config file is corrupted, using default one!")
+
 
         self.first_run()
 
