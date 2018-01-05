@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QColor, QScrollArea, QLayout
+from PyQt4.QtGui import QColor, QScrollArea, QLayout, QAction, QMenu, QLineEdit, QFormLayout
 from PyQt4.QtGui import QColorDialog
 from PyQt4.QtGui import QStandardItem
 
@@ -241,7 +241,6 @@ class Gcode_slider(QWidget):
             return []
         else:
             return [i['value'] for i in self.points if not i['value'] == -1]
-
 
 
 class Spline_editor(QWidget):
@@ -616,6 +615,64 @@ class SettingsDialog(QDialog):
         data['automatic_placing'] = dialog.automatic_placing_checkbox.isChecked()
         data['analyze'] = dialog.analyze_checkbox.isChecked()
         data['automatic_update_parameters'] = dialog.update_parameters_checkbox.isChecked()
+        return (data, result == QDialog.Accepted)
+
+
+class NewOctoPrintDialog(QDialog):
+    def __init__(self, controller):
+        super(NewOctoPrintDialog, self).__init__(controller.view, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
+
+        self.controller = controller
+
+        layout = QFormLayout(self)
+
+        # nice widget for editing the date
+        self.name_label = QLabel(self.tr("Name"))
+        self.name_edit = QLineEdit()
+
+        self.ip_address_label = QLabel(self.tr("IP"))
+        self.ip_address_edit = QLineEdit()
+
+        self.apikey_label = QLabel(self.tr("ApiKey"))
+        self.apikey_edit = QLineEdit()
+
+        #self.username_label = QLabel(self.tr("User"))
+        #self.username_edit = QLineEdit()
+
+        #self.password_label = QLabel(self.tr("Password"))
+        #self.password_edit = QLineEdit()
+
+        layout.addRow(self.name_label, self.name_edit)
+        layout.addRow(self.ip_address_label, self.ip_address_edit)
+        layout.addRow(self.apikey_label, self.apikey_edit)
+        #layout.addRow(self.username_label, self.username_edit)
+        #layout.addRow(self.password_label, self.password_edit)
+
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+
+
+    @staticmethod
+    def get_settings_data(controller, ):
+        data = {}
+        dialog = NewOctoPrintDialog(controller)
+        dialog.setWindowTitle("New OctoPrint service")
+        result = dialog.exec_()
+
+        data['name'] = dialog.name_edit.text()
+        data['ip'] = dialog.ip_address_edit.text()
+        data['apikey'] = dialog.apikey_edit.text()
+        #data['user'] = dialog.username_edit.text()
+        #data['password'] = dialog.password_edit.text()
+
+
         return (data, result == QDialog.Accepted)
 
 
@@ -1265,7 +1322,29 @@ class PrusaControlView(QMainWindow):
         self.generateButton.clicked.connect(self.controller.generate_button_pressed)
         self.generateButton.setEnabled(False)
 
+        saveBWLayout = QHBoxLayout()
+        saveBWLayout.setSpacing(0)
+        self.saveMenuButton = QPushButton()
+        self.saveMenuButton.setObjectName("saveMenuButton")
+        self.saveButton = QPushButton(self.tr("Save G-Code"))
+        self.saveButton.setObjectName("saveButton")
+        self.saveButton.clicked.connect(self.controller.generate_button_pressed)
 
+        self.saveMenu = QMenu()
+        self.saveMenu.setObjectName("saveMenu")
+
+        #self.saveMenu.addActions(self.get_actual_action_list(self.saveButton))
+
+        self.update_actions_in_menu()
+        self.saveMenuButton.setMenu(self.saveMenu)
+
+        saveBWLayout.addWidget(self.saveButton)
+        saveBWLayout.addWidget(self.saveMenuButton)
+        saveBWLayout.setMargin(0)
+        self.saveBW = QWidget()
+        self.saveBW.setLayout(saveBWLayout)
+        self.saveBW.setObjectName('saveBW')
+        self.saveBW.setVisible(False)
 
         #self.right_panel_layout.setAlignment(Qt.AlignTop)
         printing_mm_parameters_layout = QGridLayout()
@@ -1324,6 +1403,7 @@ class PrusaControlView(QMainWindow):
         #self.right_panel_layout.addItem(QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
 
         self.right_panel_layout.addWidget(self.generateButton)
+        self.right_panel_layout.addWidget(self.saveBW)
         self.right_panel_layout.addWidget(self.progressBar)
         self.right_panel_layout.addWidget(self.gcode_back_b)
         self.right_panel_layout.addSpacerItem(QSpacerItem(0, 5, QSizePolicy.Minimum, QSizePolicy.Minimum))
@@ -1432,6 +1512,34 @@ class PrusaControlView(QMainWindow):
                 #print(scale* widget.maximumWidth())
                 #print(scale * widget.maximumHeight())
                 widget.setFixedSize((int)(scale * widget.maximumWidth()), (int)(scale * widget.maximumHeight()))
+
+    def update_actions_in_menu(self):
+        self.saveMenu.clear()
+        self.saveMenu.addActions(self.get_actual_action_list(self.saveButton))
+
+
+    def get_actual_action_list(self, button_widget):
+        actionList = []
+
+        action = QAction(self.tr("Save G-Code"), self)
+        action.triggered.connect(self.controller.generate_button_pressed)
+        actionList.append(action)
+
+        for address in self.controller.list_of_printing_services:
+            action_tmp = QAction("Print on %s" % address, self)
+            action_tmp.triggered.connect(self.make_action)
+            actionList.append(action_tmp)
+
+        action_tmp = QAction("Add OctoPrint", self)
+        action_tmp.triggered.connect(self.controller.add_new_octoprint)
+        actionList.append(action_tmp)
+
+        return actionList
+
+    def make_action(self):
+        sender = self.sender()
+        self.saveButton.setText(sender.text())
+        self.controller.set_print_on(sender.text())
 
 
     def open_color_pick_dialog1(self):
@@ -1821,6 +1929,19 @@ class PrusaControlView(QMainWindow):
 
         return msgBox.exec_()
 
+    def show_open_new_octoprint_dialog(self):
+        msgBox = QMessageBox(self)
+        msgBox.setObjectName("msgBox")
+        msgBox.setWindowTitle(self.tr("GCode is generated"))
+        msgBox.setText(self.tr("Scene is generated to GCode"))
+        msgBox.setInformativeText(self.tr("Do you want to close GCode preview and import new file?"))
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msgBox.setDefaultButton(QMessageBox.No)
+        msgBox.button(msgBox.Yes).setText(self.tr("Yes"))
+        msgBox.button(msgBox.No).setText(self.tr("No"))
+
+        return msgBox.exec_()
+
     def open_project_asking_dialog(self):
         msgBox = QMessageBox(self)
         msgBox.setObjectName("msgBox")
@@ -1893,6 +2014,9 @@ class PrusaControlView(QMainWindow):
         #self.progressBar.setAlignment(Qt.AlignCenter)
 
     def set_save_gcode_button(self):
+        self.saveBW.setVisible(True)
+
+        self.generateButton.setVisible(False)
         self.generateButton.setText(self.tr("Save G-Code"))
         self.generateButton.setToolTip(self.tr("Save generated gcode file"))
 
@@ -2539,6 +2663,7 @@ class PrusaControlView(QMainWindow):
         self.gcode_back_b.setVisible(False)
 
     def open_gcode_view(self):
+        self.update_actions_in_menu()
         self.set_save_gcode_button()
         self.object_group_box.setVisible(False)
         self.gcode_group_box.setVisible(True)
@@ -2558,6 +2683,8 @@ class PrusaControlView(QMainWindow):
     def close_gcode_view(self):
         self.gcode_group_box.setVisible(False)
         self.gcode_back_b.setVisible(False)
+        self.saveBW.setVisible(False)
+        self.generateButton.setVisible(True)
         self.progressBar.setVisible(True)
         self.object_group_box.setVisible(True)
         self.progressBar.setValue(0)
@@ -2565,7 +2692,9 @@ class PrusaControlView(QMainWindow):
         self.controller.view.update_scene()
 
 
-
+    def open_new_octoprint_dialog(self):
+        data, ok = NewOctoPrintDialog.get_settings_data(self.controller)
+        return data, ok
 
     def open_settings_dialog(self, editable=True):
         data, ok = SettingsDialog.get_settings_data(self.controller, editable, self.parent())

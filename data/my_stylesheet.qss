@@ -1,5 +1,5 @@
 
-.QWidget, .SettingsDialog, .AboutDialog, .QColorDialog {
+.QWidget, .SettingsDialog, .AboutDialog, .QColorDialog, .NewOctoPrintDialog {
     background-color:rgb(103, 103, 103);
     color:rgb(255, 255, 255);
     font-family: 'Titillium Web';
@@ -418,12 +418,82 @@ QSlider#spline_slider::groove:vertical{
     width: 17px;
 }
 
+QPushButton#saveMenuButton{
+    height: 27px;
+    max-width: 27px;
+    margin-right: 10px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background-color:rgb(255, 97, 0);
+}
+
+QPushButton#saveButton{
+    height: 27px;
+    font-family: 'Titillium Web';
+    font-size: 12px;
+    font-weight: bold;
+    color:rgb(255, 255, 255);
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    background-color:rgb(255, 97, 0);
+    margin-left: 30px;
+}
+
+
+QPushButton#saveMenuButton::menu-indicator{
+    image: url(base_dirdata/img/gui/arrow_dropdownmenu.png);
+    color:rgb(255, 255, 255);
+    background-color: transparent;
+    subcontrol-position: right center;
+    subcontrol-origin: padding;
+    left: -2px;
+}
+
+QMenu#saveMenu {
+    min-width: 150px;
+    max-width: 200px;
+    padding-right: 10px;
+    margin-right: 10px;
+    background-color:rgb(132, 132, 132);
+    selection-background-color: rgb(255, 97, 0);
+    selection-color: rgb(25, 25, 25);
+    color:rgb(0, 0, 0);
+    border-radius: 5px;
+    border: 1px solid rgb(110, 110, 110);
+    outline: 0px;
+}
+
+QMenu#saveMenu::item {
+    min-width: 150px;
+    max-width: 200px;
+    padding: 2px 25px 2px 20px;
+    margin-right: 10px;
+}
+
+QMenu#saveMenu::item:selected {
+    min-width: 150px;
+    max-width: 200px;
+    padding: 2px 25px 2px 20px;
+    margin-right: 10px;
+    background-color: rgb(255, 97, 0);
+    color: rgb(25, 25, 25);
+}
+
+
+QWidget#saveBW{
+    padding-left: 0px;
+    margin-right: 10px;
+    margin-left: 30px;
+    min-width: 75px;
+    height: 27px;
+}
 
 QPushButton#generateButton,
 QPushButton#gcode_back_b,
 QPushButton#basic_settings_b,
 QPushButton#advance_settings_b,
 SettingsDialog QPushButton,
+NewOctoPrintDialog QPushButton,
 AboutDialog QPushButton,
 QMessageBox#msgBox QPushButton,
 QColorDialog QPushButton

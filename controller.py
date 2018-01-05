@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #import json
+import json
 import logging
 
 #import functools
@@ -15,10 +16,12 @@ from shutil import copyfile, Error
 
 import numpy
 #import pyrr
+import urllib3
 from PyQt4.QtCore import QObject
 from PyQt4.QtCore import QTranslator, Qt, QPoint
 #from PyQt4 import QtGui
 from PyQt4.QtGui import QApplication
+from zeroconf import Zeroconf, ServiceBrowser, ServiceInfo
 
 import sceneData
 from analyzer import Analyzer
@@ -52,6 +55,44 @@ def timing(f):
         return ret
     return wrap
 
+
+class MyListener(object):
+
+    def __init__(self, controller):
+        pass
+        self.controller = controller
+
+    def remove_service(self, zeroconf, type, name):
+        print("Service %s removed" % (name,))
+        print("FIXME: Remove printer from dropdown menu here")
+        # self.controlview.printerCombo.removeItem(???) # FIXME: Remove the correct one
+        # Do we ever get remove_service notices when a printer is shut down?
+
+    def add_service(self, zeroconf, type, name):
+        info = zeroconf.get_service_info(type, name)
+        print("Service %s added, service info: %s" % (name, info))
+
+        # Try zeroconf cache first
+        info = ServiceInfo(type, name, properties = {})
+        for record in zeroconf.cache.entries_with_name(name.lower()):
+            info.update_record(zeroconf, time.time(), record)
+        for record in zeroconf.cache.entries_with_name(info.server):
+            info.update_record(zeroconf, time.time(), record)
+            if info.address and info.address[:2] != b'\xa9\xfe': # 169.254.x.x addresses are self-assigned; reject them
+                break
+        # Request more data if info from cache is not complete
+        if not info.address or not info.port:
+            info = zeroconf.get_service_info(type, name)
+            if not info:
+                print("Could not get information about %s" % name)
+                return
+        if info.address and info.port:
+            address = '.'.join(map(lambda n: str(n), info.address))
+
+        self.controller.list_of_printing_services.add(address)
+
+
+
 class Controller(QObject):
     def __init__(self, app, local_path='', progress_bar=None):
         super(Controller, self).__init__()
@@ -69,6 +110,15 @@ class Controller(QObject):
 
         self.analyzer = Analyzer(self)
         self.gcode = None
+
+        #looking for printing services
+        self.zeroconf = Zeroconf()
+        self.listener = MyListener(self)
+        self.browser = ServiceBrowser(self.zeroconf, "_octoprint._tcp.local.", self.listener)
+
+        self.default_printing_service = None
+        self.list_of_printing_services = set()
+        self.print_on_service = False
 
         self.printing_settings = {}
         self.settings = {}
@@ -398,6 +448,8 @@ class Controller(QObject):
 
 
     def exit_event(self):
+        self.zeroconf.close()
+
         if self.status in ['loading_gcode']:
             self.analyzer.cancel_analyz()
             self.gcode.cancel_parsing_gcode()
@@ -996,7 +1048,43 @@ class Controller(QObject):
             self.show_message_on_status_bar("")
         elif self.status == 'generated':
             #already generated
-            self.save_gcode_file()
+            if self.print_on_service:
+                self.print_on_actual_service()
+            else:
+                self.save_gcode_file()
+
+    def print_on_actual_service(self):
+        #TODO: Ask if prusacontrol dont have apikey for service, other way use one from file
+        apikey = 'CA54B5013E8C4C4B8BE6031F436133F5'
+
+        http = urllib3.PoolManager()
+
+        print("Printing on octoprint:")
+        url = "http://" + self.default_printing_service + '/api/files/local'
+        print("Sending to %s" % (url))
+
+        with open(self.app_config.tmp_place + 'out.gcode') as fp:
+            binary_data = fp.read()
+            print("Suggested gcode filename: " + self.generate_gcode_filename())
+            # TODO:Add check if printer is in use, denide to upload/print new thing
+            r = http.request('POST',
+                             url,
+                             fields={'file': ('%s.gcode' % self.generate_gcode_filename(), binary_data),
+                                     "command": "select", "print": 'true'},
+                             headers={'X-Api-Key': apikey})
+
+        #TODO:Add progress bar for uploading gcode to printer
+
+
+
+
+        print("Start sending gcode")
+        print("...")
+        #r = post(url, files=files)
+        print(str(r.status))
+        print("gcode recieved OK")
+        print("starting printing")
+        print("Printing on OctoPrint")
 
 
     def cancel_gcode_loading(self):
@@ -1176,6 +1264,24 @@ class Controller(QObject):
         self.save_project(filename_out)
         self.show_message_on_status_bar(self.view.tr("Project was saved"))
 
+    def set_print_on(self, printer_text):
+        printer_ip = printer_text.split(' ')[-1]
+        print("Printer IP: " + str(printer_ip))
+        self.default_printing_service = printer_ip
+        self.print_on_service = True
+
+    def add_new_octoprint(self):
+        print("show dialog for new octoprint service")
+        self.open_new_octoprint_dialog()
+        print("save octoprint settings")
+        print("add new settings to list")
+
+    def open_new_octoprint_dialog(self):
+        new_octoprint_settings, ret = self.view.open_new_octoprint_dialog()
+        if ret == QMessageBox.Yes:
+            return True
+        elif ret == QMessageBox.No:
+            return False
 
     def save_gcode_file(self):
         suggested_filename = self.generate_gcode_filename()
@@ -2425,6 +2531,8 @@ class Controller(QObject):
 
         self.actualize_extruder_set()
 
+    def find_network_printers(self):
+        pass
 
 
     def open_file(self, url):
