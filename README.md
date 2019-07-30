@@ -1,4 +1,4 @@
-# PrusaControl
+# PrusaControl is deprecated
 
 PrusaControl is an alternative user interface for Slic3r Prusa Edition. With focus to be easy to use, novice friendly, multi-language and with auto updated printing settings. Just load stl file, select material and press generate button.
 
@@ -14,6 +14,8 @@ PrusaControl is an alternative user interface for Slic3r Prusa Edition. With foc
 
 Some features are still in development
 
+Video:
+[![](http://img.youtube.com/vi/YYqVhhM7XIc/0.jpg)](http://www.youtube.com/watch?v=YYqVhhM7XIc "")
 
 
 ### Dependencies (tested version)
